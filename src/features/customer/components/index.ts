@@ -1,3 +1,13 @@
 export { BookingStatusTimeline } from "./booking-status-timeline";
+export { BookingSummaryCard } from "./booking-summary-card";
+export { BookNowButton } from "./book-now-button";
+export { HowItWorksPanel } from "./how-it-works-panel";
+export { LandingHero } from "./landing-hero";
+export { OcrEditField } from "./ocr-edit-field";
+export { PayButton } from "./pay-button";
+export { PaymentCheckButton } from "./payment-check-button";
 export { PhotoUploadField } from "./photo-upload-field";
+export { QrErrorState } from "./qr-error-state";
+export { StarRating } from "./star-rating";
+export { StatusHero } from "./status-hero";
 export { WhatsAppSupportWidget } from "./whatsapp-support-widget";

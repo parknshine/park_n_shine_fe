@@ -10,13 +10,25 @@ interface PayButtonProps {
   signedToken: string;
   plateText: string;
   slotText: string;
+  labels?: {
+    pay: string;
+    processing: string;
+    errorFallback: string;
+  };
 }
+
+const DEFAULT_LABELS = {
+  pay: "Bayar Sekarang",
+  processing: "Memproses...",
+  errorFallback: "Gagal memproses pembayaran. Coba lagi.",
+};
 
 export function PayButton({
   bookingId,
   signedToken,
   plateText,
   slotText,
+  labels = DEFAULT_LABELS,
 }: PayButtonProps) {
   const { canSubmit, confirmAndRedirect, error, isSubmitting } =
     usePaymentAction(bookingId, signedToken);
@@ -27,7 +39,7 @@ export function PayButton({
         <Alert variant="destructive">
           <AlertDescription>
             {error === "payment_confirm_failed"
-              ? "Gagal memproses pembayaran. Coba lagi."
+              ? labels.errorFallback
               : error}
           </AlertDescription>
         </Alert>
@@ -41,10 +53,10 @@ export function PayButton({
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Memproses...
+            {labels.processing}
           </>
         ) : (
-          "Bayar Sekarang"
+          labels.pay
         )}
       </Button>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import type * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 import type { ButtonVariant, ButtonSize } from "@/types";
@@ -28,41 +28,40 @@ export interface ButtonProps
   prefix?: React.ReactNode;
   /** Element rendered after the button label (icon, badge, etc.) */
   suffix?: React.ReactNode;
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      className,
-      variant = "default",
-      size = "md",
-      asChild = false,
-      prefix,
-      suffix,
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    const Comp = asChild ? Slot : "button";
+export function Button({
+  className,
+  variant = "default",
+  size = "md",
+  asChild = false,
+  prefix,
+  suffix,
+  children,
+  ref,
+  ...props
+}: ButtonProps) {
+  const baseClass = cn(
+    "inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+    variantClasses[variant],
+    sizeClasses[size],
+    className
+  );
+
+  if (asChild) {
     return (
-      <Comp
-        ref={ref}
-        className={cn(
-          "inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-          variantClasses[variant],
-          sizeClasses[size],
-          className
-        )}
-        {...props}
-      >
-        {prefix && <span className="shrink-0">{prefix}</span>}
+      <Slot ref={ref} className={baseClass} {...props}>
         {children}
-        {suffix && <span className="shrink-0">{suffix}</span>}
-      </Comp>
+      </Slot>
     );
   }
-);
-Button.displayName = "Button";
 
-export { Button };
+  return (
+    <button ref={ref} className={baseClass} {...props}>
+      {prefix && <span className="shrink-0">{prefix}</span>}
+      {children}
+      {suffix && <span className="shrink-0">{suffix}</span>}
+    </button>
+  );
+}

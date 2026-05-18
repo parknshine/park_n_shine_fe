@@ -48,13 +48,11 @@ export function PhotoUploadField({
         <label htmlFor={id} className="text-sm font-semibold text-foreground">
           {label}
         </label>
-        <Button
-          asChild
-          size="sm"
-          variant="outline"
-          prefix={<Camera className="h-4 w-4" />}
-        >
-          <label htmlFor={id}>{actionLabel}</label>
+        <Button asChild size="sm" variant="outline">
+          <label htmlFor={id} className="inline-flex items-center gap-1.5">
+            <Camera className="h-4 w-4 shrink-0" />
+            {actionLabel}
+          </label>
         </Button>
       </div>
 

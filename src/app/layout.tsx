@@ -52,6 +52,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Blocking theme-init: runs before hydration to prevent dark-mode flash.
+            React 19 warns about <script> on SPA navigation — safe to ignore here
+            because ThemeProvider handles subsequent navigations via DOM class. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');var dark=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(dark)document.documentElement.classList.add('dark')}catch(e){}})()`,

@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 interface PaymentCheckButtonProps {
   onCheck: () => void;
   delayMs?: number;
+  label?: string;
 }
 
 export function PaymentCheckButton({
   onCheck,
   delayMs = 30_000,
+  label = "Cek Status Pembayaran",
 }: PaymentCheckButtonProps) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -30,7 +32,7 @@ export function PaymentCheckButton({
       prefix={<RefreshCw className="h-4 w-4" />}
       onClick={onCheck}
     >
-      Cek Status Pembayaran
+      {label}
     </Button>
   );
 }
