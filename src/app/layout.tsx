@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Toaster } from "@/components/toaster";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Toaster } from "@/components/providers/toaster";
+import { PwaProvider } from "@/components/providers/pwa-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +17,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js Base Template",
-  description: "Next.js · Tailwind CSS · React Hook Form · Axios · Zustand · Immer · Radix UI",
+  title: {
+    default: "Park & Shine",
+    template: "%s | Park & Shine",
+  },
+  description:
+    "Waterless car wash PWA for booking, crew operations, and site supervision.",
+  applicationName: "Park & Shine",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Park & Shine",
+  },
+  icons: {
+    icon: "/icons/icon.svg",
+    apple: "/icons/icon.svg",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0d9488",
+  colorScheme: "light dark",
+  minimumScale: 1,
+  initialScale: 1,
+  width: "device-width",
 };
 
 export default function RootLayout({
@@ -27,7 +51,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* Anti-FOUC: apply theme class before first paint */}
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -35,27 +58,13 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
-          {/* Navbar */}
-          <header className="fixed inset-x-0 top-0 z-50 flex h-14 items-center border-b border-border bg-background/80 px-6 backdrop-blur-md">
-            <div className="mx-auto flex w-full max-w-2xl items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                <span className="text-sm font-semibold text-foreground">
-                  Next.js Starter
-                </span>
-              </div>
-              <ThemeToggle />
-            </div>
-          </header>
-
-          {/* Page content — offset by navbar height */}
-          <div className="pt-14">{children}</div>
-
-          <Toaster />
+          <QueryProvider>
+            {children}
+            <Toaster />
+            <PwaProvider />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

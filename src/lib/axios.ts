@@ -1,4 +1,9 @@
 import axios from "axios";
+import {
+  API_ERROR_CODES,
+  ApiContractError,
+  normalizeApiError,
+} from "@/lib/api-error";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "/api",
@@ -26,14 +31,20 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const normalizedError = normalizeApiError(error);
+
+    if (
+      normalizedError.httpStatus === 401 &&
+      normalizedError.code !== API_ERROR_CODES.BOOKING_TOKEN_INVALID
+    ) {
       // Handle unauthorised — e.g. redirect to login
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
     }
-    return Promise.reject(error);
+    return Promise.reject(normalizedError);
   }
 );
 
+export { ApiContractError };
 export default api;

@@ -1,20 +1,21 @@
-// ─── API ──────────────────────────────────────────────────────────────────────
+export type {
+  ApiErrorResponse,
+  ApiFieldError,
+  ApiListResponse,
+  ApiMeta,
+  ApiPaginatedResponse,
+  ApiPaginationMeta,
+  ApiResponse,
+  ApiResponseCode,
+  ApiSuccessResponse,
+} from "@/lib/api-response";
 
-export interface ApiResponse<T> {
-  data: T;
-  message: string;
-  success: boolean;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+export type {
+  ApiErrorCode,
+  ApiErrorDefinition,
+  ApiErrorSeverity,
+  ApiErrorSurface,
+} from "@/lib/api-error";
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 

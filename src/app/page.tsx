@@ -19,6 +19,7 @@ import {
   DialogTitle, DialogDescription, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Combobox } from "@/components/ui/combobox";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useAuthStore } from "@/store";
 import toast from "react-hot-toast";
 
@@ -47,7 +48,18 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="mx-auto max-w-2xl px-6 pb-20 pt-12">
+      <header className="fixed inset-x-0 top-0 z-50 flex h-14 items-center border-b border-border bg-background/80 px-6 backdrop-blur-md">
+        <div className="mx-auto flex w-full max-w-2xl items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-primary" />
+            <span className="text-sm font-semibold text-foreground">
+              Next.js Starter
+            </span>
+          </div>
+          <ThemeToggle />
+        </div>
+      </header>
+      <main className="mx-auto max-w-2xl px-6 pb-20 pt-12 mt-14">
 
         {/* ── Hero ─────────────────────────────────────────────── */}
         <div className="mb-14 text-center">
