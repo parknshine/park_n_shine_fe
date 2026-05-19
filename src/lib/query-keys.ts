@@ -24,7 +24,9 @@ export const mutationKeys = {
   crew: {
     checklist: (jobId: string) => ["crew", "job", jobId, "checklist"] as const,
     login: () => ["crew", "sessions"] as const,
+    media: (jobId: string) => ["crew", "job", jobId, "media"] as const,
     nextJob: () => ["crew", "jobs", "next"] as const,
+    verifyPlate: (jobId: string) => ["crew", "job", jobId, "verify"] as const,
   },
   customer: {
     confirmPayment: (bookingId: string) =>

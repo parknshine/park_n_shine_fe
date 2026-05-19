@@ -56,6 +56,10 @@ export default function BookingStatusPage() {
 
   const isPending = booking.status === BOOKING_STATUSES.PENDING;
   const isReady = booking.status === BOOKING_STATUSES.READY;
+  const isNeedsHelp = booking.status === BOOKING_STATUSES.NEEDS_HELP;
+
+  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "6281234567890";
+  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Halo Park & Shine, saya butuh bantuan dengan booking saya (ID: ${bookingId}).`)}`;
 
   return (
     <div className="mx-auto max-w-md space-y-6 px-4 py-8">
@@ -86,6 +90,22 @@ export default function BookingStatusPage() {
           >
             Beri Rating
           </Link>
+        </div>
+      )}
+
+      {isNeedsHelp && (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Tim kami sedang menghubungi supervisor untuk membantu. Silakan hubungi kami jika butuh bantuan segera.
+          </p>
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-8 py-3 text-sm font-semibold text-white transition-opacity hover:bg-emerald-600"
+          >
+            Hubungi via WhatsApp
+          </a>
         </div>
       )}
 

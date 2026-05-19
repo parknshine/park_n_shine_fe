@@ -1,4 +1,5 @@
 import type { StatusBadgeTone } from "@/components/shared";
+import type { MediaKind } from "@/types/media";
 
 export const BOOKING_STATUSES = {
   DRAFT: "DRAFT",
@@ -41,7 +42,7 @@ export interface SiteQrResolution {
 
 export interface BookingMedia {
   id: string;
-  kind: "plate" | "slot" | "before" | "after";
+  kind: MediaKind;
   url: string;
   ocrText?: string | null;
 }

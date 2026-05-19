@@ -5,19 +5,25 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { BookingMedia, UploadState } from "@/features/customer/types";
+import type { MediaKind } from "@/types/media";
 
 const MAX_IMAGE_BYTES = 500 * 1024;
 const DEFAULT_RETRY_DELAYS = [500, 1_000, 2_000];
 
 interface UsePhotoUploadOptions {
-  bookingId: string;
+  bookingId?: string;
   signedToken?: string;
   retryDelaysMs?: number[];
+  /**
+   * When provided, POST to this URL directly instead of building from bookingId.
+   * Used by crew pages that upload to /v1/crew/jobs/{jobId}/media.
+   */
+  uploadUrl?: string;
 }
 
 interface UploadPhotoOptions {
   file: File;
-  kind: BookingMedia["kind"];
+  kind: MediaKind;
 }
 
 async function compressImage(file: File): Promise<File> {
@@ -86,6 +92,7 @@ export function usePhotoUpload({
   bookingId,
   signedToken,
   retryDelaysMs = DEFAULT_RETRY_DELAYS,
+  uploadUrl,
 }: UsePhotoUploadOptions) {
   const queryClient = useQueryClient();
   const [state, setState] = useState<UploadState>({
@@ -94,6 +101,11 @@ export function usePhotoUpload({
     error: null,
     media: null,
   });
+
+  const endpoint = uploadUrl ?? `/v1/bookings/${bookingId}/media`;
+  const mutKey = bookingId
+    ? mutationKeys.customer.media(bookingId)
+    : mutationKeys.crew.media(uploadUrl ?? "");
 
   const mutation = useMutation({
     meta: { persist: false },
@@ -112,7 +124,7 @@ export function usePhotoUpload({
           }));
 
           const response = await api.post<BookingMedia>(
-            `/v1/bookings/${bookingId}/media`,
+            endpoint,
             formData,
             {
               headers: {
@@ -156,11 +168,13 @@ export function usePhotoUpload({
 
       return null;
     },
-    mutationKey: mutationKeys.customer.media(bookingId),
+    mutationKey: mutKey,
     onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.customer.booking(bookingId),
-      });
+      if (bookingId) {
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.customer.booking(bookingId),
+        });
+      }
     },
   });
 

@@ -22,14 +22,14 @@ interface StatusHeroProps {
 const STATUS_LABELS: Record<BookingStatus, string> = {
   DRAFT: "Menunggu",
   PENDING: "Menunggu Pembayaran",
-  PAID: "Pembayaran Diterima",
-  ASSIGNED: "Menunggu Tim",
-  IN_PROGRESS: "Sedang Dicuci",
-  READY: "Mobil Siap!",
+  PAID: "Antrian — Menunggu crew",
+  ASSIGNED: "Crew dalam perjalanan",
+  IN_PROGRESS: "Sedang dicuci",
+  READY: "Mobil Anda sudah bersih!",
   CLOSED: "Selesai",
-  EXPIRED: "Kadaluarsa",
-  CANCELLED: "Dibatalkan",
-  NEEDS_HELP: "Butuh Bantuan",
+  EXPIRED: "Booking kadaluarsa",
+  CANCELLED: "Booking dibatalkan",
+  NEEDS_HELP: "Kami membutuhkan info lebih lanjut",
   STALE: "Tidak Aktif",
 };
 

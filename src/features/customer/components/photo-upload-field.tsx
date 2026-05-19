@@ -3,14 +3,15 @@
 import { Camera, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/shared";
-import type { BookingMedia, UploadState } from "@/features/customer/types";
+import type { UploadState } from "@/features/customer/types";
+import type { MediaKind } from "@/types/media";
 
 interface PhotoUploadFieldProps {
   id: string;
   label: string;
-  kind: BookingMedia["kind"];
+  kind: MediaKind;
   state: UploadState;
-  onSelect: (file: File, kind: BookingMedia["kind"]) => void;
+  onSelect: (file: File, kind: MediaKind) => void;
   onRetry?: () => void;
   labels?: {
     retry: string;

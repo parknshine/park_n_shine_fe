@@ -7,6 +7,7 @@ import type { CrewLoginPayload, CrewSession } from "@/features/crew/types";
 
 export function useCrewSession() {
   const queryClient = useQueryClient();
+
   const sessionQuery = useQuery<CrewSession | null>({
     enabled: false,
     initialData: null,
@@ -23,6 +24,7 @@ export function useCrewSession() {
     },
     mutationKey: mutationKeys.crew.login(),
     onSuccess: (session) => {
+      localStorage.setItem("token", session.token);
       queryClient.setQueryData(queryKeys.crew.session(), session);
     },
   });
@@ -32,6 +34,7 @@ export function useCrewSession() {
   }
 
   function clearSession() {
+    localStorage.removeItem("token");
     queryClient.removeQueries({ queryKey: queryKeys.crew.session() });
   }
 

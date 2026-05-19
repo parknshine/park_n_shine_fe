@@ -39,7 +39,7 @@ api.interceptors.response.use(
     ) {
       // Handle unauthorised — e.g. redirect to login
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        window.location.href = "/crew/login";
       }
     }
     return Promise.reject(normalizedError);

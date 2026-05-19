@@ -6,6 +6,7 @@ export interface CrewSession {
   crewName: string;
   siteId: string;
   expiresAt: string;
+  token: string;
 }
 
 export interface CrewLoginPayload {
@@ -21,6 +22,7 @@ export interface CrewJob {
   slotText: string;
   assignedAt?: string | null;
   etaEndsAt?: string | null;
+  supervisorPhone: string;
   media: BookingMedia[];
   checklist: WashChecklistItem[];
 }
