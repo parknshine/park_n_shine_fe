@@ -94,7 +94,7 @@ export default function ReportsPage() {
             type="date"
             value={to}
             min={from}
-            max={today}
+            max={toISODate(new Date())}
             onChange={(e) => setTo(e.target.value)}
             className="w-40"
           />

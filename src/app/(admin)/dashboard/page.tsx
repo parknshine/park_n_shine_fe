@@ -51,7 +51,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Escalations */}
-      {queue && queue.escalations.length > 0 && (
+      {queue && queue.escalations?.length > 0 && (
         <EscalationsPanel
           bookings={queue.escalations}
           title={`Eskalasi — ${queue.escalations.length} booking butuh perhatian`}
@@ -59,7 +59,7 @@ export default function DashboardPage() {
       )}
 
       {/* Queue groups */}
-      {queue && queue.groups.length > 0 ? (
+      {queue && queue.groups?.length > 0 ? (
         <div className="space-y-4">
           {queue.groups.map((group) => (
             <AdminQueueGroup

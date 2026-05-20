@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
 interface Toast {
@@ -30,11 +31,15 @@ interface UIActions {
 }
 
 export const useUIStore = create<UIState & UIActions>()(
+  persist(
   immer((set) => ({
     toasts: [],
     isSidebarOpen: true,
-    activeSiteId: null,
-    sites: [],
+    activeSiteId: "site-1",
+    sites: [
+      { id: "site-1", name: "Site Thamrin" },
+      { id: "site-2", name: "Site Sudirman" },
+    ],
 
     addToast: (toast) =>
       set((state) => {
@@ -65,5 +70,12 @@ export const useUIStore = create<UIState & UIActions>()(
       set((state) => {
         state.sites = sites;
       }),
-  }))
-);
+  })),
+  {
+    name: "ui",
+    partialize: (state) => ({
+      activeSiteId: state.activeSiteId,
+      sites: state.sites,
+    }),
+  }
+));

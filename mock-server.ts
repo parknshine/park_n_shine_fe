@@ -160,6 +160,69 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     adminEmail: "admin@park-shine.com",
     createdAt: new Date(Date.now() - 1800_000).toISOString(),
   },
+  {
+    id: "audit-4",
+    bookingId: "bk-seed-4",
+    plateText: "F 1111 CC",
+    action: "status_override",
+    detail: "PAID → CANCELLED",
+    adminEmail: "admin@park-shine.com",
+    createdAt: new Date(Date.now() - 5400_000).toISOString(),
+  },
+  {
+    id: "audit-5",
+    bookingId: "bk-seed-5",
+    plateText: "B 2222 DD",
+    action: "reassign",
+    detail: "Reassigned to Budi Santoso",
+    adminEmail: "supervisor@park-shine.com",
+    createdAt: new Date(Date.now() - 900_000).toISOString(),
+  },
+  {
+    id: "audit-6",
+    bookingId: "bk-seed-8",
+    plateText: "B 5555 GG",
+    action: "status_override",
+    detail: "PENDING → PAID",
+    adminEmail: "admin@park-shine.com",
+    createdAt: new Date(Date.now() - 10800_000).toISOString(),
+  },
+  {
+    id: "audit-7",
+    bookingId: "bk-seed-6",
+    plateText: "D 3333 EE",
+    action: "refund",
+    detail: "Partial refund — Rp 20.000",
+    adminEmail: "supervisor@park-shine.com",
+    createdAt: new Date(Date.now() - 300_000).toISOString(),
+  },
+  {
+    id: "audit-8",
+    bookingId: "bk-seed-9",
+    plateText: "D 6666 HH",
+    action: "reassign",
+    detail: "Reassigned to Rudi Hartono",
+    adminEmail: "admin@park-shine.com",
+    createdAt: new Date(Date.now() - 2700_000).toISOString(),
+  },
+  {
+    id: "audit-9",
+    bookingId: "bk-seed-7",
+    plateText: "B 4444 FF",
+    action: "status_override",
+    detail: "PAID → CANCELLED",
+    adminEmail: "admin@park-shine.com",
+    createdAt: new Date(Date.now() - 14400_000).toISOString(),
+  },
+  {
+    id: "audit-10",
+    bookingId: "bk-seed-10",
+    plateText: "B 7777 II",
+    action: "reassign",
+    detail: "Reassigned to Budi Santoso",
+    adminEmail: "supervisor@park-shine.com",
+    createdAt: new Date(Date.now() - 600_000).toISOString(),
+  },
 ];
 
 const adminSettings = new Map<string, MockAdminSettings>([
@@ -167,35 +230,64 @@ const adminSettings = new Map<string, MockAdminSettings>([
   ["site-2", { siteId: "site-2", staleJobTimeoutMinutes: 20 }],
 ]);
 
+// Build a realistic statusHistory chain up to `currentStatus`
+function buildStatusHistory(currentStatus: BookingStatus, baseOffsetMs: number) {
+  const chain: BookingStatus[] = ["DRAFT", "PENDING", "PAID", "ASSIGNED", "IN_PROGRESS", "READY", "CLOSED"];
+  const escalations: BookingStatus[] = ["NEEDS_HELP", "STALE"];
+
+  let steps: BookingStatus[];
+  if (escalations.includes(currentStatus)) {
+    // escalation branches off after PAID
+    steps = ["DRAFT", "PENDING", "PAID", currentStatus];
+  } else {
+    const idx = chain.indexOf(currentStatus);
+    steps = idx >= 0 ? chain.slice(0, idx + 1) : ["DRAFT", currentStatus];
+  }
+
+  return steps.map((s, i) => ({
+    status: s,
+    changedAt: new Date(Date.now() - baseOffsetMs + i * Math.floor(baseOffsetMs / steps.length)).toISOString(),
+    labelKey: `booking.status.${s.toLowerCase()}`,
+  }));
+}
+
 function seedAdminBookings() {
-  const statusSequence: BookingStatus[] = [
-    "PAID", "PAID", "ASSIGNED", "ASSIGNED", "IN_PROGRESS",
-    "IN_PROGRESS", "READY", "NEEDS_HELP", "STALE", "PAID",
-  ];
-  const plates = [
-    "B 1234 XY", "D 5678 AB", "B 9999 ZZ", "F 1111 CC",
-    "B 2222 DD", "D 3333 EE", "B 4444 FF", "B 5555 GG",
-    "D 6666 HH", "B 7777 II",
-  ];
-  const slots = [
-    "A1", "A2", "B1", "B2", "C1", "C2", "D1", "D2", "E1", "E2",
+  const entries: Array<{
+    status: BookingStatus;
+    plate: string;
+    slot: string;
+    siteId: string;
+    priceAmount: number;
+    baseOffsetMs: number;
+  }> = [
+    { status: "PAID",        plate: "B 1234 XY", slot: "A1", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 1200_000 },
+    { status: "PAID",        plate: "D 5678 AB", slot: "A2", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 900_000 },
+    { status: "ASSIGNED",    plate: "B 9999 ZZ", slot: "B1", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 2400_000 },
+    { status: "ASSIGNED",    plate: "F 1111 CC", slot: "B2", siteId: "site-1", priceAmount: 60000, baseOffsetMs: 1800_000 },
+    { status: "IN_PROGRESS", plate: "B 2222 DD", slot: "C1", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 3600_000 },
+    { status: "IN_PROGRESS", plate: "D 3333 EE", slot: "C2", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 2700_000 },
+    { status: "READY",       plate: "B 4444 FF", slot: "D1", siteId: "site-1", priceAmount: 60000, baseOffsetMs: 5400_000 },
+    { status: "NEEDS_HELP",  plate: "B 5555 GG", slot: "D2", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 4500_000 },
+    { status: "STALE",       plate: "D 6666 HH", slot: "E1", siteId: "site-2", priceAmount: 45000, baseOffsetMs: 7200_000 },
+    { status: "PAID",        plate: "B 7777 II", slot: "E2", siteId: "site-2", priceAmount: 60000, baseOffsetMs: 600_000  },
+    { status: "IN_PROGRESS", plate: "B 8888 JJ", slot: "F1", siteId: "site-2", priceAmount: 45000, baseOffsetMs: 3000_000 },
+    { status: "NEEDS_HELP",  plate: "D 9999 KK", slot: "F2", siteId: "site-2", priceAmount: 45000, baseOffsetMs: 5000_000 },
   ];
 
-  statusSequence.forEach((status, i) => {
+  entries.forEach(({ status, plate, slot, siteId, priceAmount, baseOffsetMs }, i) => {
     const id = `bk-seed-${i + 1}`;
-    const siteId = i < 7 ? "site-1" : "site-2";
     bookings.set(id, {
       id,
       signedToken: `mock-signed-token-${id}`,
       status,
       siteName: siteId === "site-1" ? "Site Thamrin" : "Site Sudirman",
-      plateText: plates[i],
-      slotText: slots[i],
+      plateText: plate,
+      slotText: slot,
       phone: null,
       locationLat: null,
       locationLng: null,
       locationName: null,
-      priceAmount: 45000,
+      priceAmount,
       currency: "IDR",
       estimatedReadyAt: new Date(Date.now() + 1800_000).toISOString(),
       media: [
@@ -203,27 +295,16 @@ function seedAdminBookings() {
           id: `media-${id}-plate`,
           kind: "plate",
           url: "https://placehold.co/400x300/png",
-          ocrText: plates[i],
+          ocrText: plate,
         },
         {
           id: `media-${id}-slot`,
           kind: "slot",
           url: "https://placehold.co/400x300/png",
-          ocrText: slots[i],
+          ocrText: slot,
         },
       ],
-      statusHistory: [
-        {
-          status: "DRAFT",
-          changedAt: new Date(Date.now() - 3600_000).toISOString(),
-          labelKey: "booking.status.draft",
-        },
-        {
-          status,
-          changedAt: new Date(Date.now() - 1800_000).toISOString(),
-          labelKey: `booking.status.${status.toLowerCase()}`,
-        },
-      ],
+      statusHistory: buildStatusHistory(status, baseOffsetMs),
     });
   });
 }

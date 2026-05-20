@@ -37,6 +37,7 @@ export function useAdminAuth() {
     },
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
+      localStorage.setItem("admin-sites", JSON.stringify(data.sites));
       setUser(
         { id: data.email, email: data.email, name: "Admin" },
         data.token
@@ -51,6 +52,7 @@ export function useAdminAuth() {
 
   function logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("admin-sites");
     clearAuth();
     router.replace("/admin/login");
   }
