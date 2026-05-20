@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/shared";
-import { BookNowButton } from "@/features/customer/components/book-now-button";
+import { BookNowButtonV2 } from "@/features/customer/components/book-now-button-v2";
 import { HowItWorksPanel } from "@/features/customer/components/how-it-works-panel";
 import { LandingHero } from "@/features/customer/components/landing-hero";
 import { QrErrorState } from "@/features/customer/components/qr-error-state";
@@ -69,7 +69,7 @@ export default async function LandingPage({ params }: Props) {
             {blockingMessage}
           </div>
         ) : (
-          <BookNowButton qrId={qrId} />
+          <BookNowButtonV2 qrId={qrId} />
         )}
       </div>
     </AppShell>

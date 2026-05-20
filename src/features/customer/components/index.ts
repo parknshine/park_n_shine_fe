@@ -11,3 +11,5 @@ export { QrErrorState } from "./qr-error-state";
 export { StarRating } from "./star-rating";
 export { StatusHero } from "./status-hero";
 export { WhatsAppSupportWidget } from "./whatsapp-support-widget";
+export { BookingLocationCard } from "./booking-location-card";
+export { BookNowButtonV2 } from "./book-now-button-v2";

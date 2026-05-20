@@ -135,7 +135,7 @@ export default function Home() {
           {/* CTA group */}
           <div className='flex items-center gap-3'>
             <a
-              href='#'
+              href='/book/location'
               className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-6 py-3 rounded text-center'
               style={{ fontFamily: inter, fontWeight: 600 }}
             >
@@ -487,7 +487,7 @@ export default function Home() {
             {/* Book a Wash CTA */}
             <div className='flex justify-center'>
               <a
-                href='#'
+                href='/book/location'
                 className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-8 py-4 rounded text-center'
                 style={{
                   fontFamily: inter,

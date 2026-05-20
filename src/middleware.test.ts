@@ -80,6 +80,38 @@ describe("isPathAllowed", () => {
     expect(isPathAllowed("/admin/users", adminPrefixes)).toBe(true);
   });
 
+  test("allows /dashboard for admin subdomain", () => {
+    expect(isPathAllowed("/dashboard", adminPrefixes)).toBe(true);
+  });
+
+  test("allows /dashboard/* for admin subdomain", () => {
+    expect(isPathAllowed("/dashboard/overview", adminPrefixes)).toBe(true);
+  });
+
+  test("allows /reports for admin subdomain", () => {
+    expect(isPathAllowed("/reports", adminPrefixes)).toBe(true);
+  });
+
+  test("allows /reports/* for admin subdomain", () => {
+    expect(isPathAllowed("/reports/monthly", adminPrefixes)).toBe(true);
+  });
+
+  test("allows /audit for admin subdomain", () => {
+    expect(isPathAllowed("/audit", adminPrefixes)).toBe(true);
+  });
+
+  test("allows /audit/* for admin subdomain", () => {
+    expect(isPathAllowed("/audit/logs", adminPrefixes)).toBe(true);
+  });
+
+  test("allows /settings for admin subdomain", () => {
+    expect(isPathAllowed("/settings", adminPrefixes)).toBe(true);
+  });
+
+  test("allows /settings/* for admin subdomain", () => {
+    expect(isPathAllowed("/settings/profile", adminPrefixes)).toBe(true);
+  });
+
   test("blocks /crew/ on admin subdomain", () => {
     expect(isPathAllowed("/crew/home", adminPrefixes)).toBe(false);
   });

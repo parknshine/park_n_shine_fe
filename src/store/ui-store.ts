@@ -8,9 +8,16 @@ interface Toast {
   variant?: "default" | "destructive";
 }
 
+interface AdminSite {
+  id: string;
+  name: string;
+}
+
 interface UIState {
   toasts: Toast[];
   isSidebarOpen: boolean;
+  activeSiteId: string | null;
+  sites: AdminSite[];
 }
 
 interface UIActions {
@@ -18,15 +25,17 @@ interface UIActions {
   removeToast: (id: string) => void;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
+  setActiveSiteId: (siteId: string) => void;
+  setSites: (sites: AdminSite[]) => void;
 }
 
 export const useUIStore = create<UIState & UIActions>()(
   immer((set) => ({
-    // state
     toasts: [],
     isSidebarOpen: true,
+    activeSiteId: null,
+    sites: [],
 
-    // actions
     addToast: (toast) =>
       set((state) => {
         state.toasts.push({ ...toast, id: crypto.randomUUID() });
@@ -45,6 +54,16 @@ export const useUIStore = create<UIState & UIActions>()(
     setSidebarOpen: (open) =>
       set((state) => {
         state.isSidebarOpen = open;
+      }),
+
+    setActiveSiteId: (siteId) =>
+      set((state) => {
+        state.activeSiteId = siteId;
+      }),
+
+    setSites: (sites) =>
+      set((state) => {
+        state.sites = sites;
       }),
   }))
 );

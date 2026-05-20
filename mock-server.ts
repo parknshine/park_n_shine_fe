@@ -34,6 +34,7 @@ type BookingStatus =
   | "IN_PROGRESS"
   | "NEEDS_HELP"
   | "READY"
+  | "STALE"
   | "CLOSED";
 
 interface MockBooking {
@@ -43,6 +44,10 @@ interface MockBooking {
   siteName: string;
   plateText: string | null;
   slotText: string | null;
+  phone: string | null;
+  locationLat: number | null;
+  locationLng: number | null;
+  locationName: string | null;
   priceAmount: number;
   currency: "IDR";
   estimatedReadyAt: string;
@@ -93,6 +98,138 @@ const MOCK_SOP_STEPS = [
   { id: "step_5", labelKey: "crew.checklist.dry_finish", order: 5 },
 ];
 
+// ─── Admin seed data ──────────────────────────────────────────────────────────
+
+interface MockAdminAuditEntry {
+  id: string;
+  bookingId: string;
+  plateText: string | null;
+  action: "refund" | "status_override" | "reassign";
+  detail: string;
+  adminEmail: string;
+  createdAt: string;
+}
+
+interface MockAdminSettings {
+  siteId: string;
+  staleJobTimeoutMinutes: number;
+}
+
+interface MockCrewMember {
+  id: string;
+  name: string;
+  siteId: string;
+}
+
+const MOCK_SITES = [
+  { id: "site-1", name: "Site Thamrin" },
+  { id: "site-2", name: "Site Sudirman" },
+];
+
+const MOCK_CREW_MEMBERS: MockCrewMember[] = [
+  { id: "crew-1", name: "Budi Santoso", siteId: "site-1" },
+  { id: "crew-2", name: "Agus Wijaya", siteId: "site-1" },
+  { id: "crew-3", name: "Rudi Hartono", siteId: "site-2" },
+];
+
+const adminAuditLog: MockAdminAuditEntry[] = [
+  {
+    id: "audit-1",
+    bookingId: "bk-seed-1",
+    plateText: "B 1234 XY",
+    action: "status_override",
+    detail: "PENDING → PAID",
+    adminEmail: "admin@park-shine.com",
+    createdAt: new Date(Date.now() - 3600_000).toISOString(),
+  },
+  {
+    id: "audit-2",
+    bookingId: "bk-seed-2",
+    plateText: "D 5678 AB",
+    action: "refund",
+    detail: "Full refund — Rp 45.000",
+    adminEmail: "admin@park-shine.com",
+    createdAt: new Date(Date.now() - 7200_000).toISOString(),
+  },
+  {
+    id: "audit-3",
+    bookingId: "bk-seed-3",
+    plateText: "B 9999 ZZ",
+    action: "reassign",
+    detail: "Reassigned to Agus Wijaya",
+    adminEmail: "admin@park-shine.com",
+    createdAt: new Date(Date.now() - 1800_000).toISOString(),
+  },
+];
+
+const adminSettings = new Map<string, MockAdminSettings>([
+  ["site-1", { siteId: "site-1", staleJobTimeoutMinutes: 20 }],
+  ["site-2", { siteId: "site-2", staleJobTimeoutMinutes: 20 }],
+]);
+
+function seedAdminBookings() {
+  const statusSequence: BookingStatus[] = [
+    "PAID", "PAID", "ASSIGNED", "ASSIGNED", "IN_PROGRESS",
+    "IN_PROGRESS", "READY", "NEEDS_HELP", "STALE", "PAID",
+  ];
+  const plates = [
+    "B 1234 XY", "D 5678 AB", "B 9999 ZZ", "F 1111 CC",
+    "B 2222 DD", "D 3333 EE", "B 4444 FF", "B 5555 GG",
+    "D 6666 HH", "B 7777 II",
+  ];
+  const slots = [
+    "A1", "A2", "B1", "B2", "C1", "C2", "D1", "D2", "E1", "E2",
+  ];
+
+  statusSequence.forEach((status, i) => {
+    const id = `bk-seed-${i + 1}`;
+    const siteId = i < 7 ? "site-1" : "site-2";
+    bookings.set(id, {
+      id,
+      signedToken: `mock-signed-token-${id}`,
+      status,
+      siteName: siteId === "site-1" ? "Site Thamrin" : "Site Sudirman",
+      plateText: plates[i],
+      slotText: slots[i],
+      phone: null,
+      locationLat: null,
+      locationLng: null,
+      locationName: null,
+      priceAmount: 45000,
+      currency: "IDR",
+      estimatedReadyAt: new Date(Date.now() + 1800_000).toISOString(),
+      media: [
+        {
+          id: `media-${id}-plate`,
+          kind: "plate",
+          url: "https://placehold.co/400x300/png",
+          ocrText: plates[i],
+        },
+        {
+          id: `media-${id}-slot`,
+          kind: "slot",
+          url: "https://placehold.co/400x300/png",
+          ocrText: slots[i],
+        },
+      ],
+      statusHistory: [
+        {
+          status: "DRAFT",
+          changedAt: new Date(Date.now() - 3600_000).toISOString(),
+          labelKey: "booking.status.draft",
+        },
+        {
+          status,
+          changedAt: new Date(Date.now() - 1800_000).toISOString(),
+          labelKey: `booking.status.${status.toLowerCase()}`,
+        },
+      ],
+    });
+  });
+}
+
+seedAdminBookings();
+
 const STATUS_FLOW: BookingStatus[] = [
   "DRAFT",
   "PENDING",
@@ -111,6 +248,7 @@ const STATUS_LABELS: Record<BookingStatus, string> = {
   IN_PROGRESS: "Sedang Dicuci",
   NEEDS_HELP: "Butuh Bantuan",
   READY: "Mobil Siap!",
+  STALE: "Terlambat",
   CLOSED: "Selesai",
 };
 
@@ -208,9 +346,13 @@ async function handleRequest(req: Request): Promise<Response> {
       id,
       signedToken: token,
       status: "PENDING",
-      siteName: "Senayan City — P2",
+      siteName: body.qrId ? "Senayan City — P2" : "Walk-in Booking",
       plateText: null,
       slotText: null,
+      phone: null,
+      locationLat: null,
+      locationLng: null,
+      locationName: null,
       priceAmount: 35_000,
       currency: "IDR",
       estimatedReadyAt: ready,
@@ -220,7 +362,8 @@ async function handleRequest(req: Request): Promise<Response> {
     addHistory(booking, "PENDING");
     bookings.set(id, booking);
 
-    console.log(`[mock] Created booking ${id} for qrId=${body.qrId ?? "?"}`);
+    const flowType = body.qrId ? `QR flow (qrId=${body.qrId})` : "walk-in flow (no qrId)";
+    console.log(`[mock] Created booking ${id} — ${flowType}`);
 
     return json({ id, signedToken: token });
   }
@@ -281,10 +424,18 @@ async function handleRequest(req: Request): Promise<Response> {
     const body = await req.json().catch(() => ({})) as {
       plateText?: string;
       slotText?: string;
+      phone?: string;
+      locationLat?: number;
+      locationLng?: number;
+      locationName?: string;
     };
 
-    booking.plateText = body.plateText ?? booking.plateText;
-    booking.slotText  = body.slotText  ?? booking.slotText;
+    booking.plateText    = body.plateText    ?? booking.plateText;
+    booking.slotText     = body.slotText     ?? booking.slotText;
+    booking.phone        = body.phone        ?? booking.phone;
+    booking.locationLat  = body.locationLat  ?? booking.locationLat;
+    booking.locationLng  = body.locationLng  ?? booking.locationLng;
+    booking.locationName = body.locationName ?? booking.locationName;
 
     // Simulate payment: advance to PAID immediately (mock payment gateway)
     if (booking.status === "PENDING") {
@@ -316,7 +467,9 @@ async function handleRequest(req: Request): Promise<Response> {
     }
 
     const redirectUrl = `${BASE_URL}/booking/${id}/status?token=${booking.signedToken}`;
-    console.log(`[mock] Confirmed booking ${id} → ${booking.status}, redirect: ${redirectUrl}`);
+    const locationInfo = booking.locationName ? ` | loc="${booking.locationName}"` : "";
+    const phoneInfo    = booking.phone        ? ` | phone=${booking.phone}`        : "";
+    console.log(`[mock] Confirmed booking ${id} → ${booking.status}${phoneInfo}${locationInfo}, redirect: ${redirectUrl}`);
 
     return json({
       bookingId: id,
@@ -358,11 +511,14 @@ async function handleRequest(req: Request): Promise<Response> {
 
   // ── GET /v1/mock/bookings — debug list ────────────────────────────────────
   if (method === "GET" && path === "/v1/mock/bookings") {
-    const list = [...bookings.values()].map(({ id, status, plateText, slotText }) => ({
+    const list = [...bookings.values()].map(({ id, status, plateText, slotText, phone, locationName, siteName }) => ({
       id,
       status,
+      siteName,
       plateText,
       slotText,
+      phone,
+      locationName,
     }));
     return json(list);
   }
@@ -495,6 +651,204 @@ async function handleRequest(req: Request): Promise<Response> {
     return json(media);
   }
 
+  // ─── Admin: Login ─────────────────────────────────────────────────────────────
+  if (method === "POST" && path === "/v1/admin/sessions") {
+    return json({
+      success: true,
+      token: "mock-admin-token-xyz",
+      email: "admin@park-shine.com",
+      sites: MOCK_SITES,
+    });
+  }
+
+  // ─── Admin: Get Queue ────────────────────────────────────────────────────────
+  if (method === "GET" && path.startsWith("/v1/admin/sites/") && path.endsWith("/queue")) {
+    const siteId = path.split("/")[4];
+    const siteName = siteId === "site-1" ? "Site Thamrin" : "Site Sudirman";
+    const siteBookings = [...bookings.values()].filter(
+      (b) => b.siteName === siteName
+    );
+
+    const statusOrder = ["PAID", "ASSIGNED", "IN_PROGRESS", "READY", "NEEDS_HELP", "STALE"];
+    const escalationStatuses = new Set(["NEEDS_HELP", "STALE"]);
+
+    const groups = statusOrder
+      .map((status) => ({
+        status,
+        bookings: siteBookings
+          .filter((b) => b.status === status)
+          .map((b) => ({
+            ...b,
+            crewName: MOCK_CREW_MEMBERS.find((c) => c.siteId === siteId)?.name ?? null,
+            elapsedSeconds: Math.floor(Math.random() * 3600),
+          })),
+      }))
+      .filter((g) => g.bookings.length > 0);
+
+    const escalations = siteBookings
+      .filter((b) => escalationStatuses.has(b.status))
+      .map((b) => ({
+        ...b,
+        crewName: null,
+        elapsedSeconds: 1500,
+      }));
+
+    return json({
+      siteId,
+      fetchedAt: new Date().toISOString(),
+      groups,
+      escalations,
+    });
+  }
+
+  // ─── Admin: Get Booking Detail ───────────────────────────────────────────────
+  if (method === "GET" && path.match(/^\/v1\/admin\/bookings\/[^/]+$/)) {
+    const bookingId = path.split("/")[4];
+    const booking = bookings.get(bookingId);
+    if (!booking) {
+      return json({ success: false, code: "BOOKING_NOT_FOUND" }, 404);
+    }
+    const auditEntries = adminAuditLog.filter((a) => a.bookingId === bookingId);
+    return json({
+      ...booking,
+      crewName: MOCK_CREW_MEMBERS[0].name,
+      elapsedSeconds: 900,
+      auditEntries,
+    });
+  }
+
+  // ─── Admin: Reassign ─────────────────────────────────────────────────────────
+  if (method === "POST" && path.match(/^\/v1\/admin\/bookings\/[^/]+\/reassign$/)) {
+    const bookingId = path.split("/")[4];
+    const booking = bookings.get(bookingId);
+    if (!booking) {
+      return json({ success: false, code: "BOOKING_NOT_FOUND" }, 404);
+    }
+    const body = await req.json() as { crewId: string };
+    const crew = MOCK_CREW_MEMBERS.find((c) => c.id === body.crewId);
+    adminAuditLog.push({
+      id: crypto.randomUUID(),
+      bookingId,
+      plateText: booking.plateText,
+      action: "reassign",
+      detail: `Reassigned to ${crew?.name ?? body.crewId}`,
+      adminEmail: "admin@park-shine.com",
+      createdAt: new Date().toISOString(),
+    });
+    return json({ success: true });
+  }
+
+  // ─── Admin: Status Override ───────────────────────────────────────────────────
+  if (method === "POST" && path.match(/^\/v1\/admin\/bookings\/[^/]+\/status-override$/)) {
+    const bookingId = path.split("/")[4];
+    const booking = bookings.get(bookingId);
+    if (!booking) {
+      return json({ success: false, code: "BOOKING_NOT_FOUND" }, 404);
+    }
+    const body = await req.json() as { nextStatus: BookingStatus; reasonCode: string };
+    const prevStatus = booking.status;
+    booking.status = body.nextStatus;
+    booking.statusHistory.push({
+      status: body.nextStatus,
+      changedAt: new Date().toISOString(),
+      labelKey: `booking.status.${body.nextStatus.toLowerCase()}`,
+    });
+    adminAuditLog.push({
+      id: crypto.randomUUID(),
+      bookingId,
+      plateText: booking.plateText,
+      action: "status_override",
+      detail: `${prevStatus} → ${body.nextStatus} — ${body.reasonCode}`,
+      adminEmail: "admin@park-shine.com",
+      createdAt: new Date().toISOString(),
+    });
+    return json({ success: true });
+  }
+
+  // ─── Admin: Refund ────────────────────────────────────────────────────────────
+  if (method === "POST" && path.match(/^\/v1\/admin\/bookings\/[^/]+\/refund$/)) {
+    const bookingId = path.split("/")[4];
+    const booking = bookings.get(bookingId);
+    if (!booking) {
+      return json({ success: false, code: "BOOKING_NOT_FOUND" }, 404);
+    }
+    const body = await req.json() as { amountType: string; amount?: number; reasonCode: string };
+    const amount = body.amountType === "full" ? booking.priceAmount : (body.amount ?? 0);
+    adminAuditLog.push({
+      id: crypto.randomUUID(),
+      bookingId,
+      plateText: booking.plateText,
+      action: "refund",
+      detail: `${body.amountType === "full" ? "Full" : "Partial"} refund — Rp ${amount.toLocaleString("id-ID")}`,
+      adminEmail: "admin@park-shine.com",
+      createdAt: new Date().toISOString(),
+    });
+    return json({ success: true });
+  }
+
+  // ─── Admin: Report ────────────────────────────────────────────────────────────
+  if (method === "GET" && path.startsWith("/v1/admin/sites/") && path.includes("/report")) {
+    const siteId = path.split("/")[4];
+    const from = url.searchParams.get("from") ?? new Date(Date.now() - 7 * 86400_000).toISOString().slice(0, 10);
+    const to = url.searchParams.get("to") ?? new Date().toISOString().slice(0, 10);
+
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    const days: string[] = [];
+    const current = new Date(fromDate);
+    while (current <= toDate) {
+      days.push(current.toISOString().slice(0, 10));
+      current.setDate(current.getDate() + 1);
+    }
+
+    const breakdown = days.map((date) => ({
+      date,
+      totalBookings: Math.floor(Math.random() * 20) + 5,
+      completed: Math.floor(Math.random() * 15) + 3,
+      slaHitRate: Math.floor(Math.random() * 30) + 70,
+      averageRating: parseFloat((Math.random() * 2 + 3).toFixed(1)),
+      revenue: (Math.floor(Math.random() * 20) + 5) * 45000,
+    }));
+
+    const summary = {
+      siteId,
+      date: from,
+      totalBookings: breakdown.reduce((s, d) => s + d.totalBookings, 0),
+      completionRate: Math.round(breakdown.reduce((s, d) => s + d.slaHitRate, 0) / breakdown.length),
+      slaHitRate: Math.round(breakdown.reduce((s, d) => s + d.slaHitRate, 0) / breakdown.length),
+      averageRating: parseFloat((breakdown.reduce((s, d) => s + (d.averageRating ?? 0), 0) / breakdown.length).toFixed(1)),
+      revenue: breakdown.reduce((s, d) => s + d.revenue, 0),
+    };
+
+    return json({ siteId, from, to, summary, breakdown });
+  }
+
+  // ─── Admin: Audit Log ────────────────────────────────────────────────────────
+  if (method === "GET" && path.startsWith("/v1/admin/sites/") && path.includes("/audit-log")) {
+    const action = url.searchParams.get("action");
+    let entries = [...adminAuditLog];
+    if (action && action !== "all") {
+      entries = entries.filter((e) => e.action === action);
+    }
+    entries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return json(entries);
+  }
+
+  // ─── Admin: Get Settings ─────────────────────────────────────────────────────
+  if (method === "GET" && path.startsWith("/v1/admin/sites/") && path.endsWith("/settings")) {
+    const siteId = path.split("/")[4];
+    const settings = adminSettings.get(siteId) ?? { siteId, staleJobTimeoutMinutes: 20 };
+    return json(settings);
+  }
+
+  // ─── Admin: Save Settings ────────────────────────────────────────────────────
+  if (method === "POST" && path.startsWith("/v1/admin/sites/") && path.endsWith("/settings")) {
+    const siteId = path.split("/")[4];
+    const body = await req.json() as { staleJobTimeoutMinutes: number };
+    adminSettings.set(siteId, { siteId, staleJobTimeoutMinutes: body.staleJobTimeoutMinutes });
+    return json(adminSettings.get(siteId));
+  }
+
   return notFound(`No route: ${method} ${path}`);
 }
 
@@ -519,4 +873,17 @@ console.log(`  GET  /v1/mock/bookings      — list all active bookings`);
 console.log(`  POST /v1/crew/sessions`);
 console.log(`  POST /v1/crew/jobs/next`);
 console.log(`  GET  /v1/crew/jobs/:jobId`);
-console.log(`\nOpen: http://localhost:3000/q/TEST123\n`);
+console.log(`\nAdmin endpoints:`);
+console.log(`  POST /v1/admin/sessions`);
+console.log(`  GET  /v1/admin/sites/:siteId/queue`);
+console.log(`  GET  /v1/admin/bookings/:bookingId`);
+console.log(`  POST /v1/admin/bookings/:bookingId/reassign`);
+console.log(`  POST /v1/admin/bookings/:bookingId/status-override`);
+console.log(`  POST /v1/admin/bookings/:bookingId/refund`);
+console.log(`  GET  /v1/admin/sites/:siteId/report`);
+console.log(`  GET  /v1/admin/sites/:siteId/audit-log`);
+console.log(`  GET  /v1/admin/sites/:siteId/settings`);
+console.log(`  POST /v1/admin/sites/:siteId/settings`);
+console.log(`\nTest flows:`);
+console.log(`  QR flow     → http://localhost:3000/q/TEST123`);
+console.log(`  Walk-in     → http://localhost:3000/book/location\n`);

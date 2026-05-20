@@ -1,6 +1,11 @@
 export const queryKeys = {
   admin: {
     queue: (siteId: string) => ["admin", "queue", siteId] as const,
+    booking: (bookingId: string) => ["admin", "booking", bookingId] as const,
+    report: (siteId: string, from: string, to: string) =>
+      ["admin", "report", siteId, from, to] as const,
+    auditLog: (siteId: string) => ["admin", "audit-log", siteId] as const,
+    settings: (siteId: string) => ["admin", "settings", siteId] as const,
   },
   crew: {
     session: () => ["crew", "session"] as const,
@@ -14,12 +19,15 @@ export const queryKeys = {
 
 export const mutationKeys = {
   admin: {
+    login: () => ["admin", "sessions"] as const,
     overrideStatus: (bookingId: string) =>
       ["admin", "booking", bookingId, "status-override"] as const,
     reassign: (bookingId: string) =>
       ["admin", "booking", bookingId, "reassign"] as const,
     refund: (bookingId: string) =>
       ["admin", "booking", bookingId, "refund"] as const,
+    saveSettings: (siteId: string) =>
+      ["admin", "settings", siteId, "save"] as const,
   },
   crew: {
     checklist: (jobId: string) => ["crew", "job", jobId, "checklist"] as const,

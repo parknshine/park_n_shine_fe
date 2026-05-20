@@ -42,3 +42,50 @@ export interface DailySiteReport {
   averageRating: number | null;
   revenue: number;
 }
+
+export interface AuditEntry {
+  id: string;
+  bookingId: string;
+  plateText: string | null;
+  action: "refund" | "status_override" | "reassign";
+  detail: string;
+  adminEmail: string;
+  createdAt: string;
+}
+
+export interface DailyBreakdown {
+  date: string;
+  totalBookings: number;
+  completed: number;
+  slaHitRate: number;
+  averageRating: number | null;
+  revenue: number;
+}
+
+export interface AdminReport {
+  siteId: string;
+  from: string;
+  to: string;
+  summary: DailySiteReport;
+  breakdown: DailyBreakdown[];
+}
+
+export interface AdminSettings {
+  siteId: string;
+  staleJobTimeoutMinutes: number;
+}
+
+export interface AdminSite {
+  id: string;
+  name: string;
+}
+
+export interface AdminBookingDetail extends AdminQueueBooking {
+  auditEntries: AuditEntry[];
+}
+
+export interface MockCrewMember {
+  id: string;
+  name: string;
+  siteId: string;
+}

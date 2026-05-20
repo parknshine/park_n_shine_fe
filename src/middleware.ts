@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const SUBDOMAIN_CONFIG = {
   app: {
-    allowedPrefixes: ["/", "/q", "/booking"] as const,
+    allowedPrefixes: ["/", "/q", "/booking", "/book"] as const,
     defaultPath: "/",
   },
   crew: {
@@ -10,8 +10,14 @@ export const SUBDOMAIN_CONFIG = {
     defaultPath: "/crew/home",
   },
   admin: {
-    allowedPrefixes: ["/admin"] as const,
-    defaultPath: "/admin",
+    allowedPrefixes: [
+      "/admin",
+      "/dashboard",
+      "/reports",
+      "/audit",
+      "/settings",
+    ] as const,
+    defaultPath: "/admin/login",
   },
 } as const;
 

@@ -1,3 +1,9 @@
 export { AdminQueueGroup } from "./admin-queue-group";
+export { AdminSidebar } from "./admin-sidebar";
+export { AuditLogTable } from "./audit-log-table";
+export { BookingDetailDrawer } from "./booking-detail-drawer";
 export { EscalationsPanel } from "./escalations-panel";
 export { KpiSummary } from "./kpi-summary";
+export { ReassignModal } from "./reassign-modal";
+export { RefundModal } from "./refund-modal";
+export { StatusOverrideModal } from "./status-override-modal";

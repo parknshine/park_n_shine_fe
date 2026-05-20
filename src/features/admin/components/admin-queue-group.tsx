@@ -8,9 +8,21 @@ import type { AdminQueueBooking } from "@/features/admin/types";
 interface AdminQueueGroupProps {
   status: BookingStatus;
   bookings: AdminQueueBooking[];
+  onBookingClick?: (booking: AdminQueueBooking) => void;
 }
 
-export function AdminQueueGroup({ status, bookings }: AdminQueueGroupProps) {
+function formatElapsed(seconds: number): string {
+  if (seconds < 60) return `${seconds}d`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  return `${Math.floor(minutes / 60)}j ${minutes % 60}m`;
+}
+
+export function AdminQueueGroup({
+  status,
+  bookings,
+  onBookingClick,
+}: AdminQueueGroupProps) {
   return (
     <section className="rounded-lg border border-border">
       <header className="flex items-center justify-between gap-3 border-b border-border p-4">
@@ -23,7 +35,10 @@ export function AdminQueueGroup({ status, bookings }: AdminQueueGroupProps) {
         {bookings.map((booking) => (
           <article
             key={booking.id}
-            className="grid gap-2 p-4 text-sm md:grid-cols-[1fr_1fr_auto]"
+            onClick={() => onBookingClick?.(booking)}
+            className={`grid gap-2 p-4 text-sm md:grid-cols-[1fr_1fr_auto] ${
+              onBookingClick ? "cursor-pointer hover:bg-muted/50 transition-colors" : ""
+            }`}
           >
             <div>
               <p className="font-semibold text-foreground">
@@ -31,9 +46,9 @@ export function AdminQueueGroup({ status, bookings }: AdminQueueGroupProps) {
               </p>
               <p className="text-muted-foreground">{booking.slotText}</p>
             </div>
-            <p className="text-muted-foreground">{booking.crewName}</p>
+            <p className="text-muted-foreground">{booking.crewName ?? "—"}</p>
             <p className="font-mono text-xs text-muted-foreground">
-              {booking.elapsedSeconds}s
+              {formatElapsed(booking.elapsedSeconds)}
             </p>
           </article>
         ))}
