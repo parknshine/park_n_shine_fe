@@ -4,10 +4,7 @@ import {
   type ApiSuccessResponse,
 } from "@/lib/api-response";
 import { API_ERROR_CODES } from "@/lib/api-error";
-import {
-  getApiErrorMessage,
-  getApiSuccessMessage,
-} from "@/lib/api-messages";
+import { getApiErrorMessage, getApiSuccessMessage } from "@/lib/api-messages";
 import type { CustomerBooking } from "@/features/customer/types";
 import type { CrewJob } from "@/features/crew/types";
 
@@ -43,6 +40,7 @@ export const successResponseExamples = {
       status: "ASSIGNED",
       plateText: "B 1234 PNS",
       slotText: "P2-A17",
+      supervisorPhone: "+6281234567890",
       assignedAt: "2026-05-18T09:35:00.000Z",
       etaEndsAt: "2026-05-18T10:05:00.000Z",
       media: [],

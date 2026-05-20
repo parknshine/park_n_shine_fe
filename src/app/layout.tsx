@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Manrope, Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/providers/toaster";
@@ -14,6 +15,18 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -51,17 +64,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Blocking theme-init: runs before hydration to prevent dark-mode flash.
-            React 19 warns about <script> on SPA navigation — safe to ignore here
-            because ThemeProvider handles subsequent navigations via DOM class. */}
-        <script
+      <head />
+      <body className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${inter.variable} antialiased`}>
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');var dark=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(dark)document.documentElement.classList.add('dark')}catch(e){}})()`,
           }}
         />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
           <QueryProvider>
             {children}

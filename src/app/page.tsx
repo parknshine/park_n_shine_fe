@@ -1,484 +1,707 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Search, Plus, ArrowRight, Trash2,
-  DollarSign, AtSign, Eye, EyeOff, Tag,
-} from "lucide-react";
-import { ExampleForm } from "@/components/forms/example-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import {
-  Card, CardHeader, CardLabel, CardTitle, CardContent,
-} from "@/components/ui/card";
-import {
-  Dialog, DialogContent, DialogHeader,
-  DialogTitle, DialogDescription, DialogTrigger,
-} from "@/components/ui/dialog";
-import { Combobox } from "@/components/ui/combobox";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useAuthStore } from "@/store";
-import toast from "react-hot-toast";
+import { useState, useRef, useEffect } from "react";
 
-const stack = [
-  { label: "Next.js 16",      dot: "bg-neutral-800 dark:bg-neutral-300" },
-  { label: "Tailwind CSS v4", dot: "bg-sky-500" },
-  { label: "React Hook Form", dot: "bg-pink-500" },
-  { label: "Axios",           dot: "bg-purple-500" },
-  { label: "Zustand",         dot: "bg-amber-500" },
-  { label: "Immer",           dot: "bg-emerald-500" },
-  { label: "Radix UI",        dot: "bg-violet-500" },
-  { label: "Zod",             dot: "bg-blue-500" },
+const imgParkShineLogo = "/park_n_shine_logo.jpeg.png";
+const imgScanningQrCode = "/park-shine-panel-1.jpeg";
+const imgPhotographingCarPlate = "/park-shine-panel-2.jpeg";
+const imgStaffWashingCar = "/park-shine-panel-3.jpeg";
+const imgNotificationOnPhone = "/park-shine-panel-4.jpeg";
+const imgHero = "/park-shine-hero.jpeg";
+
+const manrope = "var(--font-manrope), sans-serif";
+const inter = "var(--font-inter), sans-serif";
+
+const languages = [
+  { code: "ID", label: "Indonesia" },
+  { code: "EN", label: "English" },
+];
+
+const howItWorksCards = [
+  {
+    step: 1,
+    image: imgScanningQrCode,
+    imageStyle: { left: "-69.35%", width: "238.69%", height: "100%", top: "0" },
+    title: "QR Code",
+    description: "Locate our QR Code near you after you park.",
+  },
+  {
+    step: 2,
+    image: imgPhotographingCarPlate,
+    imageStyle: { left: "-16.67%", width: "133.33%", height: "100%", top: "0" },
+    title: "Snap and Upload",
+    description:
+      "Take a picture of your number plate as well as the carpark number.",
+  },
+  {
+    step: 3,
+    image: imgStaffWashingCar,
+    imageStyle: { left: "-16.67%", width: "133.33%", height: "100%", top: "0" },
+    title: "Professional Service",
+    description:
+      "Our service crew will locate your car and start the car wash process.",
+  },
+  {
+    step: 4,
+    image: imgNotificationOnPhone,
+    imageStyle: { left: "-16.67%", width: "133.33%", height: "100%", top: "0" },
+    title: "Sparkling Clean",
+    description:
+      "Receive a notification after 30 minutes that your car is sparkling clean!",
+  },
+];
+
+const trackSteps = [
+  { label: "Park", active: true, current: false },
+  { label: "Take 2 Pictures", active: false, current: true },
+  { label: "Make Payment", active: false, current: false },
+  { label: "Crew Starts Washing", active: false, current: false },
+  { label: "Car Is Ready!", active: false, current: false },
+];
+
+const navLinks = [
+  { label: "Services", sectionId: "services" },
+  { label: "Pricing", sectionId: "pricing" },
+  { label: "About", sectionId: "about" },
+];
+
+const pricingFeatures = [
+  "Professional cleaning with premium finish",
+  "Safe, scratch-free process",
+  "High quality cleaning chemicals",
+  "Strong Protection And Shine",
+  "Eco-friendly cleaning using under 1L of water per wash vs existing that uses 100L",
 ];
 
 export default function Home() {
-  const [lastSubmit, setLastSubmit] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const { isAuthenticated, user, setUser, clearAuth } = useAuthStore();
+  const [selectedLang, setSelectedLang] = useState(languages[0]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Combobox state
-  const [fruit, setFruit] = useState<string>("");
-  const [country, setCountry] = useState<string>("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagsCount, setTagsCount] = useState<string[]>([]);
-  const [errorCombo, setErrorCombo] = useState<string>("");
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="fixed inset-x-0 top-0 z-50 flex h-14 items-center border-b border-border bg-background/80 px-6 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-2xl items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-primary" />
-            <span className="text-sm font-semibold text-foreground">
-              Next.js Starter
+    <div className='bg-white relative min-h-screen'>
+      {/* ── Navbar ─────────────────────────────────────────────── */}
+      <header
+        className='fixed left-0 right-0 top-0 z-50 bg-white'
+        style={{ boxShadow: "0px 1px 1px rgba(0,0,0,0.05)" }}
+      >
+        <div className='flex items-center justify-between max-w-[1366px] mx-auto px-12 py-4'>
+          {/* Logo */}
+          <div className='flex items-center gap-3 shrink-0'>
+            <div className='h-8 w-[57px] relative overflow-hidden shrink-0'>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                alt='Park & Shine Logo'
+                src={imgParkShineLogo}
+                className='absolute h-full w-full object-contain'
+              />
+            </div>
+            <span
+              className='text-[#0036a4] text-2xl whitespace-nowrap'
+              style={{ fontFamily: manrope, fontWeight: 700 }}
+            >
+              Park &amp; Shine
             </span>
           </div>
-          <ThemeToggle />
+
+          {/* Nav links */}
+          <nav className='flex items-center gap-6'>
+            {navLinks.map(({ label, sectionId }) => (
+              <a
+                key={label}
+                href={`#${sectionId}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className='text-[#5f5e5e] text-sm tracking-[0.7px] py-1'
+                style={{ fontFamily: inter, fontWeight: 600 }}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+
+          {/* CTA group */}
+          <div className='flex items-center gap-3'>
+            <a
+              href='#'
+              className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-6 py-3 rounded text-center'
+              style={{ fontFamily: inter, fontWeight: 600 }}
+            >
+              Book Now
+            </a>
+
+            {/* Language dropdown */}
+            <div className='relative' ref={dropdownRef}>
+              <button
+                onClick={() => setIsDropdownOpen((prev) => !prev)}
+                className='flex items-center gap-1.5 border border-[#c2c2c2] rounded-md h-11 px-4.25 bg-white text-black text-base'
+                style={{ fontFamily: inter, fontWeight: 400 }}
+              >
+                {selectedLang.code}
+                <svg
+                  width='10'
+                  height='6'
+                  viewBox='0 0 10 6'
+                  fill='none'
+                  className={`shrink-0 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
+                >
+                  <path
+                    d='M1 1L5 5L9 1'
+                    stroke='#5f5e5e'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+              </button>
+
+              {isDropdownOpen && (
+                <div
+                  className='absolute right-0 mt-1 w-36 bg-white border border-[#e8e8e8] rounded-md overflow-hidden z-50'
+                  style={{ boxShadow: "0px 4px 12px rgba(0,0,0,0.1)" }}
+                >
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setSelectedLang(lang);
+                        setIsDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-[#f7f7f7] transition-colors ${
+                        selectedLang.code === lang.code
+                          ? "text-[#0036a4] font-semibold"
+                          : "text-[#3d3d3d]"
+                      }`}
+                      style={{ fontFamily: inter }}
+                    >
+                      <span>{lang.label}</span>
+                      <span className='text-xs text-[#5f5e5e]'>{lang.code}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </header>
-      <main className="mx-auto max-w-2xl px-6 pb-20 pt-12 mt-14">
 
-        {/* ── Hero ─────────────────────────────────────────────── */}
-        <div className="mb-14 text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3.5 py-1.5 text-xs font-medium text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            Base Template · v0.1.0
+      {/* ── Main ───────────────────────────────────────────────── */}
+      <main className='pt-[76px]'>
+        {/* ── Hero Section ────────────────────────────────────── */}
+        <section className='bg-[#f7f7f7] py-20 relative overflow-hidden'>
+          {/* Corner gradients */}
+          <div
+            className='absolute left-0 top-0 size-64 opacity-20 pointer-events-none'
+            style={{
+              backgroundImage:
+                "linear-gradient(60deg, rgb(0,54,164) 0%, rgb(0,54,164) 2.86%, rgba(0,54,164,0) 2.86%, rgba(0,54,164,0) 5.72%)",
+            }}
+          />
+          <div
+            className='absolute right-0 bottom-0 size-64 opacity-20 pointer-events-none'
+            style={{
+              backgroundImage:
+                "linear-gradient(60deg, rgb(0,54,164) 0%, rgb(0,54,164) 2.86%, rgba(0,54,164,0) 2.86%, rgba(0,54,164,0) 5.72%)",
+            }}
+          />
+
+          <div className='flex gap-12 items-center max-w-[1366px] mx-auto px-12'>
+            {/* Left: copy */}
+            <div className='flex-1 flex flex-col gap-6 min-w-0'>
+              <h1
+                className='text-[56px] text-black leading-[56px]'
+                style={{ fontFamily: manrope, fontWeight: 500 }}
+              >
+                Your Car Shines
+                <br />
+                While You Shop
+              </h1>
+              <p
+                className='text-[#3d3d3d] text-lg leading-[27px] max-w-[512px]'
+                style={{ fontFamily: inter, fontWeight: 400 }}
+              >
+                Professional cleaning at your favorite parking spot. High-end
+                enterprise discipline brought to everyday convenience.
+              </p>
+              <div className='flex gap-4 pt-3'>
+                <a
+                  href='#'
+                  className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-8 py-[17px] rounded text-center'
+                  style={{ fontFamily: inter, fontWeight: 600 }}
+                >
+                  View Services
+                </a>
+                <a
+                  href='#'
+                  className='border border-[#c2c2c2] text-black text-sm tracking-[0.7px] px-8 py-[17px] rounded text-center'
+                  style={{ fontFamily: inter, fontWeight: 600 }}
+                >
+                  Find Locations
+                </a>
+              </div>
+            </div>
+
+            {/* Right: hero image */}
+            <div className='flex-1 min-w-0'>
+              <div
+                className='bg-[#eee] rounded-2xl overflow-hidden'
+                style={{ boxShadow: "0px 2px 8px 0px rgba(26,26,26,0.08)" }}
+              >
+                <div className='h-[426px] relative overflow-hidden'>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    alt='Family standing near their clean blue car in a parking garage'
+                    src={imgHero}
+                    className='absolute w-full max-w-none object-cover'
+                    style={{ height: "133.33%", top: "-16.67%", left: 0 }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── How the Magic Happens ────────────────────────────── */}
+        <section id='services' className='bg-white py-20'>
+          <div className='flex flex-col gap-12 max-w-[1366px] mx-auto px-12'>
+            <h2
+              className='text-[56px] text-black text-center leading-[56px]'
+              style={{ fontFamily: manrope, fontWeight: 500 }}
+            >
+              How the Magic Happens
+            </h2>
+
+            <div className='grid grid-cols-4 gap-6'>
+              {howItWorksCards.map(
+                ({ step, image, imageStyle, title, description }) => (
+                  <div
+                    key={step}
+                    className='bg-white border border-[#e8e8e8] rounded-lg px-[17px] pt-[33px] pb-10 relative flex flex-col'
+                    style={{
+                      filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))",
+                    }}
+                  >
+                    {/* Step badge */}
+                    <div
+                      className='absolute top-[-16px] right-4 bg-[#f9e285] rounded-xl size-10 flex items-center justify-center'
+                      style={{ boxShadow: "0px 1px 1px rgba(0,0,0,0.05)" }}
+                    >
+                      <span
+                        className='text-[#1a1c1c] text-lg text-center'
+                        style={{ fontFamily: inter, fontWeight: 700 }}
+                      >
+                        {step}
+                      </span>
+                    </div>
+
+                    {/* Image */}
+                    <div className='rounded-lg overflow-hidden mb-4'>
+                      <div
+                        className='relative overflow-hidden'
+                        style={{ height: "325px" }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          alt=''
+                          src={image}
+                          className='absolute max-w-none object-cover'
+                          style={imageStyle as React.CSSProperties}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <p
+                      className='text-[#0036a4] text-base leading-6 mb-1'
+                      style={{ fontFamily: manrope, fontWeight: 400 }}
+                    >
+                      {title}
+                    </p>
+
+                    {/* Description */}
+                    <p
+                      className='text-[#3d3d3d] text-base leading-6'
+                      style={{ fontFamily: inter, fontWeight: 400 }}
+                    >
+                      {description}
+                    </p>
+                  </div>
+                ),
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Limited Time Promotion ───────────────────────────── */}
+        <section id='pricing' className='bg-white py-20'>
+          <div className='flex flex-col gap-8 items-center max-w-[1366px] mx-auto px-12'>
+            <div className='text-center'>
+              <h2
+                className='text-[#0036a4] text-[44px] font-bold uppercase leading-[48px]'
+                style={{ fontFamily: inter }}
+              >
+                LIMITED TIME PROMOTION!
+              </h2>
+              <p
+                className='text-[#5f5e5e] text-base mt-1'
+                style={{ fontFamily: inter, fontWeight: 400 }}
+              >
+                Affordable, eco-friendly cleaning made simple
+              </p>
+            </div>
+
+            <div
+              className='bg-white border border-[#e8e8e8] rounded-lg p-[33px] w-full max-w-[576px]'
+              style={{ filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))" }}
+            >
+              <p
+                className='text-[#0036a4] text-base leading-6'
+                style={{ fontFamily: manrope, fontWeight: 400 }}
+              >
+                Waterless Cleaning
+              </p>
+              <p
+                className='text-[#1a1c1c] text-[44px] leading-[48px] font-bold'
+                style={{ fontFamily: manrope }}
+              >
+                Rp50.000
+              </p>
+              <p
+                className='text-[#3d3d3d] text-base leading-6 mt-3'
+                style={{ fontFamily: inter, fontWeight: 400 }}
+              >
+                Premium waterless cleaning that keeps your car spotless — all
+                while you shop.
+              </p>
+              <ul className='flex flex-col gap-3 mt-5'>
+                {pricingFeatures.map((feature) => (
+                  <li key={feature} className='flex gap-3 items-start'>
+                    <span className='mt-[9px] shrink-0 bg-[#0036a4] rounded-full size-[6px]' />
+                    <span
+                      className='text-[#3d3d3d] text-base leading-6'
+                      style={{ fontFamily: inter, fontWeight: 400 }}
+                    >
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Track Your Wash ─────────────────────────────────── */}
+        <section className='bg-[#f7f7f7] py-20'>
+          <div className='flex flex-col gap-8 max-w-[1366px] mx-auto px-12'>
+            {/* Card */}
+            <div
+              className='bg-white border border-[#e8e8e8] rounded-2xl p-[33px] flex items-center justify-between gap-8'
+              style={{ filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))" }}
+            >
+              {/* Left: copy */}
+              <div className='flex-1 min-w-0 flex flex-col gap-4'>
+                <h2
+                  className='text-[#0036a4] text-[44px] leading-[48px] font-bold'
+                  style={{ fontFamily: manrope }}
+                >
+                  Track Your Wash
+                </h2>
+                <p
+                  className='text-[#3d3d3d] text-base leading-6'
+                  style={{ fontFamily: inter, fontWeight: 400 }}
+                >
+                  From parking to final shine in only 30 minutes, Park &amp;
+                  Shine keeps the experience smooth and easy to follow. Perfect
+                  for drivers booking on the go.
+                </p>
+              </div>
+
+              {/* Right: steps */}
+              <div className='flex-1 min-w-0 flex items-center justify-center py-6'>
+                <div className='relative flex items-start justify-center w-full max-w-[512px]'>
+                  {/* Background divider */}
+                  <div className='absolute top-6 left-0 right-0 h-[2px] bg-[#c3c5d7]' />
+                  {/* Active segment */}
+                  <div className='absolute top-6 left-0 w-1/4 h-[2px] bg-[#0036a4]' />
+
+                  {trackSteps.map(({ label, active, current }, i) => (
+                    <div
+                      key={i}
+                      className='flex-1 flex flex-col gap-3 items-center relative'
+                    >
+                      <div
+                        className='size-12 rounded-xl flex items-center justify-center'
+                        style={{
+                          background: current
+                            ? "#024ad8"
+                            : active
+                              ? "#0036a4"
+                              : "#e5e2e1",
+                          boxShadow: current
+                            ? "0px 0px 10px rgba(2,74,216,0.3)"
+                            : "none",
+                        }}
+                      >
+                        <span
+                          className='text-base text-center font-bold'
+                          style={{
+                            fontFamily: inter,
+                            color: current
+                              ? "#c2ceff"
+                              : active
+                                ? "white"
+                                : "#5f5e5e",
+                          }}
+                        >
+                          {i + 1}
+                        </span>
+                      </div>
+                      <span
+                        className='text-xs text-center leading-[17px]'
+                        style={{
+                          fontFamily: inter,
+                          fontWeight: 400,
+                          color: current ? "#0036a4" : "#1a1c1c",
+                        }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Book a Wash CTA */}
+            <div className='flex justify-center'>
+              <a
+                href='#'
+                className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-8 py-4 rounded text-center'
+                style={{
+                  fontFamily: inter,
+                  fontWeight: 600,
+                  boxShadow: "0px 8px 12px rgba(26,26,26,0.12)",
+                }}
+              >
+                Book a Wash
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Seamless Integration ─────────────────────────────── */}
+        <section id='about' className='bg-[#f7f7f7] py-20'>
+          <div className='flex flex-col gap-12 max-w-[1366px] mx-auto px-12'>
+            <div className='text-center flex flex-col gap-2'>
+              <h2
+                className='text-[44px] text-black leading-[48px]'
+                style={{ fontFamily: manrope, fontWeight: 500 }}
+              >
+                Seamless Integration
+              </h2>
+              <p
+                className='text-[#5f5e5e] text-base'
+                style={{ fontFamily: inter, fontWeight: 400 }}
+              >
+                Our process is designed for zero friction.
+              </p>
+            </div>
+
+            <div className='flex flex-col gap-12'>
+              {/* Step 1 */}
+              <div
+                className='bg-white border border-[#e8e8e8] rounded-2xl p-[25px] flex gap-12 items-center'
+                style={{
+                  filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))",
+                }}
+              >
+                <div className='flex-1 min-w-0'>
+                  <div className='aspect-video relative rounded overflow-hidden'>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      alt='Scanning QR code'
+                      src={imgScanningQrCode}
+                      className='absolute max-w-none h-full object-cover'
+                      style={{ left: "-0.35%", width: "100.7%" }}
+                    />
+                  </div>
+                </div>
+                <div className='flex-1 min-w-0 flex flex-col gap-4'>
+                  <div className='bg-[#dce1ff] size-12 rounded-xl flex items-center justify-center shrink-0'>
+                    <span
+                      className='text-[#0036a4] text-base text-center'
+                      style={{ fontFamily: manrope, fontWeight: 400 }}
+                    >
+                      1
+                    </span>
+                  </div>
+                  <h3
+                    className='text-[32px] text-black leading-[38px]'
+                    style={{ fontFamily: manrope, fontWeight: 500 }}
+                  >
+                    Scan &amp; Park
+                  </h3>
+                  <p
+                    className='text-[#3d3d3d] text-lg leading-[27px]'
+                    style={{ fontFamily: inter, fontWeight: 400 }}
+                  >
+                    Locate one of our designated parking spots. Scan the QR code
+                    on the pillar to log your location and select your service
+                    tier.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div
+                className='bg-white border border-[#e8e8e8] rounded-2xl p-[25px] flex gap-12 items-center'
+                style={{
+                  filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))",
+                }}
+              >
+                <div className='flex-1 min-w-0 flex flex-col gap-4'>
+                  <div className='bg-[#dce1ff] size-12 rounded-xl flex items-center justify-center shrink-0'>
+                    <span
+                      className='text-[#0036a4] text-base text-center'
+                      style={{ fontFamily: manrope, fontWeight: 400 }}
+                    >
+                      2
+                    </span>
+                  </div>
+                  <h3
+                    className='text-[32px] text-black leading-[38px]'
+                    style={{ fontFamily: manrope, fontWeight: 500 }}
+                  >
+                    Return to a Clean Car
+                  </h3>
+                  <p
+                    className='text-[#3d3d3d] text-lg leading-[27px]'
+                    style={{ fontFamily: inter, fontWeight: 400 }}
+                  >
+                    Go about your day. We&apos;ll handle the rest and notify you
+                    the moment your vehicle is ready.
+                  </p>
+                </div>
+                <div className='flex-1 min-w-0'>
+                  <div className='aspect-video relative rounded overflow-hidden'>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      alt='Notification on phone'
+                      src={imgNotificationOnPhone}
+                      className='absolute max-w-none w-full object-cover'
+                      style={{ height: "177.78%", top: "-38.89%", left: 0 }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* ── Footer ─────────────────────────────────────────────── */}
+      <footer className='bg-[#00164f] border-t border-[#455b72]'>
+        <div className='max-w-[1366px] mx-auto px-12 py-20 grid grid-cols-5 gap-6'>
+          {/* Brand */}
+          <div className='col-span-2 flex flex-col gap-4'>
+            <h3
+              className='text-white text-[32px] leading-[38px]'
+              style={{ fontFamily: manrope, fontWeight: 500 }}
+            >
+              Park &amp; Shine
+            </h3>
+            <p
+              className='text-[#b2c9e4] text-base leading-[26px] max-w-[384px]'
+              style={{ fontFamily: inter, fontWeight: 400 }}
+            >
+              Premium commercial automotive care delivered where you park.
+            </p>
+            <p
+              className='text-[#b2c9e4] text-xs leading-[17px] mt-4'
+              style={{ fontFamily: inter, fontWeight: 400 }}
+            >
+              &copy; 2024 Park &amp; Shine. Commercial Clean Automotive Care.
+            </p>
           </div>
 
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            <span className="text-foreground">Next.js </span>
-            <span className="bg-linear-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
-              Starter
-            </span>
-          </h1>
-
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Production-ready template with type-safe forms, global state,
-            HTTP layer, and accessible UI components.
-          </p>
-
-          <div className="mt-8 flex flex-wrap justify-center gap-2">
-            {stack.map(({ label, dot }) => (
-              <span
-                key={label}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-foreground"
+          {/* Company */}
+          <div className='flex flex-col gap-3'>
+            <p
+              className='text-white text-sm tracking-[0.7px] mb-1'
+              style={{ fontFamily: inter, fontWeight: 600 }}
+            >
+              Company
+            </p>
+            {["About", "Locations", "Careers"].map((link) => (
+              <a
+                key={link}
+                href='#'
+                className='text-[#b2c9e4] text-base leading-[26px]'
+                style={{ fontFamily: inter, fontWeight: 400 }}
               >
-                <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
-                {label}
-              </span>
+                {link}
+              </a>
+            ))}
+          </div>
+
+          {/* Services */}
+          <div className='flex flex-col gap-3'>
+            <p
+              className='text-white text-sm tracking-[0.7px] mb-1'
+              style={{ fontFamily: inter, fontWeight: 600 }}
+            >
+              Services
+            </p>
+            {["Services", "Pricing", "Fleet Services"].map((link) => (
+              <a
+                key={link}
+                href='#'
+                className='text-[#b2c9e4] text-base leading-[26px]'
+                style={{ fontFamily: inter, fontWeight: 400 }}
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+
+          {/* Legal & Support */}
+          <div className='flex flex-col gap-3'>
+            <p
+              className='text-white text-sm tracking-[0.7px] mb-1'
+              style={{ fontFamily: inter, fontWeight: 600 }}
+            >
+              Legal &amp; Support
+            </p>
+            {[
+              "Support",
+              "Privacy Policy",
+              "Terms of Service",
+              "Contact Us",
+            ].map((link) => (
+              <a
+                key={link}
+                href='#'
+                className='text-[#b2c9e4] text-base leading-[26px]'
+                style={{ fontFamily: inter, fontWeight: 400 }}
+              >
+                {link}
+              </a>
             ))}
           </div>
         </div>
-
-        <div className="space-y-4">
-
-          {/* ── Zustand + Immer ──────────────────────────────────── */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <CardLabel>State management</CardLabel>
-                  <CardTitle className="mt-1">Zustand + Immer</CardTitle>
-                </div>
-                <span
-                  className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-background ${
-                    isAuthenticated ? "bg-emerald-500" : "bg-border"
-                  }`}
-                />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-5 rounded-lg bg-muted px-3.5 py-2.5 text-sm">
-                <span className="text-muted-foreground">Auth state: </span>
-                <span className="font-mono text-foreground">
-                  {isAuthenticated ? `logged in as "${user?.name}"` : "not logged in"}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  prefix={<Plus className="h-3.5 w-3.5" />}
-                  onClick={() =>
-                    setUser({ id: "1", name: "Jane Doe", email: "jane@example.com" }, "tok_abc")
-                  }
-                >
-                  Simulate login
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={clearAuth}
-                  disabled={!isAuthenticated}
-                >
-                  Logout
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ── React Hook Form + Zod ───────────────────────────── */}
-          <Card>
-            <CardHeader>
-              <CardLabel>Form validation</CardLabel>
-              <CardTitle className="mt-1">React Hook Form + Zod</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {lastSubmit && (
-                <Alert variant="success" className="mb-5">
-                  <AlertTitle>Last submission</AlertTitle>
-                  <pre className="mt-1 whitespace-pre-wrap break-all font-mono text-xs opacity-90">
-                    {lastSubmit}
-                  </pre>
-                </Alert>
-              )}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    suffix={<ArrowRight className="h-3.5 w-3.5" />}
-                  >
-                    Open form
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Example form</DialogTitle>
-                    <DialogDescription>
-                      Validated with Zod. Submit to see the result.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="mt-5">
-                    <ExampleForm
-                      onSubmit={(v) => setLastSubmit(JSON.stringify(v, null, 2))}
-                    />
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </CardContent>
-          </Card>
-
-          {/* ── Button showcase ──────────────────────────────────── */}
-          <Card>
-            <CardHeader>
-              <CardLabel>Components</CardLabel>
-              <CardTitle className="mt-1">Button</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm">Default</Button>
-                <Button size="sm" variant="outline">Outline</Button>
-                <Button size="sm" variant="ghost">Ghost</Button>
-                <Button size="sm" variant="destructive">Destructive</Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm" prefix={<Search className="h-3.5 w-3.5" />}>
-                  Search
-                </Button>
-                <Button size="sm" variant="outline" prefix={<Plus className="h-3.5 w-3.5" />}>
-                  New item
-                </Button>
-                <Button size="sm" variant="outline" suffix={<ArrowRight className="h-3.5 w-3.5" />}>
-                  Continue
-                </Button>
-                <Button size="sm" variant="destructive" prefix={<Trash2 className="h-3.5 w-3.5" />}>
-                  Delete
-                </Button>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button size="sm">Small</Button>
-                <Button size="md">Medium</Button>
-                <Button size="lg">Large</Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ── Input & Textarea showcase ─────────────────────────── */}
-          <Card>
-            <CardHeader>
-              <CardLabel>Components</CardLabel>
-              <CardTitle className="mt-1">Input &amp; Textarea</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Input placeholder="Default input" />
-              <Input
-                placeholder="Search…"
-                prefix={<Search className="h-4 w-4" />}
-              />
-              <Input
-                placeholder="0.00"
-                prefix={<DollarSign className="h-4 w-4" />}
-                suffix={<span className="text-xs font-medium">USD</span>}
-              />
-              <Input
-                placeholder="username"
-                prefix={<AtSign className="h-4 w-4" />}
-              />
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                suffix={
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((p) => !p)}
-                    className="text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {showPassword
-                      ? <EyeOff className="h-4 w-4" />
-                      : <Eye className="h-4 w-4" />}
-                  </button>
-                }
-              />
-              <Textarea placeholder="Textarea — multi-line input…" />
-            </CardContent>
-          </Card>
-
-          {/* ── Combobox showcase ───────────────────────────────── */}
-          <Card>
-            <CardHeader>
-              <CardLabel>Components</CardLabel>
-              <CardTitle className="mt-1">Combobox</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {/* Single — basic */}
-              <Combobox
-                id="fruit"
-                options={[
-                  { label: "Apple", value: "apple" },
-                  { label: "Banana", value: "banana" },
-                  { label: "Blueberry", value: "blueberry" },
-                  { label: "Grapes", value: "grapes" },
-                  { label: "Mango", value: "mango" },
-                  { label: "Orange", value: "orange" },
-                  { label: "Pineapple", value: "pineapple" },
-                  { label: "Strawberry", value: "strawberry" },
-                ]}
-                value={fruit}
-                onChange={setFruit}
-                placeholder="Select a fruit…"
-                helperText={fruit ? `You selected: ${fruit}` : "Single select with search."}
-              />
-
-              {/* Single — with prefix */}
-              <Combobox
-                id="country"
-                options={[
-                  { label: "Indonesia", value: "id" },
-                  { label: "United States", value: "us" },
-                  { label: "United Kingdom", value: "uk" },
-                  { label: "Japan", value: "jp" },
-                  { label: "Germany", value: "de" },
-                  { label: "France", value: "fr" },
-                  { label: "Australia", value: "au" },
-                  { label: "Canada", value: "ca" },
-                ]}
-                value={country}
-                onChange={setCountry}
-                prefix={<Search className="h-4 w-4" />}
-                placeholder="Select a country…"
-                helperText="Single select with prefix icon."
-              />
-
-              {/* Multi-select — showValues (default) */}
-              <Combobox
-                id="tags"
-                multiple
-                options={[
-                  { label: "Design", value: "design" },
-                  { label: "Engineering", value: "engineering" },
-                  { label: "Marketing", value: "marketing" },
-                  { label: "Product", value: "product" },
-                  { label: "Sales", value: "sales" },
-                  { label: "Support", value: "support" },
-                ]}
-                value={tags}
-                onChange={setTags}
-                prefix={<Tag className="h-4 w-4" />}
-                placeholder="Select tags…"
-                helperText="showValues={true} — tampil badge per item, bisa dihapus langsung."
-              />
-
-              {/* Multi-select — showValues={false} */}
-              <Combobox
-                id="tags-count"
-                multiple
-                showValues={false}
-                options={[
-                  { label: "Design", value: "design" },
-                  { label: "Engineering", value: "engineering" },
-                  { label: "Marketing", value: "marketing" },
-                  { label: "Product", value: "product" },
-                  { label: "Sales", value: "sales" },
-                  { label: "Support", value: "support" },
-                ]}
-                value={tagsCount}
-                onChange={setTagsCount}
-                prefix={<Tag className="h-4 w-4" />}
-                placeholder="Select tags…"
-                helperText="showValues={false} — tampil jumlah saja, misal &quot;3 selected&quot;."
-              />
-
-              {/* Error state — validate on open/close */}
-              <Combobox
-                id="error-combo"
-                options={[
-                  { label: "Option A", value: "a" },
-                  { label: "Option B", value: "b" },
-                  { label: "Option C", value: "c" },
-                ]}
-                value={errorCombo}
-                onChange={(v) => {
-                  setErrorCombo(v);
-                }}
-                placeholder="Required field…"
-                required
-                errorMessage={!errorCombo ? "Please select an option." : undefined}
-                helperText={errorCombo ? "Looks good!" : undefined}
-              />
-            </CardContent>
-          </Card>
-
-          {/* ── Toast showcase ───────────────────────────────────── */}
-          <Card>
-            <CardHeader>
-              <CardLabel>Components</CardLabel>
-              <CardTitle className="mt-1">Toast</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => toast.success("Changes saved successfully.")}
-                >
-                  Success
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => toast.error("Something went wrong. Please try again.")}
-                >
-                  Error
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => toast.loading("Saving changes…")}
-                >
-                  Loading
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    toast.promise(
-                      new Promise((resolve) => setTimeout(resolve, 2000)),
-                      {
-                        loading: "Processing request…",
-                        success: "Request completed!",
-                        error: "Request failed.",
-                      }
-                    )
-                  }
-                >
-                  Promise
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    toast("Heads up — this is a neutral message.", {
-                      icon: "💡",
-                    })
-                  }
-                >
-                  Custom icon
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => toast.dismiss()}
-                >
-                  Dismiss all
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ── Badge showcase ───────────────────────────────────── */}
-          <Card>
-            <CardHeader>
-              <CardLabel>Components</CardLabel>
-              <CardTitle className="mt-1">Badge</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                <Badge>Default</Badge>
-                <Badge variant="secondary">Secondary</Badge>
-                <Badge variant="outline">Outline</Badge>
-                <Badge variant="success">Success</Badge>
-                <Badge variant="warning">Warning</Badge>
-                <Badge variant="destructive">Destructive</Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ── Alert showcase ───────────────────────────────────── */}
-          <Card>
-            <CardHeader>
-              <CardLabel>Components</CardLabel>
-              <CardTitle className="mt-1">Alert</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Alert>
-                <AlertTitle>Info</AlertTitle>
-                <AlertDescription>This is a default informational alert.</AlertDescription>
-              </Alert>
-              <Alert variant="success">
-                <AlertTitle>Success</AlertTitle>
-                <AlertDescription>Your changes have been saved successfully.</AlertDescription>
-              </Alert>
-              <Alert variant="warning">
-                <AlertTitle>Warning</AlertTitle>
-                <AlertDescription>Your session will expire in 5 minutes.</AlertDescription>
-              </Alert>
-              <Alert variant="destructive">
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>Something went wrong. Please try again.</AlertDescription>
-              </Alert>
-            </CardContent>
-          </Card>
-
-        </div>
-
-        <p className="mt-12 text-center text-xs text-muted-foreground/60">
-          Next.js · Tailwind v4 · React Hook Form · Axios · Zustand · Immer · Radix UI · Zod
-        </p>
-
-      </main>
+      </footer>
     </div>
   );
 }
