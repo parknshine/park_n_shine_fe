@@ -3,6 +3,7 @@
 import { Camera, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/shared";
+import { useTranslation } from "@/i18n";
 import type { UploadState } from "@/features/customer/types";
 import type { MediaKind } from "@/types/media";
 
@@ -28,20 +29,22 @@ export function PhotoUploadField({
   state,
   onSelect,
   onRetry,
-  labels = {
-    retry: "customer.upload.retry",
-    upload: "customer.upload.select",
-    uploading: "customer.upload.uploading",
-    retrying: "customer.upload.retrying",
-  },
+  labels,
 }: PhotoUploadFieldProps) {
+  const { t } = useTranslation("customer");
+  const resolvedLabels = labels ?? {
+    retry: t("upload.retry"),
+    upload: t("upload.select"),
+    uploading: t("upload.uploading"),
+    retrying: t("upload.retrying"),
+  };
   const isBusy = state.status === "uploading" || state.status === "retrying";
   const actionLabel =
     state.status === "uploading"
-      ? labels.uploading
+      ? resolvedLabels.uploading
       : state.status === "retrying"
-        ? labels.retrying
-        : labels.upload;
+        ? resolvedLabels.retrying
+        : resolvedLabels.upload;
 
   return (
     <div className="rounded-lg border border-border p-4">
@@ -96,7 +99,7 @@ export function PhotoUploadField({
               prefix={<RotateCcw className="h-4 w-4" />}
               onClick={onRetry}
             >
-              {labels.retry}
+              {resolvedLabels.retry}
             </Button>
           )}
         </div>

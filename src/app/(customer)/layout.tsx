@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { WhatsAppSupportWidget } from "@/features/customer/components";
+import { LanguageSwitcher } from "@/components/shared";
 
 interface CustomerLayoutProps {
   children: ReactNode;
@@ -14,7 +15,7 @@ export default function CustomerLayout({ children }: CustomerLayoutProps) {
   return (
     <NuqsAdapter>
       <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-sm">
-        <div className="mx-auto flex h-14 max-w-md items-center px-4">
+        <div className="mx-auto flex h-14 max-w-md items-center justify-between px-4">
           <div className="flex items-center gap-2.5">
             <Image
               src="/icons/icon.svg"
@@ -27,6 +28,7 @@ export default function CustomerLayout({ children }: CustomerLayoutProps) {
               Park & Shine
             </span>
           </div>
+          <LanguageSwitcher />
         </div>
       </header>
 

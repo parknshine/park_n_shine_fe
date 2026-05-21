@@ -1,0 +1,23 @@
+{
+  "action": {
+    "retry": "Coba Lagi",
+    "save": "Simpan",
+    "back": "Kembali",
+    "close": "Tutup",
+    "next": "Lanjut",
+    "send": "Kirim",
+    "skip": "Lewati"
+  },
+  "state": {
+    "loading": "Memuat...",
+    "processing": "Memproses...",
+    "searching": "Mencari...",
+    "uploading": "Mengunggah…",
+    "retrying": "Mencoba ulang…",
+    "preparing": "Menyiapkan booking..."
+  },
+  "error": {
+    "generic": "Terjadi kesalahan. Coba lagi.",
+    "notFound": "Tidak ditemukan."
+  }
+}

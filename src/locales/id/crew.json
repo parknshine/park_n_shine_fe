@@ -1,0 +1,68 @@
+{
+  "home": {
+    "queueLabel": "Antrian Job",
+    "readyTitle": "Siap Bertugas",
+    "emptyTitle": "Tidak ada job saat ini",
+    "emptyDescription": "Belum ada kendaraan di antrean. Coba lagi beberapa saat.",
+    "claimButton": "Ambil Job Berikutnya",
+    "claimAriaLabel": "Ambil job berikutnya",
+    "claimHint": "Tekan tombol untuk mengambil job dari antrean",
+    "searching": "Mencari Job…"
+  },
+  "job": {
+    "loading": "Memuat data job",
+    "notFoundTitle": "Job tidak ditemukan",
+    "notFoundDescription": "Job ini mungkin sudah selesai atau tidak tersedia.",
+    "backToQueue": "Kembali ke Antrian",
+    "backAriaLabel": "Kembali ke antrian",
+    "queueNav": "Antrian",
+    "plateNumber": "Nomor Plat",
+    "assignedAt": "Ditugaskan",
+    "timeRemaining": "Sisa Waktu",
+    "timeExpired": "Waktu habis",
+    "timeAriaLabel": "Sisa waktu: {{time}}",
+    "vehiclePhotos": "Foto Kendaraan",
+    "vehiclePhotosAriaLabel": "Foto kendaraan pelanggan",
+    "photoAlt": "Foto {{kind}} kendaraan",
+    "verifyButton": "Verifikasi Plat",
+    "verifyAriaLabel": "Verifikasi plat kendaraan",
+    "photoKind": {
+      "plate": "Plat",
+      "slot": "Slot",
+      "front": "Depan",
+      "back": "Belakang",
+      "left": "Kiri",
+      "right": "Kanan",
+      "before": "Sebelum",
+      "after": "Sesudah"
+    }
+  },
+  "verify": {
+    "title": "Verifikasi Plat",
+    "platePhotoAlt": "Foto plat kendaraan customer",
+    "plateNotAvailable": "Foto plat tidak tersedia",
+    "matched": "Plat Cocok",
+    "notFound": "Tidak Ditemukan",
+    "escalatedTitle": "Job Dieskalasi",
+    "escalatedDescription": "Plat tidak ditemukan. Supervisor telah diberitahu.",
+    "backToQueue": "Kembali ke Antrian"
+  },
+  "beforePhotos": {
+    "title": "Foto Kondisi Kendaraan",
+    "subtitle": "Ambil 4 foto sebelum mulai cuci.",
+    "photoCount": "{{done}}/4 Foto Diambil",
+    "continueButton": "Lanjut",
+    "continueAriaLabel": "Lanjut ke checklist",
+    "countAriaLabel": "{{done}} dari 4 foto diambil",
+    "uploadLabels": {
+      "retry": "Coba lagi",
+      "upload": "Ambil Foto",
+      "uploading": "Mengunggah…",
+      "retrying": "Mencoba ulang…"
+    }
+  },
+  "checklist": {
+    "title": "Checklist Cuci",
+    "comingSoon": "Fitur ini akan tersedia di Sprint 6."
+  }
+}

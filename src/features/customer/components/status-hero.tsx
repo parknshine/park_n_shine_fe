@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Car,
   CheckCircle2,
@@ -6,6 +8,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n";
 import { StatusBadge } from "@/components/shared";
 import {
   BOOKING_STATUS_TONES,
@@ -19,18 +22,18 @@ interface StatusHeroProps {
   slot?: string | null;
 }
 
-const STATUS_LABELS: Record<BookingStatus, string> = {
-  DRAFT: "Menunggu",
-  PENDING: "Menunggu Pembayaran",
-  PAID: "Antrian — Menunggu crew",
-  ASSIGNED: "Crew dalam perjalanan",
-  IN_PROGRESS: "Sedang dicuci",
-  READY: "Mobil Anda sudah bersih!",
-  CLOSED: "Selesai",
-  EXPIRED: "Booking kadaluarsa",
-  CANCELLED: "Booking dibatalkan",
-  NEEDS_HELP: "Kami membutuhkan info lebih lanjut",
-  STALE: "Tidak Aktif",
+const STATUS_LABEL_KEYS: Record<BookingStatus, string> = {
+  DRAFT: "booking.status.draft",
+  PENDING: "booking.status.pending",
+  PAID: "booking.status.paid",
+  ASSIGNED: "booking.status.assigned",
+  IN_PROGRESS: "booking.status.in_progress",
+  READY: "booking.status.ready",
+  CLOSED: "booking.status.closed",
+  EXPIRED: "booking.status.expired",
+  CANCELLED: "booking.status.cancelled",
+  NEEDS_HELP: "booking.status.needs_help",
+  STALE: "booking.status.stale",
 };
 
 function StatusIcon({ status }: { status: BookingStatus }) {
@@ -58,6 +61,7 @@ function StatusIcon({ status }: { status: BookingStatus }) {
 }
 
 export function StatusHero({ status, plate, slot }: StatusHeroProps) {
+  const { t } = useTranslation("customer");
   const isActive =
     status === BOOKING_STATUSES.ASSIGNED ||
     status === BOOKING_STATUSES.IN_PROGRESS;
@@ -77,7 +81,7 @@ export function StatusHero({ status, plate, slot }: StatusHeroProps) {
       </div>
 
       <StatusBadge tone={BOOKING_STATUS_TONES[status]}>
-        {STATUS_LABELS[status]}
+        {t(STATUS_LABEL_KEYS[status])}
       </StatusBadge>
 
       {(plate || slot) && (

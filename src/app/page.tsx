@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "@/i18n";
+import { useUIStore } from "@/store/ui-store";
 
 const imgParkShineLogo = "/park_n_shine_logo.jpeg.png";
 const imgScanningQrCode = "/park-shine-panel-1.jpeg";
@@ -17,64 +19,47 @@ const languages = [
   { code: "EN", label: "English" },
 ];
 
-const howItWorksCards = [
+const howItWorksData = [
   {
     step: 1,
     image: imgScanningQrCode,
     imageStyle: { left: "-69.35%", width: "238.69%", height: "100%", top: "0" },
-    title: "QR Code",
-    description: "Locate our QR Code near you after you park.",
   },
   {
     step: 2,
     image: imgPhotographingCarPlate,
     imageStyle: { left: "-16.67%", width: "133.33%", height: "100%", top: "0" },
-    title: "Snap and Upload",
-    description:
-      "Take a picture of your number plate as well as the carpark number.",
   },
   {
     step: 3,
     image: imgStaffWashingCar,
     imageStyle: { left: "-16.67%", width: "133.33%", height: "100%", top: "0" },
-    title: "Professional Service",
-    description:
-      "Our service crew will locate your car and start the car wash process.",
   },
   {
     step: 4,
     image: imgNotificationOnPhone,
     imageStyle: { left: "-16.67%", width: "133.33%", height: "100%", top: "0" },
-    title: "Sparkling Clean",
-    description:
-      "Receive a notification after 30 minutes that your car is sparkling clean!",
   },
 ];
 
-const trackSteps = [
-  { label: "Park", active: true, current: false },
-  { label: "Take 2 Pictures", active: false, current: true },
-  { label: "Make Payment", active: false, current: false },
-  { label: "Crew Starts Washing", active: false, current: false },
-  { label: "Car Is Ready!", active: false, current: false },
+const trackStepsData = [
+  { active: true, current: false },
+  { active: false, current: true },
+  { active: false, current: false },
+  { active: false, current: false },
+  { active: false, current: false },
 ];
 
-const navLinks = [
-  { label: "Services", sectionId: "services" },
-  { label: "Pricing", sectionId: "pricing" },
-  { label: "About", sectionId: "about" },
-];
-
-const pricingFeatures = [
-  "Professional cleaning with premium finish",
-  "Safe, scratch-free process",
-  "High quality cleaning chemicals",
-  "Strong Protection And Shine",
-  "Eco-friendly cleaning using under 1L of water per wash vs existing that uses 100L",
+const navSections = [
+  { key: "services" as const, sectionId: "services" },
+  { key: "pricing" as const, sectionId: "pricing" },
+  { key: "about" as const, sectionId: "about" },
 ];
 
 export default function Home() {
-  const [selectedLang, setSelectedLang] = useState(languages[0]);
+  const { t } = useTranslation("customer");
+  const locale = useUIStore((s) => s.locale);
+  const setLocale = useUIStore((s) => s.setLocale);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -87,6 +72,14 @@ export default function Home() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const pricingFeatures = [
+    t("landingPage.pricing.feature1"),
+    t("landingPage.pricing.feature2"),
+    t("landingPage.pricing.feature3"),
+    t("landingPage.pricing.feature4"),
+    t("landingPage.pricing.feature5"),
+  ];
 
   return (
     <div className='bg-white relative min-h-screen'>
@@ -116,9 +109,9 @@ export default function Home() {
 
           {/* Nav links */}
           <nav className='flex items-center gap-6'>
-            {navLinks.map(({ label, sectionId }) => (
+            {navSections.map(({ key, sectionId }) => (
               <a
-                key={label}
+                key={sectionId}
                 href={`#${sectionId}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -127,7 +120,7 @@ export default function Home() {
                 className='text-[#5f5e5e] text-sm tracking-[0.7px] py-1'
                 style={{ fontFamily: inter, fontWeight: 600 }}
               >
-                {label}
+                {t(`landingPage.nav.${key}`)}
               </a>
             ))}
           </nav>
@@ -139,17 +132,19 @@ export default function Home() {
               className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-6 py-3 rounded text-center'
               style={{ fontFamily: inter, fontWeight: 600 }}
             >
-              Book Now
+              {t("landingPage.nav.bookNow")}
             </a>
 
             {/* Language dropdown */}
             <div className='relative' ref={dropdownRef}>
               <button
+                type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
                 className='flex items-center gap-1.5 border border-[#c2c2c2] rounded-md h-11 px-4.25 bg-white text-black text-base'
                 style={{ fontFamily: inter, fontWeight: 400 }}
+                aria-label={locale === "id" ? "Ganti bahasa" : "Change language"}
               >
-                {selectedLang.code}
+                {locale.toUpperCase()}
                 <svg
                   width='10'
                   height='6'
@@ -175,12 +170,13 @@ export default function Home() {
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
+                      type="button"
                       onClick={() => {
-                        setSelectedLang(lang);
+                        setLocale(lang.code.toLowerCase() as "id" | "en");
                         setIsDropdownOpen(false);
                       }}
                       className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-[#f7f7f7] transition-colors ${
-                        selectedLang.code === lang.code
+                        locale.toUpperCase() === lang.code
                           ? "text-[#0036a4] font-semibold"
                           : "text-[#3d3d3d]"
                       }`}
@@ -224,16 +220,18 @@ export default function Home() {
                 className='text-[56px] text-black leading-[56px]'
                 style={{ fontFamily: manrope, fontWeight: 500 }}
               >
-                Your Car Shines
-                <br />
-                While You Shop
+                {t("landingPage.hero.heading").split("\n").map((line, i) => (
+                  <span key={i}>
+                    {i > 0 && <br />}
+                    {line}
+                  </span>
+                ))}
               </h1>
               <p
                 className='text-[#3d3d3d] text-lg leading-[27px] max-w-[512px]'
                 style={{ fontFamily: inter, fontWeight: 400 }}
               >
-                Professional cleaning at your favorite parking spot. High-end
-                enterprise discipline brought to everyday convenience.
+                {t("landingPage.hero.description")}
               </p>
               <div className='flex gap-4 pt-3'>
                 <a
@@ -241,14 +239,14 @@ export default function Home() {
                   className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-8 py-[17px] rounded text-center'
                   style={{ fontFamily: inter, fontWeight: 600 }}
                 >
-                  View Services
+                  {t("landingPage.hero.viewServices")}
                 </a>
                 <a
                   href='#'
                   className='border border-[#c2c2c2] text-black text-sm tracking-[0.7px] px-8 py-[17px] rounded text-center'
                   style={{ fontFamily: inter, fontWeight: 600 }}
                 >
-                  Find Locations
+                  {t("landingPage.hero.findLocations")}
                 </a>
               </div>
             </div>
@@ -262,7 +260,7 @@ export default function Home() {
                 <div className='h-[426px] relative overflow-hidden'>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    alt='Family standing near their clean blue car in a parking garage'
+                    alt={t("landingPage.hero.imageAlt")}
                     src={imgHero}
                     className='absolute w-full max-w-none object-cover'
                     style={{ height: "133.33%", top: "-16.67%", left: 0 }}
@@ -280,66 +278,64 @@ export default function Home() {
               className='text-[56px] text-black text-center leading-[56px]'
               style={{ fontFamily: manrope, fontWeight: 500 }}
             >
-              How the Magic Happens
+              {t("landingPage.howItWorks.title")}
             </h2>
 
             <div className='grid grid-cols-4 gap-6'>
-              {howItWorksCards.map(
-                ({ step, image, imageStyle, title, description }) => (
+              {howItWorksData.map(({ step, image, imageStyle }) => (
+                <div
+                  key={step}
+                  className='bg-white border border-[#e8e8e8] rounded-lg px-[17px] pt-[33px] pb-10 relative flex flex-col'
+                  style={{
+                    filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))",
+                  }}
+                >
+                  {/* Step badge */}
                   <div
-                    key={step}
-                    className='bg-white border border-[#e8e8e8] rounded-lg px-[17px] pt-[33px] pb-10 relative flex flex-col'
-                    style={{
-                      filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))",
-                    }}
+                    className='absolute top-[-16px] right-4 bg-[#f9e285] rounded-xl size-10 flex items-center justify-center'
+                    style={{ boxShadow: "0px 1px 1px rgba(0,0,0,0.05)" }}
                   >
-                    {/* Step badge */}
-                    <div
-                      className='absolute top-[-16px] right-4 bg-[#f9e285] rounded-xl size-10 flex items-center justify-center'
-                      style={{ boxShadow: "0px 1px 1px rgba(0,0,0,0.05)" }}
+                    <span
+                      className='text-[#1a1c1c] text-lg text-center'
+                      style={{ fontFamily: inter, fontWeight: 700 }}
                     >
-                      <span
-                        className='text-[#1a1c1c] text-lg text-center'
-                        style={{ fontFamily: inter, fontWeight: 700 }}
-                      >
-                        {step}
-                      </span>
-                    </div>
-
-                    {/* Image */}
-                    <div className='rounded-lg overflow-hidden mb-4'>
-                      <div
-                        className='relative overflow-hidden'
-                        style={{ height: "325px" }}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          alt=''
-                          src={image}
-                          className='absolute max-w-none object-cover'
-                          style={imageStyle as React.CSSProperties}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <p
-                      className='text-[#0036a4] text-base leading-6 mb-1'
-                      style={{ fontFamily: manrope, fontWeight: 400 }}
-                    >
-                      {title}
-                    </p>
-
-                    {/* Description */}
-                    <p
-                      className='text-[#3d3d3d] text-base leading-6'
-                      style={{ fontFamily: inter, fontWeight: 400 }}
-                    >
-                      {description}
-                    </p>
+                      {step}
+                    </span>
                   </div>
-                ),
-              )}
+
+                  {/* Image */}
+                  <div className='rounded-lg overflow-hidden mb-4'>
+                    <div
+                      className='relative overflow-hidden'
+                      style={{ height: "325px" }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        alt=''
+                        src={image}
+                        className='absolute max-w-none object-cover'
+                        style={imageStyle as React.CSSProperties}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <p
+                    className='text-[#0036a4] text-base leading-6 mb-1'
+                    style={{ fontFamily: manrope, fontWeight: 400 }}
+                  >
+                    {t(`landingPage.howItWorks.card${step}.title`)}
+                  </p>
+
+                  {/* Description */}
+                  <p
+                    className='text-[#3d3d3d] text-base leading-6'
+                    style={{ fontFamily: inter, fontWeight: 400 }}
+                  >
+                    {t(`landingPage.howItWorks.card${step}.description`)}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -352,13 +348,13 @@ export default function Home() {
                 className='text-[#0036a4] text-[44px] font-bold uppercase leading-[48px]'
                 style={{ fontFamily: inter }}
               >
-                LIMITED TIME PROMOTION!
+                {t("landingPage.pricing.title")}
               </h2>
               <p
                 className='text-[#5f5e5e] text-base mt-1'
                 style={{ fontFamily: inter, fontWeight: 400 }}
               >
-                Affordable, eco-friendly cleaning made simple
+                {t("landingPage.pricing.subtitle")}
               </p>
             </div>
 
@@ -370,7 +366,7 @@ export default function Home() {
                 className='text-[#0036a4] text-base leading-6'
                 style={{ fontFamily: manrope, fontWeight: 400 }}
               >
-                Waterless Cleaning
+                {t("landingPage.pricing.serviceLabel")}
               </p>
               <p
                 className='text-[#1a1c1c] text-[44px] leading-[48px] font-bold'
@@ -382,8 +378,7 @@ export default function Home() {
                 className='text-[#3d3d3d] text-base leading-6 mt-3'
                 style={{ fontFamily: inter, fontWeight: 400 }}
               >
-                Premium waterless cleaning that keeps your car spotless — all
-                while you shop.
+                {t("landingPage.pricing.description")}
               </p>
               <ul className='flex flex-col gap-3 mt-5'>
                 {pricingFeatures.map((feature) => (
@@ -416,15 +411,13 @@ export default function Home() {
                   className='text-[#0036a4] text-[44px] leading-[48px] font-bold'
                   style={{ fontFamily: manrope }}
                 >
-                  Track Your Wash
+                  {t("landingPage.track.title")}
                 </h2>
                 <p
                   className='text-[#3d3d3d] text-base leading-6'
                   style={{ fontFamily: inter, fontWeight: 400 }}
                 >
-                  From parking to final shine in only 30 minutes, Park &amp;
-                  Shine keeps the experience smooth and easy to follow. Perfect
-                  for drivers booking on the go.
+                  {t("landingPage.track.description")}
                 </p>
               </div>
 
@@ -436,7 +429,7 @@ export default function Home() {
                   {/* Active segment */}
                   <div className='absolute top-6 left-0 w-1/4 h-[2px] bg-[#0036a4]' />
 
-                  {trackSteps.map(({ label, active, current }, i) => (
+                  {trackStepsData.map(({ active, current }, i) => (
                     <div
                       key={i}
                       className='flex-1 flex flex-col gap-3 items-center relative'
@@ -476,7 +469,7 @@ export default function Home() {
                           color: current ? "#0036a4" : "#1a1c1c",
                         }}
                       >
-                        {label}
+                        {t(`landingPage.track.step${i + 1}`)}
                       </span>
                     </div>
                   ))}
@@ -495,7 +488,7 @@ export default function Home() {
                   boxShadow: "0px 8px 12px rgba(26,26,26,0.12)",
                 }}
               >
-                Book a Wash
+                {t("landingPage.track.bookNow")}
               </a>
             </div>
           </div>
@@ -509,13 +502,13 @@ export default function Home() {
                 className='text-[44px] text-black leading-[48px]'
                 style={{ fontFamily: manrope, fontWeight: 500 }}
               >
-                Seamless Integration
+                {t("landingPage.integration.title")}
               </h2>
               <p
                 className='text-[#5f5e5e] text-base'
                 style={{ fontFamily: inter, fontWeight: 400 }}
               >
-                Our process is designed for zero friction.
+                {t("landingPage.integration.subtitle")}
               </p>
             </div>
 
@@ -531,7 +524,7 @@ export default function Home() {
                   <div className='aspect-video relative rounded overflow-hidden'>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      alt='Scanning QR code'
+                      alt={t("landingPage.integration.step1.imageAlt")}
                       src={imgScanningQrCode}
                       className='absolute max-w-none h-full object-cover'
                       style={{ left: "-0.35%", width: "100.7%" }}
@@ -551,15 +544,13 @@ export default function Home() {
                     className='text-[32px] text-black leading-[38px]'
                     style={{ fontFamily: manrope, fontWeight: 500 }}
                   >
-                    Scan &amp; Park
+                    {t("landingPage.integration.step1.title")}
                   </h3>
                   <p
                     className='text-[#3d3d3d] text-lg leading-[27px]'
                     style={{ fontFamily: inter, fontWeight: 400 }}
                   >
-                    Locate one of our designated parking spots. Scan the QR code
-                    on the pillar to log your location and select your service
-                    tier.
+                    {t("landingPage.integration.step1.description")}
                   </p>
                 </div>
               </div>
@@ -584,21 +575,20 @@ export default function Home() {
                     className='text-[32px] text-black leading-[38px]'
                     style={{ fontFamily: manrope, fontWeight: 500 }}
                   >
-                    Return to a Clean Car
+                    {t("landingPage.integration.step2.title")}
                   </h3>
                   <p
                     className='text-[#3d3d3d] text-lg leading-[27px]'
                     style={{ fontFamily: inter, fontWeight: 400 }}
                   >
-                    Go about your day. We&apos;ll handle the rest and notify you
-                    the moment your vehicle is ready.
+                    {t("landingPage.integration.step2.description")}
                   </p>
                 </div>
                 <div className='flex-1 min-w-0'>
                   <div className='aspect-video relative rounded overflow-hidden'>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      alt='Notification on phone'
+                      alt={t("landingPage.integration.step2.imageAlt")}
                       src={imgNotificationOnPhone}
                       className='absolute max-w-none w-full object-cover'
                       style={{ height: "177.78%", top: "-38.89%", left: 0 }}
@@ -626,13 +616,13 @@ export default function Home() {
               className='text-[#b2c9e4] text-base leading-[26px] max-w-[384px]'
               style={{ fontFamily: inter, fontWeight: 400 }}
             >
-              Premium commercial automotive care delivered where you park.
+              {t("landingPage.footer.tagline")}
             </p>
             <p
               className='text-[#b2c9e4] text-xs leading-[17px] mt-4'
               style={{ fontFamily: inter, fontWeight: 400 }}
             >
-              &copy; 2024 Park &amp; Shine. Commercial Clean Automotive Care.
+              {t("landingPage.footer.copyright")}
             </p>
           </div>
 
@@ -642,9 +632,13 @@ export default function Home() {
               className='text-white text-sm tracking-[0.7px] mb-1'
               style={{ fontFamily: inter, fontWeight: 600 }}
             >
-              Company
+              {t("landingPage.footer.companyHeading")}
             </p>
-            {["About", "Locations", "Careers"].map((link) => (
+            {[
+              t("landingPage.footer.about"),
+              t("landingPage.footer.locations"),
+              t("landingPage.footer.careers"),
+            ].map((link) => (
               <a
                 key={link}
                 href='#'
@@ -662,9 +656,13 @@ export default function Home() {
               className='text-white text-sm tracking-[0.7px] mb-1'
               style={{ fontFamily: inter, fontWeight: 600 }}
             >
-              Services
+              {t("landingPage.footer.servicesHeading")}
             </p>
-            {["Services", "Pricing", "Fleet Services"].map((link) => (
+            {[
+              t("landingPage.footer.services"),
+              t("landingPage.footer.pricing"),
+              t("landingPage.footer.fleetServices"),
+            ].map((link) => (
               <a
                 key={link}
                 href='#'
@@ -682,13 +680,13 @@ export default function Home() {
               className='text-white text-sm tracking-[0.7px] mb-1'
               style={{ fontFamily: inter, fontWeight: 600 }}
             >
-              Legal &amp; Support
+              {t("landingPage.footer.legalHeading")}
             </p>
             {[
-              "Support",
-              "Privacy Policy",
-              "Terms of Service",
-              "Contact Us",
+              t("landingPage.footer.support"),
+              t("landingPage.footer.privacyPolicy"),
+              t("landingPage.footer.termsOfService"),
+              t("landingPage.footer.contactUs"),
             ].map((link) => (
               <a
                 key={link}

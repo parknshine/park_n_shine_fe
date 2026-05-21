@@ -13,3 +13,4 @@ export { StatusHero } from "./status-hero";
 export { WhatsAppSupportWidget } from "./whatsapp-support-widget";
 export { BookingLocationCard } from "./booking-location-card";
 export { BookNowButtonV2 } from "./book-now-button-v2";
+export { QrBlockingMessage } from "./qr-blocking-message";

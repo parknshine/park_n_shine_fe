@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/providers/toaster";
 import { PwaProvider } from "@/components/providers/pwa-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { I18nProvider } from "@/components/providers/i18n-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <head />
       <body className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${inter.variable} antialiased`}>
         <Script
@@ -73,13 +74,15 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem('theme');var dark=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(dark)document.documentElement.classList.add('dark')}catch(e){}})()`,
           }}
         />
-        <ThemeProvider>
-          <QueryProvider>
-            {children}
-            <Toaster />
-            <PwaProvider />
-          </QueryProvider>
-        </ThemeProvider>
+        <I18nProvider>
+          <ThemeProvider>
+            <QueryProvider>
+              {children}
+              <Toaster />
+              <PwaProvider />
+            </QueryProvider>
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

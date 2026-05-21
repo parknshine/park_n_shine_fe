@@ -322,15 +322,15 @@ const STATUS_FLOW: BookingStatus[] = [
 ];
 
 const STATUS_LABELS: Record<BookingStatus, string> = {
-  DRAFT: "Draft",
-  PENDING: "Menunggu Pembayaran",
-  PAID: "Pembayaran Diterima",
-  ASSIGNED: "Menunggu Tim",
-  IN_PROGRESS: "Sedang Dicuci",
-  NEEDS_HELP: "Butuh Bantuan",
-  READY: "Mobil Siap!",
-  STALE: "Terlambat",
-  CLOSED: "Selesai",
+  DRAFT: "booking.status.draft",
+  PENDING: "booking.status.pending",
+  PAID: "booking.status.paid",
+  ASSIGNED: "booking.status.assigned",
+  IN_PROGRESS: "booking.status.in_progress",
+  NEEDS_HELP: "booking.status.needs_help",
+  READY: "booking.status.ready",
+  STALE: "booking.status.stale",
+  CLOSED: "booking.status.closed",
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { useCrewJob } from "@/features/crew/hooks";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -36,13 +37,6 @@ function formatAssignedAt(raw?: string | null): string {
   }
 }
 
-const PHOTO_KIND_LABELS: Record<string, string> = {
-  plate: "Plat",
-  slot: "Slot",
-  before: "Sebelum",
-  after: "Sesudah",
-};
-
 // ---------------------------------------------------------------------------
 // ETA Countdown
 // ---------------------------------------------------------------------------
@@ -52,6 +46,7 @@ interface EtaCountdownProps {
 }
 
 function EtaCountdown({ etaEndsAt }: EtaCountdownProps) {
+  const { t } = useTranslation("crew");
   const [remaining, setRemaining] = useState<number>(() =>
     Math.max(0, new Date(etaEndsAt).getTime() - Date.now())
   );
@@ -89,7 +84,7 @@ function EtaCountdown({ etaEndsAt }: EtaCountdownProps) {
             : "border-border bg-muted/40"
       )}
       aria-live="polite"
-      aria-label={`Sisa waktu: ${formatCountdown(remaining)}`}
+      aria-label={t("job.timeAriaLabel", { time: formatCountdown(remaining) })}
     >
       <div className="mb-1.5 flex items-center gap-1.5">
         <Clock
@@ -113,7 +108,7 @@ function EtaCountdown({ etaEndsAt }: EtaCountdownProps) {
                 : "text-muted-foreground"
           )}
         >
-          Sisa Waktu
+          {t("job.timeRemaining")}
         </span>
       </div>
 
@@ -132,7 +127,7 @@ function EtaCountdown({ etaEndsAt }: EtaCountdownProps) {
 
       {isDone && (
         <p className="mt-1.5 text-xs font-medium text-red-500">
-          Waktu habis
+          {t("job.timeExpired")}
         </p>
       )}
     </section>
@@ -147,6 +142,7 @@ export function CrewJobDetailPage() {
   const { jobId } = useParams<{ jobId: string }>();
   const router = useRouter();
   const { job, isLoading, error } = useCrewJob(jobId);
+  const { t } = useTranslation("crew");
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
@@ -154,7 +150,7 @@ export function CrewJobDetailPage() {
       <main className="flex min-h-[calc(100dvh-44px)] items-center justify-center">
         <Loader2
           className="h-8 w-8 animate-spin text-muted-foreground"
-          aria-label="Memuat data job"
+          aria-label={t("job.loading")}
         />
       </main>
     );
@@ -169,10 +165,10 @@ export function CrewJobDetailPage() {
         </div>
         <div className="space-y-1">
           <p className="text-base font-semibold text-foreground">
-            Job tidak ditemukan
+            {t("job.notFoundTitle")}
           </p>
           <p className="text-sm text-muted-foreground">
-            Job ini mungkin sudah selesai atau tidak tersedia.
+            {t("job.notFoundDescription")}
           </p>
         </div>
         <Button
@@ -180,7 +176,7 @@ export function CrewJobDetailPage() {
           size="md"
           onClick={() => router.replace("/crew/home")}
         >
-          Kembali ke Antrian
+          {t("job.backToQueue")}
         </Button>
       </main>
     );
@@ -205,9 +201,9 @@ export function CrewJobDetailPage() {
           onClick={() => router.replace("/crew/home")}
           prefix={<ChevronLeft className="h-4 w-4" />}
           className="-ml-2 mb-4 text-muted-foreground"
-          aria-label="Kembali ke antrian"
+          aria-label={t("job.backAriaLabel")}
         >
-          Antrian
+          {t("job.queueNav")}
         </Button>
 
         {/* ── Job header card ─────────────────────────────────────────── */}
@@ -216,11 +212,11 @@ export function CrewJobDetailPage() {
           {/* Plate reader panel */}
           <div className="flex flex-col items-center gap-2 bg-zinc-900 px-6 py-6">
             <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Nomor Plat
+              {t("job.plateNumber")}
             </span>
             <p
               className="font-mono text-4xl font-extrabold tracking-[0.15em] text-white"
-              aria-label={`Nomor plat: ${job.plateText}`}
+              aria-label={`${t("job.plateNumber")}: ${job.plateText}`}
             >
               {job.plateText}
             </p>
@@ -240,7 +236,7 @@ export function CrewJobDetailPage() {
           {/* Assigned timestamp */}
           <div className="border-t border-border px-4 py-2.5">
             <p className="text-xs text-muted-foreground">
-              <span className="font-medium">Ditugaskan:</span>{" "}
+              <span className="font-medium">{t("job.assignedAt")}:</span>{" "}
               {formatAssignedAt(job.assignedAt)}
             </p>
           </div>
@@ -257,12 +253,12 @@ export function CrewJobDetailPage() {
         {customerPhotos.length > 0 && (
           <section className="mb-4">
             <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Foto Kendaraan
+              {t("job.vehiclePhotos")}
             </p>
             <div
               className="flex gap-3 overflow-x-auto pb-1"
               role="list"
-              aria-label="Foto kendaraan pelanggan"
+              aria-label={t("job.vehiclePhotosAriaLabel")}
             >
               {customerPhotos.map((photo) => (
                 <figure
@@ -274,13 +270,13 @@ export function CrewJobDetailPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photo.url}
-                      alt={`Foto ${PHOTO_KIND_LABELS[photo.kind] ?? photo.kind} kendaraan`}
+                      alt={t("job.photoAlt", { kind: t(`job.photoKind.${photo.kind}`, { defaultValue: photo.kind }) })}
                       className="h-full w-full object-cover"
                       loading="lazy"
                     />
                   </div>
                   <figcaption className="mt-1 text-center text-[10px] font-medium text-muted-foreground">
-                    {PHOTO_KIND_LABELS[photo.kind] ?? photo.kind}
+                    {t(`job.photoKind.${photo.kind}`, { defaultValue: photo.kind })}
                   </figcaption>
                 </figure>
               ))}
@@ -298,9 +294,9 @@ export function CrewJobDetailPage() {
             className="h-14 w-full rounded-xl text-base font-bold"
             onClick={() => router.push(`/crew/jobs/${jobId}/verify`)}
             suffix={<ArrowRight className="h-5 w-5" />}
-            aria-label="Verifikasi plat kendaraan"
+            aria-label={t("job.verifyAriaLabel")}
           >
-            Verifikasi Plat
+            {t("job.verifyButton")}
           </Button>
         </div>
       </div>

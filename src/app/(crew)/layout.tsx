@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { AppShell } from "@/components/shared/app-shell";
+import { LanguageSwitcher } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { useCrewSession } from "@/features/crew/hooks";
 
@@ -53,6 +54,7 @@ export function CrewLayout({ children }: CrewLayoutProps) {
           </div>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <span className="text-sm font-medium text-foreground">
               {session.crewName}
             </span>

@@ -13,9 +13,11 @@ import {
   usePaymentActionV2,
   type ConfirmBookingPayloadV2,
 } from "@/features/customer/hooks/use-payment-action-v2";
+import { useTranslation } from "@/i18n";
 
 export default function WalkInConfirmPage() {
   const router = useRouter();
+  const { t } = useTranslation("customer");
 
   const [{ bookingId, token, lat, lng, loc, phone, plate, slot }] =
     useQueryStates({
@@ -66,13 +68,13 @@ export default function WalkInConfirmPage() {
       <div className="space-y-6">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Langkah 3 dari 3
+            {t("booking.step", { current: 3, total: 3 })}
           </p>
           <h1 className="mt-1 text-2xl font-bold text-foreground">
-            Konfirmasi
+            {t("booking.confirm.title")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Periksa detail booking sebelum membayar.
+            {t("booking.confirm.subtitle")}
           </p>
         </div>
 
@@ -93,7 +95,7 @@ export default function WalkInConfirmPage() {
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4" />
-          Ubah foto
+          {t("booking.confirm.back")}
         </button>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
@@ -107,10 +109,10 @@ export default function WalkInConfirmPage() {
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Memproses...
+              {t("booking.confirm.processing")}
             </>
           ) : (
-            "Bayar Sekarang"
+            t("booking.confirm.pay")
           )}
         </Button>
       </div>

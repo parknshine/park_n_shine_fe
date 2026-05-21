@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { usePhotoUpload } from "@/features/customer/hooks/use-photo-upload";
 import type { MediaKind } from "@/types/media";
+import { useTranslation } from "@/i18n";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -17,20 +18,6 @@ interface AngleConfig {
   id: string;
 }
 
-const ANGLES: AngleConfig[] = [
-  { kind: "front", label: "Depan",    id: "photo-front" },
-  { kind: "back",  label: "Belakang", id: "photo-back"  },
-  { kind: "left",  label: "Kiri",     id: "photo-left"  },
-  { kind: "right", label: "Kanan",    id: "photo-right" },
-];
-
-const UPLOAD_LABELS = {
-  retry:     "Coba lagi",
-  upload:    "Ambil Foto",
-  uploading: "Mengunggah…",
-  retrying:  "Mencoba ulang…",
-};
-
 // ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
@@ -38,6 +25,21 @@ const UPLOAD_LABELS = {
 export function BeforePhotosPage() {
   const { jobId } = useParams<{ jobId: string }>();
   const router = useRouter();
+  const { t } = useTranslation("crew");
+
+  const ANGLES: AngleConfig[] = [
+    { kind: "front" as const, label: t("job.photoKind.front"), id: "photo-front" },
+    { kind: "back"  as const, label: t("job.photoKind.back"),  id: "photo-back"  },
+    { kind: "left"  as const, label: t("job.photoKind.left"),  id: "photo-left"  },
+    { kind: "right" as const, label: t("job.photoKind.right"), id: "photo-right" },
+  ];
+
+  const uploadLabels = {
+    retry:     t("beforePhotos.uploadLabels.retry"),
+    upload:    t("beforePhotos.uploadLabels.upload"),
+    uploading: t("beforePhotos.uploadLabels.uploading"),
+    retrying:  t("beforePhotos.uploadLabels.retrying"),
+  };
 
   const uploadUrl = `/v1/crew/jobs/${jobId}/media`;
 
@@ -64,10 +66,10 @@ export function BeforePhotosPage() {
 
         {/* Page header */}
         <h1 className="text-lg font-semibold text-foreground">
-          Foto Kondisi Kendaraan
+          {t("beforePhotos.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Ambil 4 foto sebelum mulai cuci.
+          {t("beforePhotos.subtitle")}
         </p>
 
         {/* 2×2 photo grid */}
@@ -81,7 +83,7 @@ export function BeforePhotosPage() {
                 label={angle.label}
                 kind={angle.kind}
                 state={upload}
-                labels={UPLOAD_LABELS}
+                labels={uploadLabels}
                 onSelect={(file, kind) => {
                   void upload.uploadPhoto({ file, kind });
                 }}
@@ -106,9 +108,9 @@ export function BeforePhotosPage() {
             disabled={!allDone}
             onClick={() => router.replace(`/crew/jobs/${jobId}/checklist`)}
             suffix={<ArrowRight className="h-5 w-5" />}
-            aria-label={allDone ? "Lanjut ke checklist" : `${doneCount} dari 4 foto diambil`}
+            aria-label={allDone ? t("beforePhotos.continueAriaLabel") : t("beforePhotos.countAriaLabel", { done: doneCount })}
           >
-            {allDone ? "Lanjut" : `${doneCount}/4 Foto Diambil`}
+            {allDone ? t("beforePhotos.continueButton") : t("beforePhotos.photoCount", { done: doneCount })}
           </Button>
         </div>
       </div>

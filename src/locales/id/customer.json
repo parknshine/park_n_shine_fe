@@ -1,0 +1,190 @@
+{
+  "landing": {
+    "badge": "Cuci Mobil Tanpa Perlu Keluar Parkir",
+    "heading": "Mobil Bersih,\nTanpa Keluar\nParkiran.",
+    "heroAlt": "Keluarga bahagia di parkiran dengan mobil bersih"
+  },
+  "landingPage": {
+    "nav": {
+      "services": "Layanan",
+      "pricing": "Harga",
+      "about": "Tentang",
+      "bookNow": "Pesan Sekarang"
+    },
+    "hero": {
+      "heading": "Mobilmu Bersih\nSementara Kamu\nBelanja",
+      "description": "Layanan cuci profesional di tempat parkir favoritmu. Disiplin kelas atas untuk kenyamanan sehari-hari.",
+      "viewServices": "Lihat Layanan",
+      "findLocations": "Temukan Lokasi",
+      "imageAlt": "Keluarga berdiri di samping mobil biru bersih di parkiran"
+    },
+    "howItWorks": {
+      "title": "Bagaimana Cara Kerjanya",
+      "card1": {
+        "title": "QR Code",
+        "description": "Temukan QR Code kami di area parkirmu setelah memarkir kendaraan."
+      },
+      "card2": {
+        "title": "Foto & Upload",
+        "description": "Ambil foto plat nomor dan nomor slot parkir kendaraanmu."
+      },
+      "card3": {
+        "title": "Layanan Profesional",
+        "description": "Tim kami akan menemukan kendaraanmu dan memulai proses pencucian."
+      },
+      "card4": {
+        "title": "Bersih Mengkilap",
+        "description": "Terima notifikasi setelah 30 menit bahwa kendaraanmu sudah mengkilap bersih!"
+      }
+    },
+    "pricing": {
+      "title": "PROMO WAKTU TERBATAS!",
+      "subtitle": "Harga terjangkau, ramah lingkungan, mudah digunakan",
+      "serviceLabel": "Cuci Tanpa Air",
+      "description": "Cuci kendaraan premium tanpa air yang menjaga mobilmu tetap bersih — sementara kamu berbelanja.",
+      "feature1": "Pembersihan profesional dengan hasil premium",
+      "feature2": "Proses aman, bebas goresan",
+      "feature3": "Bahan pembersih berkualitas tinggi",
+      "feature4": "Perlindungan dan kilap yang kuat",
+      "feature5": "Ramah lingkungan — kurang dari 1L air per cuci vs pencucian biasa yang menggunakan 100L"
+    },
+    "track": {
+      "title": "Lacak Cucian Kamu",
+      "description": "Dari parkir hingga kilap sempurna hanya dalam 30 menit, Park & Shine membuat prosesnya lancar dan mudah diikuti. Sempurna untuk pengemudi yang memesan dari mana saja.",
+      "step1": "Parkir",
+      "step2": "Ambil 2 Foto",
+      "step3": "Lakukan Pembayaran",
+      "step4": "Tim Mulai Mencuci",
+      "step5": "Mobil Siap!",
+      "bookNow": "Pesan Cuci"
+    },
+    "integration": {
+      "title": "Integrasi Seamless",
+      "subtitle": "Proses kami dirancang tanpa hambatan.",
+      "step1": {
+        "title": "Scan & Parkir",
+        "description": "Temukan salah satu spot parkir kami. Scan QR code di pilar untuk mencatat lokasi dan pilih paket layanan.",
+        "imageAlt": "Memindai QR code"
+      },
+      "step2": {
+        "title": "Kembali ke Mobil yang Bersih",
+        "description": "Lanjutkan aktivitasmu. Kami yang mengerjakan semuanya dan akan memberi notifikasi begitu kendaraanmu siap.",
+        "imageAlt": "Notifikasi di ponsel"
+      }
+    },
+    "footer": {
+      "tagline": "Perawatan otomotif komersial premium di tempat kamu parkir.",
+      "copyright": "© 2024 Park & Shine. Commercial Clean Automotive Care.",
+      "companyHeading": "Perusahaan",
+      "about": "Tentang",
+      "locations": "Lokasi",
+      "careers": "Karir",
+      "servicesHeading": "Layanan",
+      "services": "Layanan",
+      "pricing": "Harga",
+      "fleetServices": "Layanan Armada",
+      "legalHeading": "Legal & Dukungan",
+      "support": "Dukungan",
+      "privacyPolicy": "Kebijakan Privasi",
+      "termsOfService": "Syarat & Ketentuan",
+      "contactUs": "Hubungi Kami"
+    }
+  },
+  "upload": {
+    "select": "Ambil Foto",
+    "retry": "Coba Lagi",
+    "uploading": "Mengunggah...",
+    "retrying": "Mencoba ulang..."
+  },
+  "booking": {
+    "status": {
+      "draft": "Draft",
+      "pending": "Menunggu Pembayaran",
+      "paid": "Pembayaran Diterima",
+      "assigned": "Menunggu Tim",
+      "in_progress": "Sedang Dicuci",
+      "needs_help": "Butuh Bantuan",
+      "ready": "Mobil Siap!",
+      "stale": "Tidak Aktif",
+      "closed": "Selesai",
+      "expired": "Kadaluarsa",
+      "cancelled": "Dibatalkan"
+    },
+    "step": "Langkah {{current}} dari {{total}}",
+    "location": {
+      "title": "Lokasi Kendaraan",
+      "subtitle": "Tandai posisi kendaraanmu di peta. Geser penanda untuk menyesuaikan.",
+      "useCurrentLocation": "Gunakan Lokasi Saat Ini",
+      "searchingLocation": "Mencari lokasi...",
+      "searchingAddress": "Mencari alamat...",
+      "useThisLocation": "Gunakan Lokasi Ini",
+      "errorNotSupported": "Browser tidak mendukung geolokasi.",
+      "errorDenied": "Tidak dapat mengambil lokasi. Izinkan akses lokasi dan coba lagi."
+    },
+    "capture": {
+      "title": "Foto Kendaraan",
+      "subtitle": "Ambil foto plat nomor dan slot parkir mobilmu.",
+      "platePhotoLabel": "Foto Plat Nomor",
+      "slotPhotoLabel": "Foto Slot Parkir",
+      "plateOcrLabel": "Nomor Plat (perbaiki jika ada yang salah)",
+      "platePlaceholder": "contoh: B 1234 SKJ",
+      "slotOcrLabel": "Nomor Slot (perbaiki jika ada yang salah)",
+      "slotPlaceholder": "contoh: P2-G15",
+      "phoneLabel": "Nomor HP",
+      "phonePlaceholder": "08xxxxxxxxxx",
+      "errorCreate": "Gagal membuat booking. Silakan coba lagi."
+    },
+    "confirm": {
+      "title": "Konfirmasi",
+      "subtitle": "Periksa detail booking sebelum membayar.",
+      "back": "Ubah foto",
+      "pay": "Bayar Sekarang",
+      "processing": "Memproses..."
+    },
+    "summary": {
+      "plate": "Plat Nomor",
+      "slot": "Slot Parkir",
+      "location": "Lokasi",
+      "price": "Harga",
+      "estimatedReady": "Estimasi Selesai"
+    }
+  },
+  "status": {
+    "invalidLink": "Link tidak valid. Silakan scan ulang QR code.",
+    "notFound": "Booking tidak ditemukan.",
+    "carReady": "Mobil kamu sudah bersih!",
+    "thankYou": "Terima kasih telah menggunakan Park & Shine.",
+    "rateButton": "Beri Rating",
+    "needsHelp": "Tim kami sedang menghubungi supervisor untuk membantu. Silakan hubungi kami jika butuh bantuan segera.",
+    "contactWhatsApp": "Hubungi via WhatsApp",
+    "closed": "Booking ini telah selesai.",
+    "historyTitle": "Riwayat Status",
+    "whatsAppMessage": "Halo Park & Shine, saya butuh bantuan dengan booking saya (ID: {{bookingId}})."
+  },
+  "rate": {
+    "title": "Bagaimana pengalamanmu?",
+    "subtitle": "Nilai layanan Park & Shine hari ini",
+    "starLabel": "Pilih bintang",
+    "feedbackLabel": "Ada yang bisa kami perbaiki?",
+    "feedbackOptional": "(opsional)",
+    "feedbackPlaceholder": "Tuliskan masukan kamu di sini...",
+    "submit": "Kirim Penilaian",
+    "submitting": "Mengirim...",
+    "skip": "Lewati",
+    "doneTitle": "Terima kasih!",
+    "doneSubtitle": "Penilaianmu membantu kami terus berkembang."
+  },
+  "qr": {
+    "cannotProceedTitle": "Tidak Dapat Melanjutkan",
+    "invalidMessage": "QR Code tidak valid atau sudah kadaluarsa.",
+    "pausedMessage": "Booking sedang ditutup sementara. Silakan coba lagi nanti.",
+    "pastCutoffMessage": "Booking hari ini sudah ditutup. Coba lagi besok!"
+  },
+  "howItWorks": {
+    "title": "Cara Kerja",
+    "step1Alt": "Scan QR code di area parkir",
+    "step2Alt": "Foto plat dan slot parkir",
+    "step3Alt": "Tim kami mencuci mobilmu",
+    "step4Alt": "Mobilmu siap dan bersih!"
+  }
+}

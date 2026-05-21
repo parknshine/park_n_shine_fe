@@ -9,11 +9,13 @@ import api from "@/lib/axios";
 import { mutationKeys } from "@/lib/query-keys";
 import { StarRating } from "@/features/customer/components/star-rating";
 import type { RatingPayload } from "@/features/customer/types";
+import { useTranslation } from "@/i18n";
 
 export default function BookingRatePage() {
   const { id: bookingId } = useParams<{ id: string }>();
   const [token] = useQueryState("token", parseAsString);
   const router = useRouter();
+  const { t } = useTranslation("customer");
 
   const [score, setScore] = useState(0);
   const [reason, setReason] = useState("");
@@ -51,10 +53,10 @@ export default function BookingRatePage() {
           <span className="text-4xl">✨</span>
         </div>
         <h2 className="text-xl font-bold text-foreground">
-          Terima kasih!
+          {t("rate.doneTitle")}
         </h2>
         <p className="text-sm text-muted-foreground">
-          Penilaianmu membantu kami terus berkembang.
+          {t("rate.doneSubtitle")}
         </p>
       </div>
     );
@@ -64,17 +66,17 @@ export default function BookingRatePage() {
     <div className="mx-auto max-w-md space-y-6 px-4 py-8">
       <div className="space-y-1 text-center">
         <h1 className="text-2xl font-bold text-foreground">
-          Bagaimana pengalamanmu?
+          {t("rate.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Nilai layanan Park &amp; Shine hari ini
+          {t("rate.subtitle")}
         </p>
       </div>
 
       <StarRating
         value={score}
         onChange={setScore}
-        label="Pilih bintang"
+        label={t("rate.starLabel")}
       />
 
       {score > 0 && score <= 2 && (
@@ -83,14 +85,14 @@ export default function BookingRatePage() {
             htmlFor="reason"
             className="block text-sm font-medium text-foreground"
           >
-            Ada yang bisa kami perbaiki? <span className="text-muted-foreground">(opsional)</span>
+            {t("rate.feedbackLabel")} <span className="text-muted-foreground">{t("rate.feedbackOptional")}</span>
           </label>
           <textarea
             id="reason"
             rows={3}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Tuliskan masukan kamu di sini..."
+            placeholder={t("rate.feedbackPlaceholder")}
             className="w-full resize-none rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
@@ -102,7 +104,7 @@ export default function BookingRatePage() {
         onClick={handleSubmit}
         className="w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {mutation.isPending ? "Mengirim..." : "Kirim Penilaian"}
+        {mutation.isPending ? t("rate.submitting") : t("rate.submit")}
       </button>
 
       <button
@@ -110,7 +112,7 @@ export default function BookingRatePage() {
         onClick={handleSkip}
         className="w-full py-2 text-sm text-muted-foreground hover:text-foreground"
       >
-        Lewati
+        {t("action.skip", { ns: "common" })}
       </button>
     </div>
   );

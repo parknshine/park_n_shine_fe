@@ -3,6 +3,7 @@ import { AppShell } from "@/components/shared";
 import { BookNowButtonV2 } from "@/features/customer/components/book-now-button-v2";
 import { HowItWorksPanel } from "@/features/customer/components/how-it-works-panel";
 import { LandingHero } from "@/features/customer/components/landing-hero";
+import { QrBlockingMessage } from "@/features/customer/components/qr-blocking-message";
 import { QrErrorState } from "@/features/customer/components/qr-error-state";
 import type { SiteQrResolution } from "@/features/customer/types";
 
@@ -40,7 +41,7 @@ export default async function LandingPage({ params }: Props) {
   if (!resolution) {
     return (
       <AppShell surface="customer">
-        <QrErrorState message="QR Code tidak valid atau sudah kadaluarsa." />
+        <QrErrorState reason="invalid" />
       </AppShell>
     );
   }
@@ -53,10 +54,10 @@ export default async function LandingPage({ params }: Props) {
   cutoff.setHours(cutoffHour, cutoffMinute, 0, 0);
   const isPastCutoff = now > cutoff;
 
-  const blockingMessage = resolution.intakePaused
-    ? "Booking sedang ditutup sementara. Silakan coba lagi nanti."
+  const blockingReason = resolution.intakePaused
+    ? "paused"
     : isPastCutoff
-      ? "Booking hari ini sudah ditutup. Coba lagi besok!"
+      ? "past_cutoff"
       : null;
 
   return (
@@ -64,10 +65,8 @@ export default async function LandingPage({ params }: Props) {
       <div className="space-y-8 pb-10">
         <LandingHero siteName={resolution.siteName} />
         <HowItWorksPanel />
-        {blockingMessage ? (
-          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center text-sm text-destructive">
-            {blockingMessage}
-          </div>
+        {blockingReason ? (
+          <QrBlockingMessage reason={blockingReason} />
         ) : (
           <BookNowButtonV2 qrId={qrId} />
         )}

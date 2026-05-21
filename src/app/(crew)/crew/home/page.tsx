@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useNextJob } from "@/features/crew/hooks";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n";
 
 export function CrewHomePage() {
   const router = useRouter();
   const { claimNextJob, job, isLoading, hasNoJob, error } = useNextJob();
+  const { t } = useTranslation("crew");
 
   useEffect(() => {
     if (job) {
@@ -34,10 +36,10 @@ export function CrewHomePage() {
         </span>
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            Antrian Job
+            {t("home.queueLabel")}
           </p>
           <h1 className="text-lg font-bold leading-tight text-foreground">
-            Siap Bertugas
+            {t("home.readyTitle")}
           </h1>
         </div>
       </div>
@@ -46,8 +48,8 @@ export function CrewHomePage() {
       <div className="flex flex-1 flex-col items-center justify-center gap-6">
         {hasNoJob ? (
           <EmptyState
-            title="Tidak ada job saat ini"
-            description="Belum ada kendaraan di antrean. Coba lagi beberapa saat."
+            title={t("home.emptyTitle")}
+            description={t("home.emptyDescription")}
             action={
               <Button
                 variant="outline"
@@ -55,7 +57,7 @@ export function CrewHomePage() {
                 onClick={handleClaim}
                 prefix={<Inbox className="h-4 w-4" />}
               >
-                Coba Lagi
+                {t("action.retry", { ns: "common" })}
               </Button>
             }
           />
@@ -78,15 +80,15 @@ export function CrewHomePage() {
                 )}
                 disabled={isLoading}
                 onClick={handleClaim}
-                aria-label="Ambil job berikutnya"
+                aria-label={t("home.claimAriaLabel")}
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    Mencari Job…
+                    {t("home.searching")}
                   </>
                 ) : (
-                  "Ambil Job Berikutnya"
+                  t("home.claimButton")
                 )}
               </Button>
             </div>
@@ -94,7 +96,7 @@ export function CrewHomePage() {
             {/* Hint text */}
             {!isLoading && (
               <p className="text-center text-xs text-muted-foreground">
-                Tekan tombol untuk mengambil job dari antrean
+                {t("home.claimHint")}
               </p>
             )}
           </div>

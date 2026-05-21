@@ -1,0 +1,23 @@
+{
+  "action": {
+    "retry": "Try Again",
+    "save": "Save",
+    "back": "Back",
+    "close": "Close",
+    "next": "Continue",
+    "send": "Send",
+    "skip": "Skip"
+  },
+  "state": {
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "searching": "Searching...",
+    "uploading": "Uploading…",
+    "retrying": "Retrying…",
+    "preparing": "Preparing booking..."
+  },
+  "error": {
+    "generic": "Something went wrong. Please try again.",
+    "notFound": "Not found."
+  }
+}

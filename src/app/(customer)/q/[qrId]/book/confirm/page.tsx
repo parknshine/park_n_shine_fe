@@ -6,6 +6,7 @@ import { parseAsString, useQueryStates } from "nuqs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Loader2, Phone } from "lucide-react";
 import api from "@/lib/axios";
+import { useTranslation } from "@/i18n";
 import { AppShell } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +23,7 @@ interface QrConfirmPayload {
 
 export default function BookConfirmPage() {
   const router = useRouter();
+  const { t } = useTranslation("customer");
   const { qrId } = useParams<{ qrId: string }>();
   const queryClient = useQueryClient();
 
@@ -98,13 +100,13 @@ export default function BookConfirmPage() {
       <div className="space-y-6">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Langkah 2 dari 2
+            {t("booking.step", { current: 2, total: 2 })}
           </p>
           <h1 className="mt-1 text-2xl font-bold text-foreground">
-            Konfirmasi
+            {t("booking.confirm.title")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Periksa detail booking sebelum membayar.
+            {t("booking.confirm.subtitle")}
           </p>
         </div>
 
@@ -122,7 +124,7 @@ export default function BookConfirmPage() {
             <div className="flex items-center gap-3">
               <Phone className="h-5 w-5 shrink-0 text-primary" />
               <div>
-                <p className="text-xs text-muted-foreground">Nomor HP</p>
+                <p className="text-xs text-muted-foreground">{t("booking.capture.phoneLabel")}</p>
                 <p className="font-semibold text-foreground">{phone}</p>
               </div>
             </div>
@@ -135,7 +137,7 @@ export default function BookConfirmPage() {
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4" />
-          Ubah foto
+          {t("booking.confirm.back")}
         </button>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
@@ -149,10 +151,10 @@ export default function BookConfirmPage() {
           {mutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Memproses...
+              {t("booking.confirm.processing")}
             </>
           ) : (
-            "Bayar Sekarang"
+            t("booking.confirm.pay")
           )}
         </Button>
       </div>

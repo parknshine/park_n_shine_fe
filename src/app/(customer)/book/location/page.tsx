@@ -7,6 +7,7 @@ import { Loader2, MapPin, Navigation } from "lucide-react";
 import { AppShell } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { useLocationPicker } from "@/features/customer/hooks/use-location-picker";
+import { useTranslation } from "@/i18n";
 
 // Leaflet requires browser APIs — must be imported without SSR
 const LocationMap = dynamic(
@@ -28,6 +29,7 @@ const DEFAULT_LNG = 106.8456;
 
 export default function WalkInLocationPage() {
   const router = useRouter();
+  const { t } = useTranslation("customer");
 
   const {
     lat,
@@ -69,13 +71,13 @@ export default function WalkInLocationPage() {
       <div className="space-y-6">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Langkah 1 dari 3
+            {t("booking.step", { current: 1, total: 3 })}
           </p>
           <h1 className="mt-1 text-2xl font-bold text-foreground">
-            Lokasi Kendaraan
+            {t("booking.location.title")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Tandai posisi kendaraanmu di peta. Geser penanda untuk menyesuaikan.
+            {t("booking.location.subtitle")}
           </p>
         </div>
 
@@ -94,12 +96,12 @@ export default function WalkInLocationPage() {
           {isLocating ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Mencari lokasi...
+              {t("booking.location.searchingLocation")}
             </>
           ) : (
             <>
               <Navigation className="mr-2 h-4 w-4" />
-              Gunakan Lokasi Saat Ini
+              {t("booking.location.useCurrentLocation")}
             </>
           )}
         </Button>
@@ -107,7 +109,7 @@ export default function WalkInLocationPage() {
         {isGeocoding && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Mencari alamat...</span>
+            <span>{t("booking.location.searchingAddress")}</span>
           </div>
         )}
 
@@ -121,9 +123,9 @@ export default function WalkInLocationPage() {
         {error && (
           <p className="text-sm text-destructive">
             {error === "geolocation_not_supported"
-              ? "Browser tidak mendukung geolokasi."
+              ? t("booking.location.errorNotSupported")
               : error === "geolocation_denied"
-                ? "Tidak dapat mengambil lokasi. Izinkan akses lokasi dan coba lagi."
+                ? t("booking.location.errorDenied")
                 : error}
           </p>
         )}
@@ -134,7 +136,7 @@ export default function WalkInLocationPage() {
           disabled={!hasLocation}
           onClick={handleNext}
         >
-          Gunakan Lokasi Ini
+          {t("booking.location.useThisLocation")}
         </Button>
       </div>
     </AppShell>

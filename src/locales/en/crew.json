@@ -1,0 +1,68 @@
+{
+  "home": {
+    "queueLabel": "Job Queue",
+    "readyTitle": "Ready for Duty",
+    "emptyTitle": "No jobs right now",
+    "emptyDescription": "No vehicles in the queue. Check again in a moment.",
+    "claimButton": "Claim Next Job",
+    "claimAriaLabel": "Claim next job",
+    "claimHint": "Tap the button to claim a job from the queue",
+    "searching": "Searching for Job…"
+  },
+  "job": {
+    "loading": "Loading job data",
+    "notFoundTitle": "Job not found",
+    "notFoundDescription": "This job may have been completed or is no longer available.",
+    "backToQueue": "Back to Queue",
+    "backAriaLabel": "Back to queue",
+    "queueNav": "Queue",
+    "plateNumber": "Plate Number",
+    "assignedAt": "Assigned",
+    "timeRemaining": "Time Remaining",
+    "timeExpired": "Time's up",
+    "timeAriaLabel": "Time remaining: {{time}}",
+    "vehiclePhotos": "Vehicle Photos",
+    "vehiclePhotosAriaLabel": "Customer vehicle photos",
+    "photoAlt": "{{kind}} photo of vehicle",
+    "verifyButton": "Verify Plate",
+    "verifyAriaLabel": "Verify vehicle plate",
+    "photoKind": {
+      "plate": "Plate",
+      "slot": "Slot",
+      "front": "Front",
+      "back": "Back",
+      "left": "Left",
+      "right": "Right",
+      "before": "Before",
+      "after": "After"
+    }
+  },
+  "verify": {
+    "title": "Verify Plate",
+    "platePhotoAlt": "Customer vehicle plate photo",
+    "plateNotAvailable": "Plate photo not available",
+    "matched": "Plate Matched",
+    "notFound": "Not Found",
+    "escalatedTitle": "Job Escalated",
+    "escalatedDescription": "Plate not found. Supervisor has been notified.",
+    "backToQueue": "Back to Queue"
+  },
+  "beforePhotos": {
+    "title": "Vehicle Condition Photos",
+    "subtitle": "Take 4 photos before starting the wash.",
+    "photoCount": "{{done}}/4 Photos Taken",
+    "continueButton": "Continue",
+    "continueAriaLabel": "Continue to checklist",
+    "countAriaLabel": "{{done}} of 4 photos taken",
+    "uploadLabels": {
+      "retry": "Try again",
+      "upload": "Take Photo",
+      "uploading": "Uploading…",
+      "retrying": "Retrying…"
+    }
+  },
+  "checklist": {
+    "title": "Wash Checklist",
+    "comingSoon": "This feature will be available in Sprint 6."
+  }
+}

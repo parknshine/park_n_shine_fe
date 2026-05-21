@@ -13,9 +13,13 @@ import { PhotoUploadField } from "@/features/customer/components/photo-upload-fi
 import { usePhotoUpload } from "@/features/customer/hooks";
 import { isValidPhone } from "@/features/customer/utils/phone";
 import type { CustomerBooking } from "@/features/customer/types";
+import { useTranslation } from "@/i18n";
+import { useUIStore } from "@/store/ui-store";
 
 export default function WalkInCapturePage() {
   const router = useRouter();
+  const { t } = useTranslation("customer");
+  const locale = useUIStore((s) => s.locale);
 
   const [{ lat, lng, loc }] = useQueryStates({
     lat: parseAsString,
@@ -33,7 +37,7 @@ export default function WalkInCapturePage() {
     meta: { persist: false },
     mutationFn: async () => {
       const response = await api.post<CustomerBooking>("/v1/bookings", {
-        locale: "id-ID",
+        locale: locale === "en" ? "en-US" : "id-ID",
       });
       return response.data;
     },
@@ -111,7 +115,7 @@ export default function WalkInCapturePage() {
       <AppShell surface="customer">
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Menyiapkan booking...</p>
+          <p className="text-sm text-muted-foreground">{t("state.preparing", { ns: "common" })}</p>
         </div>
       </AppShell>
     );
@@ -122,7 +126,7 @@ export default function WalkInCapturePage() {
       <AppShell surface="customer">
         <div className="space-y-4 pt-10 text-center">
           <p className="text-sm text-destructive">
-            Gagal membuat booking. Silakan coba lagi.
+            {t("booking.capture.errorCreate")}
           </p>
           <Button
             onClick={() => {
@@ -130,7 +134,7 @@ export default function WalkInCapturePage() {
               createMutation.mutate();
             }}
           >
-            Coba Lagi
+            {t("action.retry", { ns: "common" })}
           </Button>
         </div>
       </AppShell>
@@ -142,13 +146,13 @@ export default function WalkInCapturePage() {
       <div className="space-y-6">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Langkah 2 dari 3
+            {t("booking.step", { current: 2, total: 3 })}
           </p>
           <h1 className="mt-1 text-2xl font-bold text-foreground">
-            Foto Kendaraan
+            {t("booking.capture.title")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ambil foto plat nomor dan slot parkir mobilmu.
+            {t("booking.capture.subtitle")}
           </p>
         </div>
 
@@ -156,7 +160,7 @@ export default function WalkInCapturePage() {
           <PhotoUploadField
             id="plate-photo"
             kind="plate"
-            label="Foto Plat Nomor"
+            label={t("booking.capture.platePhotoLabel")}
             state={plateUpload}
             onSelect={(file, kind) => plateUpload.uploadPhoto({ file, kind })}
             onRetry={plateUpload.reset}
@@ -164,17 +168,17 @@ export default function WalkInCapturePage() {
           {plateUpload.status === "success" && (
             <OcrEditField
               id="plate-text"
-              label="Nomor Plat (perbaiki jika ada yang salah)"
+              label={t("booking.capture.plateOcrLabel")}
               value={plateText}
               onChange={setPlateText}
-              placeholder="contoh: B 1234 SKJ"
+              placeholder={t("booking.capture.platePlaceholder")}
             />
           )}
 
           <PhotoUploadField
             id="slot-photo"
             kind="slot"
-            label="Foto Slot Parkir"
+            label={t("booking.capture.slotPhotoLabel")}
             state={slotUpload}
             onSelect={(file, kind) => slotUpload.uploadPhoto({ file, kind })}
             onRetry={slotUpload.reset}
@@ -182,10 +186,10 @@ export default function WalkInCapturePage() {
           {slotUpload.status === "success" && (
             <OcrEditField
               id="slot-text"
-              label="Nomor Slot (perbaiki jika ada yang salah)"
+              label={t("booking.capture.slotOcrLabel")}
               value={slotText}
               onChange={setSlotText}
-              placeholder="contoh: P2-G15"
+              placeholder={t("booking.capture.slotPlaceholder")}
             />
           )}
 
@@ -194,7 +198,7 @@ export default function WalkInCapturePage() {
               htmlFor="phone"
               className="text-sm font-medium text-foreground"
             >
-              Nomor HP
+              {t("booking.capture.phoneLabel")}
             </label>
             <input
               id="phone"
@@ -202,7 +206,7 @@ export default function WalkInCapturePage() {
               inputMode="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="08xxxxxxxxxx"
+              placeholder={t("booking.capture.phonePlaceholder")}
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
           </div>
@@ -215,7 +219,7 @@ export default function WalkInCapturePage() {
           suffix={<ArrowRight className="h-4 w-4" />}
           onClick={handleContinue}
         >
-          Lanjut
+          {t("action.next", { ns: "common" })}
         </Button>
       </div>
     </AppShell>

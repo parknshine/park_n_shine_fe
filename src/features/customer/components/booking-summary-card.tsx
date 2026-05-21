@@ -1,4 +1,7 @@
+"use client";
+
 import { Banknote, Car, Clock, MapPin } from "lucide-react";
+import { useTranslation } from "@/i18n";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface BookingSummaryCardProps {
@@ -34,13 +37,15 @@ export function BookingSummaryCard({
   currency,
   estimatedReadyAt,
 }: BookingSummaryCardProps) {
+  const { t } = useTranslation("customer");
+
   return (
     <Card>
       <CardContent className="space-y-4 pt-5">
         <div className="flex items-center gap-3">
           <Car className="h-5 w-5 shrink-0 text-primary" />
           <div>
-            <p className="text-xs text-muted-foreground">Plat Nomor</p>
+            <p className="text-xs text-muted-foreground">{t("booking.summary.plate")}</p>
             <p className="font-mono text-lg font-bold uppercase tracking-widest text-foreground">
               {plate}
             </p>
@@ -50,7 +55,7 @@ export function BookingSummaryCard({
         <div className="flex items-center gap-3">
           <MapPin className="h-5 w-5 shrink-0 text-primary" />
           <div>
-            <p className="text-xs text-muted-foreground">Slot Parkir</p>
+            <p className="text-xs text-muted-foreground">{t("booking.summary.slot")}</p>
             <p className="font-semibold text-foreground">{slot}</p>
           </div>
         </div>
@@ -59,7 +64,7 @@ export function BookingSummaryCard({
           <div className="flex items-center gap-3">
             <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" />
             <div>
-              <p className="text-xs text-muted-foreground">Lokasi</p>
+              <p className="text-xs text-muted-foreground">{t("booking.summary.location")}</p>
               <p className="font-semibold text-foreground">{siteName}</p>
             </div>
           </div>
@@ -69,7 +74,7 @@ export function BookingSummaryCard({
           <div className="flex items-center gap-3">
             <Banknote className="h-5 w-5 shrink-0 text-primary" />
             <div>
-              <p className="text-xs text-muted-foreground">Harga</p>
+              <p className="text-xs text-muted-foreground">{t("booking.summary.price")}</p>
               <p className="font-semibold text-foreground">
                 {currency === "IDR" ? formatIDR(priceAmount) : String(priceAmount)}
               </p>
@@ -81,7 +86,7 @@ export function BookingSummaryCard({
           <div className="flex items-center gap-3">
             <Clock className="h-5 w-5 shrink-0 text-primary" />
             <div>
-              <p className="text-xs text-muted-foreground">Estimasi Selesai</p>
+              <p className="text-xs text-muted-foreground">{t("booking.summary.estimatedReady")}</p>
               <p className="font-semibold text-foreground">
                 {formatLocalTime(estimatedReadyAt)}
               </p>

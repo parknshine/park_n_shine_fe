@@ -10,10 +10,12 @@ import { StatusHero } from "@/features/customer/components/status-hero";
 import { PaymentCheckButton } from "@/features/customer/components/payment-check-button";
 import { BookingStatusTimeline } from "@/features/customer/components/booking-status-timeline";
 import { BOOKING_STATUSES } from "@/features/customer/types";
+import { useTranslation } from "@/i18n";
 
 export default function BookingStatusPage() {
   const { id: bookingId } = useParams<{ id: string }>();
   const [token] = useQueryState("token", parseAsString);
+  const { t } = useTranslation("customer");
 
   const { booking, isLoading, error, refresh } = useBookingStatus({
     bookingId,
@@ -25,7 +27,7 @@ export default function BookingStatusPage() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
         <p className="text-sm text-muted-foreground">
-          Link tidak valid. Silakan scan ulang QR code.
+          {t("status.invalidLink")}
         </p>
       </div>
     );
@@ -43,7 +45,7 @@ export default function BookingStatusPage() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
         <p className="text-sm text-muted-foreground">
-          Booking tidak ditemukan.
+          {t("status.notFound")}
         </p>
       </div>
     );
@@ -59,7 +61,7 @@ export default function BookingStatusPage() {
   const isNeedsHelp = booking.status === BOOKING_STATUSES.NEEDS_HELP;
 
   const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "6281234567890";
-  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Halo Park & Shine, saya butuh bantuan dengan booking saya (ID: ${bookingId}).`)}`;
+  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(t("status.whatsAppMessage", { bookingId }))}`;
 
   return (
     <div className="mx-auto max-w-md space-y-6 px-4 py-8">
@@ -79,16 +81,16 @@ export default function BookingStatusPage() {
       {isReady && (
         <div className="rounded-2xl bg-primary/10 p-6 text-center space-y-4">
           <p className="text-lg font-semibold text-primary">
-            Mobil kamu sudah bersih!
+            {t("status.carReady")}
           </p>
           <p className="text-sm text-muted-foreground">
-            Terima kasih telah menggunakan Park &amp; Shine.
+            {t("status.thankYou")}
           </p>
           <Link
             href={`/booking/${bookingId}/rate?token=${token}`}
             className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
-            Beri Rating
+            {t("status.rateButton")}
           </Link>
         </div>
       )}
@@ -96,7 +98,7 @@ export default function BookingStatusPage() {
       {isNeedsHelp && (
         <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center space-y-4">
           <p className="text-sm text-muted-foreground">
-            Tim kami sedang menghubungi supervisor untuk membantu. Silakan hubungi kami jika butuh bantuan segera.
+            {t("status.needsHelp")}
           </p>
           <a
             href={waUrl}
@@ -104,7 +106,7 @@ export default function BookingStatusPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-8 py-3 text-sm font-semibold text-white transition-opacity hover:bg-emerald-600"
           >
-            Hubungi via WhatsApp
+            {t("status.contactWhatsApp")}
           </a>
         </div>
       )}
@@ -112,7 +114,7 @@ export default function BookingStatusPage() {
       {isTerminal && booking.status === BOOKING_STATUSES.CLOSED && (
         <div className="rounded-2xl bg-muted p-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Booking ini telah selesai.
+            {t("status.closed")}
           </p>
         </div>
       )}
@@ -120,7 +122,7 @@ export default function BookingStatusPage() {
       {booking.statusHistory.length > 0 && (
         <details className="rounded-xl border border-border">
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground select-none">
-            Riwayat Status
+            {t("status.historyTitle")}
           </summary>
           <div className="px-4 pb-4 pt-2">
             <BookingStatusTimeline events={booking.statusHistory} />

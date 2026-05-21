@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslation } from "@/i18n";
 import { StatusBadge } from "@/components/shared";
 import {
   BOOKING_STATUS_TONES,
@@ -9,24 +12,23 @@ interface BookingStatusTimelineProps {
 }
 
 export function BookingStatusTimeline({ events }: BookingStatusTimelineProps) {
+  const { t } = useTranslation("customer");
+
   return (
     <ol className="space-y-3">
       {events.map((event) => (
         <li
           key={`${event.status}-${event.changedAt}`}
-          className="flex items-start justify-between gap-4 border-b border-border pb-3 last:border-b-0 last:pb-0"
+          className="border-b border-border pb-3 last:border-b-0 last:pb-0"
         >
           <div className="min-w-0">
             <StatusBadge tone={BOOKING_STATUS_TONES[event.status]}>
-              {event.labelKey}
+              {t(event.labelKey)}
             </StatusBadge>
             <p className="mt-1 text-xs text-muted-foreground">
               {event.changedAt}
             </p>
           </div>
-          <span className="shrink-0 font-mono text-xs text-muted-foreground">
-            {event.status}
-          </span>
         </li>
       ))}
     </ol>

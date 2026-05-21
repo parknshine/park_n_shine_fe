@@ -1,0 +1,190 @@
+{
+  "landing": {
+    "badge": "Waterless Car Wash Without Leaving Your Parking Spot",
+    "heading": "Clean Car,\nNo Need to\nLeave the Lot.",
+    "heroAlt": "Happy family in parking lot with clean car"
+  },
+  "landingPage": {
+    "nav": {
+      "services": "Services",
+      "pricing": "Pricing",
+      "about": "About",
+      "bookNow": "Book Now"
+    },
+    "hero": {
+      "heading": "Your Car Shines\nWhile You Shop",
+      "description": "Professional cleaning at your favorite parking spot. High-end enterprise discipline brought to everyday convenience.",
+      "viewServices": "View Services",
+      "findLocations": "Find Locations",
+      "imageAlt": "Family standing near their clean blue car in a parking garage"
+    },
+    "howItWorks": {
+      "title": "How the Magic Happens",
+      "card1": {
+        "title": "QR Code",
+        "description": "Locate our QR Code near you after you park."
+      },
+      "card2": {
+        "title": "Snap and Upload",
+        "description": "Take a picture of your number plate as well as the carpark number."
+      },
+      "card3": {
+        "title": "Professional Service",
+        "description": "Our service crew will locate your car and start the car wash process."
+      },
+      "card4": {
+        "title": "Sparkling Clean",
+        "description": "Receive a notification after 30 minutes that your car is sparkling clean!"
+      }
+    },
+    "pricing": {
+      "title": "LIMITED TIME PROMOTION!",
+      "subtitle": "Affordable, eco-friendly cleaning made simple",
+      "serviceLabel": "Waterless Cleaning",
+      "description": "Premium waterless cleaning that keeps your car spotless — all while you shop.",
+      "feature1": "Professional cleaning with premium finish",
+      "feature2": "Safe, scratch-free process",
+      "feature3": "High quality cleaning chemicals",
+      "feature4": "Strong Protection And Shine",
+      "feature5": "Eco-friendly cleaning using under 1L of water per wash vs existing that uses 100L"
+    },
+    "track": {
+      "title": "Track Your Wash",
+      "description": "From parking to final shine in only 30 minutes, Park & Shine keeps the experience smooth and easy to follow. Perfect for drivers booking on the go.",
+      "step1": "Park",
+      "step2": "Take 2 Pictures",
+      "step3": "Make Payment",
+      "step4": "Crew Starts Washing",
+      "step5": "Car Is Ready!",
+      "bookNow": "Book a Wash"
+    },
+    "integration": {
+      "title": "Seamless Integration",
+      "subtitle": "Our process is designed for zero friction.",
+      "step1": {
+        "title": "Scan & Park",
+        "description": "Locate one of our designated parking spots. Scan the QR code on the pillar to log your location and select your service tier.",
+        "imageAlt": "Scanning QR code"
+      },
+      "step2": {
+        "title": "Return to a Clean Car",
+        "description": "Go about your day. We'll handle the rest and notify you the moment your vehicle is ready.",
+        "imageAlt": "Notification on phone"
+      }
+    },
+    "footer": {
+      "tagline": "Premium commercial automotive care delivered where you park.",
+      "copyright": "© 2024 Park & Shine. Commercial Clean Automotive Care.",
+      "companyHeading": "Company",
+      "about": "About",
+      "locations": "Locations",
+      "careers": "Careers",
+      "servicesHeading": "Services",
+      "services": "Services",
+      "pricing": "Pricing",
+      "fleetServices": "Fleet Services",
+      "legalHeading": "Legal & Support",
+      "support": "Support",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "contactUs": "Contact Us"
+    }
+  },
+  "upload": {
+    "select": "Take Photo",
+    "retry": "Retry",
+    "uploading": "Uploading...",
+    "retrying": "Retrying..."
+  },
+  "booking": {
+    "status": {
+      "draft": "Draft",
+      "pending": "Awaiting Payment",
+      "paid": "Payment Received",
+      "assigned": "Crew Assigned",
+      "in_progress": "Being Washed",
+      "needs_help": "Needs Assistance",
+      "ready": "Car Ready!",
+      "stale": "Inactive",
+      "closed": "Completed",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+    "step": "Step {{current}} of {{total}}",
+    "location": {
+      "title": "Vehicle Location",
+      "subtitle": "Mark your vehicle position on the map. Drag the marker to adjust.",
+      "useCurrentLocation": "Use Current Location",
+      "searchingLocation": "Locating...",
+      "searchingAddress": "Looking up address...",
+      "useThisLocation": "Use This Location",
+      "errorNotSupported": "Your browser does not support geolocation.",
+      "errorDenied": "Could not get location. Please allow location access and try again."
+    },
+    "capture": {
+      "title": "Vehicle Photos",
+      "subtitle": "Take a photo of your license plate and parking slot.",
+      "platePhotoLabel": "License Plate Photo",
+      "slotPhotoLabel": "Parking Slot Photo",
+      "plateOcrLabel": "Plate Number (correct if needed)",
+      "platePlaceholder": "e.g. B 1234 SKJ",
+      "slotOcrLabel": "Slot Number (correct if needed)",
+      "slotPlaceholder": "e.g. P2-G15",
+      "phoneLabel": "Phone Number",
+      "phonePlaceholder": "08xxxxxxxxxx",
+      "errorCreate": "Failed to create booking. Please try again."
+    },
+    "confirm": {
+      "title": "Confirmation",
+      "subtitle": "Review your booking details before paying.",
+      "back": "Change photos",
+      "pay": "Pay Now",
+      "processing": "Processing..."
+    },
+    "summary": {
+      "plate": "Plate Number",
+      "slot": "Parking Slot",
+      "location": "Location",
+      "price": "Price",
+      "estimatedReady": "Estimated Completion"
+    }
+  },
+  "status": {
+    "invalidLink": "Invalid link. Please scan the QR code again.",
+    "notFound": "Booking not found.",
+    "carReady": "Your car is clean!",
+    "thankYou": "Thank you for using Park & Shine.",
+    "rateButton": "Rate Us",
+    "needsHelp": "Our team is contacting a supervisor to help. Please contact us if you need immediate assistance.",
+    "contactWhatsApp": "Contact via WhatsApp",
+    "closed": "This booking has been completed.",
+    "historyTitle": "Status History",
+    "whatsAppMessage": "Hello Park & Shine, I need help with my booking (ID: {{bookingId}})."
+  },
+  "rate": {
+    "title": "How was your experience?",
+    "subtitle": "Rate Park & Shine today",
+    "starLabel": "Select stars",
+    "feedbackLabel": "Anything we can improve?",
+    "feedbackOptional": "(optional)",
+    "feedbackPlaceholder": "Write your feedback here...",
+    "submit": "Submit Rating",
+    "submitting": "Submitting...",
+    "skip": "Skip",
+    "doneTitle": "Thank you!",
+    "doneSubtitle": "Your feedback helps us improve."
+  },
+  "qr": {
+    "cannotProceedTitle": "Cannot Proceed",
+    "invalidMessage": "This QR code is invalid or has expired.",
+    "pausedMessage": "Bookings are temporarily closed. Please try again later.",
+    "pastCutoffMessage": "Bookings for today are closed. Try again tomorrow!"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "step1Alt": "Scan the QR code in the parking area",
+    "step2Alt": "Photo your plate and parking slot",
+    "step3Alt": "Our team washes your car",
+    "step4Alt": "Your car is ready and clean!"
+  }
+}

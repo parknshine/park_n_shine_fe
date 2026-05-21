@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCrewJob, useVerifyPlate } from "@/features/crew/hooks";
+import { useTranslation } from "@/i18n";
 
 // ---------------------------------------------------------------------------
 // Page
@@ -18,6 +19,7 @@ import { useCrewJob, useVerifyPlate } from "@/features/crew/hooks";
 export function VerifyPlatePage() {
   const { jobId } = useParams<{ jobId: string }>();
   const router = useRouter();
+  const { t } = useTranslation("crew");
 
   const { job, isLoading: isJobLoading } = useCrewJob(jobId);
   const { verify, isLoading, error } = useVerifyPlate(jobId);
@@ -30,7 +32,7 @@ export function VerifyPlatePage() {
       <main className="flex min-h-[calc(100dvh-44px)] items-center justify-center">
         <Loader2
           className="h-8 w-8 animate-spin text-muted-foreground"
-          aria-label="Memuat data job"
+          aria-label={t("job.loading")}
         />
       </main>
     );
@@ -72,12 +74,12 @@ export function VerifyPlatePage() {
           prefix={<ChevronLeft className="h-4 w-4" />}
           className="-ml-2 mb-4 text-muted-foreground"
         >
-          Kembali
+          {t("action.back", { ns: "common" })}
         </Button>
 
         {/* Heading */}
         <h1 className="mb-5 text-lg font-semibold text-foreground">
-          Verifikasi Plat
+          {t("verify.title")}
         </h1>
 
         {/* Plate photo */}
@@ -85,13 +87,13 @@ export function VerifyPlatePage() {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={plateMedia.url}
-            alt="Foto plat kendaraan customer"
+            alt={t("verify.platePhotoAlt")}
             className="mb-4 h-48 w-full rounded-xl border border-border object-cover"
           />
         ) : (
           <div className="mb-4 flex h-48 items-center justify-center rounded-xl border border-dashed border-border bg-muted">
             <span className="text-sm text-muted-foreground">
-              Foto plat tidak tersedia
+              {t("verify.plateNotAvailable")}
             </span>
           </div>
         )}
@@ -118,13 +120,13 @@ export function VerifyPlatePage() {
                 aria-hidden="true"
               />
               <span className="font-semibold text-amber-700 dark:text-amber-300">
-                Job Dieskalasi
+                {t("verify.escalatedTitle")}
               </span>
             </div>
 
             {/* Body */}
             <p className="mb-4 text-sm text-amber-700 dark:text-amber-300">
-              Plat tidak ditemukan. Supervisor telah diberitahu.
+              {t("verify.escalatedDescription")}
             </p>
 
             {/* Back to queue button */}
@@ -133,7 +135,7 @@ export function VerifyPlatePage() {
               className="w-full"
               onClick={() => router.replace("/crew/home")}
             >
-              Kembali ke Antrian
+              {t("verify.backToQueue")}
             </Button>
           </div>
         )}
@@ -158,7 +160,7 @@ export function VerifyPlatePage() {
               disabled={isLoading}
               onClick={handleMatched}
             >
-              Plat Cocok
+              {t("verify.matched")}
             </Button>
 
             {/* Secondary: Tidak Ditemukan */}
@@ -169,7 +171,7 @@ export function VerifyPlatePage() {
               disabled={isLoading}
               onClick={handleNotFound}
             >
-              Tidak Ditemukan
+              {t("verify.notFound")}
             </Button>
           </div>
         </div>
