@@ -390,8 +390,9 @@ export function createApiErrorMessageResponse({
   locale = API_MESSAGE_LOCALES.ID,
   message,
   meta,
-}: Omit<ApiErrorResponse, "success"> & {
+}: Omit<ApiErrorResponse, "success" | "message"> & {
   locale?: ApiMessageLocale;
+  message?: string;
 }): ApiErrorResponse {
   return {
     code,
