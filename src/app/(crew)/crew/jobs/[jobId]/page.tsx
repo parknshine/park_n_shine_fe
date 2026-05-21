@@ -5,8 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowRight, ChevronLeft, Clock, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCrewJob } from "@/features/crew/hooks";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
+import { queryKeys } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
@@ -141,8 +143,14 @@ function EtaCountdown({ etaEndsAt }: EtaCountdownProps) {
 export function CrewJobDetailPage() {
   const { jobId } = useParams<{ jobId: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { job, isLoading, error } = useCrewJob(jobId);
   const { t } = useTranslation("crew");
+
+  function goBackToQueue() {
+    queryClient.removeQueries({ queryKey: queryKeys.crew.nextJob() });
+    router.replace("/crew/home");
+  }
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
@@ -174,7 +182,7 @@ export function CrewJobDetailPage() {
         <Button
           variant="outline"
           size="md"
-          onClick={() => router.replace("/crew/home")}
+          onClick={goBackToQueue}
         >
           {t("job.backToQueue")}
         </Button>
@@ -198,7 +206,7 @@ export function CrewJobDetailPage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.replace("/crew/home")}
+          onClick={goBackToQueue}
           prefix={<ChevronLeft className="h-4 w-4" />}
           className="-ml-2 mb-4 text-muted-foreground"
           aria-label={t("job.backAriaLabel")}
@@ -286,7 +294,7 @@ export function CrewJobDetailPage() {
       </main>
 
       {/* ── Sticky CTA ──────────────────────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
+      <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
         <div className="mx-auto max-w-md">
           <Button
             size="lg"

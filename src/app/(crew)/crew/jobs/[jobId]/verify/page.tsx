@@ -143,7 +143,7 @@ export function VerifyPlatePage() {
 
       {/* Sticky CTA — hidden when escalated */}
       {!isEscalated && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
+        <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
           <div className="space-y-2">
             {/* Primary: Plat Cocok */}
             <Button

@@ -1,9 +1,14 @@
 "use client";
 
+"use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
 import { useCrewSession } from "@/features/crew/hooks";
+import { useTranslation } from "@/i18n";
+import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,10 +16,12 @@ import { cn } from "@/lib/utils";
 
 export function CrewLoginPage() {
   const router = useRouter();
+  const { t } = useTranslation("crew");
   const { login, session, isLoading, error } = useCrewSession();
 
   const [shiftCode, setShiftCode] = useState("");
   const [pin, setPin] = useState("");
+  const [showPin, setShowPin] = useState(false);
 
   useEffect(() => {
     if (session) {
@@ -42,6 +49,9 @@ export function CrewLoginPage() {
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center bg-white px-4 py-10">
+      <div className="absolute right-4 top-4">
+        <LanguageSwitcher />
+      </div>
       <div className="w-full max-w-sm">
         {/* ── Logo & wordmark ── */}
         <div className="mb-10 flex flex-col items-center gap-3">
@@ -60,7 +70,7 @@ export function CrewLoginPage() {
             <p
               className="text-xs font-semibold uppercase tracking-[0.12em] text-primary"
             >
-              Crew Portal
+              {t("login.portalLabel")}
             </p>
             <h1
               className="mt-0.5 text-2xl font-medium leading-tight text-foreground"
@@ -78,10 +88,10 @@ export function CrewLoginPage() {
             <h2
               className="text-lg font-medium text-foreground"
             >
-              Sign in to your shift
+              {t("login.title")}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Enter your shift code and PIN to continue.
+              {t("login.subtitle")}
             </p>
           </div>
 
@@ -92,14 +102,14 @@ export function CrewLoginPage() {
                 htmlFor="shiftCode"
                 className="text-sm font-medium text-foreground"
               >
-                Shift Code
+                {t("login.shiftCodeLabel")}
               </Label>
               <Input
                 id="shiftCode"
                 type="text"
                 inputMode="numeric"
                 maxLength={6}
-                placeholder="6-digit code"
+                placeholder={t("login.shiftCodePlaceholder")}
                 value={shiftCode}
                 onChange={handleShiftCodeChange}
                 autoComplete="off"
@@ -121,23 +131,34 @@ export function CrewLoginPage() {
                 htmlFor="pin"
                 className="text-sm font-medium text-foreground"
               >
-                PIN
+                {t("login.pinLabel")}
               </Label>
-              <Input
-                id="pin"
-                type="password"
-                placeholder="Enter your PIN"
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                autoComplete="current-password"
-                className={cn(
-                  "h-11 rounded-md border text-base",
-                  "focus:ring-2",
-                  error
-                    ? "border-destructive focus:ring-destructive/30"
-                    : "border-muted-foreground/40 focus:border-primary focus:ring-primary/20"
-                )}
-              />
+              <div className="relative">
+                <Input
+                  id="pin"
+                  type={showPin ? "text" : "password"}
+                  placeholder={t("login.pinPlaceholder")}
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  autoComplete="current-password"
+                  className={cn(
+                    "h-11 rounded-md border pr-10 text-base",
+                    "focus:ring-2",
+                    error
+                      ? "border-destructive focus:ring-destructive/30"
+                      : "border-muted-foreground/40 focus:border-primary focus:ring-primary/20"
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPin((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  tabIndex={-1}
+                  aria-label={showPin ? "Hide PIN" : "Show PIN"}
+                >
+                  {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             {/* Inline error */}
@@ -168,11 +189,7 @@ export function CrewLoginPage() {
             <Button
               type="submit"
               disabled={!canSubmit}
-              className={cn(
-                "mt-1 h-11 w-full rounded-md text-sm font-semibold uppercase tracking-[0.07em]",
-                "transition-colors",
-                canSubmit && "bg-primary text-primary-foreground"
-              )}
+              className="mt-1 h-11 w-full rounded-md text-sm font-semibold uppercase tracking-[0.07em]"
               prefix={
                 isLoading ? (
                   <svg
@@ -199,14 +216,14 @@ export function CrewLoginPage() {
                 ) : undefined
               }
             >
-              {isLoading ? "Signing in…" : "Sign In"}
+              {isLoading ? t("login.signingIn") : t("login.signIn")}
             </Button>
           </form>
         </div>
 
         {/* ── Footer note ── */}
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          Crew access only &mdash; not a customer portal
+          {t("login.footerNote")}
         </p>
       </div>
     </main>

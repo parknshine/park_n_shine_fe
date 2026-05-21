@@ -1,4 +1,16 @@
 {
+  "login": {
+    "portalLabel": "Crew Portal",
+    "title": "Masuk ke shift kamu",
+    "subtitle": "Masukkan kode shift dan PIN untuk melanjutkan.",
+    "shiftCodeLabel": "Kode Shift",
+    "shiftCodePlaceholder": "6 digit kode",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "Masukkan PIN kamu",
+    "signingIn": "Masuk…",
+    "signIn": "Masuk",
+    "footerNote": "Khusus crew — bukan portal pelanggan"
+  },
   "home": {
     "queueLabel": "Antrian Job",
     "readyTitle": "Siap Bertugas",

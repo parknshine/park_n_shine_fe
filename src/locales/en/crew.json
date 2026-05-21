@@ -1,4 +1,16 @@
 {
+  "login": {
+    "portalLabel": "Crew Portal",
+    "title": "Sign in to your shift",
+    "subtitle": "Enter your shift code and PIN to continue.",
+    "shiftCodeLabel": "Shift Code",
+    "shiftCodePlaceholder": "6-digit code",
+    "pinLabel": "PIN",
+    "pinPlaceholder": "Enter your PIN",
+    "signingIn": "Signing in…",
+    "signIn": "Sign In",
+    "footerNote": "Crew access only — not a customer portal"
+  },
   "home": {
     "queueLabel": "Job Queue",
     "readyTitle": "Ready for Duty",

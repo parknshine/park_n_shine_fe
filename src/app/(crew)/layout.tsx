@@ -31,41 +31,54 @@ export function CrewLayout({ children }: CrewLayoutProps) {
     router.replace("/crew/login");
   }
 
+  const initials = session.crewName
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-sm">
-        <div className="mx-auto flex h-11 max-w-md items-center justify-between px-4">
-          <div className="flex items-center gap-2.5">
-            <Image
-              src="/icons/icon.svg"
-              alt="Park & Shine logo"
-              width={28}
-              height={28}
-              className="shrink-0"
-            />
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm font-bold text-foreground leading-none">
-                Park & Shine
-              </span>
-              <span className="text-[10px] font-medium text-muted-foreground leading-tight tracking-wide uppercase">
-                Crew
-              </span>
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
+        <div className="mx-auto flex h-14 max-w-md items-center justify-between px-4">
+          {/* Brand */}
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+              <Image
+                src="/icons/icon.svg"
+                alt="Park & Shine"
+                width={20}
+                height={20}
+                className="shrink-0"
+              />
             </div>
+            <span className="text-sm font-semibold text-foreground">
+              Park & Shine
+            </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Right controls */}
+          <div className="flex items-center gap-1">
             <LanguageSwitcher />
-            <span className="text-sm font-medium text-foreground">
-              {session.crewName}
-            </span>
+
+            {/* Crew avatar */}
+            <div
+              title={session.crewName}
+              className="ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
+            >
+              {initials}
+            </div>
+
+            {/* Logout */}
             <Button
               variant="ghost"
               size="sm"
               onClick={handleLogout}
               aria-label="Logout"
-              className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>

@@ -72,8 +72,8 @@ export function BeforePhotosPage() {
           {t("beforePhotos.subtitle")}
         </p>
 
-        {/* 2×2 photo grid */}
-        <div className="mt-5 grid grid-cols-2 gap-3">
+        {/* Photo list */}
+        <div className="mt-5 flex flex-col gap-3">
           {ANGLES.map((angle) => {
             const upload = uploadMap[angle.kind];
             return (
@@ -99,7 +99,7 @@ export function BeforePhotosPage() {
       </main>
 
       {/* Sticky CTA */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
+      <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
         <div className="mx-auto max-w-md">
           <Button
             size="lg"
