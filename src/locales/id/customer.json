@@ -132,6 +132,7 @@
       "slotPlaceholder": "contoh: P2-G15",
       "phoneLabel": "Nomor HP",
       "phonePlaceholder": "08xxxxxxxxxx",
+      "phoneHelper": "Untuk menerima notifikasi progress cuci mobil via WhatsApp, masukkan nomor HP Anda.",
       "errorCreate": "Gagal membuat booking. Silakan coba lagi."
     },
     "confirm": {

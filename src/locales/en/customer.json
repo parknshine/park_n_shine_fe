@@ -132,6 +132,7 @@
       "slotPlaceholder": "e.g. P2-G15",
       "phoneLabel": "Phone Number",
       "phonePlaceholder": "08xxxxxxxxxx",
+      "phoneHelper": "To receive WhatsApp notifications on your car wash progress, please enter your phone number.",
       "errorCreate": "Failed to create booking. Please try again."
     },
     "confirm": {
