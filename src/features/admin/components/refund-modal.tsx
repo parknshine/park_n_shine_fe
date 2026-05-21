@@ -12,13 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useBookingActions } from "@/features/admin/hooks";
+import { useTranslation } from "@/i18n";
 
-const REFUND_REASON_CODES = [
-  "Kendaraan tidak ditemukan",
-  "Kendaraan tidak bisa dicuci — terlalu rapat",
-  "Pembatalan oleh pelanggan",
-  "Kesalahan pembayaran",
-  "Lainnya",
+const REFUND_REASONS: Array<{ value: string; labelKey: string }> = [
+  { value: "Kendaraan tidak ditemukan", labelKey: "vehicleNotFound" },
+  { value: "Kendaraan tidak bisa dicuci — terlalu rapat", labelKey: "vehicleTooTight" },
+  { value: "Pembatalan oleh pelanggan", labelKey: "customerCancellation" },
+  { value: "Kesalahan pembayaran", labelKey: "paymentError" },
+  { value: "Lainnya", labelKey: "other" },
 ];
 
 interface RefundModalProps {
@@ -40,6 +41,7 @@ export function RefundModal({
   const [partialAmount, setPartialAmount] = useState("");
   const [reasonCode, setReasonCode] = useState("");
   const { refund, isSubmitting, error } = useBookingActions(bookingId);
+  const { t } = useTranslation("admin");
 
   const refundAmount =
     amountType === "full" ? priceAmount : Number(partialAmount) || 0;
@@ -70,33 +72,33 @@ export function RefundModal({
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Proses Refund</DialogTitle>
+          <DialogTitle>{t("refundModal.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label>Tipe refund</Label>
+            <Label>{t("refundModal.typeLabel")}</Label>
             <div className="flex gap-2">
               <Button
                 size="sm"
                 variant={amountType === "full" ? "default" : "outline"}
                 onClick={() => setAmountType("full")}
               >
-                Full — Rp {priceAmount.toLocaleString("id-ID")}
+                {t("refundModal.fullLabel", { amount: priceAmount.toLocaleString("id-ID") })}
               </Button>
               <Button
                 size="sm"
                 variant={amountType === "partial" ? "default" : "outline"}
                 onClick={() => setAmountType("partial")}
               >
-                Partial
+                {t("refundModal.partial")}
               </Button>
             </div>
           </div>
 
           {amountType === "partial" && (
             <div className="space-y-1.5">
-              <Label htmlFor="partial-amount">Nominal refund (Rp)</Label>
+              <Label htmlFor="partial-amount">{t("refundModal.amountLabel")}</Label>
               <Input
                 id="partial-amount"
                 type="number"
@@ -110,17 +112,17 @@ export function RefundModal({
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="refund-reason">Alasan refund (wajib)</Label>
+            <Label htmlFor="refund-reason">{t("refundModal.reasonLabel")}</Label>
             <select
               id="refund-reason"
               value={reasonCode}
               onChange={(e) => setReasonCode(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             >
-              <option value="">— pilih alasan —</option>
-              {REFUND_REASON_CODES.map((r) => (
-                <option key={r} value={r}>
-                  {r}
+              <option value="">{t("refundModal.reasonPlaceholder")}</option>
+              {REFUND_REASONS.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {t(`refundModal.reasons.${r.labelKey}`)}
                 </option>
               ))}
             </select>
@@ -128,29 +130,25 @@ export function RefundModal({
 
           {canConfirm && (
             <p className="rounded-md bg-muted px-3 py-2 text-sm text-foreground">
-              Refund{" "}
-              <strong>Rp {refundAmount.toLocaleString("id-ID")}</strong> akan
-              diproses ke customer.
+              {t("refundModal.confirmation", { amount: refundAmount.toLocaleString("id-ID") })}
             </p>
           )}
 
           {error && (
-            <p className="text-sm text-destructive">
-              Gagal proses refund. Coba lagi.
-            </p>
+            <p className="text-sm text-destructive">{t("refundModal.error")}</p>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Batal
+            {t("refundModal.cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={handleConfirm}
             disabled={!canConfirm || isSubmitting}
           >
-            {isSubmitting ? "Memproses..." : "Konfirmasi Refund"}
+            {isSubmitting ? t("refundModal.processing") : t("refundModal.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,3 +1,4 @@
+export { AdminNavbar } from "./admin-navbar";
 export { AdminQueueGroup } from "./admin-queue-group";
 export { AdminSidebar } from "./admin-sidebar";
 export { AuditLogTable } from "./audit-log-table";

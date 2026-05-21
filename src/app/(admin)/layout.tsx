@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { AdminSidebar } from "@/features/admin/components";
+import { AdminSidebar, AdminNavbar } from "@/features/admin/components";
 import { useUIStore } from "@/store/ui-store";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -38,7 +38,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
       <AdminSidebar />
-      <main className="flex-1 overflow-y-auto p-6">{children}</main>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <AdminNavbar />
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+      </div>
     </div>
   );
 }

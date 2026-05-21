@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useBookingActions } from "@/features/admin/hooks";
+import { useTranslation } from "@/i18n";
 
 const MOCK_CREW: Record<string, Array<{ id: string; name: string }>> = {
   "site-1": [
@@ -38,6 +39,7 @@ export function ReassignModal({
   const [crewId, setCrewId] = useState("");
   const { reassign, isSubmitting, error } = useBookingActions(bookingId);
   const crewOptions = MOCK_CREW[siteId] ?? [];
+  const { t } = useTranslation("admin");
 
   async function handleConfirm() {
     if (!crewId) return;
@@ -53,19 +55,19 @@ export function ReassignModal({
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Reassign Crew</DialogTitle>
+          <DialogTitle>{t("reassignModal.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3 py-2">
           <div className="space-y-1.5">
-            <Label htmlFor="crew-select">Pilih crew</Label>
+            <Label htmlFor="crew-select">{t("reassignModal.crewLabel")}</Label>
             <select
               id="crew-select"
               value={crewId}
               onChange={(e) => setCrewId(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             >
-              <option value="">— pilih crew —</option>
+              <option value="">{t("reassignModal.crewPlaceholder")}</option>
               {crewOptions.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -74,16 +76,16 @@ export function ReassignModal({
             </select>
           </div>
           {error && (
-            <p className="text-sm text-destructive">Gagal reassign. Coba lagi.</p>
+            <p className="text-sm text-destructive">{t("reassignModal.error")}</p>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Batal
+            {t("reassignModal.cancel")}
           </Button>
           <Button onClick={handleConfirm} disabled={!crewId || isSubmitting}>
-            {isSubmitting ? "Menyimpan..." : "Konfirmasi"}
+            {isSubmitting ? t("reassignModal.saving") : t("reassignModal.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

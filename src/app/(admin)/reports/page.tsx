@@ -9,6 +9,7 @@ import { KpiSummary } from "@/features/admin/components";
 import { useAdminReport } from "@/features/admin/hooks";
 import { useUIStore } from "@/store/ui-store";
 import type { DailyBreakdown } from "@/features/admin/types";
+import { useTranslation } from "@/i18n";
 
 function toISODate(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -42,6 +43,7 @@ function exportToCSV(breakdown: DailyBreakdown[], from: string, to: string) {
 
 export default function ReportsPage() {
   const activeSiteId = useUIStore((s) => s.activeSiteId);
+  const { t } = useTranslation("admin");
 
   const [from, setFrom] = useState(() => toISODate(new Date(Date.now() - 7 * 86400_000)));
   const [to, setTo] = useState(() => toISODate(new Date()));
@@ -62,22 +64,31 @@ export default function ReportsPage() {
   if (!activeSiteId) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Pilih site dari sidebar.</p>
+        <p className="text-muted-foreground">{t("common.selectSite")}</p>
       </div>
     );
   }
 
+  const columns = [
+    t("reports.columns.date"),
+    t("reports.columns.bookings"),
+    t("reports.columns.completed"),
+    t("reports.columns.sla"),
+    t("reports.columns.avgRating"),
+    t("reports.columns.revenue"),
+  ];
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-foreground">Reports</h1>
-        <p className="text-sm text-muted-foreground">KPI harian per site</p>
+        <h1 className="text-xl font-bold text-foreground">{t("reports.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("reports.subtitle")}</p>
       </div>
 
       {/* Controls */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="space-y-1">
-          <Label htmlFor="from-date">Dari</Label>
+          <Label htmlFor="from-date">{t("reports.fromLabel")}</Label>
           <Input
             id="from-date"
             type="date"
@@ -88,7 +99,7 @@ export default function ReportsPage() {
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="to-date">Sampai</Label>
+          <Label htmlFor="to-date">{t("reports.toLabel")}</Label>
           <Input
             id="to-date"
             type="date"
@@ -100,7 +111,7 @@ export default function ReportsPage() {
           />
         </div>
         <Button onClick={handleApply} disabled={isLoading}>
-          {isLoading ? "Memuat..." : "Terapkan"}
+          {isLoading ? t("reports.loading") : t("reports.apply")}
         </Button>
         <Button
           variant="outline"
@@ -110,7 +121,7 @@ export default function ReportsPage() {
           }
         >
           <Download className="mr-2 h-4 w-4" />
-          Export CSV
+          {t("reports.exportCsv")}
         </Button>
       </div>
 
@@ -123,16 +134,14 @@ export default function ReportsPage() {
           <table className="w-full text-sm">
             <thead className="border-b border-border bg-muted/50">
               <tr>
-                {["Tanggal", "Bookings", "Completed", "SLA%", "Avg Rating", "Revenue"].map(
-                  (col) => (
-                    <th
-                      key={col}
-                      className="px-4 py-3 text-left font-medium text-muted-foreground"
-                    >
-                      {col}
-                    </th>
-                  )
-                )}
+                {columns.map((col) => (
+                  <th
+                    key={col}
+                    className="px-4 py-3 text-left font-medium text-muted-foreground"
+                  >
+                    {col}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -149,7 +158,7 @@ export default function ReportsPage() {
             </tbody>
             <tfoot className="border-t border-border bg-muted/50 font-semibold">
               <tr>
-                <td className="px-4 py-3">Total</td>
+                <td className="px-4 py-3">{t("reports.totalRow")}</td>
                 <td className="px-4 py-3">
                   {report.breakdown.reduce((s, d) => s + d.totalBookings, 0)}
                 </td>
@@ -185,9 +194,7 @@ export default function ReportsPage() {
 
       {report && report.breakdown.length === 0 && (
         <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border">
-          <p className="text-sm text-muted-foreground">
-            Tidak ada data untuk range ini.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("reports.noData")}</p>
         </div>
       )}
     </div>

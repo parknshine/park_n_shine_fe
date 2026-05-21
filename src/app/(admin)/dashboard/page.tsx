@@ -9,11 +9,13 @@ import {
 } from "@/features/admin/components";
 import { useAdminQueue } from "@/features/admin/hooks";
 import type { AdminQueueBooking } from "@/features/admin/types";
+import { useTranslation } from "@/i18n";
 
 export default function DashboardPage() {
   const activeSiteId = useUIStore((s) => s.activeSiteId);
   const [selectedBooking, setSelectedBooking] =
     useState<AdminQueueBooking | null>(null);
+  const { t } = useTranslation("admin");
 
   const { queue, isLoading, refresh } = useAdminQueue({
     siteId: activeSiteId ?? "",
@@ -28,7 +30,7 @@ export default function DashboardPage() {
   if (!activeSiteId) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Pilih site dari sidebar.</p>
+        <p className="text-muted-foreground">{t("common.selectSite")}</p>
       </div>
     );
   }
@@ -36,7 +38,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Memuat queue...</p>
+        <p className="text-muted-foreground">{t("dashboard.loading")}</p>
       </div>
     );
   }
@@ -44,17 +46,20 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Live queue — diperbarui setiap 10 detik
-        </p>
+        <h1 className="text-xl font-bold text-foreground">{t("dashboard.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
       </div>
 
       {/* Escalations */}
       {queue && queue.escalations?.length > 0 && (
         <EscalationsPanel
           bookings={queue.escalations}
-          title={`Eskalasi — ${queue.escalations.length} booking butuh perhatian`}
+          title={t(
+            queue.escalations.length === 1
+              ? "dashboard.escalationsTitle"
+              : "dashboard.escalationsTitlePlural",
+            { count: queue.escalations.length }
+          )}
         />
       )}
 
@@ -72,9 +77,7 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-border">
-          <p className="text-sm text-muted-foreground">
-            Tidak ada booking saat ini.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("dashboard.emptyQueue")}</p>
         </div>
       )}
 

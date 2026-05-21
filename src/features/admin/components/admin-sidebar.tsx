@@ -2,18 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BarChart2,
-  LayoutGrid,
-  LogOut,
-  ScrollText,
-  Settings,
-} from "lucide-react";
+import { BarChart2, LayoutGrid, ScrollText, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
-import { useAdminAuth } from "@/features/admin/hooks";
+import { useTranslation } from "@/i18n";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
@@ -24,11 +16,10 @@ const NAV_ITEMS = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const { logout } = useAdminAuth();
-  const user = useAuthStore((s) => s.user);
   const sites = useUIStore((s) => s.sites);
   const activeSiteId = useUIStore((s) => s.activeSiteId);
   const setActiveSiteId = useUIStore((s) => s.setActiveSiteId);
+  const { t } = useTranslation("admin");
 
   return (
     <aside className="flex h-full w-56 flex-col border-r border-border bg-background">
@@ -37,7 +28,7 @@ export function AdminSidebar() {
         <p className="text-sm font-bold tracking-tight text-foreground">
           Park &amp; Shine
         </p>
-        <p className="text-xs text-muted-foreground">Admin Console</p>
+        <p className="text-xs text-muted-foreground">{t("common.adminConsole")}</p>
       </div>
 
       {/* Site selector */}
@@ -47,7 +38,7 @@ export function AdminSidebar() {
             htmlFor="site-select"
             className="mb-1 block text-xs font-medium text-muted-foreground"
           >
-            Site aktif
+            {t("common.siteActive")}
           </label>
           <select
             id="site-select"
@@ -86,23 +77,6 @@ export function AdminSidebar() {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="border-t border-border px-4 py-3">
-        {user && (
-          <p className="mb-2 truncate text-xs text-muted-foreground">
-            {(user as { email?: string }).email ?? "admin"}
-          </p>
-        )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-2 text-muted-foreground"
-          onClick={logout}
-        >
-          <LogOut className="h-4 w-4" />
-          Logout
-        </Button>
-      </div>
     </aside>
   );
 }

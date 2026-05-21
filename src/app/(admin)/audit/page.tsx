@@ -7,18 +7,15 @@ import { BookingDetailDrawer } from "@/features/admin/components";
 import { useAuditLog } from "@/features/admin/hooks";
 import { useUIStore } from "@/store/ui-store";
 import type { AuditEntry } from "@/features/admin/types";
+import { useTranslation } from "@/i18n";
 
-const ACTION_OPTIONS = [
-  { value: "all", label: "Semua aksi" },
-  { value: "status_override", label: "Override Status" },
-  { value: "refund", label: "Refund" },
-  { value: "reassign", label: "Reassign" },
-];
+const ACTION_VALUES = ["all", "status_override", "refund", "reassign"] as const;
 
 export default function AuditPage() {
   const activeSiteId = useUIStore((s) => s.activeSiteId);
   const [action, setAction] = useState("all");
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const { t } = useTranslation("admin");
 
   const { entries, isLoading } = useAuditLog(activeSiteId ?? "", { action });
 
@@ -29,7 +26,7 @@ export default function AuditPage() {
   if (!activeSiteId) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Pilih site dari sidebar.</p>
+        <p className="text-muted-foreground">{t("common.selectSite")}</p>
       </div>
     );
   }
@@ -37,25 +34,23 @@ export default function AuditPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-foreground">Audit Trail</h1>
-        <p className="text-sm text-muted-foreground">
-          Semua aksi admin — read-only, tidak dapat dihapus
-        </p>
+        <h1 className="text-xl font-bold text-foreground">{t("audit.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("audit.subtitle")}</p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="space-y-1">
-          <Label htmlFor="action-filter">Filter aksi</Label>
+          <Label htmlFor="action-filter">{t("audit.filterLabel")}</Label>
           <select
             id="action-filter"
             value={action}
             onChange={(e) => setAction(e.target.value)}
             className="rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
-            {ACTION_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
+            {ACTION_VALUES.map((value) => (
+              <option key={value} value={value}>
+                {t(`audit.actions.${value}`)}
               </option>
             ))}
           </select>
@@ -63,7 +58,7 @@ export default function AuditPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Memuat audit log...</p>
+        <p className="text-sm text-muted-foreground">{t("audit.loading")}</p>
       ) : (
         <AuditLogTable entries={entries} onRowClick={handleRowClick} />
       )}

@@ -19,6 +19,10 @@ export const SUBDOMAIN_CONFIG = {
     ] as const,
     defaultPath: "/admin/login",
   },
+  www: {
+    allowedPrefixes: ["/"] as const,
+    defaultPath: "/",
+  },
 } as const;
 
 type Subdomain = keyof typeof SUBDOMAIN_CONFIG;
@@ -32,7 +36,7 @@ export function detectSubdomain(host: string): Subdomain | null {
   const hostname = host.split(":")[0];
   const parts = hostname.split(".");
 
-  // Need at least 3 parts: subdomain.domain.tld
+  // Root domain (e.g. "park-shine.sg") — treat as landing page, pass through
   if (parts.length < 3) return null;
 
   const sub = parts[0];

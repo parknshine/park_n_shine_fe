@@ -1,0 +1,162 @@
+{
+  "common": {
+    "selectSite": "Pilih site dari sidebar.",
+    "adminConsole": "Admin Console",
+    "siteActive": "Site aktif",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Park & Shine",
+    "subtitle": "Admin Console",
+    "emailLabel": "Email",
+    "emailPlaceholder": "admin@park-shine.com",
+    "passwordLabel": "Password",
+    "signingIn": "Masuk...",
+    "signIn": "Masuk ke Admin Console",
+    "loginFailed": "Login gagal. Coba lagi.",
+    "mockCredentials": "Mock credentials: email apapun + password admin123"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Live queue — diperbarui setiap 10 detik",
+    "loading": "Memuat queue...",
+    "emptyQueue": "Tidak ada booking saat ini.",
+    "escalationsTitle": "Eskalasi — {{count}} booking butuh perhatian",
+    "escalationsTitlePlural": "Eskalasi — {{count}} booking butuh perhatian"
+  },
+  "audit": {
+    "title": "Audit Trail",
+    "subtitle": "Semua aksi admin — read-only, tidak dapat dihapus",
+    "filterLabel": "Filter aksi",
+    "loading": "Memuat audit log...",
+    "actions": {
+      "all": "Semua aksi",
+      "status_override": "Override Status",
+      "refund": "Refund",
+      "reassign": "Reassign"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "KPI harian per site",
+    "fromLabel": "Dari",
+    "toLabel": "Sampai",
+    "loading": "Memuat...",
+    "apply": "Terapkan",
+    "exportCsv": "Export CSV",
+    "noData": "Tidak ada data untuk range ini.",
+    "totalRow": "Total",
+    "columns": {
+      "date": "Tanggal",
+      "bookings": "Bookings",
+      "completed": "Completed",
+      "sla": "SLA%",
+      "avgRating": "Avg Rating",
+      "revenue": "Revenue"
+    },
+    "kpi": {
+      "totalBookings": "Total Bookings",
+      "completionRate": "Tingkat Penyelesaian",
+      "slaHitRate": "SLA Hit Rate",
+      "averageRating": "Rata-rata Rating",
+      "revenue": "Revenue"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Konfigurasi per site",
+    "loading": "Memuat settings...",
+    "staleTimeout": {
+      "title": "Stale Job Timeout",
+      "description": "Booking PAID yang belum di-claim lebih dari X menit akan muncul di Escalations Panel.",
+      "label": "Timeout (menit)",
+      "unit": "menit",
+      "hint": "Min: 5, Max: 120",
+      "resetLabel": "Reset ke 20 menit",
+      "saving": "Menyimpan...",
+      "save": "Save Changes",
+      "success": "Settings berhasil disimpan.",
+      "error": "Gagal menyimpan. Coba lagi."
+    }
+  },
+  "drawer": {
+    "loading": "Memuat...",
+    "closeAriaLabel": "Tutup",
+    "statusHistory": "Riwayat Status",
+    "photos": "Foto",
+    "actions": "Aksi",
+    "auditLog": "Audit Log",
+    "reassignCrew": "Reassign Crew",
+    "overrideStatus": "Override Status",
+    "refund": "Refund"
+  },
+  "queueGroup": {
+    "seconds": "{{n}}d",
+    "minutes": "{{n}}m",
+    "hours": "{{h}}j {{m}}m"
+  },
+  "reassignModal": {
+    "title": "Reassign Crew",
+    "crewLabel": "Pilih crew",
+    "crewPlaceholder": "— pilih crew —",
+    "error": "Gagal reassign. Coba lagi.",
+    "cancel": "Batal",
+    "saving": "Menyimpan...",
+    "confirm": "Konfirmasi"
+  },
+  "overrideModal": {
+    "title": "Override Status",
+    "transitionLabel": "Transisi status",
+    "transitionPlaceholder": "— pilih transisi —",
+    "reasonLabel": "Alasan (wajib)",
+    "reasonPlaceholder": "Masukkan alasan override...",
+    "error": "Gagal override status. Coba lagi.",
+    "cancel": "Batal",
+    "saving": "Menyimpan...",
+    "confirm": "Konfirmasi"
+  },
+  "refundModal": {
+    "title": "Proses Refund",
+    "typeLabel": "Tipe refund",
+    "fullLabel": "Full — Rp {{amount}}",
+    "partial": "Partial",
+    "amountLabel": "Nominal refund (Rp)",
+    "reasonLabel": "Alasan refund (wajib)",
+    "reasonPlaceholder": "— pilih alasan —",
+    "confirmation": "Refund Rp {{amount}} akan diproses ke customer.",
+    "error": "Gagal proses refund. Coba lagi.",
+    "cancel": "Batal",
+    "processing": "Memproses...",
+    "confirm": "Konfirmasi Refund",
+    "reasons": {
+      "vehicleNotFound": "Kendaraan tidak ditemukan",
+      "vehicleTooTight": "Kendaraan tidak bisa dicuci — terlalu rapat",
+      "customerCancellation": "Pembatalan oleh pelanggan",
+      "paymentError": "Kesalahan pembayaran",
+      "other": "Lainnya"
+    }
+  },
+  "navbar": {
+    "escalationsAriaLabel": "Notifikasi eskalasi",
+    "escalationsTitle": "{{count}} eskalasi butuh perhatian",
+    "escalationsTitlePlural": "{{count}} eskalasi butuh perhatian",
+    "noEscalations": "Tidak ada eskalasi",
+    "noEscalationsDesc": "Semua booking berjalan lancar."
+  },
+  "auditTable": {
+    "empty": "Tidak ada audit entry.",
+    "columns": {
+      "timestamp": "Timestamp",
+      "bookingId": "Booking ID",
+      "plate": "Plate",
+      "action": "Action",
+      "detail": "Detail",
+      "admin": "Admin"
+    },
+    "actions": {
+      "refund": "Refund",
+      "status_override": "Override Status",
+      "reassign": "Reassign"
+    }
+  }
+}

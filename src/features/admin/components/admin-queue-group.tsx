@@ -1,9 +1,12 @@
+"use client";
+
 import { StatusBadge } from "@/components/shared";
 import {
   BOOKING_STATUS_TONES,
   type BookingStatus,
 } from "@/features/customer/types";
 import type { AdminQueueBooking } from "@/features/admin/types";
+import { useTranslation } from "@/i18n";
 
 interface AdminQueueGroupProps {
   status: BookingStatus;
@@ -11,18 +14,20 @@ interface AdminQueueGroupProps {
   onBookingClick?: (booking: AdminQueueBooking) => void;
 }
 
-function formatElapsed(seconds: number): string {
-  if (seconds < 60) return `${seconds}d`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  return `${Math.floor(minutes / 60)}j ${minutes % 60}m`;
-}
-
 export function AdminQueueGroup({
   status,
   bookings,
   onBookingClick,
 }: AdminQueueGroupProps) {
+  const { t } = useTranslation("admin");
+
+  function formatElapsed(seconds: number): string {
+    if (seconds < 60) return t("queueGroup.seconds", { n: seconds });
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return t("queueGroup.minutes", { n: minutes });
+    return t("queueGroup.hours", { h: Math.floor(minutes / 60), m: minutes % 60 });
+  }
+
   return (
     <section className="rounded-lg border border-border">
       <header className="flex items-center justify-between gap-3 border-b border-border p-4">

@@ -12,6 +12,7 @@ import type { AdminBookingDetail } from "@/features/admin/types";
 import { ReassignModal } from "./reassign-modal";
 import { StatusOverrideModal } from "./status-override-modal";
 import { RefundModal } from "./refund-modal";
+import { useTranslation } from "@/i18n";
 
 interface BookingDetailDrawerProps {
   bookingId: string | null;
@@ -29,6 +30,7 @@ export function BookingDetailDrawer({
   const [activeModal, setActiveModal] = useState<
     "reassign" | "override" | "refund" | null
   >(null);
+  const { t } = useTranslation("admin");
 
   const { data: booking, isLoading } = useQuery({
     enabled: !!bookingId,
@@ -68,13 +70,13 @@ export function BookingDetailDrawer({
               </>
             )}
             {isLoading && (
-              <span className="text-sm text-muted-foreground">Memuat...</span>
+              <span className="text-sm text-muted-foreground">{t("drawer.loading")}</span>
             )}
           </div>
           <button
             onClick={onClose}
             className="rounded-md p-1 text-muted-foreground hover:text-foreground"
-            aria-label="Tutup"
+            aria-label={t("drawer.closeAriaLabel")}
           >
             <X className="h-4 w-4" />
           </button>
@@ -86,7 +88,7 @@ export function BookingDetailDrawer({
               {/* Status History */}
               <section>
                 <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Riwayat Status
+                  {t("drawer.statusHistory")}
                 </h3>
                 <ol className="space-y-2">
                   {booking.statusHistory.map((entry, i) => (
@@ -106,7 +108,7 @@ export function BookingDetailDrawer({
               {booking.media.length > 0 && (
                 <section>
                   <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Foto
+                    {t("drawer.photos")}
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
                     {booking.media.map((m) => (
@@ -129,7 +131,7 @@ export function BookingDetailDrawer({
               {/* Actions */}
               <section>
                 <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Aksi
+                  {t("drawer.actions")}
                 </h3>
                 <div className="flex flex-col gap-2">
                   <Button
@@ -137,21 +139,21 @@ export function BookingDetailDrawer({
                     size="sm"
                     onClick={() => setActiveModal("reassign")}
                   >
-                    Reassign Crew
+                    {t("drawer.reassignCrew")}
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setActiveModal("override")}
                   >
-                    Override Status
+                    {t("drawer.overrideStatus")}
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
                     onClick={() => setActiveModal("refund")}
                   >
-                    Refund
+                    {t("drawer.refund")}
                   </Button>
                 </div>
               </section>
@@ -160,7 +162,7 @@ export function BookingDetailDrawer({
               {booking.auditEntries.length > 0 && (
                 <section>
                   <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Audit Log
+                    {t("drawer.auditLog")}
                   </h3>
                   <ol className="space-y-2">
                     {booking.auditEntries.map((entry) => (

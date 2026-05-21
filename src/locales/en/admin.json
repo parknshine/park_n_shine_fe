@@ -1,0 +1,162 @@
+{
+  "common": {
+    "selectSite": "Select a site from the sidebar.",
+    "adminConsole": "Admin Console",
+    "siteActive": "Active site",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Park & Shine",
+    "subtitle": "Admin Console",
+    "emailLabel": "Email",
+    "emailPlaceholder": "admin@park-shine.com",
+    "passwordLabel": "Password",
+    "signingIn": "Signing in...",
+    "signIn": "Sign in to Admin Console",
+    "loginFailed": "Login failed. Please try again.",
+    "mockCredentials": "Mock credentials: any email + password admin123"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Live queue — updated every 10 seconds",
+    "loading": "Loading queue...",
+    "emptyQueue": "No bookings at the moment.",
+    "escalationsTitle": "Escalations — {{count}} booking needs attention",
+    "escalationsTitlePlural": "Escalations — {{count}} bookings need attention"
+  },
+  "audit": {
+    "title": "Audit Trail",
+    "subtitle": "All admin actions — read-only, cannot be deleted",
+    "filterLabel": "Filter action",
+    "loading": "Loading audit log...",
+    "actions": {
+      "all": "All actions",
+      "status_override": "Override Status",
+      "refund": "Refund",
+      "reassign": "Reassign"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Daily KPI per site",
+    "fromLabel": "From",
+    "toLabel": "To",
+    "loading": "Loading...",
+    "apply": "Apply",
+    "exportCsv": "Export CSV",
+    "noData": "No data for this date range.",
+    "totalRow": "Total",
+    "columns": {
+      "date": "Date",
+      "bookings": "Bookings",
+      "completed": "Completed",
+      "sla": "SLA%",
+      "avgRating": "Avg Rating",
+      "revenue": "Revenue"
+    },
+    "kpi": {
+      "totalBookings": "Total Bookings",
+      "completionRate": "Completion Rate",
+      "slaHitRate": "SLA Hit Rate",
+      "averageRating": "Average Rating",
+      "revenue": "Revenue"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Per-site configuration",
+    "loading": "Loading settings...",
+    "staleTimeout": {
+      "title": "Stale Job Timeout",
+      "description": "PAID bookings unclaimed for more than X minutes will appear in the Escalations Panel.",
+      "label": "Timeout (minutes)",
+      "unit": "minutes",
+      "hint": "Min: 5, Max: 120",
+      "resetLabel": "Reset to 20 minutes",
+      "saving": "Saving...",
+      "save": "Save Changes",
+      "success": "Settings saved successfully.",
+      "error": "Failed to save. Please try again."
+    }
+  },
+  "drawer": {
+    "loading": "Loading...",
+    "closeAriaLabel": "Close",
+    "statusHistory": "Status History",
+    "photos": "Photos",
+    "actions": "Actions",
+    "auditLog": "Audit Log",
+    "reassignCrew": "Reassign Crew",
+    "overrideStatus": "Override Status",
+    "refund": "Refund"
+  },
+  "queueGroup": {
+    "seconds": "{{n}}s",
+    "minutes": "{{n}}m",
+    "hours": "{{h}}h {{m}}m"
+  },
+  "reassignModal": {
+    "title": "Reassign Crew",
+    "crewLabel": "Select crew",
+    "crewPlaceholder": "— select crew —",
+    "error": "Failed to reassign. Please try again.",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "confirm": "Confirm"
+  },
+  "overrideModal": {
+    "title": "Override Status",
+    "transitionLabel": "Status transition",
+    "transitionPlaceholder": "— select transition —",
+    "reasonLabel": "Reason (required)",
+    "reasonPlaceholder": "Enter override reason...",
+    "error": "Failed to override status. Please try again.",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "confirm": "Confirm"
+  },
+  "refundModal": {
+    "title": "Process Refund",
+    "typeLabel": "Refund type",
+    "fullLabel": "Full — Rp {{amount}}",
+    "partial": "Partial",
+    "amountLabel": "Refund amount (Rp)",
+    "reasonLabel": "Refund reason (required)",
+    "reasonPlaceholder": "— select reason —",
+    "confirmation": "Refund Rp {{amount}} will be processed to the customer.",
+    "error": "Failed to process refund. Please try again.",
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "confirm": "Confirm Refund",
+    "reasons": {
+      "vehicleNotFound": "Vehicle not found",
+      "vehicleTooTight": "Vehicle cannot be washed — too tight",
+      "customerCancellation": "Customer cancellation",
+      "paymentError": "Payment error",
+      "other": "Other"
+    }
+  },
+  "navbar": {
+    "escalationsAriaLabel": "Escalation notifications",
+    "escalationsTitle": "{{count}} escalation needs attention",
+    "escalationsTitlePlural": "{{count}} escalations need attention",
+    "noEscalations": "No escalations",
+    "noEscalationsDesc": "All bookings are running smoothly."
+  },
+  "auditTable": {
+    "empty": "No audit entries.",
+    "columns": {
+      "timestamp": "Timestamp",
+      "bookingId": "Booking ID",
+      "plate": "Plate",
+      "action": "Action",
+      "detail": "Detail",
+      "admin": "Admin"
+    },
+    "actions": {
+      "refund": "Refund",
+      "status_override": "Override Status",
+      "reassign": "Reassign"
+    }
+  }
+}

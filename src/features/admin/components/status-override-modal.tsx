@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useBookingActions } from "@/features/admin/hooks";
 import type { BookingStatus } from "@/features/customer/types";
 import type { StatusOverridePayload } from "@/features/admin/types";
+import { useTranslation } from "@/i18n";
 
 const VALID_TRANSITIONS: Array<{
   label: string;
@@ -42,6 +43,7 @@ export function StatusOverrideModal({
     useState<StatusOverridePayload["nextStatus"] | "">("");
   const [reasonCode, setReasonCode] = useState("");
   const { overrideStatus, isSubmitting, error } = useBookingActions(bookingId);
+  const { t } = useTranslation("admin");
 
   async function handleConfirm() {
     if (!nextStatus || !reasonCode.trim()) return;
@@ -59,12 +61,12 @@ export function StatusOverrideModal({
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Override Status</DialogTitle>
+          <DialogTitle>{t("overrideModal.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3 py-2">
           <div className="space-y-1.5">
-            <Label htmlFor="transition-select">Transisi status</Label>
+            <Label htmlFor="transition-select">{t("overrideModal.transitionLabel")}</Label>
             <select
               id="transition-select"
               value={nextStatus}
@@ -75,20 +77,20 @@ export function StatusOverrideModal({
               }
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             >
-              <option value="">— pilih transisi —</option>
-              {VALID_TRANSITIONS.map((t) => (
-                <option key={t.label} value={t.nextStatus}>
-                  {t.label}
+              <option value="">{t("overrideModal.transitionPlaceholder")}</option>
+              {VALID_TRANSITIONS.map((transition) => (
+                <option key={transition.label} value={transition.nextStatus}>
+                  {transition.label}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="reason">Alasan (wajib)</Label>
+            <Label htmlFor="reason">{t("overrideModal.reasonLabel")}</Label>
             <Textarea
               id="reason"
-              placeholder="Masukkan alasan override..."
+              placeholder={t("overrideModal.reasonPlaceholder")}
               value={reasonCode}
               onChange={(e) => setReasonCode(e.target.value)}
               rows={3}
@@ -96,21 +98,19 @@ export function StatusOverrideModal({
           </div>
 
           {error && (
-            <p className="text-sm text-destructive">
-              Gagal override status. Coba lagi.
-            </p>
+            <p className="text-sm text-destructive">{t("overrideModal.error")}</p>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Batal
+            {t("overrideModal.cancel")}
           </Button>
           <Button
             onClick={handleConfirm}
             disabled={!nextStatus || !reasonCode.trim() || isSubmitting}
           >
-            {isSubmitting ? "Menyimpan..." : "Konfirmasi"}
+            {isSubmitting ? t("overrideModal.saving") : t("overrideModal.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>
