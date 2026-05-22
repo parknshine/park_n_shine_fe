@@ -61,6 +61,7 @@ export default function Home() {
   const locale = useUIStore((s) => s.locale);
   const setLocale = useUIStore((s) => s.setLocale);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,6 +82,11 @@ export default function Home() {
     t("landingPage.pricing.feature5"),
   ];
 
+  function handleNavClick(sectionId: string) {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+    setIsMenuOpen(false);
+  }
+
   return (
     <div className='bg-white relative min-h-screen'>
       {/* ── Navbar ─────────────────────────────────────────────── */}
@@ -88,7 +94,7 @@ export default function Home() {
         className='fixed left-0 right-0 top-0 z-50 bg-white'
         style={{ boxShadow: "0px 1px 1px rgba(0,0,0,0.05)" }}
       >
-        <div className='flex items-center justify-between max-w-[1366px] mx-auto px-12 py-4'>
+        <div className='flex items-center justify-between max-w-[1366px] mx-auto px-4 md:px-12 py-4'>
           {/* Logo */}
           <div className='flex items-center gap-3 shrink-0'>
             <div className='h-8 w-[57px] relative overflow-hidden shrink-0'>
@@ -100,22 +106,22 @@ export default function Home() {
               />
             </div>
             <span
-              className='text-[#0036a4] text-2xl whitespace-nowrap'
+              className='text-[#0036a4] text-xl md:text-2xl whitespace-nowrap'
               style={{ fontFamily: manrope, fontWeight: 700 }}
             >
               Park &amp; Shine
             </span>
           </div>
 
-          {/* Nav links */}
-          <nav className='flex items-center gap-6'>
+          {/* Nav links — desktop only */}
+          <nav className='hidden md:flex items-center gap-6'>
             {navSections.map(({ key, sectionId }) => (
               <a
                 key={sectionId}
                 href={`#${sectionId}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+                  handleNavClick(sectionId);
                 }}
                 className='text-[#5f5e5e] text-sm tracking-[0.7px] py-1'
                 style={{ fontFamily: inter, fontWeight: 600 }}
@@ -125,8 +131,8 @@ export default function Home() {
             ))}
           </nav>
 
-          {/* CTA group */}
-          <div className='flex items-center gap-3'>
+          {/* CTA group — desktop only */}
+          <div className='hidden md:flex items-center gap-3'>
             <a
               href='/book/location'
               className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-6 py-3 rounded text-center'
@@ -140,7 +146,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
-                className='flex items-center gap-1.5 border border-[#c2c2c2] rounded-md h-11 px-4.25 bg-white text-black text-base'
+                className='flex items-center gap-1.5 border border-[#c2c2c2] rounded-md h-11 px-4 bg-white text-black text-base'
                 style={{ fontFamily: inter, fontWeight: 400 }}
                 aria-label={locale === "id" ? "Ganti bahasa" : "Change language"}
               >
@@ -190,13 +196,81 @@ export default function Home() {
               )}
             </div>
           </div>
+
+          {/* Hamburger — mobile only */}
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            className='flex md:hidden items-center justify-center p-2 rounded-md text-[#3d3d3d]'
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMenuOpen ? (
+              <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
+                <path d='M18 6L6 18M6 6l12 12' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
+              </svg>
+            ) : (
+              <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
+                <path d='M4 6h16M4 12h16M4 18h16' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
+              </svg>
+            )}
+          </button>
         </div>
+
+        {/* Mobile menu panel */}
+        {isMenuOpen && (
+          <div className='md:hidden border-t border-[#e8e8e8] bg-white px-4 py-4 flex flex-col gap-1'>
+            {navSections.map(({ key, sectionId }) => (
+              <a
+                key={sectionId}
+                href={`#${sectionId}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick(sectionId);
+                }}
+                className='text-[#5f5e5e] text-base tracking-[0.7px] py-3 border-b border-[#f0f0f0]'
+                style={{ fontFamily: inter, fontWeight: 600 }}
+              >
+                {t(`landingPage.nav.${key}`)}
+              </a>
+            ))}
+            <div className='flex items-center gap-3 pt-3'>
+              <a
+                href='/book/location'
+                className='flex-1 bg-[#0036a4] text-white text-sm tracking-[0.7px] px-6 py-3 rounded text-center'
+                style={{ fontFamily: inter, fontWeight: 600 }}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {t("landingPage.nav.bookNow")}
+              </a>
+              <div className='flex gap-1'>
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => {
+                      setLocale(lang.code.toLowerCase() as "id" | "en");
+                      setIsMenuOpen(false);
+                    }}
+                    className={`px-3 py-2 rounded-md text-sm border transition-colors ${
+                      locale.toUpperCase() === lang.code
+                        ? "border-[#0036a4] text-[#0036a4] font-semibold bg-[#f0f4ff]"
+                        : "border-[#c2c2c2] text-[#3d3d3d]"
+                    }`}
+                    style={{ fontFamily: inter }}
+                  >
+                    {lang.code}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ── Main ───────────────────────────────────────────────── */}
       <main className='pt-[76px]'>
         {/* ── Hero Section ────────────────────────────────────── */}
-        <section className='bg-[#f7f7f7] py-20 relative overflow-hidden'>
+        <section className='bg-[#f7f7f7] py-12 md:py-20 relative overflow-hidden'>
           {/* Corner gradients */}
           <div
             className='absolute left-0 top-0 size-64 opacity-20 pointer-events-none'
@@ -213,11 +287,11 @@ export default function Home() {
             }}
           />
 
-          <div className='flex gap-12 items-center max-w-[1366px] mx-auto px-12'>
+          <div className='flex flex-col md:flex-row gap-8 md:gap-12 items-center max-w-[1366px] mx-auto px-4 md:px-12'>
             {/* Left: copy */}
-            <div className='flex-1 flex flex-col gap-6 min-w-0'>
+            <div className='flex-1 flex flex-col gap-6 min-w-0 w-full'>
               <h1
-                className='text-[56px] text-black leading-[56px]'
+                className='text-[36px] leading-[40px] md:text-[56px] md:leading-[56px] text-black'
                 style={{ fontFamily: manrope, fontWeight: 500 }}
               >
                 {t("landingPage.hero.heading").split("\n").map((line, i) => (
@@ -228,21 +302,25 @@ export default function Home() {
                 ))}
               </h1>
               <p
-                className='text-[#3d3d3d] text-lg leading-[27px] max-w-[512px]'
+                className='text-[#3d3d3d] text-base md:text-lg leading-[27px] max-w-[512px]'
                 style={{ fontFamily: inter, fontWeight: 400 }}
               >
                 {t("landingPage.hero.description")}
               </p>
-              <div className='flex gap-4 pt-3'>
+              <div className='flex flex-col sm:flex-row gap-3 pt-3'>
                 <a
-                  href='#'
+                  href='#services'
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
+                  }}
                   className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-8 py-[17px] rounded text-center'
                   style={{ fontFamily: inter, fontWeight: 600 }}
                 >
                   {t("landingPage.hero.viewServices")}
                 </a>
                 <a
-                  href='#'
+                  href='/book/location'
                   className='border border-[#c2c2c2] text-black text-sm tracking-[0.7px] px-8 py-[17px] rounded text-center'
                   style={{ fontFamily: inter, fontWeight: 600 }}
                 >
@@ -252,12 +330,12 @@ export default function Home() {
             </div>
 
             {/* Right: hero image */}
-            <div className='flex-1 min-w-0'>
+            <div className='flex-1 min-w-0 w-full'>
               <div
                 className='bg-[#eee] rounded-2xl overflow-hidden'
                 style={{ boxShadow: "0px 2px 8px 0px rgba(26,26,26,0.08)" }}
               >
-                <div className='h-[426px] relative overflow-hidden'>
+                <div className='h-[240px] sm:h-[320px] md:h-[426px] relative overflow-hidden'>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     alt={t("landingPage.hero.imageAlt")}
@@ -272,16 +350,16 @@ export default function Home() {
         </section>
 
         {/* ── How the Magic Happens ────────────────────────────── */}
-        <section id='services' className='bg-white py-20'>
-          <div className='flex flex-col gap-12 max-w-[1366px] mx-auto px-12'>
+        <section id='services' className='bg-white py-12 md:py-20'>
+          <div className='flex flex-col gap-8 md:gap-12 max-w-[1366px] mx-auto px-4 md:px-12'>
             <h2
-              className='text-[56px] text-black text-center leading-[56px]'
+              className='text-[36px] leading-[40px] md:text-[56px] md:leading-[56px] text-black text-center'
               style={{ fontFamily: manrope, fontWeight: 500 }}
             >
               {t("landingPage.howItWorks.title")}
             </h2>
 
-            <div className='grid grid-cols-4 gap-6'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
               {howItWorksData.map(({ step, image, imageStyle }) => (
                 <div
                   key={step}
@@ -305,10 +383,7 @@ export default function Home() {
 
                   {/* Image */}
                   <div className='rounded-lg overflow-hidden mb-4'>
-                    <div
-                      className='relative overflow-hidden'
-                      style={{ height: "325px" }}
-                    >
+                    <div className='relative overflow-hidden h-[220px] sm:h-[260px] lg:h-[325px]'>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         alt=''
@@ -341,11 +416,11 @@ export default function Home() {
         </section>
 
         {/* ── Limited Time Promotion ───────────────────────────── */}
-        <section id='pricing' className='bg-white py-20'>
-          <div className='flex flex-col gap-8 items-center max-w-[1366px] mx-auto px-12'>
+        <section id='pricing' className='bg-white py-12 md:py-20'>
+          <div className='flex flex-col gap-8 items-center max-w-[1366px] mx-auto px-4 md:px-12'>
             <div className='text-center'>
               <h2
-                className='text-[#0036a4] text-[44px] font-bold uppercase leading-[48px]'
+                className='text-[#0036a4] text-[32px] leading-[38px] md:text-[44px] md:leading-[48px] font-bold uppercase'
                 style={{ fontFamily: inter }}
               >
                 {t("landingPage.pricing.title")}
@@ -359,7 +434,7 @@ export default function Home() {
             </div>
 
             <div
-              className='bg-white border border-[#e8e8e8] rounded-lg p-[33px] w-full max-w-[576px]'
+              className='bg-white border border-[#e8e8e8] rounded-lg p-6 md:p-[33px] w-full max-w-[576px]'
               style={{ filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))" }}
             >
               <p
@@ -369,7 +444,7 @@ export default function Home() {
                 {t("landingPage.pricing.serviceLabel")}
               </p>
               <p
-                className='text-[#1a1c1c] text-[44px] leading-[48px] font-bold'
+                className='text-[#1a1c1c] text-[36px] leading-[42px] md:text-[44px] md:leading-[48px] font-bold'
                 style={{ fontFamily: manrope }}
               >
                 Rp50.000
@@ -398,17 +473,17 @@ export default function Home() {
         </section>
 
         {/* ── Track Your Wash ─────────────────────────────────── */}
-        <section className='bg-[#f7f7f7] py-20'>
-          <div className='flex flex-col gap-8 max-w-[1366px] mx-auto px-12'>
+        <section className='bg-[#f7f7f7] py-12 md:py-20'>
+          <div className='flex flex-col gap-8 max-w-[1366px] mx-auto px-4 md:px-12'>
             {/* Card */}
             <div
-              className='bg-white border border-[#e8e8e8] rounded-2xl p-[33px] flex items-center justify-between gap-8'
+              className='bg-white border border-[#e8e8e8] rounded-2xl p-6 md:p-[33px] flex flex-col md:flex-row items-center justify-between gap-8'
               style={{ filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))" }}
             >
               {/* Left: copy */}
-              <div className='flex-1 min-w-0 flex flex-col gap-4'>
+              <div className='flex-1 min-w-0 flex flex-col gap-4 w-full'>
                 <h2
-                  className='text-[#0036a4] text-[44px] leading-[48px] font-bold'
+                  className='text-[#0036a4] text-[30px] leading-[36px] md:text-[44px] md:leading-[48px] font-bold'
                   style={{ fontFamily: manrope }}
                 >
                   {t("landingPage.track.title")}
@@ -422,7 +497,7 @@ export default function Home() {
               </div>
 
               {/* Right: steps */}
-              <div className='flex-1 min-w-0 flex items-center justify-center py-6'>
+              <div className='flex-1 min-w-0 flex items-center justify-center py-6 w-full'>
                 <div className='relative flex items-start justify-center w-full max-w-[512px]'>
                   {/* Background divider */}
                   <div className='absolute top-6 left-0 right-0 h-[2px] bg-[#c3c5d7]' />
@@ -435,7 +510,7 @@ export default function Home() {
                       className='flex-1 flex flex-col gap-3 items-center relative'
                     >
                       <div
-                        className='size-12 rounded-xl flex items-center justify-center'
+                        className='size-10 md:size-12 rounded-xl flex items-center justify-center'
                         style={{
                           background: current
                             ? "#024ad8"
@@ -448,7 +523,7 @@ export default function Home() {
                         }}
                       >
                         <span
-                          className='text-base text-center font-bold'
+                          className='text-sm md:text-base text-center font-bold'
                           style={{
                             fontFamily: inter,
                             color: current
@@ -462,7 +537,7 @@ export default function Home() {
                         </span>
                       </div>
                       <span
-                        className='text-xs text-center leading-[17px]'
+                        className='text-[10px] md:text-xs text-center leading-[17px]'
                         style={{
                           fontFamily: inter,
                           fontWeight: 400,
@@ -481,7 +556,7 @@ export default function Home() {
             <div className='flex justify-center'>
               <a
                 href='/book/location'
-                className='bg-[#0036a4] text-white text-sm tracking-[0.7px] px-8 py-4 rounded text-center'
+                className='w-full sm:w-auto bg-[#0036a4] text-white text-sm tracking-[0.7px] px-8 py-4 rounded text-center'
                 style={{
                   fontFamily: inter,
                   fontWeight: 600,
@@ -495,11 +570,11 @@ export default function Home() {
         </section>
 
         {/* ── Seamless Integration ─────────────────────────────── */}
-        <section id='about' className='bg-[#f7f7f7] py-20'>
-          <div className='flex flex-col gap-12 max-w-[1366px] mx-auto px-12'>
+        <section id='about' className='bg-[#f7f7f7] py-12 md:py-20'>
+          <div className='flex flex-col gap-8 md:gap-12 max-w-[1366px] mx-auto px-4 md:px-12'>
             <div className='text-center flex flex-col gap-2'>
               <h2
-                className='text-[44px] text-black leading-[48px]'
+                className='text-[32px] leading-[38px] md:text-[44px] md:leading-[48px] text-black'
                 style={{ fontFamily: manrope, fontWeight: 500 }}
               >
                 {t("landingPage.integration.title")}
@@ -512,15 +587,15 @@ export default function Home() {
               </p>
             </div>
 
-            <div className='flex flex-col gap-12'>
-              {/* Step 1 */}
+            <div className='flex flex-col gap-8 md:gap-12'>
+              {/* Step 1: image left, text right */}
               <div
-                className='bg-white border border-[#e8e8e8] rounded-2xl p-[25px] flex gap-12 items-center'
+                className='bg-white border border-[#e8e8e8] rounded-2xl p-6 md:p-[25px] flex flex-col md:flex-row gap-8 md:gap-12 items-center'
                 style={{
                   filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))",
                 }}
               >
-                <div className='flex-1 min-w-0'>
+                <div className='flex-1 min-w-0 w-full'>
                   <div className='aspect-video relative rounded overflow-hidden'>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -531,7 +606,7 @@ export default function Home() {
                     />
                   </div>
                 </div>
-                <div className='flex-1 min-w-0 flex flex-col gap-4'>
+                <div className='flex-1 min-w-0 flex flex-col gap-4 w-full'>
                   <div className='bg-[#dce1ff] size-12 rounded-xl flex items-center justify-center shrink-0'>
                     <span
                       className='text-[#0036a4] text-base text-center'
@@ -541,13 +616,13 @@ export default function Home() {
                     </span>
                   </div>
                   <h3
-                    className='text-[32px] text-black leading-[38px]'
+                    className='text-[24px] leading-[30px] md:text-[32px] md:leading-[38px] text-black'
                     style={{ fontFamily: manrope, fontWeight: 500 }}
                   >
                     {t("landingPage.integration.step1.title")}
                   </h3>
                   <p
-                    className='text-[#3d3d3d] text-lg leading-[27px]'
+                    className='text-[#3d3d3d] text-base md:text-lg leading-[27px]'
                     style={{ fontFamily: inter, fontWeight: 400 }}
                   >
                     {t("landingPage.integration.step1.description")}
@@ -555,14 +630,14 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Step 2 */}
+              {/* Step 2: text left, image right — reverse on mobile (text first) */}
               <div
-                className='bg-white border border-[#e8e8e8] rounded-2xl p-[25px] flex gap-12 items-center'
+                className='bg-white border border-[#e8e8e8] rounded-2xl p-6 md:p-[25px] flex flex-col md:flex-row gap-8 md:gap-12 items-center'
                 style={{
                   filter: "drop-shadow(0px 2px 4px rgba(26,26,26,0.08))",
                 }}
               >
-                <div className='flex-1 min-w-0 flex flex-col gap-4'>
+                <div className='flex-1 min-w-0 flex flex-col gap-4 w-full'>
                   <div className='bg-[#dce1ff] size-12 rounded-xl flex items-center justify-center shrink-0'>
                     <span
                       className='text-[#0036a4] text-base text-center'
@@ -572,19 +647,19 @@ export default function Home() {
                     </span>
                   </div>
                   <h3
-                    className='text-[32px] text-black leading-[38px]'
+                    className='text-[24px] leading-[30px] md:text-[32px] md:leading-[38px] text-black'
                     style={{ fontFamily: manrope, fontWeight: 500 }}
                   >
                     {t("landingPage.integration.step2.title")}
                   </h3>
                   <p
-                    className='text-[#3d3d3d] text-lg leading-[27px]'
+                    className='text-[#3d3d3d] text-base md:text-lg leading-[27px]'
                     style={{ fontFamily: inter, fontWeight: 400 }}
                   >
                     {t("landingPage.integration.step2.description")}
                   </p>
                 </div>
-                <div className='flex-1 min-w-0'>
+                <div className='flex-1 min-w-0 w-full'>
                   <div className='aspect-video relative rounded overflow-hidden'>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -603,11 +678,11 @@ export default function Home() {
 
       {/* ── Footer ─────────────────────────────────────────────── */}
       <footer className='bg-[#00164f] border-t border-[#455b72]'>
-        <div className='max-w-[1366px] mx-auto px-12 py-20 grid grid-cols-5 gap-6'>
+        <div className='max-w-[1366px] mx-auto px-4 md:px-12 py-12 md:py-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-6'>
           {/* Brand */}
-          <div className='col-span-2 flex flex-col gap-4'>
+          <div className='col-span-1 sm:col-span-2 flex flex-col gap-4'>
             <h3
-              className='text-white text-[32px] leading-[38px]'
+              className='text-white text-[28px] leading-[34px] md:text-[32px] md:leading-[38px]'
               style={{ fontFamily: manrope, fontWeight: 500 }}
             >
               Park &amp; Shine
@@ -626,30 +701,6 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Company */}
-          <div className='flex flex-col gap-3'>
-            <p
-              className='text-white text-sm tracking-[0.7px] mb-1'
-              style={{ fontFamily: inter, fontWeight: 600 }}
-            >
-              {t("landingPage.footer.companyHeading")}
-            </p>
-            {[
-              t("landingPage.footer.about"),
-              t("landingPage.footer.locations"),
-              t("landingPage.footer.careers"),
-            ].map((link) => (
-              <a
-                key={link}
-                href='#'
-                className='text-[#b2c9e4] text-base leading-[26px]'
-                style={{ fontFamily: inter, fontWeight: 400 }}
-              >
-                {link}
-              </a>
-            ))}
-          </div>
-
           {/* Services */}
           <div className='flex flex-col gap-3'>
             <p
@@ -659,17 +710,21 @@ export default function Home() {
               {t("landingPage.footer.servicesHeading")}
             </p>
             {[
-              t("landingPage.footer.services"),
-              t("landingPage.footer.pricing"),
-              t("landingPage.footer.fleetServices"),
-            ].map((link) => (
+              { label: t("landingPage.footer.services"), sectionId: "services" },
+              { label: t("landingPage.footer.pricing"), sectionId: "pricing" },
+              { label: t("landingPage.footer.fleetServices"), sectionId: "about" },
+            ].map(({ label, sectionId }) => (
               <a
-                key={link}
-                href='#'
+                key={label}
+                href={`#${sectionId}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+                }}
                 className='text-[#b2c9e4] text-base leading-[26px]'
                 style={{ fontFamily: inter, fontWeight: 400 }}
               >
-                {link}
+                {label}
               </a>
             ))}
           </div>
@@ -683,18 +738,18 @@ export default function Home() {
               {t("landingPage.footer.legalHeading")}
             </p>
             {[
-              t("landingPage.footer.support"),
-              t("landingPage.footer.privacyPolicy"),
-              t("landingPage.footer.termsOfService"),
-              t("landingPage.footer.contactUs"),
-            ].map((link) => (
+              { label: t("landingPage.footer.support"), href: "/support" },
+              { label: t("landingPage.footer.privacyPolicy"), href: "/privacy-policy" },
+              { label: t("landingPage.footer.termsOfService"), href: "/terms" },
+              { label: t("landingPage.footer.contactUs"), href: "/contact" },
+            ].map(({ label, href }) => (
               <a
-                key={link}
-                href='#'
-                className='text-[#b2c9e4] text-base leading-[26px]'
+                key={label}
+                href={href}
+                className='text-[#b2c9e4] text-base leading-[26px] hover:text-white transition-colors'
                 style={{ fontFamily: inter, fontWeight: 400 }}
               >
-                {link}
+                {label}
               </a>
             ))}
           </div>
