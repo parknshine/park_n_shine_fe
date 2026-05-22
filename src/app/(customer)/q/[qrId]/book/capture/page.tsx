@@ -33,7 +33,10 @@ export default function BookCapturePage() {
   const createMutation = useMutation({
     meta: { persist: false },
     mutationFn: async () => {
-      const payload: CreateBookingPayload = { qrId, locale: locale === "en" ? "en-US" : "id-ID" };
+      const payload: CreateBookingPayload = {
+        qrId,
+        locale: locale === "en" ? "en-US" : "id-ID",
+      };
       const response = await api.post<CustomerBooking>("/v1/bookings", payload);
       return response.data;
     },
@@ -98,12 +101,17 @@ export default function BookCapturePage() {
     router.push(`/q/${qrId}/book/confirm?${params.toString()}`);
   }
 
+  console.log("createMutation.isPending", createMutation.isPending);
+  console.log("bookingId", bookingId);
+  console.log("createMutation.isError", createMutation.isError);
   if (createMutation.isPending || (!bookingId && !createMutation.isError)) {
     return (
-      <AppShell surface="customer">
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">{t("state.preparing", { ns: "common" })}</p>
+      <AppShell surface='customer'>
+        <div className='flex min-h-[60vh] flex-col items-center justify-center gap-3'>
+          <Loader2 className='h-8 w-8 animate-spin text-primary' />
+          <p className='text-sm text-muted-foreground'>
+            {t("state.preparing", { ns: "common" })}
+          </p>
         </div>
       </AppShell>
     );
@@ -111,9 +119,9 @@ export default function BookCapturePage() {
 
   if (createMutation.isError) {
     return (
-      <AppShell surface="customer">
-        <div className="space-y-4 pt-10 text-center">
-          <p className="text-sm text-destructive">
+      <AppShell surface='customer'>
+        <div className='space-y-4 pt-10 text-center'>
+          <p className='text-sm text-destructive'>
             {t("booking.capture.errorCreate")}
           </p>
           <Button
@@ -130,24 +138,24 @@ export default function BookCapturePage() {
   }
 
   return (
-    <AppShell surface="customer">
-      <div className="space-y-6">
+    <AppShell surface='customer'>
+      <div className='space-y-6'>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
             {t("booking.step", { current: 1, total: 2 })}
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-foreground">
+          <h1 className='mt-1 text-2xl font-bold text-foreground'>
             {t("booking.capture.title")}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className='mt-1 text-sm text-muted-foreground'>
             {t("booking.capture.subtitle")}
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <PhotoUploadField
-            id="plate-photo"
-            kind="plate"
+            id='plate-photo'
+            kind='plate'
             label={t("booking.capture.platePhotoLabel")}
             state={plateUpload}
             onSelect={(file, kind) => plateUpload.uploadPhoto({ file, kind })}
@@ -155,7 +163,7 @@ export default function BookCapturePage() {
           />
           {plateUpload.status === "success" && (
             <OcrEditField
-              id="plate-text"
+              id='plate-text'
               label={t("booking.capture.plateOcrLabel")}
               value={plateText}
               onChange={setPlateText}
@@ -164,8 +172,8 @@ export default function BookCapturePage() {
           )}
 
           <PhotoUploadField
-            id="slot-photo"
-            kind="slot"
+            id='slot-photo'
+            kind='slot'
             label={t("booking.capture.slotPhotoLabel")}
             state={slotUpload}
             onSelect={(file, kind) => slotUpload.uploadPhoto({ file, kind })}
@@ -173,7 +181,7 @@ export default function BookCapturePage() {
           />
           {slotUpload.status === "success" && (
             <OcrEditField
-              id="slot-text"
+              id='slot-text'
               label={t("booking.capture.slotOcrLabel")}
               value={slotText}
               onChange={setSlotText}
@@ -181,33 +189,33 @@ export default function BookCapturePage() {
             />
           )}
 
-          <div className="space-y-1.5">
+          <div className='space-y-1.5'>
             <label
-              htmlFor="phone"
-              className="text-sm font-medium text-foreground"
+              htmlFor='phone'
+              className='text-sm font-medium text-foreground'
             >
               {t("booking.capture.phoneLabel")}
             </label>
             <input
-              id="phone"
-              type="tel"
-              inputMode="tel"
+              id='phone'
+              type='tel'
+              inputMode='tel'
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder={t("booking.capture.phonePlaceholder")}
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className='w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
             />
-            <p className="text-xs text-muted-foreground">
+            <p className='text-xs text-muted-foreground'>
               {t("booking.capture.phoneHelper")}
             </p>
           </div>
         </div>
 
         <Button
-          size="lg"
-          className="w-full rounded-full"
+          size='lg'
+          className='w-full rounded-full'
           disabled={!canContinue}
-          suffix={<ArrowRight className="h-4 w-4" />}
+          suffix={<ArrowRight className='h-4 w-4' />}
           onClick={handleContinue}
         >
           {t("action.next", { ns: "common" })}

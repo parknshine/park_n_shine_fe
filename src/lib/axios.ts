@@ -27,9 +27,14 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor — normalise errors
+// Response interceptor — unwrap { success, data } envelope + normalise errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.data && typeof response.data === "object" && "success" in response.data && response.data.data !== undefined) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   (error) => {
     const normalizedError = normalizeApiError(error);
 

@@ -28,7 +28,8 @@ async function getQrResolution(
       cache: "no-store",
     });
     if (!res.ok) return null;
-    return res.json() as Promise<SiteQrResolution>;
+    const body = await res.json() as { data: SiteQrResolution };
+    return body.data ?? null;
   } catch {
     return null;
   }
