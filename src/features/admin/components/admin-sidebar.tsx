@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart2, LayoutGrid, ScrollText, Settings } from "lucide-react";
+import { BarChart2, LayoutGrid, QrCode, ScrollText, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
 import { useTranslation } from "@/i18n";
+import { Combobox } from "@/components/ui/combobox";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
+  { href: "/sites", label: "Sites & QR", icon: QrCode },
   { href: "/reports", label: "Reports", icon: BarChart2 },
   { href: "/audit", label: "Audit Trail", icon: ScrollText },
   { href: "/settings", label: "Settings", icon: Settings },
@@ -34,24 +36,15 @@ export function AdminSidebar() {
       {/* Site selector */}
       {sites.length > 0 && (
         <div className="border-b border-border px-4 py-3">
-          <label
-            htmlFor="site-select"
-            className="mb-1 block text-xs font-medium text-muted-foreground"
-          >
+          <p className="mb-1.5 text-xs font-medium text-muted-foreground">
             {t("common.siteActive")}
-          </label>
-          <select
-            id="site-select"
+          </p>
+          <Combobox
+            options={sites.map((s) => ({ value: s.id, label: s.name }))}
             value={activeSiteId ?? ""}
-            onChange={(e) => setActiveSiteId(e.target.value)}
-            className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm text-foreground"
-          >
-            {sites.map((site) => (
-              <option key={site.id} value={site.id}>
-                {site.name}
-              </option>
-            ))}
-          </select>
+            onChange={setActiveSiteId}
+            placeholder={t("common.siteActive")}
+          />
         </div>
       )}
 

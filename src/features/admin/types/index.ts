@@ -89,3 +89,46 @@ export interface MockCrewMember {
   name: string;
   siteId: string;
 }
+
+export interface AdminSiteDetail {
+  id: string;
+  name: string;
+  address: string;
+  timezone: string;
+  intakePaused: boolean;
+  cutoffTime: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminQrCode {
+  id: string;
+  siteId: string;
+  label: string;
+  rotatedAt: string | null;
+  createdAt: string;
+}
+
+export interface CreateSitePayload {
+  name: string;
+  address: string;
+  timezone: string;
+  cutoffTime?: string | null;
+}
+
+export interface UpdateSitePayload {
+  name?: string;
+  address?: string;
+  timezone?: string;
+  cutoffTime?: string | null;
+  intakePaused?: boolean;
+}
+
+export interface GenerateQrPayload {
+  label: string;
+}
+
+export interface RotateQrResult {
+  oldQrId: string;
+  newQr: AdminQrCode;
+}

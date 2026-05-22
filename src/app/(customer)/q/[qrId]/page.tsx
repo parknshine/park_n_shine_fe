@@ -48,12 +48,14 @@ export default async function LandingPage({ params }: Props) {
   }
 
   const now = new Date();
-  const [cutoffHour, cutoffMinute] = resolution.cutoffTime
-    .split(":")
-    .map(Number);
-  const cutoff = new Date(now);
-  cutoff.setHours(cutoffHour, cutoffMinute, 0, 0);
-  const isPastCutoff = now > cutoff;
+  const isPastCutoff = resolution.cutoffTime
+    ? (() => {
+        const [cutoffHour, cutoffMinute] = resolution.cutoffTime.split(":").map(Number);
+        const cutoff = new Date(now);
+        cutoff.setHours(cutoffHour, cutoffMinute, 0, 0);
+        return now > cutoff;
+      })()
+    : false;
 
   const blockingReason = resolution.intakePaused
     ? "paused"

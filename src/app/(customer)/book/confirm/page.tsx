@@ -32,10 +32,10 @@ export default function WalkInConfirmPage() {
     });
 
   useEffect(() => {
-    if (!bookingId || !token || !lat || !lng || !loc || !phone || !plate || !slot) {
+    if (!bookingId || !token || !lat || !lng || !loc || !plate || !slot) {
       router.replace("/book/location");
     }
-  }, [bookingId, token, lat, lng, loc, phone, plate, slot, router]);
+  }, [bookingId, token, lat, lng, loc, plate, slot, router]);
 
   const { booking } = useBookingStatus({
     bookingId: bookingId ?? "",
@@ -47,7 +47,7 @@ export default function WalkInConfirmPage() {
   const { canSubmit, confirmAndRedirect, error, isSubmitting } =
     usePaymentActionV2(bookingId ?? "", token ?? "");
 
-  if (!bookingId || !token || !lat || !lng || !loc || !phone || !plate || !slot) {
+  if (!bookingId || !token || !lat || !lng || !loc || !plate || !slot) {
     return null;
   }
 
@@ -55,7 +55,7 @@ export default function WalkInConfirmPage() {
     const payload: ConfirmBookingPayloadV2 = {
       plateText: plate!,
       slotText: slot!,
-      phone: phone!,
+      ...(phone ? { phone } : {}),
       locationLat: parseFloat(lat!),
       locationLng: parseFloat(lng!),
       locationName: loc!,

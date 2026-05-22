@@ -18,7 +18,7 @@ import type { PaymentIntentResponse } from "@/features/customer/types";
 interface QrConfirmPayload {
   plateText: string;
   slotText: string;
-  phone: string;
+  phone?: string;
 }
 
 export default function BookConfirmPage() {
@@ -36,10 +36,10 @@ export default function BookConfirmPage() {
   });
 
   useEffect(() => {
-    if (!bookingId || !token || !phone || !plate || !slot) {
+    if (!bookingId || !token || !plate || !slot) {
       router.replace(`/q/${qrId}/book/capture`);
     }
-  }, [bookingId, token, phone, plate, slot, router, qrId]);
+  }, [bookingId, token, plate, slot, router, qrId]);
 
   const { booking } = useBookingStatus({
     bookingId: bookingId ?? "",
@@ -53,9 +53,10 @@ export default function BookConfirmPage() {
   const mutation = useMutation({
     meta: { persist: false },
     mutationFn: async (payload: QrConfirmPayload) => {
+      const { plateText, slotText, ...rest } = payload;
       const response = await api.post<PaymentIntentResponse>(
         `/v1/bookings/${bookingId}/confirm`,
-        payload,
+        { ...rest, plate: plateText, slot: slotText },
         {
           headers: {
             "Idempotency-Key": bookingId,
@@ -73,18 +74,21 @@ export default function BookConfirmPage() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId ?? ""),
       });
-      window.location.assign(paymentIntent.redirectUrl);
+      const redirectUrl =
+        paymentIntent.redirectUrl ??
+        `/booking/${bookingId}/status?token=${token}`;
+      window.location.assign(redirectUrl);
     },
   });
 
-  if (!bookingId || !token || !phone || !plate || !slot) {
+  if (!bookingId || !token || !plate || !slot) {
     return null;
   }
 
   function handlePay() {
     if (mutation.isPending || hasSubmitted) return;
     setHasSubmitted(true);
-    mutation.mutate({ plateText: plate!, slotText: slot!, phone: phone! });
+    mutation.mutate({ plateText: plate!, slotText: slot!, ...(phone ? { phone } : {}) });
   }
 
   const canSubmit = !mutation.isPending && !hasSubmitted;
@@ -119,17 +123,19 @@ export default function BookConfirmPage() {
           estimatedReadyAt={booking?.estimatedReadyAt}
         />
 
-        <Card>
-          <CardContent className="pt-5">
-            <div className="flex items-center gap-3">
-              <Phone className="h-5 w-5 shrink-0 text-primary" />
-              <div>
-                <p className="text-xs text-muted-foreground">{t("booking.capture.phoneLabel")}</p>
-                <p className="font-semibold text-foreground">{phone}</p>
+        {phone && (
+          <Card>
+            <CardContent className="pt-5">
+              <div className="flex items-center gap-3">
+                <Phone className="h-5 w-5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-xs text-muted-foreground">{t("booking.capture.phoneLabel")}</p>
+                  <p className="font-semibold text-foreground">{phone}</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         <button
           type="button"

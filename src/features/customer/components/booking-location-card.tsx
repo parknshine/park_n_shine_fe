@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface BookingLocationCardProps {
   locationName: string;
-  phone: string;
+  phone?: string;
 }
 
 export function BookingLocationCard({
@@ -28,13 +28,15 @@ export function BookingLocationCard({
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Phone className="h-5 w-5 shrink-0 text-primary" />
-          <div>
-            <p className="text-xs text-muted-foreground">{t("booking.capture.phoneLabel")}</p>
-            <p className="font-semibold text-foreground">{phone}</p>
+        {phone && (
+          <div className="flex items-center gap-3">
+            <Phone className="h-5 w-5 shrink-0 text-primary" />
+            <div>
+              <p className="text-xs text-muted-foreground">{t("booking.capture.phoneLabel")}</p>
+              <p className="font-semibold text-foreground">{phone}</p>
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

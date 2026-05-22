@@ -231,8 +231,19 @@ const adminSettings = new Map<string, MockAdminSettings>([
 ]);
 
 // Build a realistic statusHistory chain up to `currentStatus`
-function buildStatusHistory(currentStatus: BookingStatus, baseOffsetMs: number) {
-  const chain: BookingStatus[] = ["DRAFT", "PENDING", "PAID", "ASSIGNED", "IN_PROGRESS", "READY", "CLOSED"];
+function buildStatusHistory(
+  currentStatus: BookingStatus,
+  baseOffsetMs: number,
+) {
+  const chain: BookingStatus[] = [
+    "DRAFT",
+    "PENDING",
+    "PAID",
+    "ASSIGNED",
+    "IN_PROGRESS",
+    "READY",
+    "CLOSED",
+  ];
   const escalations: BookingStatus[] = ["NEEDS_HELP", "STALE"];
 
   let steps: BookingStatus[];
@@ -246,7 +257,9 @@ function buildStatusHistory(currentStatus: BookingStatus, baseOffsetMs: number) 
 
   return steps.map((s, i) => ({
     status: s,
-    changedAt: new Date(Date.now() - baseOffsetMs + i * Math.floor(baseOffsetMs / steps.length)).toISOString(),
+    changedAt: new Date(
+      Date.now() - baseOffsetMs + i * Math.floor(baseOffsetMs / steps.length),
+    ).toISOString(),
     labelKey: `booking.status.${s.toLowerCase()}`,
   }));
 }
@@ -260,53 +273,139 @@ function seedAdminBookings() {
     priceAmount: number;
     baseOffsetMs: number;
   }> = [
-    { status: "PAID",        plate: "B 1234 XY", slot: "A1", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 1200_000 },
-    { status: "PAID",        plate: "D 5678 AB", slot: "A2", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 900_000 },
-    { status: "ASSIGNED",    plate: "B 9999 ZZ", slot: "B1", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 2400_000 },
-    { status: "ASSIGNED",    plate: "F 1111 CC", slot: "B2", siteId: "site-1", priceAmount: 60000, baseOffsetMs: 1800_000 },
-    { status: "IN_PROGRESS", plate: "B 2222 DD", slot: "C1", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 3600_000 },
-    { status: "IN_PROGRESS", plate: "D 3333 EE", slot: "C2", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 2700_000 },
-    { status: "READY",       plate: "B 4444 FF", slot: "D1", siteId: "site-1", priceAmount: 60000, baseOffsetMs: 5400_000 },
-    { status: "NEEDS_HELP",  plate: "B 5555 GG", slot: "D2", siteId: "site-1", priceAmount: 45000, baseOffsetMs: 4500_000 },
-    { status: "STALE",       plate: "D 6666 HH", slot: "E1", siteId: "site-2", priceAmount: 45000, baseOffsetMs: 7200_000 },
-    { status: "PAID",        plate: "B 7777 II", slot: "E2", siteId: "site-2", priceAmount: 60000, baseOffsetMs: 600_000  },
-    { status: "IN_PROGRESS", plate: "B 8888 JJ", slot: "F1", siteId: "site-2", priceAmount: 45000, baseOffsetMs: 3000_000 },
-    { status: "NEEDS_HELP",  plate: "D 9999 KK", slot: "F2", siteId: "site-2", priceAmount: 45000, baseOffsetMs: 5000_000 },
+    {
+      status: "PAID",
+      plate: "B 1234 XY",
+      slot: "A1",
+      siteId: "site-1",
+      priceAmount: 45000,
+      baseOffsetMs: 1200_000,
+    },
+    {
+      status: "PAID",
+      plate: "D 5678 AB",
+      slot: "A2",
+      siteId: "site-1",
+      priceAmount: 45000,
+      baseOffsetMs: 900_000,
+    },
+    {
+      status: "ASSIGNED",
+      plate: "B 9999 ZZ",
+      slot: "B1",
+      siteId: "site-1",
+      priceAmount: 45000,
+      baseOffsetMs: 2400_000,
+    },
+    {
+      status: "ASSIGNED",
+      plate: "F 1111 CC",
+      slot: "B2",
+      siteId: "site-1",
+      priceAmount: 60000,
+      baseOffsetMs: 1800_000,
+    },
+    {
+      status: "IN_PROGRESS",
+      plate: "B 2222 DD",
+      slot: "C1",
+      siteId: "site-1",
+      priceAmount: 45000,
+      baseOffsetMs: 3600_000,
+    },
+    {
+      status: "IN_PROGRESS",
+      plate: "D 3333 EE",
+      slot: "C2",
+      siteId: "site-1",
+      priceAmount: 45000,
+      baseOffsetMs: 2700_000,
+    },
+    {
+      status: "READY",
+      plate: "B 4444 FF",
+      slot: "D1",
+      siteId: "site-1",
+      priceAmount: 60000,
+      baseOffsetMs: 5400_000,
+    },
+    {
+      status: "NEEDS_HELP",
+      plate: "B 5555 GG",
+      slot: "D2",
+      siteId: "site-1",
+      priceAmount: 45000,
+      baseOffsetMs: 4500_000,
+    },
+    {
+      status: "STALE",
+      plate: "D 6666 HH",
+      slot: "E1",
+      siteId: "site-2",
+      priceAmount: 45000,
+      baseOffsetMs: 7200_000,
+    },
+    {
+      status: "PAID",
+      plate: "B 7777 II",
+      slot: "E2",
+      siteId: "site-2",
+      priceAmount: 60000,
+      baseOffsetMs: 600_000,
+    },
+    {
+      status: "IN_PROGRESS",
+      plate: "B 8888 JJ",
+      slot: "F1",
+      siteId: "site-2",
+      priceAmount: 45000,
+      baseOffsetMs: 3000_000,
+    },
+    {
+      status: "NEEDS_HELP",
+      plate: "D 9999 KK",
+      slot: "F2",
+      siteId: "site-2",
+      priceAmount: 45000,
+      baseOffsetMs: 5000_000,
+    },
   ];
 
-  entries.forEach(({ status, plate, slot, siteId, priceAmount, baseOffsetMs }, i) => {
-    const id = `bk-seed-${i + 1}`;
-    bookings.set(id, {
-      id,
-      signedToken: `mock-signed-token-${id}`,
-      status,
-      siteName: siteId === "site-1" ? "Site Thamrin" : "Site Sudirman",
-      plateText: plate,
-      slotText: slot,
-      phone: null,
-      locationLat: null,
-      locationLng: null,
-      locationName: null,
-      priceAmount,
-      currency: "IDR",
-      estimatedReadyAt: new Date(Date.now() + 1800_000).toISOString(),
-      media: [
-        {
-          id: `media-${id}-plate`,
-          kind: "plate",
-          url: "https://placehold.co/400x300/png",
-          ocrText: plate,
-        },
-        {
-          id: `media-${id}-slot`,
-          kind: "slot",
-          url: "https://placehold.co/400x300/png",
-          ocrText: slot,
-        },
-      ],
-      statusHistory: buildStatusHistory(status, baseOffsetMs),
-    });
-  });
+  entries.forEach(
+    ({ status, plate, slot, siteId, priceAmount, baseOffsetMs }, i) => {
+      const id = `bk-seed-${i + 1}`;
+      bookings.set(id, {
+        id,
+        signedToken: `mock-signed-token-${id}`,
+        status,
+        siteName: siteId === "site-1" ? "Site Thamrin" : "Site Sudirman",
+        plateText: plate,
+        slotText: slot,
+        phone: null,
+        locationLat: null,
+        locationLng: null,
+        locationName: null,
+        priceAmount,
+        currency: "IDR",
+        estimatedReadyAt: new Date(Date.now() + 1800_000).toISOString(),
+        media: [
+          {
+            id: `media-${id}-plate`,
+            kind: "plate",
+            url: "https://placehold.co/400x300/png",
+            ocrText: plate,
+          },
+          {
+            id: `media-${id}-slot`,
+            kind: "slot",
+            url: "https://placehold.co/400x300/png",
+            ocrText: slot,
+          },
+        ],
+        statusHistory: buildStatusHistory(status, baseOffsetMs),
+      });
+    },
+  );
 }
 
 seedAdminBookings();
@@ -362,11 +461,19 @@ function advanceStatus(booking: MockBooking): boolean {
 // ─── OCR simulation ───────────────────────────────────────────────────────────
 
 const MOCK_PLATES = ["B 1234 SKJ", "D 5678 ABC", "F 9012 XYZ", "B 3141 PNS"];
-const MOCK_SLOTS  = ["P1-A01", "P2-B12", "P3-C05", "G1-D08"];
+const MOCK_SLOTS = ["P1-A01", "P2-B12", "P3-C05", "G1-D08"];
+
+function mediaTypeToKind(type: unknown): string | null {
+  if (type === "PLATE_PHOTO") return "plate";
+  if (type === "SLOT_PHOTO") return "slot";
+  return null;
+}
 
 function simulateOcr(kind: string): string | null {
-  if (kind === "plate") return MOCK_PLATES[Math.floor(Math.random() * MOCK_PLATES.length)];
-  if (kind === "slot")  return MOCK_SLOTS[Math.floor(Math.random() * MOCK_SLOTS.length)];
+  if (kind === "plate")
+    return MOCK_PLATES[Math.floor(Math.random() * MOCK_PLATES.length)];
+  if (kind === "slot")
+    return MOCK_SLOTS[Math.floor(Math.random() * MOCK_SLOTS.length)];
   return null;
 }
 
@@ -375,7 +482,8 @@ function simulateOcr(kind: string): string | null {
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Booking-Token, Idempotency-Key",
+  "Access-Control-Allow-Headers":
+    "Content-Type, Authorization, X-Booking-Token, Idempotency-Key",
 };
 
 function json(data: unknown, status = 200): Response {
@@ -392,8 +500,8 @@ function notFound(message = "Not found"): Response {
 // ─── Router ───────────────────────────────────────────────────────────────────
 
 async function handleRequest(req: Request): Promise<Response> {
-  const url    = new URL(req.url);
-  const path   = url.pathname;
+  const url = new URL(req.url);
+  const path = url.pathname;
   const method = req.method;
 
   // Preflight
@@ -418,8 +526,8 @@ async function handleRequest(req: Request): Promise<Response> {
 
   // ── POST /v1/bookings ─────────────────────────────────────────────────────
   if (method === "POST" && path === "/v1/bookings") {
-    const body = await req.json().catch(() => ({})) as { qrId?: string };
-    const id    = randomId();
+    const body = (await req.json().catch(() => ({}))) as { qrId?: string };
+    const id = randomId();
     const token = `tok_${randomId()}${randomId()}`;
     const ready = new Date(Date.now() + 20 * 60 * 1000).toISOString();
 
@@ -443,7 +551,9 @@ async function handleRequest(req: Request): Promise<Response> {
     addHistory(booking, "PENDING");
     bookings.set(id, booking);
 
-    const flowType = body.qrId ? `QR flow (qrId=${body.qrId})` : "walk-in flow (no qrId)";
+    const flowType = body.qrId
+      ? `QR flow (qrId=${body.qrId})`
+      : "walk-in flow (no qrId)";
     console.log(`[mock] Created booking ${id} — ${flowType}`);
 
     return json({ id, signedToken: token });
@@ -452,7 +562,7 @@ async function handleRequest(req: Request): Promise<Response> {
   // ── POST /v1/bookings/:id/media ───────────────────────────────────────────
   const mediaMatch = path.match(/^\/v1\/bookings\/([^/]+)\/media$/);
   if (method === "POST" && mediaMatch) {
-    const id      = mediaMatch[1];
+    const id = mediaMatch[1];
     const booking = bookings.get(id);
     if (!booking) return notFound("Booking tidak ditemukan");
 
@@ -461,14 +571,20 @@ async function handleRequest(req: Request): Promise<Response> {
     let kind: string = "plate";
     if (contentType.includes("multipart")) {
       const form = await req.formData().catch(() => null);
-      kind = (form?.get("kind") as string) ?? "plate";
+      kind =
+        (form?.get("kind") as string | null) ??
+        mediaTypeToKind(form?.get("type")) ??
+        "plate";
     } else {
-      const body = await req.json().catch(() => ({})) as { kind?: string };
-      kind = body.kind ?? "plate";
+      const body = (await req.json().catch(() => ({}))) as {
+        kind?: string;
+        type?: string;
+      };
+      kind = body.kind ?? mediaTypeToKind(body.type) ?? "plate";
     }
 
-    const mediaId  = randomId();
-    const ocrText  = simulateOcr(kind);
+    const mediaId = randomId();
+    const ocrText = simulateOcr(kind);
     const mediaUrl = `https://placehold.co/400x300/0d9488/ffffff?text=${encodeURIComponent(kind.toUpperCase())}`;
 
     const media = {
@@ -482,14 +598,16 @@ async function handleRequest(req: Request): Promise<Response> {
     // Simulate 600 ms processing delay
     await new Promise((r) => setTimeout(r, 600));
 
-    console.log(`[mock] Media uploaded for booking ${id}: kind=${kind} ocr="${ocrText}"`);
+    console.log(
+      `[mock] Media uploaded for booking ${id}: kind=${kind} ocr="${ocrText}"`,
+    );
     return json(media);
   }
 
   // ── GET /v1/bookings/:id ──────────────────────────────────────────────────
   const bookingMatch = path.match(/^\/v1\/bookings\/([^/]+)$/);
   if (method === "GET" && bookingMatch) {
-    const id      = bookingMatch[1];
+    const id = bookingMatch[1];
     const booking = bookings.get(id);
     if (!booking) return notFound("Booking tidak ditemukan");
     return json(booking);
@@ -498,11 +616,11 @@ async function handleRequest(req: Request): Promise<Response> {
   // ── POST /v1/bookings/:id/confirm ─────────────────────────────────────────
   const confirmMatch = path.match(/^\/v1\/bookings\/([^/]+)\/confirm$/);
   if (method === "POST" && confirmMatch) {
-    const id      = confirmMatch[1];
+    const id = confirmMatch[1];
     const booking = bookings.get(id);
     if (!booking) return notFound("Booking tidak ditemukan");
 
-    const body = await req.json().catch(() => ({})) as {
+    const body = (await req.json().catch(() => ({}))) as {
       plateText?: string;
       slotText?: string;
       phone?: string;
@@ -511,11 +629,11 @@ async function handleRequest(req: Request): Promise<Response> {
       locationName?: string;
     };
 
-    booking.plateText    = body.plateText    ?? booking.plateText;
-    booking.slotText     = body.slotText     ?? booking.slotText;
-    booking.phone        = body.phone        ?? booking.phone;
-    booking.locationLat  = body.locationLat  ?? booking.locationLat;
-    booking.locationLng  = body.locationLng  ?? booking.locationLng;
+    booking.plateText = body.plateText ?? booking.plateText;
+    booking.slotText = body.slotText ?? booking.slotText;
+    booking.phone = body.phone ?? booking.phone;
+    booking.locationLat = body.locationLat ?? booking.locationLat;
+    booking.locationLng = body.locationLng ?? booking.locationLng;
     booking.locationName = body.locationName ?? booking.locationName;
 
     // Simulate payment: advance to PAID immediately (mock payment gateway)
@@ -548,9 +666,13 @@ async function handleRequest(req: Request): Promise<Response> {
     }
 
     const redirectUrl = `${BASE_URL}/booking/${id}/status?token=${booking.signedToken}`;
-    const locationInfo = booking.locationName ? ` | loc="${booking.locationName}"` : "";
-    const phoneInfo    = booking.phone        ? ` | phone=${booking.phone}`        : "";
-    console.log(`[mock] Confirmed booking ${id} → ${booking.status}${phoneInfo}${locationInfo}, redirect: ${redirectUrl}`);
+    const locationInfo = booking.locationName
+      ? ` | loc="${booking.locationName}"`
+      : "";
+    const phoneInfo = booking.phone ? ` | phone=${booking.phone}` : "";
+    console.log(
+      `[mock] Confirmed booking ${id} → ${booking.status}${phoneInfo}${locationInfo}, redirect: ${redirectUrl}`,
+    );
 
     return json({
       bookingId: id,
@@ -562,12 +684,17 @@ async function handleRequest(req: Request): Promise<Response> {
   // ── POST /v1/bookings/:id/rate ────────────────────────────────────────────
   const rateMatch = path.match(/^\/v1\/bookings\/([^/]+)\/rate$/);
   if (method === "POST" && rateMatch) {
-    const id      = rateMatch[1];
+    const id = rateMatch[1];
     const booking = bookings.get(id);
     if (!booking) return notFound("Booking tidak ditemukan");
 
-    const body = await req.json().catch(() => ({})) as { score?: number; reason?: string };
-    console.log(`[mock] Rating for booking ${id}: score=${body.score} reason="${body.reason ?? ""}"`);
+    const body = (await req.json().catch(() => ({}))) as {
+      score?: number;
+      reason?: string;
+    };
+    console.log(
+      `[mock] Rating for booking ${id}: score=${body.score} reason="${body.reason ?? ""}"`,
+    );
 
     if (booking.status === "READY") {
       booking.status = "CLOSED";
@@ -580,11 +707,11 @@ async function handleRequest(req: Request): Promise<Response> {
   // ── POST /v1/mock/advance/:id — manually advance status ──────────────────
   const advanceMatch = path.match(/^\/v1\/mock\/advance\/([^/]+)$/);
   if (method === "POST" && advanceMatch) {
-    const id      = advanceMatch[1];
+    const id = advanceMatch[1];
     const booking = bookings.get(id);
     if (!booking) return notFound("Booking tidak ditemukan");
     const prev = booking.status;
-    const ok   = advanceStatus(booking);
+    const ok = advanceStatus(booking);
     if (!ok) return json({ error: "Already at final status" }, 400);
     console.log(`[mock] Manual advance ${id}: ${prev} → ${booking.status}`);
     return json({ id, prev, status: booking.status });
@@ -592,29 +719,35 @@ async function handleRequest(req: Request): Promise<Response> {
 
   // ── GET /v1/mock/bookings — debug list ────────────────────────────────────
   if (method === "GET" && path === "/v1/mock/bookings") {
-    const list = [...bookings.values()].map(({ id, status, plateText, slotText, phone, locationName, siteName }) => ({
-      id,
-      status,
-      siteName,
-      plateText,
-      slotText,
-      phone,
-      locationName,
-    }));
+    const list = [...bookings.values()].map(
+      ({ id, status, plateText, slotText, phone, locationName, siteName }) => ({
+        id,
+        status,
+        siteName,
+        plateText,
+        slotText,
+        phone,
+        locationName,
+      }),
+    );
     return json(list);
   }
 
   // ── POST /v1/crew/sessions ────────────────────────────────────────────────
   if (method === "POST" && path === "/v1/crew/sessions") {
-    const body = await req.json().catch(() => ({})) as {
+    const body = (await req.json().catch(() => ({}))) as {
       shiftCode?: string;
       pin?: string;
     };
 
     if (!body.shiftCode || body.shiftCode.length !== 6) {
       return json(
-        { success: false, code: "INVALID_SHIFT_CODE", message: "Kode shift harus 6 digit" },
-        400
+        {
+          success: false,
+          code: "INVALID_SHIFT_CODE",
+          message: "Kode shift harus 6 digit",
+        },
+        400,
       );
     }
 
@@ -627,7 +760,9 @@ async function handleRequest(req: Request): Promise<Response> {
       token: `mock_crew_jwt_${randomId()}`,
     };
 
-    console.log(`[mock] Crew login: shiftCode=${body.shiftCode} → session ${session.id}`);
+    console.log(
+      `[mock] Crew login: shiftCode=${body.shiftCode} → session ${session.id}`,
+    );
     return json(session);
   }
 
@@ -660,7 +795,9 @@ async function handleRequest(req: Request): Promise<Response> {
     };
 
     crewJobs.set(jobId, job);
-    console.log(`[mock] Crew claimed job ${jobId} for booking ${paidBooking.id}`);
+    console.log(
+      `[mock] Crew claimed job ${jobId} for booking ${paidBooking.id}`,
+    );
     return json(job);
   }
 
@@ -680,7 +817,7 @@ async function handleRequest(req: Request): Promise<Response> {
     const job = crewJobs.get(jobId);
     if (!job) return notFound("Job tidak ditemukan");
 
-    const body = await req.json().catch(() => ({})) as {
+    const body = (await req.json().catch(() => ({}))) as {
       result?: "matched" | "not_found";
       reason?: string;
     };
@@ -698,7 +835,9 @@ async function handleRequest(req: Request): Promise<Response> {
       }
     }
 
-    console.log(`[mock] Crew verify job ${jobId}: result=${body.result ?? "?"}`);
+    console.log(
+      `[mock] Crew verify job ${jobId}: result=${body.result ?? "?"}`,
+    );
     return json({ success: true });
   }
 
@@ -715,13 +854,18 @@ async function handleRequest(req: Request): Promise<Response> {
       const form = await req.formData().catch(() => null);
       kind = (form?.get("kind") as string) ?? "front";
     } else {
-      const body = await req.json().catch(() => ({})) as { kind?: string };
+      const body = (await req.json().catch(() => ({}))) as { kind?: string };
       kind = body.kind ?? "front";
     }
 
     const mediaId = randomId();
     const mediaUrl = `https://placehold.co/400x300/0d9488/ffffff?text=${encodeURIComponent(kind.toUpperCase())}`;
-    const media = { id: mediaId, kind: kind as "front" | "back" | "left" | "right", url: mediaUrl, ocrText: null };
+    const media = {
+      id: mediaId,
+      kind: kind as "front" | "back" | "left" | "right",
+      url: mediaUrl,
+      ocrText: null,
+    };
 
     job.media.push(media);
 
@@ -743,14 +887,25 @@ async function handleRequest(req: Request): Promise<Response> {
   }
 
   // ─── Admin: Get Queue ────────────────────────────────────────────────────────
-  if (method === "GET" && path.startsWith("/v1/admin/sites/") && path.endsWith("/queue")) {
+  if (
+    method === "GET" &&
+    path.startsWith("/v1/admin/sites/") &&
+    path.endsWith("/queue")
+  ) {
     const siteId = path.split("/")[4];
     const siteName = siteId === "site-1" ? "Site Thamrin" : "Site Sudirman";
     const siteBookings = [...bookings.values()].filter(
-      (b) => b.siteName === siteName
+      (b) => b.siteName === siteName,
     );
 
-    const statusOrder = ["PAID", "ASSIGNED", "IN_PROGRESS", "READY", "NEEDS_HELP", "STALE"];
+    const statusOrder = [
+      "PAID",
+      "ASSIGNED",
+      "IN_PROGRESS",
+      "READY",
+      "NEEDS_HELP",
+      "STALE",
+    ];
     const escalationStatuses = new Set(["NEEDS_HELP", "STALE"]);
 
     const groups = statusOrder
@@ -760,7 +915,8 @@ async function handleRequest(req: Request): Promise<Response> {
           .filter((b) => b.status === status)
           .map((b) => ({
             ...b,
-            crewName: MOCK_CREW_MEMBERS.find((c) => c.siteId === siteId)?.name ?? null,
+            crewName:
+              MOCK_CREW_MEMBERS.find((c) => c.siteId === siteId)?.name ?? null,
             elapsedSeconds: Math.floor(Math.random() * 3600),
           })),
       }))
@@ -799,13 +955,16 @@ async function handleRequest(req: Request): Promise<Response> {
   }
 
   // ─── Admin: Reassign ─────────────────────────────────────────────────────────
-  if (method === "POST" && path.match(/^\/v1\/admin\/bookings\/[^/]+\/reassign$/)) {
+  if (
+    method === "POST" &&
+    path.match(/^\/v1\/admin\/bookings\/[^/]+\/reassign$/)
+  ) {
     const bookingId = path.split("/")[4];
     const booking = bookings.get(bookingId);
     if (!booking) {
       return json({ success: false, code: "BOOKING_NOT_FOUND" }, 404);
     }
-    const body = await req.json() as { crewId: string };
+    const body = (await req.json()) as { crewId: string };
     const crew = MOCK_CREW_MEMBERS.find((c) => c.id === body.crewId);
     adminAuditLog.push({
       id: crypto.randomUUID(),
@@ -820,13 +979,19 @@ async function handleRequest(req: Request): Promise<Response> {
   }
 
   // ─── Admin: Status Override ───────────────────────────────────────────────────
-  if (method === "POST" && path.match(/^\/v1\/admin\/bookings\/[^/]+\/status-override$/)) {
+  if (
+    method === "POST" &&
+    path.match(/^\/v1\/admin\/bookings\/[^/]+\/status-override$/)
+  ) {
     const bookingId = path.split("/")[4];
     const booking = bookings.get(bookingId);
     if (!booking) {
       return json({ success: false, code: "BOOKING_NOT_FOUND" }, 404);
     }
-    const body = await req.json() as { nextStatus: BookingStatus; reasonCode: string };
+    const body = (await req.json()) as {
+      nextStatus: BookingStatus;
+      reasonCode: string;
+    };
     const prevStatus = booking.status;
     booking.status = body.nextStatus;
     booking.statusHistory.push({
@@ -847,14 +1012,22 @@ async function handleRequest(req: Request): Promise<Response> {
   }
 
   // ─── Admin: Refund ────────────────────────────────────────────────────────────
-  if (method === "POST" && path.match(/^\/v1\/admin\/bookings\/[^/]+\/refund$/)) {
+  if (
+    method === "POST" &&
+    path.match(/^\/v1\/admin\/bookings\/[^/]+\/refund$/)
+  ) {
     const bookingId = path.split("/")[4];
     const booking = bookings.get(bookingId);
     if (!booking) {
       return json({ success: false, code: "BOOKING_NOT_FOUND" }, 404);
     }
-    const body = await req.json() as { amountType: string; amount?: number; reasonCode: string };
-    const amount = body.amountType === "full" ? booking.priceAmount : (body.amount ?? 0);
+    const body = (await req.json()) as {
+      amountType: string;
+      amount?: number;
+      reasonCode: string;
+    };
+    const amount =
+      body.amountType === "full" ? booking.priceAmount : (body.amount ?? 0);
     adminAuditLog.push({
       id: crypto.randomUUID(),
       bookingId,
@@ -868,10 +1041,17 @@ async function handleRequest(req: Request): Promise<Response> {
   }
 
   // ─── Admin: Report ────────────────────────────────────────────────────────────
-  if (method === "GET" && path.startsWith("/v1/admin/sites/") && path.includes("/report")) {
+  if (
+    method === "GET" &&
+    path.startsWith("/v1/admin/sites/") &&
+    path.includes("/report")
+  ) {
     const siteId = path.split("/")[4];
-    const from = url.searchParams.get("from") ?? new Date(Date.now() - 7 * 86400_000).toISOString().slice(0, 10);
-    const to = url.searchParams.get("to") ?? new Date().toISOString().slice(0, 10);
+    const from =
+      url.searchParams.get("from") ??
+      new Date(Date.now() - 7 * 86400_000).toISOString().slice(0, 10);
+    const to =
+      url.searchParams.get("to") ?? new Date().toISOString().slice(0, 10);
 
     const fromDate = new Date(from);
     const toDate = new Date(to);
@@ -895,9 +1075,18 @@ async function handleRequest(req: Request): Promise<Response> {
       siteId,
       date: from,
       totalBookings: breakdown.reduce((s, d) => s + d.totalBookings, 0),
-      completionRate: Math.round(breakdown.reduce((s, d) => s + d.slaHitRate, 0) / breakdown.length),
-      slaHitRate: Math.round(breakdown.reduce((s, d) => s + d.slaHitRate, 0) / breakdown.length),
-      averageRating: parseFloat((breakdown.reduce((s, d) => s + (d.averageRating ?? 0), 0) / breakdown.length).toFixed(1)),
+      completionRate: Math.round(
+        breakdown.reduce((s, d) => s + d.slaHitRate, 0) / breakdown.length,
+      ),
+      slaHitRate: Math.round(
+        breakdown.reduce((s, d) => s + d.slaHitRate, 0) / breakdown.length,
+      ),
+      averageRating: parseFloat(
+        (
+          breakdown.reduce((s, d) => s + (d.averageRating ?? 0), 0) /
+          breakdown.length
+        ).toFixed(1),
+      ),
       revenue: breakdown.reduce((s, d) => s + d.revenue, 0),
     };
 
@@ -905,28 +1094,49 @@ async function handleRequest(req: Request): Promise<Response> {
   }
 
   // ─── Admin: Audit Log ────────────────────────────────────────────────────────
-  if (method === "GET" && path.startsWith("/v1/admin/sites/") && path.includes("/audit-log")) {
+  if (
+    method === "GET" &&
+    path.startsWith("/v1/admin/sites/") &&
+    path.includes("/audit-log")
+  ) {
     const action = url.searchParams.get("action");
     let entries = [...adminAuditLog];
     if (action && action !== "all") {
       entries = entries.filter((e) => e.action === action);
     }
-    entries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    entries.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
     return json(entries);
   }
 
   // ─── Admin: Get Settings ─────────────────────────────────────────────────────
-  if (method === "GET" && path.startsWith("/v1/admin/sites/") && path.endsWith("/settings")) {
+  if (
+    method === "GET" &&
+    path.startsWith("/v1/admin/sites/") &&
+    path.endsWith("/settings")
+  ) {
     const siteId = path.split("/")[4];
-    const settings = adminSettings.get(siteId) ?? { siteId, staleJobTimeoutMinutes: 20 };
+    const settings = adminSettings.get(siteId) ?? {
+      siteId,
+      staleJobTimeoutMinutes: 20,
+    };
     return json(settings);
   }
 
   // ─── Admin: Save Settings ────────────────────────────────────────────────────
-  if (method === "POST" && path.startsWith("/v1/admin/sites/") && path.endsWith("/settings")) {
+  if (
+    method === "POST" &&
+    path.startsWith("/v1/admin/sites/") &&
+    path.endsWith("/settings")
+  ) {
     const siteId = path.split("/")[4];
-    const body = await req.json() as { staleJobTimeoutMinutes: number };
-    adminSettings.set(siteId, { siteId, staleJobTimeoutMinutes: body.staleJobTimeoutMinutes });
+    const body = (await req.json()) as { staleJobTimeoutMinutes: number };
+    adminSettings.set(siteId, {
+      siteId,
+      staleJobTimeoutMinutes: body.staleJobTimeoutMinutes,
+    });
     return json(adminSettings.get(siteId));
   }
 
@@ -940,7 +1150,9 @@ Bun.serve({
   fetch: handleRequest,
 });
 
-console.log(`\n🚿 Park & Shine Mock Server running on http://localhost:${PORT}`);
+console.log(
+  `\n🚿 Park & Shine Mock Server running on http://localhost:${PORT}`,
+);
 console.log(`\nEndpoints:`);
 console.log(`  GET  /v1/qr/:qrId`);
 console.log(`  POST /v1/bookings`);

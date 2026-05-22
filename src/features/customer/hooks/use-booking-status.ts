@@ -22,13 +22,34 @@ export function useBookingStatus({
     enabled,
     meta: { persist: true },
     queryFn: async () => {
-      const response = await api.get<CustomerBooking>(
-        `/v1/bookings/${bookingId}`,
-        {
-          headers: { "X-Booking-Token": signedToken },
-        }
-      );
-      return response.data;
+      const response = await api.get<{
+        bookingId: string;
+        status: CustomerBooking["status"];
+        plate?: string | null;
+        slot?: string | null;
+        price?: number;
+        siteName: string;
+        timeline?: { status: CustomerBooking["status"]; timestamp: string }[];
+      }>(`/v1/bookings/${bookingId}`, {
+        headers: { "X-Booking-Token": signedToken },
+      });
+      const d = response.data;
+      const booking: CustomerBooking = {
+        id: d.bookingId ?? bookingId,
+        signedToken,
+        status: d.status,
+        siteName: d.siteName,
+        plateText: d.plate ?? null,
+        slotText: d.slot ?? null,
+        priceAmount: d.price,
+        media: [],
+        statusHistory: (d.timeline ?? []).map((t) => ({
+          status: t.status,
+          changedAt: t.timestamp,
+          labelKey: `booking.status.${t.status.toLowerCase()}`,
+        })),
+      };
+      return booking;
     },
     queryKey: queryKeys.customer.booking(bookingId),
     refetchInterval: pollIntervalMs,

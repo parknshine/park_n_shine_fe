@@ -10,7 +10,7 @@ import type { PaymentIntentResponse } from "@/features/customer/types";
 export interface ConfirmBookingPayloadV2 {
   plateText: string;
   slotText: string;
-  phone: string;
+  phone?: string;
   locationLat: number;
   locationLng: number;
   locationName: string;
@@ -24,9 +24,10 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
   const mutation = useMutation({
     meta: { persist: false },
     mutationFn: async (payload: ConfirmBookingPayloadV2) => {
+      const { plateText, slotText, ...rest } = payload;
       const response = await api.post<PaymentIntentResponse>(
         `/v1/bookings/${bookingId}/confirm`,
-        payload,
+        { ...rest, plate: plateText, slot: slotText },
         {
           headers: {
             "Idempotency-Key": bookingId,
@@ -44,7 +45,10 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId),
       });
-      window.location.assign(paymentIntent.redirectUrl);
+      const redirectUrl =
+        paymentIntent.redirectUrl ??
+        `/booking/${bookingId}/status?token=${signedToken}`;
+      window.location.assign(redirectUrl);
     },
   });
 

@@ -119,7 +119,7 @@ export default function BookingStatusPage() {
         </div>
       )}
 
-      {booking.statusHistory.length > 0 && (
+      {(booking.statusHistory?.length ?? 0) > 0 && (
         <details className="rounded-xl border border-border">
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground select-none">
             {t("status.historyTitle")}

@@ -93,7 +93,7 @@ export default function WalkInCapturePage() {
     slotUpload.status === "success" &&
     plateText.trim().length > 0 &&
     slotText.trim().length > 0 &&
-    isValidPhone(phone);
+    (phone === "" || isValidPhone(phone));
 
   function handleContinue() {
     if (!bookingId || !signedToken) return;

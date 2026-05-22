@@ -16,9 +16,10 @@ export function usePaymentAction(bookingId: string, signedToken: string) {
   const mutation = useMutation({
     meta: { persist: false },
     mutationFn: async (payload: ConfirmBookingPayload) => {
+      const { plateText, slotText, ...rest } = payload;
       const response = await api.post<PaymentIntentResponse>(
         `/v1/bookings/${bookingId}/confirm`,
-        payload,
+        { ...rest, plate: plateText, slot: slotText },
         {
           headers: {
             "Idempotency-Key": bookingId,
@@ -36,7 +37,10 @@ export function usePaymentAction(bookingId: string, signedToken: string) {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId),
       });
-      window.location.assign(paymentIntent.redirectUrl);
+      const redirectUrl =
+        paymentIntent.redirectUrl ??
+        `/booking/${bookingId}/status?token=${signedToken}`;
+      window.location.assign(redirectUrl);
     },
   });
 

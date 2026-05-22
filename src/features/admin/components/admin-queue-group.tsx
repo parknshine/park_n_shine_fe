@@ -51,7 +51,7 @@ export function AdminQueueGroup({
               </p>
               <p className="text-muted-foreground">{booking.slotText}</p>
             </div>
-            <p className="text-muted-foreground">{booking.crewName ?? "—"}</p>
+            <p className="text-muted-foreground">{booking.crewName ?? "Unassigned"}</p>
             <p className="font-mono text-xs text-muted-foreground">
               {formatElapsed(booking.elapsedSeconds)}
             </p>

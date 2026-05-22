@@ -42,11 +42,8 @@ export const useUIStore = create<UIState & UIActions>()(
     immer((set) => ({
       toasts: [],
       isSidebarOpen: true,
-      activeSiteId: "site-1",
-      sites: [
-        { id: "site-1", name: "Site Thamrin" },
-        { id: "site-2", name: "Site Sudirman" },
-      ],
+      activeSiteId: null,
+      sites: [],
       locale: detectLocale(),
 
       addToast: (toast) =>
