@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AuditLogTable } from "@/features/admin/components";
 import { BookingDetailDrawer } from "@/features/admin/components";
 import { useAuditLog } from "@/features/admin/hooks";
@@ -42,18 +49,18 @@ export default function AuditPage() {
       <div className="flex flex-wrap items-end gap-3">
         <div className="space-y-1">
           <Label htmlFor="action-filter">{t("audit.filterLabel")}</Label>
-          <select
-            id="action-filter"
-            value={action}
-            onChange={(e) => setAction(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            {ACTION_VALUES.map((value) => (
-              <option key={value} value={value}>
-                {t(`audit.actions.${value}`)}
-              </option>
-            ))}
-          </select>
+          <Select value={action} onValueChange={setAction}>
+            <SelectTrigger id="action-filter" className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {ACTION_VALUES.map((value) => (
+                <SelectItem key={value} value={value}>
+                  {t(`audit.actions.${value}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

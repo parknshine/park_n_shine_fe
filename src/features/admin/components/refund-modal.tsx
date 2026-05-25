@@ -12,6 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useBookingActions } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
 
@@ -113,20 +120,19 @@ export function RefundModal({
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="refund-reason">{t("refundModal.reasonLabel")}</Label>
-            <select
-              id="refund-reason"
-              value={reasonCode}
-              onChange={(e) => setReasonCode(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="">{t("refundModal.reasonPlaceholder")}</option>
-              {REFUND_REASONS.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {t(`refundModal.reasons.${r.labelKey}`)}
-                </option>
-              ))}
-            </select>
+            <Label>{t("refundModal.reasonLabel")}</Label>
+            <Select value={reasonCode} onValueChange={setReasonCode}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("refundModal.reasonPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {REFUND_REASONS.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>
+                    {t(`refundModal.reasons.${r.labelKey}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {canConfirm && (

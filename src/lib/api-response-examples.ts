@@ -569,31 +569,25 @@ export const adminSuccessExamples = {
     meta: META,
   }),
 
-  /** FR-11: Laporan harian KPI site berhasil dimuat */
+  /** FR-11: Laporan KPI site berhasil dimuat */
   dailyReportFetched: createApiSuccessMessageResponse<AdminReport>({
     code: API_RESPONSE_CODES.DAILY_REPORT_FETCHED,
     data: {
       siteId: "site_grand_indonesia",
-      from: "2026-05-21",
-      to: "2026-05-21",
-      summary: {
-        siteId: "site_grand_indonesia",
-        date: "2026-05-21",
-        totalBookings: 42,
-        completionRate: 0.93,
-        slaHitRate: 0.88,
-        averageRating: 4.6,
-        revenue: 3150000,
-      },
-      breakdown: [
-        {
-          date: "2026-05-21",
-          totalBookings: 42,
-          completed: 39,
-          slaHitRate: 0.88,
-          averageRating: 4.6,
-          revenue: 3150000,
+      period: { from: "2026-05-21", to: "2026-05-21" },
+      bookings: {
+        total: 42,
+        byStatus: {
+          CLOSED: 39,
+          CANCELLED: 2,
+          EXPIRED: 1,
         },
+      },
+      revenue: { totalGross: 3150000, currency: "IDR" },
+      avgTurnaroundSeconds: 1320,
+      crew: [
+        { crewId: "crew_01", crewName: "Budi", jobsCompleted: 22, avgTurnaroundSeconds: 1200 },
+        { crewId: "crew_02", crewName: "Sari", jobsCompleted: 17, avgTurnaroundSeconds: 1470 },
       ],
     },
     meta: META,

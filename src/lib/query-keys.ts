@@ -5,7 +5,7 @@ export const queryKeys = {
     report: (siteId: string, from: string, to: string) =>
       ["admin", "report", siteId, from, to] as const,
     auditLog: (siteId: string) => ["admin", "audit-log", siteId] as const,
-    settings: (siteId: string) => ["admin", "settings", siteId] as const,
+    settings: () => ["admin", "settings"] as const,
     sites: () => ["admin", "sites"] as const,
     site: (siteId: string) => ["admin", "sites", siteId] as const,
     qrCodes: (siteId: string) => ["admin", "sites", siteId, "qr-codes"] as const,
@@ -32,8 +32,7 @@ export const mutationKeys = {
       ["admin", "booking", bookingId, "reassign"] as const,
     refund: (bookingId: string) =>
       ["admin", "booking", bookingId, "refund"] as const,
-    saveSettings: (siteId: string) =>
-      ["admin", "settings", siteId, "save"] as const,
+    saveSettings: () => ["admin", "settings", "save"] as const,
     createSite: () => ["admin", "sites", "create"] as const,
     updateSite: (siteId: string) => ["admin", "sites", siteId, "update"] as const,
     generateQr: (siteId: string) => ["admin", "sites", siteId, "qr", "generate"] as const,

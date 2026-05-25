@@ -38,28 +38,32 @@
   },
   "reports": {
     "title": "Reports",
-    "subtitle": "KPI harian per site",
+    "subtitle": "Ringkasan booking per site",
     "fromLabel": "Dari",
     "toLabel": "Sampai",
     "loading": "Memuat...",
     "apply": "Terapkan",
     "exportCsv": "Export CSV",
-    "noData": "Tidak ada data untuk range ini.",
+    "noData": "Tidak ada data untuk rentang ini.",
     "totalRow": "Total",
+    "statusBreakdown": "Booking per Status",
+    "crewPerformance": "Performa Crew",
     "columns": {
-      "date": "Tanggal",
-      "bookings": "Bookings",
-      "completed": "Completed",
-      "sla": "SLA%",
-      "avgRating": "Avg Rating",
-      "revenue": "Revenue"
+      "status": "Status",
+      "count": "Jumlah"
     },
     "kpi": {
-      "totalBookings": "Total Bookings",
-      "completionRate": "Tingkat Penyelesaian",
-      "slaHitRate": "SLA Hit Rate",
-      "averageRating": "Rata-rata Rating",
-      "revenue": "Revenue"
+      "totalBookings": "Total Booking",
+      "closed": "Selesai",
+      "revenue": "Revenue",
+      "avgTurnaround": "Rata-rata Waktu",
+      "cancelled": "Batal / Expired"
+    },
+    "crew": {
+      "name": "Crew",
+      "jobs": "Pekerjaan",
+      "avgTurnaround": "Rata-rata Waktu",
+      "revenue": "Est. Revenue"
     }
   },
   "settings": {
@@ -82,10 +86,20 @@
   "drawer": {
     "loading": "Memuat...",
     "closeAriaLabel": "Tutup",
+    "bookingInfo": "Info Booking",
+    "site": "Site",
+    "slot": "Slot",
+    "crew": "Crew",
+    "price": "Harga",
+    "elapsed": "Durasi",
+    "estimatedReady": "Est. Selesai",
     "statusHistory": "Riwayat Status",
+    "noStatusHistory": "Belum ada riwayat status",
     "photos": "Foto",
+    "noPhotos": "Belum ada foto",
     "actions": "Aksi",
     "auditLog": "Audit Log",
+    "noAuditLog": "Belum ada log",
     "reassignCrew": "Reassign Crew",
     "overrideStatus": "Override Status",
     "refund": "Refund"

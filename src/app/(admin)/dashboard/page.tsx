@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useUIStore } from "@/store/ui-store";
 import {
   AdminQueueGroup,
@@ -11,16 +12,34 @@ import { useAdminQueue } from "@/features/admin/hooks";
 import type { AdminQueueBooking } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 
-export default function DashboardPage() {
+function DashboardContent() {
   const activeSiteId = useUIStore((s) => s.activeSiteId);
   const [selectedBooking, setSelectedBooking] =
     useState<AdminQueueBooking | null>(null);
   const { t } = useTranslation("admin");
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const { queue, isLoading, refresh } = useAdminQueue({
     siteId: activeSiteId ?? "",
     enabled: !!activeSiteId,
   });
+
+  // Auto-open drawer when bookingId is in the URL (e.g. from notification click)
+  useEffect(() => {
+    const bookingId = searchParams.get("bookingId");
+    if (!bookingId || !queue) return;
+
+    const allBookings = [
+      ...(queue.escalations ?? []),
+      ...(queue.groups ?? []).flatMap((g) => g.bookings),
+    ];
+    const found = allBookings.find((b) => b.id === bookingId);
+    if (found) {
+      setSelectedBooking(found);
+      router.replace("/dashboard");
+    }
+  }, [searchParams, queue, router]);
 
   function handleActionSuccess() {
     setSelectedBooking(null);
@@ -90,5 +109,13 @@ export default function DashboardPage() {
         onActionSuccess={handleActionSuccess}
       />
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   );
 }

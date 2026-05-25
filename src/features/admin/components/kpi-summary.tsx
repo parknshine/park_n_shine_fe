@@ -1,21 +1,36 @@
 "use client";
 
-import type { DailySiteReport } from "@/features/admin/types";
+import type { AdminReport } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 
 interface KpiSummaryProps {
-  report: DailySiteReport;
+  report: AdminReport;
+}
+
+function formatRupiah(amount: number): string {
+  return `Rp ${amount.toLocaleString("id-ID")}`;
+}
+
+function formatTurnaround(seconds: number | null): string {
+  if (seconds === null) return "—";
+  if (seconds < 60) return `${seconds}s`;
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return s > 0 ? `${m}m ${s}s` : `${m}m`;
 }
 
 export function KpiSummary({ report }: KpiSummaryProps) {
   const { t } = useTranslation("admin");
 
+  const closed = report.bookings.byStatus["CLOSED"] ?? 0;
+  const cancelled = (report.bookings.byStatus["CANCELLED"] ?? 0) + (report.bookings.byStatus["EXPIRED"] ?? 0);
+
   const metrics = [
-    { labelKey: "reports.kpi.totalBookings", value: report.totalBookings },
-    { labelKey: "reports.kpi.completionRate", value: `${report.completionRate}%` },
-    { labelKey: "reports.kpi.slaHitRate", value: `${report.slaHitRate}%` },
-    { labelKey: "reports.kpi.averageRating", value: report.averageRating ?? "-" },
-    { labelKey: "reports.kpi.revenue", value: report.revenue },
+    { labelKey: "reports.kpi.totalBookings", value: report.bookings.total },
+    { labelKey: "reports.kpi.closed", value: closed },
+    { labelKey: "reports.kpi.revenue", value: formatRupiah(report.revenue.totalGross) },
+    { labelKey: "reports.kpi.avgTurnaround", value: formatTurnaround(report.avgTurnaroundSeconds) },
+    { labelKey: "reports.kpi.cancelled", value: cancelled },
   ];
 
   return (

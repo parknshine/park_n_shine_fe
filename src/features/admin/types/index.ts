@@ -33,14 +33,11 @@ export interface ReassignBookingPayload {
   reasonCode?: string;
 }
 
-export interface DailySiteReport {
-  siteId: string;
-  date: string;
-  totalBookings: number;
-  completionRate: number;
-  slaHitRate: number;
-  averageRating: number | null;
-  revenue: number;
+export interface ReportCrewPerformance {
+  crewId: string;
+  crewName: string;
+  jobsCompleted: number;
+  avgTurnaroundSeconds: number | null;
 }
 
 export interface AuditEntry {
@@ -53,25 +50,22 @@ export interface AuditEntry {
   createdAt: string;
 }
 
-export interface DailyBreakdown {
-  date: string;
-  totalBookings: number;
-  completed: number;
-  slaHitRate: number;
-  averageRating: number | null;
-  revenue: number;
-}
-
 export interface AdminReport {
   siteId: string;
-  from: string;
-  to: string;
-  summary: DailySiteReport;
-  breakdown: DailyBreakdown[];
+  period: { from: string; to: string };
+  bookings: {
+    total: number;
+    byStatus: Record<string, number>;
+  };
+  revenue: {
+    totalGross: number;
+    currency: "IDR";
+  };
+  avgTurnaroundSeconds: number | null;
+  crew: ReportCrewPerformance[];
 }
 
 export interface AdminSettings {
-  siteId: string;
   staleJobTimeoutMinutes: number;
 }
 

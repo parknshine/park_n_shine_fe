@@ -1,4 +1,5 @@
 {
+  "unassigned": "Unassigned",
   "action": {
     "retry": "Try Again",
     "save": "Save",

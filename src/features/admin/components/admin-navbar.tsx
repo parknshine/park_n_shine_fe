@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Bell, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
@@ -21,6 +21,7 @@ const PAGE_TITLE_KEYS: Record<string, string> = {
 
 export function AdminNavbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { logout } = useAdminAuth();
   const user = useAuthStore((s) => s.user);
   const activeSiteId = useUIStore((s) => s.activeSiteId);
@@ -89,7 +90,19 @@ export function AdminNavbar() {
                   {escalations.map((booking) => (
                     <li
                       key={booking.id}
-                      className="flex items-center justify-between gap-3 px-4 py-3"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        setShowEscalations(false);
+                        router.push(`/dashboard?bookingId=${booking.id}`);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          setShowEscalations(false);
+                          router.push(`/dashboard?bookingId=${booking.id}`);
+                        }
+                      }}
+                      className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-muted/60"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-foreground">

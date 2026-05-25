@@ -13,7 +13,7 @@ export function useAdminReport(siteId: string, from: string, to: string) {
     queryKey: queryKeys.admin.report(siteId, from, to),
     queryFn: async () => {
       const response = await api.get<AdminReport>(
-        `/v1/admin/sites/${siteId}/report?from=${from}&to=${to}`
+        `/v1/admin/reports/summary?siteId=${siteId}&from=${from}&to=${to}`
       );
       return response.data;
     },

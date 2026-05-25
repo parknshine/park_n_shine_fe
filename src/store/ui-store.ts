@@ -2,11 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
-function detectLocale(): "id" | "en" {
-  if (typeof navigator === "undefined") return "id";
-  return navigator.language.startsWith("en") ? "en" : "id";
-}
-
 interface Toast {
   id: string;
   title: string;
@@ -44,7 +39,7 @@ export const useUIStore = create<UIState & UIActions>()(
       isSidebarOpen: true,
       activeSiteId: null,
       sites: [],
-      locale: detectLocale(),
+      locale: "id",
 
       addToast: (toast) =>
         set((state) => {
@@ -88,6 +83,7 @@ export const useUIStore = create<UIState & UIActions>()(
         sites: state.sites,
         locale: state.locale,
       }),
+      skipHydration: true,
     }
   )
 );

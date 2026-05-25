@@ -5,33 +5,27 @@ import api from "@/lib/axios";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { AdminSettings } from "@/features/admin/types";
 
-export function useAdminSettings(siteId: string) {
+export function useAdminSettings() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    enabled: !!siteId,
-    queryKey: queryKeys.admin.settings(siteId),
+    queryKey: queryKeys.admin.settings(),
     queryFn: async () => {
-      const response = await api.get<AdminSettings>(
-        `/v1/admin/sites/${siteId}/settings`
-      );
+      const response = await api.get<AdminSettings>("/v1/admin/settings");
       return response.data;
     },
   });
 
   const saveMutation = useMutation({
     meta: { persist: false },
-    mutationKey: mutationKeys.admin.saveSettings(siteId),
+    mutationKey: mutationKeys.admin.saveSettings(),
     mutationFn: async (payload: { staleJobTimeoutMinutes: number }) => {
-      const response = await api.post<AdminSettings>(
-        `/v1/admin/sites/${siteId}/settings`,
-        payload
-      );
+      const response = await api.post<AdminSettings>("/v1/admin/settings", payload);
       return response.data;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.admin.settings(siteId),
+        queryKey: queryKeys.admin.settings(),
       });
     },
   });

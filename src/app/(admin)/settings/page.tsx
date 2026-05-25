@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminSettings } from "@/features/admin/hooks";
-import { useUIStore } from "@/store/ui-store";
 import type { AdminSettings } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 
@@ -68,24 +67,13 @@ function SettingsForm({ settings, save, isSaving }: SettingsFormProps) {
           {t("settings.staleTimeout.resetLabel")}
         </button>
       </div>
-
     </div>
   );
 }
 
 export default function SettingsPage() {
-  const activeSiteId = useUIStore((s) => s.activeSiteId);
   const { t } = useTranslation("admin");
-  const { settings, isLoading, save, isSaving } =
-    useAdminSettings(activeSiteId ?? "");
-
-  if (!activeSiteId) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">{t("common.selectSite")}</p>
-      </div>
-    );
-  }
+  const { settings, isLoading, save, isSaving } = useAdminSettings();
 
   return (
     <div className="max-w-md space-y-6">

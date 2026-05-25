@@ -11,6 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useBookingActions } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
 
@@ -61,20 +68,19 @@ export function ReassignModal({
 
         <div className="space-y-3 py-2">
           <div className="space-y-1.5">
-            <Label htmlFor="crew-select">{t("reassignModal.crewLabel")}</Label>
-            <select
-              id="crew-select"
-              value={crewId}
-              onChange={(e) => setCrewId(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="">{t("reassignModal.crewPlaceholder")}</option>
-              {crewOptions.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            <Label>{t("reassignModal.crewLabel")}</Label>
+            <Select value={crewId} onValueChange={setCrewId}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("reassignModal.crewPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {crewOptions.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

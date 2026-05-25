@@ -38,7 +38,7 @@
   },
   "reports": {
     "title": "Reports",
-    "subtitle": "Daily KPI per site",
+    "subtitle": "Booking summary per site",
     "fromLabel": "From",
     "toLabel": "To",
     "loading": "Loading...",
@@ -46,20 +46,24 @@
     "exportCsv": "Export CSV",
     "noData": "No data for this date range.",
     "totalRow": "Total",
+    "statusBreakdown": "Bookings by Status",
+    "crewPerformance": "Crew Performance",
     "columns": {
-      "date": "Date",
-      "bookings": "Bookings",
-      "completed": "Completed",
-      "sla": "SLA%",
-      "avgRating": "Avg Rating",
-      "revenue": "Revenue"
+      "status": "Status",
+      "count": "Count"
     },
     "kpi": {
       "totalBookings": "Total Bookings",
-      "completionRate": "Completion Rate",
-      "slaHitRate": "SLA Hit Rate",
-      "averageRating": "Average Rating",
-      "revenue": "Revenue"
+      "closed": "Completed",
+      "revenue": "Revenue",
+      "avgTurnaround": "Avg Turnaround",
+      "cancelled": "Cancelled / Expired"
+    },
+    "crew": {
+      "name": "Crew",
+      "jobs": "Jobs",
+      "avgTurnaround": "Avg Turnaround",
+      "revenue": "Est. Revenue"
     }
   },
   "settings": {
@@ -82,10 +86,20 @@
   "drawer": {
     "loading": "Loading...",
     "closeAriaLabel": "Close",
+    "bookingInfo": "Booking Info",
+    "site": "Site",
+    "slot": "Slot",
+    "crew": "Crew",
+    "price": "Price",
+    "elapsed": "Elapsed",
+    "estimatedReady": "Est. Ready",
     "statusHistory": "Status History",
+    "noStatusHistory": "No status history yet",
     "photos": "Photos",
+    "noPhotos": "No photos yet",
     "actions": "Actions",
     "auditLog": "Audit Log",
+    "noAuditLog": "No log entries yet",
     "reassignCrew": "Reassign Crew",
     "overrideStatus": "Override Status",
     "refund": "Refund"

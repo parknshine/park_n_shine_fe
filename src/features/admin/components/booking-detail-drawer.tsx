@@ -85,31 +85,73 @@ export function BookingDetailDrawer({
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {booking && (
             <>
+              {/* Booking Info */}
+              <section>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t("drawer.bookingInfo")}
+                </h3>
+                <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+                  <dt className="text-muted-foreground">{t("drawer.site")}</dt>
+                  <dd className="font-medium text-foreground">{booking.siteName}</dd>
+
+                  <dt className="text-muted-foreground">{t("drawer.slot")}</dt>
+                  <dd className="font-medium text-foreground">{booking.slotText ?? "—"}</dd>
+
+                  <dt className="text-muted-foreground">{t("drawer.crew")}</dt>
+                  <dd className="font-medium text-foreground">
+                    {booking.crewName ?? t("common:unassigned")}
+                  </dd>
+
+                  <dt className="text-muted-foreground">{t("drawer.price")}</dt>
+                  <dd className="font-medium text-foreground">
+                    {booking.priceAmount != null
+                      ? formatPrice(booking.priceAmount, booking.currency ?? "IDR")
+                      : "—"}
+                  </dd>
+
+                  <dt className="text-muted-foreground">{t("drawer.elapsed")}</dt>
+                  <dd className="font-medium text-foreground">
+                    {formatElapsed(booking.elapsedSeconds, t)}
+                  </dd>
+
+                  <dt className="text-muted-foreground">{t("drawer.estimatedReady")}</dt>
+                  <dd className="font-medium text-foreground">
+                    {booking.estimatedReadyAt
+                      ? new Date(booking.estimatedReadyAt).toLocaleString("id-ID")
+                      : "—"}
+                  </dd>
+                </dl>
+              </section>
+
               {/* Status History */}
               <section>
                 <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {t("drawer.statusHistory")}
                 </h3>
-                <ol className="space-y-2">
-                  {booking.statusHistory.map((entry, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm">
-                      <StatusBadge tone={BOOKING_STATUS_TONES[entry.status] ?? "neutral"}>
-                        {entry.status}
-                      </StatusBadge>
-                      <span className="text-muted-foreground">
-                        {new Date(entry.changedAt).toLocaleString("id-ID")}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
+                {booking.statusHistory.length > 0 ? (
+                  <ol className="space-y-2">
+                    {booking.statusHistory.map((entry, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm">
+                        <StatusBadge tone={BOOKING_STATUS_TONES[entry.status] ?? "neutral"}>
+                          {entry.status}
+                        </StatusBadge>
+                        <span className="text-muted-foreground">
+                          {new Date(entry.changedAt).toLocaleString("id-ID")}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t("drawer.noStatusHistory")}</p>
+                )}
               </section>
 
-              {/* Media */}
-              {booking.media.length > 0 && (
-                <section>
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {t("drawer.photos")}
-                  </h3>
+              {/* Photos */}
+              <section>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t("drawer.photos")}
+                </h3>
+                {booking.media.length > 0 ? (
                   <div className="grid grid-cols-2 gap-2">
                     {booking.media.map((m) => (
                       <div key={m.id} className="space-y-1">
@@ -125,8 +167,10 @@ export function BookingDetailDrawer({
                       </div>
                     ))}
                   </div>
-                </section>
-              )}
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t("drawer.noPhotos")}</p>
+                )}
+              </section>
 
               {/* Actions */}
               <section>
@@ -137,6 +181,7 @@ export function BookingDetailDrawer({
                   <Button
                     variant="outline"
                     size="sm"
+                    disabled={["READY", "CLOSED", "CANCELLED", "EXPIRED"].includes(booking.status)}
                     onClick={() => setActiveModal("reassign")}
                   >
                     {t("drawer.reassignCrew")}
@@ -144,6 +189,7 @@ export function BookingDetailDrawer({
                   <Button
                     variant="outline"
                     size="sm"
+                    disabled={["CLOSED", "EXPIRED"].includes(booking.status)}
                     onClick={() => setActiveModal("override")}
                   >
                     {t("drawer.overrideStatus")}
@@ -151,6 +197,7 @@ export function BookingDetailDrawer({
                   <Button
                     variant="destructive"
                     size="sm"
+                    disabled={["DRAFT", "PENDING", "CLOSED", "CANCELLED", "EXPIRED"].includes(booking.status)}
                     onClick={() => setActiveModal("refund")}
                   >
                     {t("drawer.refund")}
@@ -158,12 +205,12 @@ export function BookingDetailDrawer({
                 </div>
               </section>
 
-              {/* Audit entries */}
-              {booking.auditEntries.length > 0 && (
-                <section>
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {t("drawer.auditLog")}
-                  </h3>
+              {/* Audit Log */}
+              <section>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t("drawer.auditLog")}
+                </h3>
+                {booking.auditEntries.length > 0 ? (
                   <ol className="space-y-2">
                     {booking.auditEntries.map((entry) => (
                       <li
@@ -180,8 +227,10 @@ export function BookingDetailDrawer({
                       </li>
                     ))}
                   </ol>
-                </section>
-              )}
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t("drawer.noAuditLog")}</p>
+                )}
+              </section>
             </>
           )}
         </div>
@@ -215,4 +264,22 @@ export function BookingDetailDrawer({
       )}
     </>
   );
+}
+
+function formatElapsed(
+  seconds: number,
+  t: (key: string, opts?: Record<string, unknown>) => string
+): string {
+  if (seconds < 60) return t("queueGroup.seconds", { n: seconds });
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return t("queueGroup.minutes", { n: minutes });
+  return t("queueGroup.hours", { h: Math.floor(minutes / 60), m: minutes % 60 });
+}
+
+function formatPrice(amount: number, currency: string = "IDR"): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
 }

@@ -13,6 +13,21 @@ export function I18nProvider({ children }: I18nProviderProps) {
   const locale = useUIStore((s) => s.locale);
 
   useEffect(() => {
+    let hasStoredLocale = false;
+    try {
+      const stored = localStorage.getItem("ui");
+      hasStoredLocale = !!JSON.parse(stored ?? "{}")?.state?.locale;
+    } catch {}
+
+    useUIStore.persist.rehydrate();
+
+    if (!hasStoredLocale) {
+      const detected = navigator.language.startsWith("en") ? "en" : "id";
+      useUIStore.getState().setLocale(detected);
+    }
+  }, []);
+
+  useEffect(() => {
     void i18n.changeLanguage(locale);
   }, [locale]);
 

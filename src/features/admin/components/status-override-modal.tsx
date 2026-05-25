@@ -12,6 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useBookingActions } from "@/features/admin/hooks";
 import type { BookingStatus } from "@/features/customer/types";
 import type { StatusOverridePayload } from "@/features/admin/types";
@@ -67,24 +74,22 @@ export function StatusOverrideModal({
 
         <div className="space-y-3 py-2">
           <div className="space-y-1.5">
-            <Label htmlFor="transition-select">{t("overrideModal.transitionLabel")}</Label>
-            <select
-              id="transition-select"
+            <Label>{t("overrideModal.transitionLabel")}</Label>
+            <Select
               value={nextStatus}
-              onChange={(e) =>
-                setNextStatus(
-                  e.target.value as StatusOverridePayload["nextStatus"] | ""
-                )
-              }
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              onValueChange={(v) => setNextStatus(v as StatusOverridePayload["nextStatus"])}
             >
-              <option value="">{t("overrideModal.transitionPlaceholder")}</option>
-              {VALID_TRANSITIONS.map((transition) => (
-                <option key={transition.label} value={transition.nextStatus}>
-                  {transition.label}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder={t("overrideModal.transitionPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {VALID_TRANSITIONS.map((transition) => (
+                  <SelectItem key={transition.label} value={transition.nextStatus}>
+                    {transition.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
