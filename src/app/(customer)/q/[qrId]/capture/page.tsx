@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
 import { ArrowRight } from "lucide-react";
@@ -11,6 +11,14 @@ import { PhotoUploadField } from "@/features/customer/components/photo-upload-fi
 import { usePhotoUpload } from "@/features/customer/hooks";
 
 export default function CapturePage() {
+  return (
+    <Suspense>
+      <CaptureContent />
+    </Suspense>
+  );
+}
+
+function CaptureContent() {
   const router = useRouter();
   const { qrId } = useParams<{ qrId: string }>();
   const [{ bookingId, token }] = useQueryStates({

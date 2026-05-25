@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Loader2, BriefcaseBusiness, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,10 @@ export function CrewHomePage() {
       router.replace(`/crew/jobs/${job.id}`);
     }
   }, [job, router]);
+
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
 
   async function handleClaim() {
     const claimed = await claimNextJob();
@@ -102,15 +107,6 @@ export function CrewHomePage() {
           </div>
         )}
 
-        {/* Inline error */}
-        {error && (
-          <p
-            role="alert"
-            className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-center text-sm font-medium text-destructive"
-          >
-            {error}
-          </p>
-        )}
       </div>
     </main>
   );

@@ -38,11 +38,7 @@ api.interceptors.response.use(
   (error) => {
     const normalizedError = normalizeApiError(error);
 
-    if (
-      normalizedError.httpStatus === 401 &&
-      normalizedError.code !== API_ERROR_CODES.BOOKING_TOKEN_INVALID
-    ) {
-      // Handle unauthorised — e.g. redirect to login
+    if (normalizedError.code === API_ERROR_CODES.CREW_SESSION_EXPIRED) {
       if (typeof window !== "undefined") {
         window.location.href = "/crew/login";
       }

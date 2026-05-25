@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Plus, RotateCcw, Printer, ArrowLeft } from "lucide-react";
+import { Plus, RotateCcw, Printer, ArrowLeft, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -104,6 +104,9 @@ export default function QrManagementPage() {
           <h1 className="text-xl font-bold text-foreground">QR Codes</h1>
           <p className="text-sm text-muted-foreground">Manage QR codes for this site</p>
         </div>
+        <Button variant="outline" onClick={() => router.push(`/sites/${siteId}/shifts`)}>
+          <CalendarClock className="mr-2 h-4 w-4" /> Shifts
+        </Button>
         <Button onClick={() => setShowGenerate(true)}>
           <Plus className="mr-2 h-4 w-4" /> Generate QR
         </Button>

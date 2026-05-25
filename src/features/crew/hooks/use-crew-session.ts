@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import { API_ERROR_CODES } from "@/lib/api-error";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { CrewLoginPayload, CrewSession } from "@/features/crew/types";
 
@@ -38,16 +39,19 @@ export function useCrewSession() {
     queryClient.removeQueries({ queryKey: queryKeys.crew.session() });
   }
 
-  const error =
-    mutation.error instanceof Error
-      ? mutation.error.message
-      : mutation.error
-        ? "crew_login_failed"
-        : null;
+  function getErrorKey(err: unknown): string | null {
+    if (!err) return null;
+    const code = (err as { code?: string }).code;
+    if (code === API_ERROR_CODES.CREW_INVALID_SHIFT_CODE) return "login.errors.shiftCodeInvalid";
+    if (code === API_ERROR_CODES.CREW_INVALID_PIN) return "login.errors.pinInvalid";
+    return "login.errors.default";
+  }
+
+  const errorKey = getErrorKey(mutation.error);
 
   return {
     clearSession,
-    error,
+    errorKey,
     isLoading: mutation.isPending,
     isOfflinePaused: mutation.isPaused,
     login,

@@ -9,7 +9,12 @@
     "pinPlaceholder": "Masukkan PIN kamu",
     "signingIn": "Masuk…",
     "signIn": "Masuk",
-    "footerNote": "Khusus crew — bukan portal pelanggan"
+    "footerNote": "Khusus crew — bukan portal pelanggan",
+    "errors": {
+      "shiftCodeInvalid": "Kode shift tidak valid atau sudah berakhir.",
+      "pinInvalid": "PIN salah. Coba lagi.",
+      "default": "Login gagal. Coba lagi."
+    }
   },
   "home": {
     "queueLabel": "Antrian Job",

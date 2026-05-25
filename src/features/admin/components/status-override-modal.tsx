@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +54,7 @@ export function StatusOverrideModal({
       setReasonCode("");
       onSuccess();
     } catch {
-      // error displayed via `error` state
+      toast.error(t("overrideModal.error"));
     }
   }
 
@@ -97,9 +98,6 @@ export function StatusOverrideModal({
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-destructive">{t("overrideModal.error")}</p>
-          )}
         </div>
 
         <DialogFooter>

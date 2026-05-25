@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
 import { ArrowLeft } from "lucide-react";
@@ -10,6 +10,14 @@ import { PayButton } from "@/features/customer/components/pay-button";
 import { useBookingStatus } from "@/features/customer/hooks";
 
 export default function ConfirmPage() {
+  return (
+    <Suspense>
+      <ConfirmContent />
+    </Suspense>
+  );
+}
+
+function ConfirmContent() {
   const router = useRouter();
   const { qrId } = useParams<{ qrId: string }>();
   const [{ bookingId, token, plate, slot }] = useQueryStates({

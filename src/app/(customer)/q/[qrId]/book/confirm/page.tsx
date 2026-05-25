@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,6 +23,14 @@ interface QrConfirmPayload {
 }
 
 export default function BookConfirmPage() {
+  return (
+    <Suspense>
+      <BookConfirmContent />
+    </Suspense>
+  );
+}
+
+function BookConfirmContent() {
   const router = useRouter();
   const { t } = useTranslation("customer");
   const { qrId } = useParams<{ qrId: string }>();
@@ -67,8 +76,10 @@ export default function BookConfirmPage() {
       return response.data;
     },
     mutationKey: mutationKeys.customer.confirmPayment(bookingId ?? ""),
-    onError: () => {
+    onError: (err) => {
       setHasSubmitted(false);
+      const msg = err instanceof Error ? err.message : "payment_confirm_failed";
+      toast.error(msg);
     },
     onSuccess: (paymentIntent) => {
       void queryClient.invalidateQueries({
@@ -92,12 +103,6 @@ export default function BookConfirmPage() {
   }
 
   const canSubmit = !mutation.isPending && !hasSubmitted;
-  const error =
-    mutation.error instanceof Error
-      ? mutation.error.message
-      : mutation.error
-        ? "payment_confirm_failed"
-        : null;
 
   return (
     <AppShell surface="customer">
@@ -145,8 +150,6 @@ export default function BookConfirmPage() {
           <ArrowLeft className="h-4 w-4" />
           {t("booking.confirm.back")}
         </button>
-
-        {error && <p className="text-sm text-destructive">{error}</p>}
 
         <Button
           size="lg"

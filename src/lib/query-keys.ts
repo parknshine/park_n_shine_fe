@@ -9,6 +9,8 @@ export const queryKeys = {
     sites: () => ["admin", "sites"] as const,
     site: (siteId: string) => ["admin", "sites", siteId] as const,
     qrCodes: (siteId: string) => ["admin", "sites", siteId, "qr-codes"] as const,
+    crew: () => ["admin", "crew"] as const,
+    shifts: (siteId: string) => ["admin", "sites", siteId, "shifts"] as const,
   },
   crew: {
     session: () => ["crew", "session"] as const,
@@ -35,6 +37,11 @@ export const mutationKeys = {
     updateSite: (siteId: string) => ["admin", "sites", siteId, "update"] as const,
     generateQr: (siteId: string) => ["admin", "sites", siteId, "qr", "generate"] as const,
     rotateQr: (qrId: string) => ["admin", "qr", qrId, "rotate"] as const,
+    createCrew: () => ["admin", "crew", "create"] as const,
+    updateCrew: (crewId: string) => ["admin", "crew", crewId, "update"] as const,
+    createShift: (siteId: string) => ["admin", "sites", siteId, "shifts", "create"] as const,
+    updateShiftCrew: (shiftId: string) => ["admin", "shifts", shiftId, "crew"] as const,
+    closeShift: (shiftId: string) => ["admin", "shifts", shiftId, "close"] as const,
   },
   crew: {
     checklist: (jobId: string) => ["crew", "job", jobId, "checklist"] as const,

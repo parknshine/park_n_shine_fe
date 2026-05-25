@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import api from "@/lib/axios";
@@ -30,32 +31,26 @@ export function BookNowButton({ qrId }: BookNowButtonProps) {
       });
       router.push(`/q/${qrId}/capture?${params.toString()}`);
     },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Gagal membuat booking. Coba lagi.");
+    },
   });
 
   return (
-    <div className="space-y-2">
-      <Button
-        size="lg"
-        className="w-full rounded-full"
-        disabled={mutation.isPending}
-        onClick={() => mutation.mutate()}
-      >
-        {mutation.isPending ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Memproses...
-          </>
-        ) : (
-          "Book a Wash"
-        )}
-      </Button>
-      {mutation.error && (
-        <p className="text-center text-sm text-destructive">
-          {mutation.error instanceof Error
-            ? mutation.error.message
-            : "Gagal membuat booking. Coba lagi."}
-        </p>
+    <Button
+      size="lg"
+      className="w-full rounded-full"
+      disabled={mutation.isPending}
+      onClick={() => mutation.mutate()}
+    >
+      {mutation.isPending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Memproses...
+        </>
+      ) : (
+        "Book a Wash"
       )}
-    </div>
+    </Button>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Loader2, MapPin, Navigation } from "lucide-react";
@@ -44,6 +45,17 @@ export default function WalkInLocationPage() {
   } = useLocationPicker();
 
   const hasRequestedRef = useRef(false);
+
+  useEffect(() => {
+    if (!error) return;
+    const msg =
+      error === "geolocation_not_supported"
+        ? t("booking.location.errorNotSupported")
+        : error === "geolocation_denied"
+          ? t("booking.location.errorDenied")
+          : error;
+    toast.error(msg);
+  }, [error, t]);
 
   // Request geolocation once on mount
   useEffect(() => {
@@ -118,16 +130,6 @@ export default function WalkInLocationPage() {
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <p className="text-sm text-foreground">{locationName}</p>
           </div>
-        )}
-
-        {error && (
-          <p className="text-sm text-destructive">
-            {error === "geolocation_not_supported"
-              ? t("booking.location.errorNotSupported")
-              : error === "geolocation_denied"
-                ? t("booking.location.errorDenied")
-                : error}
-          </p>
         )}
 
         <Button

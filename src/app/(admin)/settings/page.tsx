@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,21 +12,20 @@ import { useTranslation } from "@/i18n";
 
 interface SettingsFormProps {
   settings: AdminSettings;
-  save: (data: { staleJobTimeoutMinutes: number }) => Promise<void>;
+  save: (data: { staleJobTimeoutMinutes: number }) => Promise<unknown>;
   isSaving: boolean;
-  saveSuccess: boolean;
-  error: string | null;
 }
 
-function SettingsForm({ settings, save, isSaving, saveSuccess, error }: SettingsFormProps) {
+function SettingsForm({ settings, save, isSaving }: SettingsFormProps) {
   const [timeoutMinutes, setTimeoutMinutes] = useState(settings.staleJobTimeoutMinutes);
   const { t } = useTranslation("admin");
 
   async function handleSave() {
     try {
       await save({ staleJobTimeoutMinutes: timeoutMinutes });
+      toast.success(t("settings.staleTimeout.success"));
     } catch {
-      // error displayed via `error` state
+      toast.error(t("settings.staleTimeout.error"));
     }
   }
 
@@ -69,14 +69,6 @@ function SettingsForm({ settings, save, isSaving, saveSuccess, error }: Settings
         </button>
       </div>
 
-      {saveSuccess && (
-        <p className="text-sm text-green-600 dark:text-green-400">
-          {t("settings.staleTimeout.success")}
-        </p>
-      )}
-      {error && (
-        <p className="text-sm text-destructive">{t("settings.staleTimeout.error")}</p>
-      )}
     </div>
   );
 }
@@ -84,7 +76,7 @@ function SettingsForm({ settings, save, isSaving, saveSuccess, error }: Settings
 export default function SettingsPage() {
   const activeSiteId = useUIStore((s) => s.activeSiteId);
   const { t } = useTranslation("admin");
-  const { settings, isLoading, save, isSaving, saveSuccess, error } =
+  const { settings, isLoading, save, isSaving } =
     useAdminSettings(activeSiteId ?? "");
 
   if (!activeSiteId) {
@@ -110,8 +102,6 @@ export default function SettingsPage() {
           settings={settings}
           save={save}
           isSaving={isSaving}
-          saveSuccess={saveSuccess}
-          error={error}
         />
       )}
     </div>

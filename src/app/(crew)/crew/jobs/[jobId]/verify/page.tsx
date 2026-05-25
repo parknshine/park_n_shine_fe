@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import {
   AlertTriangle,
@@ -25,6 +26,10 @@ export function VerifyPlatePage() {
   const { verify, isLoading, error } = useVerifyPlate(jobId);
 
   const [isEscalated, setIsEscalated] = useState(false);
+
+  useEffect(() => {
+    if (error && !isEscalated) toast.error(error);
+  }, [error, isEscalated]);
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isJobLoading || !job) {
@@ -102,13 +107,6 @@ export function VerifyPlatePage() {
         <p className="mb-6 text-center font-mono text-2xl font-bold tracking-widest text-foreground">
           {job.plateText}
         </p>
-
-        {/* Inline error */}
-        {error && !isEscalated && (
-          <p className="mb-4 text-center text-sm text-destructive" role="alert">
-            {error}
-          </p>
-        )}
 
         {/* Escalation card */}
         {isEscalated && (

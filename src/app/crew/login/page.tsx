@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "react-hot-toast";
 import { useCrewSession } from "@/features/crew/hooks";
 import { useTranslation } from "@/i18n";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
@@ -17,7 +18,7 @@ import { cn } from "@/lib/utils";
 export function CrewLoginPage() {
   const router = useRouter();
   const { t } = useTranslation("crew");
-  const { login, session, isLoading, error } = useCrewSession();
+  const { login, session, isLoading, errorKey } = useCrewSession();
 
   const [shiftCode, setShiftCode] = useState("");
   const [pin, setPin] = useState("");
@@ -42,8 +43,12 @@ export function CrewLoginPage() {
     try {
       await login({ shiftCode, pin });
       router.replace("/crew/home");
-    } catch {
-      // error is surfaced via the `error` field from useCrewSession
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      let msgKey = "login.errors.default";
+      if (code === "CREW_INVALID_SHIFT_CODE") msgKey = "login.errors.shiftCodeInvalid";
+      if (code === "CREW_INVALID_PIN") msgKey = "login.errors.pinInvalid";
+      toast.error(t(msgKey));
     }
   }
 
@@ -115,13 +120,7 @@ export function CrewLoginPage() {
                 autoComplete="off"
                 autoCorrect="off"
                 spellCheck={false}
-                className={cn(
-                  "h-11 rounded-md border text-base font-medium tracking-[0.2em] placeholder:tracking-normal",
-                  "focus:ring-2",
-                  error
-                    ? "border-destructive focus:ring-destructive/30"
-                    : "border-muted-foreground/40 focus:border-primary focus:ring-primary/20"
-                )}
+                className="h-11 rounded-md border border-muted-foreground/40 text-base font-medium tracking-[0.2em] placeholder:tracking-normal focus:ring-2 focus:border-primary focus:ring-primary/20"
               />
             </div>
 
@@ -141,13 +140,7 @@ export function CrewLoginPage() {
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   autoComplete="current-password"
-                  className={cn(
-                    "h-11 rounded-md border pr-10 text-base",
-                    "focus:ring-2",
-                    error
-                      ? "border-destructive focus:ring-destructive/30"
-                      : "border-muted-foreground/40 focus:border-primary focus:ring-primary/20"
-                  )}
+                  className="h-11 rounded-md border border-muted-foreground/40 pr-10 text-base focus:ring-2 focus:border-primary focus:ring-primary/20"
                 />
                 <button
                   type="button"
@@ -160,30 +153,6 @@ export function CrewLoginPage() {
                 </button>
               </div>
             </div>
-
-            {/* Inline error */}
-            {error && (
-              <div
-                role="alert"
-                className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5"
-              >
-                <svg
-                  aria-hidden="true"
-                  className="mt-0.5 h-4 w-4 shrink-0 text-destructive"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                >
-                  <circle cx="8" cy="8" r="7.25" stroke="currentColor" strokeWidth="1.5" />
-                  <path
-                    d="M8 4.5v4M8 10.5v1"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <p className="text-sm text-destructive">{error}</p>
-              </div>
-            )}
 
             {/* Submit */}
             <Button

@@ -84,12 +84,6 @@ export interface AdminBookingDetail extends AdminQueueBooking {
   auditEntries: AuditEntry[];
 }
 
-export interface MockCrewMember {
-  id: string;
-  name: string;
-  siteId: string;
-}
-
 export interface AdminSiteDetail {
   id: string;
   name: string;
@@ -131,4 +125,47 @@ export interface GenerateQrPayload {
 export interface RotateQrResult {
   oldQrId: string;
   newQr: AdminQrCode;
+}
+
+export interface AdminCrewMember {
+  id: string;
+  name: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface AdminShiftCrewMember {
+  id: string;
+  name: string;
+  active: boolean;
+}
+
+export interface AdminShift {
+  id: string;
+  siteId: string;
+  shiftCode: string;
+  startedAt: string;
+  endedAt: string;
+  isActive: boolean;
+  createdAt: string;
+  crewMembers: AdminShiftCrewMember[];
+}
+
+export interface CreateCrewPayload {
+  name: string;
+  pin: string;
+}
+
+export interface UpdateCrewPayload {
+  name?: string;
+  pin?: string;
+  active?: boolean;
+}
+
+export interface CreateShiftPayload {
+  crewMemberIds: string[];
+}
+
+export interface UpdateShiftCrewPayload {
+  crewMemberIds: string[];
 }

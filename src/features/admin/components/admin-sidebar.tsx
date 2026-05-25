@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart2, LayoutGrid, QrCode, ScrollText, Settings } from "lucide-react";
+import { BarChart2, LayoutGrid, QrCode, ScrollText, Settings, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
 import { useTranslation } from "@/i18n";
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: "/sites", label: "Sites & QR", icon: QrCode },
   { href: "/reports", label: "Reports", icon: BarChart2 },
   { href: "/audit", label: "Audit Trail", icon: ScrollText },
+  { href: "/crew", label: "Crew", icon: Users },
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 

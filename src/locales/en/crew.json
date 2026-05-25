@@ -9,7 +9,12 @@
     "pinPlaceholder": "Enter your PIN",
     "signingIn": "Signing in…",
     "signIn": "Sign In",
-    "footerNote": "Crew access only — not a customer portal"
+    "footerNote": "Crew access only — not a customer portal",
+    "errors": {
+      "shiftCodeInvalid": "Invalid or expired shift code.",
+      "pinInvalid": "Incorrect PIN. Please try again.",
+      "default": "Login failed. Please try again."
+    }
   },
   "home": {
     "queueLabel": "Job Queue",

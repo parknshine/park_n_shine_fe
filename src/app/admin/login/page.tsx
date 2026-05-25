@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +19,7 @@ export default function AdminLoginPage() {
     try {
       await login({ email, password });
     } catch {
-      // error displayed via `error` state
+      toast.error(t("login.loginFailed"));
     }
   }
 
@@ -58,10 +59,6 @@ export default function AdminLoginPage() {
               autoComplete="current-password"
             />
           </div>
-
-          {error && (
-            <p className="text-sm text-destructive">{t("login.loginFailed")}</p>
-          )}
 
           <Button
             type="submit"

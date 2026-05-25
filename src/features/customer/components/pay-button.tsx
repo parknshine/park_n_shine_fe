@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { usePaymentAction } from "@/features/customer/hooks";
 
@@ -33,17 +34,13 @@ export function PayButton({
   const { canSubmit, confirmAndRedirect, error, isSubmitting } =
     usePaymentAction(bookingId, signedToken);
 
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error === "payment_confirm_failed" ? labels.errorFallback : error);
+  }, [error, labels.errorFallback]);
+
   return (
     <div className="space-y-3">
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>
-            {error === "payment_confirm_failed"
-              ? labels.errorFallback
-              : error}
-          </AlertDescription>
-        </Alert>
-      )}
       <Button
         size="lg"
         className="w-full rounded-full"

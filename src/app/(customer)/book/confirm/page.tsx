@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -16,6 +17,14 @@ import {
 import { useTranslation } from "@/i18n";
 
 export default function WalkInConfirmPage() {
+  return (
+    <Suspense>
+      <WalkInConfirmContent />
+    </Suspense>
+  );
+}
+
+function WalkInConfirmContent() {
   const router = useRouter();
   const { t } = useTranslation("customer");
 
@@ -46,6 +55,10 @@ export default function WalkInConfirmPage() {
 
   const { canSubmit, confirmAndRedirect, error, isSubmitting } =
     usePaymentActionV2(bookingId ?? "", token ?? "");
+
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
 
   if (!bookingId || !token || !lat || !lng || !loc || !plate || !slot) {
     return null;
@@ -87,7 +100,7 @@ export default function WalkInConfirmPage() {
           estimatedReadyAt={booking?.estimatedReadyAt}
         />
 
-        <BookingLocationCard locationName={loc} phone={phone} />
+        <BookingLocationCard locationName={loc ?? ""} phone={phone ?? undefined} />
 
         <button
           type="button"
@@ -97,8 +110,6 @@ export default function WalkInConfirmPage() {
           <ArrowLeft className="h-4 w-4" />
           {t("booking.confirm.back")}
         </button>
-
-        {error && <p className="text-sm text-destructive">{error}</p>}
 
         <Button
           size="lg"

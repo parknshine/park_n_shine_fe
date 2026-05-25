@@ -162,6 +162,14 @@ export const API_ERROR_MESSAGES = {
     "id-ID": "Checklist gagal disimpan. Coba lagi.",
     "en-US": "Checklist could not be saved. Try again.",
   },
+  [API_ERROR_CODES.CREW_INVALID_PIN]: {
+    "id-ID": "PIN salah. Coba lagi.",
+    "en-US": "Incorrect PIN. Please try again.",
+  },
+  [API_ERROR_CODES.CREW_INVALID_SHIFT_CODE]: {
+    "id-ID": "Kode shift tidak valid atau sudah berakhir.",
+    "en-US": "Invalid or expired shift code.",
+  },
   [API_ERROR_CODES.CREW_SESSION_EXPIRED]: {
     "id-ID": "Sesi crew sudah berakhir. Masuk kembali dengan shift code dan PIN.",
     "en-US": "Crew session has expired. Sign in again with shift code and PIN.",

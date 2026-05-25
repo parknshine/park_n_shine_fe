@@ -1,6 +1,7 @@
 "use client";
 
-import { startTransition, useEffect, useRef, useState } from "react";
+import { startTransition, Suspense, useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
 import { useMutation } from "@tanstack/react-query";
@@ -17,6 +18,14 @@ import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 
 export default function WalkInCapturePage() {
+  return (
+    <Suspense>
+      <WalkInCaptureContent />
+    </Suspense>
+  );
+}
+
+function WalkInCaptureContent() {
   const router = useRouter();
   const { t } = useTranslation("customer");
   const locale = useUIStore((s) => s.locale);
@@ -121,13 +130,14 @@ export default function WalkInCapturePage() {
     );
   }
 
+  useEffect(() => {
+    if (createMutation.isError) toast.error(t("booking.capture.errorCreate"));
+  }, [createMutation.isError, t]);
+
   if (createMutation.isError) {
     return (
       <AppShell surface="customer">
         <div className="space-y-4 pt-10 text-center">
-          <p className="text-sm text-destructive">
-            {t("booking.capture.errorCreate")}
-          </p>
           <Button
             onClick={() => {
               hasCreatedRef.current = false;

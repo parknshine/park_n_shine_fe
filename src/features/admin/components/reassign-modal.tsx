@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import {
   Dialog,
   DialogContent,
@@ -47,7 +48,7 @@ export function ReassignModal({
       await reassign({ crewId });
       onSuccess();
     } catch {
-      // error displayed via `error` state
+      toast.error(t("reassignModal.error"));
     }
   }
 
@@ -75,9 +76,6 @@ export function ReassignModal({
               ))}
             </select>
           </div>
-          {error && (
-            <p className="text-sm text-destructive">{t("reassignModal.error")}</p>
-          )}
         </div>
 
         <DialogFooter>

@@ -1,6 +1,7 @@
 "use client";
 
 import { startTransition, useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Loader2 } from "lucide-react";
@@ -117,13 +118,14 @@ export default function BookCapturePage() {
     );
   }
 
+  useEffect(() => {
+    if (createMutation.isError) toast.error(t("booking.capture.errorCreate"));
+  }, [createMutation.isError, t]);
+
   if (createMutation.isError) {
     return (
       <AppShell surface='customer'>
         <div className='space-y-4 pt-10 text-center'>
-          <p className='text-sm text-destructive'>
-            {t("booking.capture.errorCreate")}
-          </p>
           <Button
             onClick={() => {
               hasCreatedRef.current = false;

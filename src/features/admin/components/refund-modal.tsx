@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import {
   Dialog,
   DialogContent,
@@ -59,7 +60,7 @@ export function RefundModal({
       setReasonCode("");
       onSuccess();
     } catch {
-      // error displayed via `error` state
+      toast.error(t("refundModal.error"));
     }
   }
 
@@ -134,9 +135,6 @@ export function RefundModal({
             </p>
           )}
 
-          {error && (
-            <p className="text-sm text-destructive">{t("refundModal.error")}</p>
-          )}
         </div>
 
         <DialogFooter>
