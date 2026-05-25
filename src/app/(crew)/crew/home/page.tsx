@@ -3,16 +3,17 @@
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { Loader2, BriefcaseBusiness, Inbox } from "lucide-react";
+import { BriefcaseBusiness, Inbox, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
-import { useNextJob } from "@/features/crew/hooks";
+import { useJobQueue, useNextJob } from "@/features/crew/hooks";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
 export function CrewHomePage() {
   const router = useRouter();
   const { claimNextJob, job, isLoading, hasNoJob, error } = useNextJob();
+  const { count, hasJob } = useJobQueue();
   const { t } = useTranslation("crew");
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export function CrewHomePage() {
 
       {/* Main action area */}
       <div className="flex flex-1 flex-col items-center justify-center gap-6">
-        {hasNoJob ? (
+        {hasNoJob && !hasJob ? (
           <EmptyState
             title={t("home.emptyTitle")}
             description={t("home.emptyDescription")}
@@ -68,9 +69,24 @@ export function CrewHomePage() {
           />
         ) : (
           <div className="w-full space-y-4">
+            {/* Live job count badge */}
+            {hasJob && (
+              <div className="flex items-center justify-center">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                  </span>
+                  {count === 1
+                    ? t("home.jobWaiting_one", { count, defaultValue: `${count} job waiting` })
+                    : t("home.jobWaiting_other", { count, defaultValue: `${count} jobs waiting` })}
+                </span>
+              </div>
+            )}
+
             {/* Pulse ring behind the button when idle */}
             <div className="relative w-full">
-              {!isLoading && (
+              {!isLoading && hasJob && (
                 <span
                   className="absolute inset-0 -z-10 animate-pulse rounded-xl bg-primary/20"
                   aria-hidden="true"
@@ -101,12 +117,13 @@ export function CrewHomePage() {
             {/* Hint text */}
             {!isLoading && (
               <p className="text-center text-xs text-muted-foreground">
-                {t("home.claimHint")}
+                {hasJob
+                  ? t("home.claimHintReady", { defaultValue: "Tap to claim the next available job" })
+                  : t("home.claimHint")}
               </p>
             )}
           </div>
         )}
-
       </div>
     </main>
   );

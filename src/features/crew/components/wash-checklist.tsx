@@ -4,6 +4,17 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { WashChecklistItem } from "@/features/crew/types";
 
+function formatCompletedAt(iso: string): string {
+  try {
+    return new Intl.DateTimeFormat("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
 interface WashChecklistProps {
   items: WashChecklistItem[];
   nextItemId?: string;
@@ -47,7 +58,7 @@ export function WashChecklist({
               </p>
               {item.completedAt && (
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {item.completedAt}
+                  {formatCompletedAt(item.completedAt)}
                 </p>
               )}
             </div>

@@ -16,6 +16,7 @@ export const queryKeys = {
     session: () => ["crew", "session"] as const,
     job: (jobId: string) => ["crew", "job", jobId] as const,
     nextJob: () => ["crew", "jobs", "next"] as const,
+    queue: () => ["crew", "jobs", "queue"] as const,
   },
   customer: {
     booking: (bookingId: string) => ["customer", "booking", bookingId] as const,
@@ -45,6 +46,7 @@ export const mutationKeys = {
   },
   crew: {
     checklist: (jobId: string) => ["crew", "job", jobId, "checklist"] as const,
+    completeJob: (jobId: string) => ["crew", "job", jobId, "complete"] as const,
     login: () => ["crew", "sessions"] as const,
     media: (jobId: string) => ["crew", "job", jobId, "media"] as const,
     nextJob: () => ["crew", "jobs", "next"] as const,

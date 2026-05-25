@@ -24,7 +24,10 @@
     "claimButton": "Ambil Job Berikutnya",
     "claimAriaLabel": "Ambil job berikutnya",
     "claimHint": "Tekan tombol untuk mengambil job dari antrean",
-    "searching": "Mencari Job…"
+    "searching": "Mencari Job…",
+    "jobWaiting_one": "{{count}} job menunggu",
+    "jobWaiting_other": "{{count}} job menunggu",
+    "claimHintReady": "Tekan untuk mengambil job yang tersedia"
   },
   "job": {
     "loading": "Memuat data job",
@@ -80,6 +83,36 @@
   },
   "checklist": {
     "title": "Checklist Cuci",
-    "comingSoon": "Fitur ini akan tersedia di Sprint 6."
+    "subtitle": "Selesaikan setiap langkah secara berurutan.",
+    "progress": "{{done}}/{{total}} langkah selesai",
+    "allDoneHint": "Semua langkah selesai! 🎉",
+    "continueButton": "Lanjut ke Selesai",
+    "continueAriaLabel": "Lanjut ke halaman selesai",
+    "item": {
+      "done": "Selesai",
+      "saving": "Menyimpan…"
+    },
+    "steps": {
+      "rinse": "Bilas kendaraan",
+      "apply_foam": "Aplikasi busa",
+      "wipe_body": "Lap bodi kendaraan",
+      "clean_rims": "Bersihkan velg",
+      "dry_finish": "Keringkan & finishing"
+    }
+  },
+  "finish": {
+    "title": "Selesai",
+    "subtitle": "Ambil foto kendaraan sesudah dicuci, lalu konfirmasi.",
+    "afterPhotoLabel": "Foto Sesudah Cuci",
+    "completeButton": "Selesai & Kembali ke Antrian",
+    "completing": "Menyelesaikan…",
+    "completeAriaLabel": "Tandai job sebagai selesai",
+    "error": "Gagal menyelesaikan job. Coba lagi.",
+    "uploadLabels": {
+      "retry": "Coba lagi",
+      "upload": "Ambil Foto",
+      "uploading": "Mengunggah…",
+      "retrying": "Mencoba ulang…"
+    }
   }
 }

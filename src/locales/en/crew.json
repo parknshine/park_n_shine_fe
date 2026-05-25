@@ -24,7 +24,10 @@
     "claimButton": "Claim Next Job",
     "claimAriaLabel": "Claim next job",
     "claimHint": "Tap the button to claim a job from the queue",
-    "searching": "Searching for Job…"
+    "searching": "Searching for Job…",
+    "jobWaiting_one": "{{count}} job waiting",
+    "jobWaiting_other": "{{count}} jobs waiting",
+    "claimHintReady": "Tap to claim the next available job"
   },
   "job": {
     "loading": "Loading job data",
@@ -80,6 +83,36 @@
   },
   "checklist": {
     "title": "Wash Checklist",
-    "comingSoon": "This feature will be available in Sprint 6."
+    "subtitle": "Complete each step in order.",
+    "progress": "{{done}}/{{total}} steps done",
+    "allDoneHint": "All steps complete! 🎉",
+    "continueButton": "Continue to Finish",
+    "continueAriaLabel": "Continue to finish page",
+    "item": {
+      "done": "Done",
+      "saving": "Saving…"
+    },
+    "steps": {
+      "rinse": "Rinse vehicle",
+      "apply_foam": "Apply foam",
+      "wipe_body": "Wipe body panels",
+      "clean_rims": "Clean rims",
+      "dry_finish": "Dry & finish"
+    }
+  },
+  "finish": {
+    "title": "Finish",
+    "subtitle": "Take an after photo and confirm the wash is complete.",
+    "afterPhotoLabel": "After Photo",
+    "completeButton": "Done & Back to Queue",
+    "completing": "Completing…",
+    "completeAriaLabel": "Mark job as complete",
+    "error": "Failed to complete the job. Please try again.",
+    "uploadLabels": {
+      "retry": "Retry",
+      "upload": "Take Photo",
+      "uploading": "Uploading…",
+      "retrying": "Retrying…"
+    }
   }
 }

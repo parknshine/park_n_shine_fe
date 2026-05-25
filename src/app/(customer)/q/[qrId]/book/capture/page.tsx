@@ -102,9 +102,10 @@ export default function BookCapturePage() {
     router.push(`/q/${qrId}/book/confirm?${params.toString()}`);
   }
 
-  console.log("createMutation.isPending", createMutation.isPending);
-  console.log("bookingId", bookingId);
-  console.log("createMutation.isError", createMutation.isError);
+  useEffect(() => {
+    if (createMutation.isError) toast.error(t("booking.capture.errorCreate"));
+  }, [createMutation.isError, t]);
+
   if (createMutation.isPending || (!bookingId && !createMutation.isError)) {
     return (
       <AppShell surface='customer'>
@@ -117,10 +118,6 @@ export default function BookCapturePage() {
       </AppShell>
     );
   }
-
-  useEffect(() => {
-    if (createMutation.isError) toast.error(t("booking.capture.errorCreate"));
-  }, [createMutation.isError, t]);
 
   if (createMutation.isError) {
     return (

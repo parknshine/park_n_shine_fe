@@ -1,13 +1,14 @@
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ChevronRight } from "lucide-react";
 import { StatusBadge } from "@/components/shared";
 import type { AdminQueueBooking } from "@/features/admin/types";
 
 interface EscalationsPanelProps {
   bookings: AdminQueueBooking[];
   title: string;
+  onBookingClick?: (booking: AdminQueueBooking) => void;
 }
 
-export function EscalationsPanel({ bookings, title }: EscalationsPanelProps) {
+export function EscalationsPanel({ bookings, title, onBookingClick }: EscalationsPanelProps) {
   if (bookings.length === 0) {
     return null;
   }
@@ -24,7 +25,13 @@ export function EscalationsPanel({ bookings, title }: EscalationsPanelProps) {
         {bookings.map((booking) => (
           <article
             key={booking.id}
-            className="flex items-center justify-between gap-3 rounded-md bg-background p-3"
+            className="flex cursor-pointer items-center justify-between gap-3 rounded-md bg-background p-3 transition-colors hover:bg-muted/60"
+            role="button"
+            tabIndex={0}
+            onClick={() => onBookingClick?.(booking)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") onBookingClick?.(booking);
+            }}
           >
             <div>
               <p className="text-sm font-semibold text-foreground">
@@ -34,7 +41,10 @@ export function EscalationsPanel({ bookings, title }: EscalationsPanelProps) {
                 {booking.slotText}
               </p>
             </div>
-            <StatusBadge tone="danger">{booking.status}</StatusBadge>
+            <div className="flex items-center gap-2">
+              <StatusBadge tone="danger">{booking.status}</StatusBadge>
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            </div>
           </article>
         ))}
       </div>

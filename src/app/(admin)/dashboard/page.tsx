@@ -60,6 +60,7 @@ export default function DashboardPage() {
               : "dashboard.escalationsTitlePlural",
             { count: queue.escalations.length }
           )}
+          onBookingClick={setSelectedBooking}
         />
       )}
 
