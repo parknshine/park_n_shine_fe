@@ -1,6 +1,7 @@
 export const queryKeys = {
   admin: {
     queue: (siteId: string) => ["admin", "queue", siteId] as const,
+    walkInQueue: () => ["admin", "queue", "walkin"] as const,
     booking: (bookingId: string) => ["admin", "booking", bookingId] as const,
     report: (siteId: string, from: string, to: string) =>
       ["admin", "report", siteId, from, to] as const,

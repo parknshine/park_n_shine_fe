@@ -172,5 +172,11 @@
       "status_override": "Override Status",
       "reassign": "Reassign"
     }
+  },
+  "walkin": {
+    "title": "Antrian Walk-In",
+    "subtitle": "Booking tanpa site — berbasis GPS atau belum ditetapkan",
+    "loading": "Memuat antrian walk-in...",
+    "emptyQueue": "Tidak ada booking walk-in saat ini."
   }
 }

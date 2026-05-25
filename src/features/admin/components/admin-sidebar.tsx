@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart2, LayoutGrid, QrCode, ScrollText, Settings, Users } from "lucide-react";
+import { BarChart2, LayoutGrid, PersonStanding, QrCode, ScrollText, Settings, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
 import { useTranslation } from "@/i18n";
@@ -10,6 +10,7 @@ import { Combobox } from "@/components/ui/combobox";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
+  { href: "/walkin", label: "Walk-In Queue", icon: PersonStanding },
   { href: "/sites", label: "Sites & QR", icon: QrCode },
   { href: "/reports", label: "Reports", icon: BarChart2 },
   { href: "/audit", label: "Audit Trail", icon: ScrollText },

@@ -172,5 +172,11 @@
       "status_override": "Override Status",
       "reassign": "Reassign"
     }
+  },
+  "walkin": {
+    "title": "Walk-In Queue",
+    "subtitle": "Bookings without a site — GPS-based or unassigned",
+    "loading": "Loading walk-in queue...",
+    "emptyQueue": "No walk-in bookings at the moment."
   }
 }
