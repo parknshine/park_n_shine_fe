@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   CreditCard,
   Droplets,
+  Loader2,
   XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,10 @@ import {
   BOOKING_STATUSES,
   type BookingStatus,
 } from "@/features/customer/types";
+
+// Statuses that are internal / transitional — shown as a neutral loading state
+// instead of displaying a confusing label to the customer.
+const TRANSITIONAL_STATUSES = new Set<BookingStatus>(["DRAFT", "STALE"]);
 
 interface StatusHeroProps {
   status: BookingStatus;
@@ -62,6 +67,22 @@ function StatusIcon({ status }: { status: BookingStatus }) {
 
 export function StatusHero({ status, plate, slot }: StatusHeroProps) {
   const { t } = useTranslation("customer");
+
+  // DRAFT / STALE are internal states — render a neutral loading indicator
+  // so the customer never sees a confusing badge flash by.
+  if (TRANSITIONAL_STATUSES.has(status)) {
+    return (
+      <div className="space-y-4 text-center">
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-muted">
+          <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {t("status.preparing", { defaultValue: "Preparing your booking…" })}
+        </p>
+      </div>
+    );
+  }
+
   const isActive =
     status === BOOKING_STATUSES.ASSIGNED ||
     status === BOOKING_STATUSES.IN_PROGRESS;

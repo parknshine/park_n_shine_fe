@@ -3,7 +3,18 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { queryKeys } from "@/lib/query-keys";
-import type { CustomerBooking } from "@/features/customer/types";
+import type { BookingStatus, CustomerBooking } from "@/features/customer/types";
+
+// Statuses that are meaningful to the customer.
+// Internal / crew-operational statuses are hidden from the timeline.
+const CUSTOMER_VISIBLE_STATUSES = new Set<BookingStatus>([
+  "PAID",
+  "IN_PROGRESS",
+  "READY",
+  "CLOSED",
+  "EXPIRED",
+  "CANCELLED",
+]);
 
 interface UseBookingStatusOptions {
   bookingId: string;
@@ -20,7 +31,7 @@ export function useBookingStatus({
 }: UseBookingStatusOptions) {
   const query = useQuery({
     enabled,
-    meta: { persist: true },
+    meta: { persist: false },
     queryFn: async () => {
       const response = await api.get<{
         bookingId: string;
@@ -43,11 +54,13 @@ export function useBookingStatus({
         slotText: d.slot ?? null,
         priceAmount: d.price,
         media: [],
-        statusHistory: (d.timeline ?? []).map((t) => ({
-          status: t.status,
-          changedAt: t.timestamp,
-          labelKey: `booking.status.${t.status.toLowerCase()}`,
-        })),
+        statusHistory: (d.timeline ?? [])
+          .filter((t) => CUSTOMER_VISIBLE_STATUSES.has(t.status))
+          .map((t) => ({
+            status: t.status,
+            changedAt: t.timestamp,
+            labelKey: `booking.status.${t.status.toLowerCase()}`,
+          })),
       };
       return booking;
     },

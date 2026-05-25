@@ -160,7 +160,8 @@
     "contactWhatsApp": "Hubungi via WhatsApp",
     "closed": "Booking ini telah selesai.",
     "historyTitle": "Riwayat Status",
-    "whatsAppMessage": "Halo Park & Shine, saya butuh bantuan dengan booking saya (ID: {{bookingId}})."
+    "whatsAppMessage": "Halo Park & Shine, saya butuh bantuan dengan booking saya (ID: {{bookingId}}).",
+    "preparing": "Mempersiapkan booking…"
   },
   "rate": {
     "title": "Bagaimana pengalamanmu?",

@@ -160,7 +160,8 @@
     "contactWhatsApp": "Contact via WhatsApp",
     "closed": "This booking has been completed.",
     "historyTitle": "Status History",
-    "whatsAppMessage": "Hello Park & Shine, I need help with my booking (ID: {{bookingId}})."
+    "whatsAppMessage": "Hello Park & Shine, I need help with my booking (ID: {{bookingId}}).",
+    "preparing": "Preparing your booking…"
   },
   "rate": {
     "title": "How was your experience?",
