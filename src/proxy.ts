@@ -60,7 +60,7 @@ export function isPathAllowed(
   });
 }
 
-export function middleware(req: NextRequest): NextResponse {
+export function proxy(req: NextRequest): NextResponse {
   const host = req.headers.get("host") ?? "";
   const { pathname } = req.nextUrl;
 

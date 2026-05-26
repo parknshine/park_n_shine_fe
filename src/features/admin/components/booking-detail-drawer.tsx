@@ -13,6 +13,7 @@ import { ReassignModal } from "./reassign-modal";
 import { StatusOverrideModal } from "./status-override-modal";
 import { RefundModal } from "./refund-modal";
 import { useTranslation } from "@/i18n";
+import { formatAuditDetail } from "@/features/admin/utils/format-audit-detail";
 
 interface BookingDetailDrawerProps {
   bookingId: string | null;
@@ -218,7 +219,7 @@ export function BookingDetailDrawer({
                         <p className="font-medium text-foreground capitalize">
                           {entry.action.replace(/_/g, " ")}
                         </p>
-                        <p className="text-muted-foreground">{entry.detail}</p>
+                        <p className="text-muted-foreground">{formatAuditDetail(entry.action, entry.detail)}</p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(entry.createdAt).toLocaleString("id-ID")}
                         </p>

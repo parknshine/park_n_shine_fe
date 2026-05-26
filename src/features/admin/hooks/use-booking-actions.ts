@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios-admin";
-import { mutationKeys } from "@/lib/query-keys";
+import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type {
   ReassignBookingPayload,
   RefundPayload,
@@ -28,6 +28,8 @@ export function useBookingActions(bookingId: string) {
       void queryClient.invalidateQueries({
         queryKey: ["customer", "booking", bookingId],
       });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
     },
   });
 
@@ -46,6 +48,8 @@ export function useBookingActions(bookingId: string) {
       void queryClient.invalidateQueries({
         queryKey: ["customer", "booking", bookingId],
       });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
     },
   });
 
@@ -64,6 +68,8 @@ export function useBookingActions(bookingId: string) {
       void queryClient.invalidateQueries({
         queryKey: ["customer", "booking", bookingId],
       });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
     },
   });
 

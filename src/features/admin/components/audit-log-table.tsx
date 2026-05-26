@@ -2,6 +2,7 @@
 
 import type { AuditEntry } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
+import { formatAuditDetail } from "@/features/admin/utils/format-audit-detail";
 
 interface AuditLogTableProps {
   entries: AuditEntry[];
@@ -58,7 +59,7 @@ export function AuditLogTable({ entries, onRowClick }: AuditLogTableProps) {
                 {entry.plateText ?? "—"}
               </td>
               <td className="px-4 py-3">{t(`auditTable.actions.${entry.action}`)}</td>
-              <td className="px-4 py-3 text-muted-foreground">{entry.detail}</td>
+              <td className="px-4 py-3 text-muted-foreground">{formatAuditDetail(entry.action, entry.detail)}</td>
               <td className="px-4 py-3 text-muted-foreground">{entry.adminEmail}</td>
             </tr>
           ))}
