@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
+import { OfflineBanner } from "@/components/shared";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { usePhotoUpload } from "@/features/customer/hooks/use-photo-upload";
 import { useCompleteJob } from "@/features/crew/hooks";
@@ -46,6 +47,8 @@ export function FinishPage() {
     <>
       {/* Scrollable body — leave room for sticky CTA (~88px) */}
       <main className="mx-auto max-w-md px-4 pb-28 pt-4">
+
+        <OfflineBanner visible={afterUpload.isOfflinePaused} />
 
         {/* Page header */}
         <div className="mb-6 flex items-center gap-3">

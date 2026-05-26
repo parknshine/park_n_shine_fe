@@ -17,6 +17,9 @@
     "retrying": "Retrying…",
     "preparing": "Preparing booking..."
   },
+  "offline": {
+    "waitingConnection": "Waiting for connection… Upload will resume automatically."
+  },
   "error": {
     "generic": "Something went wrong. Please try again.",
     "notFound": "Not found."

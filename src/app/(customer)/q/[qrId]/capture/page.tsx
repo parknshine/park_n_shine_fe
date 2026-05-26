@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
 import { ArrowRight } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { AppShell } from "@/components/shared";
+import { AppShell, OfflineBanner } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { OcrEditField } from "@/features/customer/components/ocr-edit-field";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
@@ -97,9 +97,12 @@ function CaptureContent() {
     retrying:  t("booking.capture.uploadLabels.retrying"),
   };
 
+  const isOfflinePaused = plateUpload.isOfflinePaused || slotUpload.isOfflinePaused;
+
   return (
     <AppShell surface="customer">
       <div className="space-y-6">
+        <OfflineBanner visible={isOfflinePaused} />
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {t("booking.step", { current: 1, total: 2 })}

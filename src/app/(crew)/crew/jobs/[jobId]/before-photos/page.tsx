@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { OfflineBanner } from "@/components/shared";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { usePhotoUpload } from "@/features/customer/hooks/use-photo-upload";
 import crewApi from "@/lib/axios-crew";
@@ -59,11 +60,14 @@ export function BeforePhotosPage() {
   const uploads = [frontUpload, backUpload, leftUpload, rightUpload];
   const allDone = uploads.every((u) => u.status === "success");
   const doneCount = uploads.filter((u) => u.status === "success").length;
+  const isOfflinePaused = uploads.some((u) => u.isOfflinePaused);
 
   return (
     <>
       {/* Scrollable body — leave room for sticky CTA (~88px) */}
       <main className="mx-auto max-w-md px-4 pb-28 pt-4">
+
+        <OfflineBanner visible={isOfflinePaused} />
 
         {/* Page header */}
         <h1 className="text-lg font-semibold text-foreground">
