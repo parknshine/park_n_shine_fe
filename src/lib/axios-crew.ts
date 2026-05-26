@@ -96,9 +96,7 @@ crewApi.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         localStorage.removeItem("crew-token");
-        if (window.location.pathname !== "/crew/login") {
-          window.location.href = "/crew/login";
-        }
+        window.dispatchEvent(new CustomEvent("crew-session-expired"));
         return Promise.reject(normalizedError);
       } finally {
         isRefreshing = false;

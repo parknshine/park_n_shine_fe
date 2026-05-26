@@ -110,6 +110,13 @@
       "expired": "Kadaluarsa",
       "cancelled": "Dibatalkan"
     },
+    "stepper": {
+      "pending":     { "label": "Menunggu Pembayaran",     "desc": "Selesaikan pembayaran untuk konfirmasi booking" },
+      "paid":        { "label": "Pembayaran Dikonfirmasi", "desc": "Booking dikonfirmasi, crew akan segera ditugaskan" },
+      "in_progress": { "label": "Sedang Dicuci",           "desc": "Crew kami sedang mencuci kendaraan Anda" },
+      "ready":       { "label": "Kendaraan Siap!",         "desc": "Kendaraan Anda sudah selesai dicuci" },
+      "closed":      { "label": "Selesai",                 "desc": "Terima kasih telah menggunakan Park & Shine" }
+    },
     "step": "Langkah {{current}} dari {{total}}",
     "location": {
       "title": "Lokasi Kendaraan",

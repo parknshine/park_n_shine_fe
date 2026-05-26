@@ -1,20 +1,44 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { BriefcaseBusiness, Inbox, Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Bell, BriefcaseBusiness, Inbox, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useJobQueue, useNextJob } from "@/features/crew/hooks";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
+import { useRealtimeEvents, getCrewIdFromToken } from "@/lib/use-realtime-events";
+import { usePushNotification } from "@/lib/use-push-notification";
+import { queryKeys } from "@/lib/query-keys";
 
 export function CrewHomePage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { claimNextJob, job, isLoading, hasNoJob, error } = useNextJob();
   const { count, hasJob } = useJobQueue();
   const { t } = useTranslation("crew");
+
+  const crewId = useMemo(() => getCrewIdFromToken(), []);
+  const { permission, subscribe: subscribePush } = usePushNotification({ type: "crew" });
+  const showPushBanner =
+    process.env.NEXT_PUBLIC_PUSH_ENABLED === "true" && permission === "default";
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+  const crewToken = typeof window !== "undefined" ? (localStorage.getItem("crew-token") ?? "") : "";
+  const sseUrl = crewId ? `${baseUrl}/v1/crew/realtime/stream?token=${crewToken}` : "";
+
+  useRealtimeEvents({
+    url: sseUrl,
+    enabled: !!crewId,
+    onEvent: (event) => {
+      if (event.type === "job_assigned") {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
+        toast.success(t("home.newJobNotification", { defaultValue: "New job assigned to you!" }));
+      }
+    },
+  });
 
   useEffect(() => {
     if (job) {
@@ -35,6 +59,17 @@ export function CrewHomePage() {
 
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-44px)] max-w-md flex-col px-4 pb-8 pt-10">
+      {/* Push notification opt-in banner */}
+      {showPushBanner && (
+        <button
+          onClick={() => void subscribePush()}
+          className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground transition-colors hover:bg-muted"
+        >
+          <Bell className="h-4 w-4 shrink-0 text-primary" />
+          <span>{t("home.enableNotifications", { defaultValue: "Enable notifications for new jobs" })}</span>
+        </button>
+      )}
+
       {/* Section header */}
       <div className="mb-8 flex items-center gap-3">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">

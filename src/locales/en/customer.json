@@ -110,6 +110,13 @@
       "expired": "Expired",
       "cancelled": "Cancelled"
     },
+    "stepper": {
+      "pending":     { "label": "Awaiting Payment",    "desc": "Complete payment to confirm your booking" },
+      "paid":        { "label": "Payment Confirmed",   "desc": "Your booking is confirmed, crew will be assigned" },
+      "in_progress": { "label": "Being Washed",        "desc": "Our crew is washing your car" },
+      "ready":       { "label": "Car Ready!",          "desc": "Your car is ready for pickup" },
+      "closed":      { "label": "Completed",           "desc": "Thank you for using Park & Shine" }
+    },
     "step": "Step {{current}} of {{total}}",
     "location": {
       "title": "Vehicle Location",

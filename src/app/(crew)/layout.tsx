@@ -26,6 +26,15 @@ export function CrewLayout({ children }: CrewLayoutProps) {
     }
   }, [session, router, isRestoring]);
 
+  useEffect(() => {
+    function handleSessionExpired() {
+      clearSession();
+      router.replace("/crew/login");
+    }
+    window.addEventListener("crew-session-expired", handleSessionExpired);
+    return () => window.removeEventListener("crew-session-expired", handleSessionExpired);
+  }, [clearSession, router]);
+
   if (isRestoring || !session) return null;
 
   function handleLogout() {

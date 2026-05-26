@@ -6,6 +6,9 @@ import { parseAsString } from "nuqs";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
+import { useRealtimeEvents } from "@/lib/use-realtime-events";
+import { usePushNotification } from "@/lib/use-push-notification";
+import { Bell } from "lucide-react";
 import { StatusHero } from "@/features/customer/components/status-hero";
 import { PaymentCheckButton } from "@/features/customer/components/payment-check-button";
 import { BookingStatusTimeline } from "@/features/customer/components/booking-status-timeline";
@@ -21,6 +24,25 @@ export default function BookingStatusPage() {
     bookingId,
     signedToken: token ?? "",
     enabled: !!bookingId && !!token,
+  });
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+  const sseUrl = bookingId && token
+    ? `${baseUrl}/v1/realtime/stream?channel=booking:${bookingId}&token=${token}`
+    : "";
+
+  useRealtimeEvents({
+    url: sseUrl,
+    enabled: !!bookingId && !!token,
+    onEvent: () => {
+      void refresh();
+    },
+  });
+
+  const { permission, subscribe: subscribePush } = usePushNotification({
+    type: "booking",
+    bookingId,
+    bookingToken: token ?? undefined,
   });
 
   if (!token) {
@@ -71,6 +93,16 @@ export default function BookingStatusPage() {
         slot={booking.slotText}
       />
 
+      {!isTerminal && permission === "default" && process.env.NEXT_PUBLIC_PUSH_ENABLED === "true" && (
+        <button
+          onClick={() => void subscribePush()}
+          className="flex w-full items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground transition-colors hover:bg-muted"
+        >
+          <Bell className="h-4 w-4 shrink-0 text-primary" />
+          <span>{t("status.enableNotifications", { defaultValue: "Enable notifications when your car is ready" })}</span>
+        </button>
+      )}
+
       {isPending && (
         <PaymentCheckButton
           onCheck={refresh}
@@ -119,16 +151,15 @@ export default function BookingStatusPage() {
         </div>
       )}
 
-      {(booking.statusHistory?.length ?? 0) > 0 && (
-        <details className="rounded-xl border border-border">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground select-none">
-            {t("status.historyTitle")}
-          </summary>
-          <div className="px-4 pb-4 pt-2">
-            <BookingStatusTimeline events={booking.statusHistory} />
-          </div>
-        </details>
-      )}
+      <div className="rounded-2xl border border-border px-4 py-5">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          {t("status.historyTitle", { defaultValue: "Booking Progress" })}
+        </p>
+        <BookingStatusTimeline
+          status={booking.status}
+          statusHistory={booking.statusHistory}
+        />
+      </div>
     </div>
   );
 }

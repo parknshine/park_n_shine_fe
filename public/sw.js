@@ -9,6 +9,43 @@ const APP_SHELL_URLS = [
   "/icons/maskable-icon.svg",
 ];
 
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+
+  let payload;
+  try {
+    payload = event.data.json();
+  } catch {
+    payload = { title: "Park & Shine", body: event.data.text() };
+  }
+
+  const title = payload.title ?? "Park & Shine";
+  const options = {
+    body: payload.body ?? "",
+    icon: "/icons/icon.svg",
+    badge: "/icons/icon.svg",
+    tag: payload.tag ?? "park-shine",
+    data: { url: payload.url ?? "/" },
+    renotify: true,
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url ?? "/";
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clients) => {
+        const existing = clients.find((c) => c.url.includes(url) && "focus" in c);
+        if (existing) return existing.focus();
+        return self.clients.openWindow(url);
+      })
+  );
+});
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
