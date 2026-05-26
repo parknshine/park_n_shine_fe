@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import QRCode from "qrcode";
-import api from "@/lib/axios";
+import api from "@/lib/axios-admin";
 import type { AdminSiteDetail, AdminQrCode } from "@/features/admin/types";
 
 export default function QrPrintPage() {

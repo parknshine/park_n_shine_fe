@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-crew";
 import { mutationKeys } from "@/lib/query-keys";
 import type { VerifyPlatePayload } from "@/features/crew/types";
 

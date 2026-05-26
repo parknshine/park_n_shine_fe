@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-crew";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type {
   CompleteChecklistPayload,

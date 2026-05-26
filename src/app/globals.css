@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 /* ─── Class-based dark variant ─────────────────────────────────────────────── */
+/* DARK MODE DISABLED — dark: classes only activate when .dark class is present (never injected) */
 @custom-variant dark (&:is(.dark *));
 
 /* ─── Design tokens ────────────────────────────────────────────────────────── */
@@ -23,7 +24,8 @@
   --ring:                    #0d9488;
 }
 
-.dark {
+/* DARK MODE DISABLED — uncomment block below to re-enable dark theme */
+/* .dark {
   --background:              #020c0e;
   --foreground:              #e0f2f1;
   --card:                    #0d2b33;
@@ -40,7 +42,7 @@
   --accent:                  #fbbf24;
   --accent-foreground:       #1c1407;
   --ring:                    #2dd4bf;
-}
+} */
 
 /* ─── Tailwind theme mapping ────────────────────────────────────────────────── */
 @theme inline {

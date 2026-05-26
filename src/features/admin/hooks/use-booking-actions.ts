@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-admin";
 import { mutationKeys } from "@/lib/query-keys";
 import type {
   ReassignBookingPayload,

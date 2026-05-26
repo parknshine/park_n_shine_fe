@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-crew";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 
 export function useCompleteJob(jobId: string) {
@@ -17,6 +17,8 @@ export function useCompleteJob(jobId: string) {
       // Clear job + next-job cache so home page starts fresh
       queryClient.removeQueries({ queryKey: queryKeys.crew.job(jobId) });
       queryClient.removeQueries({ queryKey: queryKeys.crew.nextJob() });
+      // Immediately refresh queue count so home page reflects the completed job
+      void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
     },
   });
 

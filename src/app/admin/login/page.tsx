@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,9 +10,15 @@ import { useAdminAuth } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const { login, isSubmitting, error } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("admin-token");
+    if (token) router.replace("/dashboard");
+  }, [router]);
   const { t } = useTranslation("admin");
 
   async function handleSubmit(e: React.FormEvent) {

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { usePhotoUpload } from "@/features/customer/hooks/use-photo-upload";
 import { useCompleteJob } from "@/features/crew/hooks";
+import crewApi from "@/lib/axios-crew";
 import { useTranslation } from "@/i18n";
 
 // ---------------------------------------------------------------------------
@@ -19,7 +20,7 @@ export function FinishPage() {
   const { t } = useTranslation("crew");
 
   const uploadUrl = `/v1/crew/jobs/${jobId}/media`;
-  const afterUpload = usePhotoUpload({ uploadUrl });
+  const afterUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
   const { complete, isLoading } = useCompleteJob(jobId);
 
   const photoUploaded = afterUpload.status === "success";

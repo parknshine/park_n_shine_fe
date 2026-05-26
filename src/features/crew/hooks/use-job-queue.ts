@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-crew";
 import { queryKeys } from "@/lib/query-keys";
 
 const POLL_INTERVAL_MS = 15_000; // refresh every 15 seconds while crew is on home page
@@ -25,6 +25,7 @@ export function useJobQueue() {
     },
     refetchInterval: POLL_INTERVAL_MS,
     refetchIntervalInBackground: false, // pause polling when tab is not focused
+    refetchOnMount: "always",
     staleTime: POLL_INTERVAL_MS - 1_000,
   });
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-crew";
 import { API_ERROR_CODES } from "@/lib/api-error";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { CrewLoginPayload, CrewSession } from "@/features/crew/types";
@@ -11,7 +11,7 @@ export function useCrewSession() {
 
   const sessionQuery = useQuery<CrewSession | null>({
     enabled: false,
-    initialData: null,
+    placeholderData: null,
     queryFn: async () => queryClient.getQueryData(queryKeys.crew.session()) ?? null,
     queryKey: queryKeys.crew.session(),
     staleTime: Infinity,
@@ -25,7 +25,7 @@ export function useCrewSession() {
     },
     mutationKey: mutationKeys.crew.login(),
     onSuccess: (session) => {
-      localStorage.setItem("token", session.token);
+      localStorage.setItem("crew-token", session.token);
       queryClient.setQueryData(queryKeys.crew.session(), session);
     },
   });
@@ -35,8 +35,8 @@ export function useCrewSession() {
   }
 
   function clearSession() {
-    localStorage.removeItem("token");
-    queryClient.removeQueries({ queryKey: queryKeys.crew.session() });
+    localStorage.removeItem("crew-token");
+    queryClient.removeQueries({ queryKey: ["crew"] });
   }
 
   function getErrorKey(err: unknown): string | null {

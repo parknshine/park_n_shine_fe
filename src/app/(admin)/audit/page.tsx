@@ -72,7 +72,6 @@ export default function AuditPage() {
 
       <BookingDetailDrawer
         bookingId={selectedBookingId}
-        siteId={activeSiteId}
         onClose={() => setSelectedBookingId(null)}
         onActionSuccess={() => setSelectedBookingId(null)}
       />

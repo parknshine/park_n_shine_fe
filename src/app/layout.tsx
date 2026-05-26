@@ -52,7 +52,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#0d9488",
-  colorScheme: "light dark",
+  colorScheme: "light",
   minimumScale: 1,
   initialScale: 1,
   width: "device-width",
@@ -67,13 +67,14 @@ export default function RootLayout({
     <html lang="id" suppressHydrationWarning>
       <head />
       <body className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${inter.variable} antialiased`}>
-        <Script
+        {/* DARK MODE DISABLED — script below reads localStorage/system preference and applies dark class */}
+        {/* <Script
           id="theme-init"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');var dark=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(dark)document.documentElement.classList.add('dark')}catch(e){}})()`,
           }}
-        />
+        /> */}
         <I18nProvider>
           <ThemeProvider>
             <QueryProvider>

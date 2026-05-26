@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-crew";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { CrewJob } from "@/features/crew/types";
 
@@ -10,6 +10,7 @@ export function useNextJob() {
   const jobQuery = useQuery<CrewJob | null>({
     enabled: false,
     initialData: null,
+    meta: { persist: false },
     queryFn: async () => queryClient.getQueryData(queryKeys.crew.nextJob()) ?? null,
     queryKey: queryKeys.crew.nextJob(),
     staleTime: Infinity,

@@ -76,7 +76,6 @@ export default function WalkInQueuePage() {
       {/* Booking detail drawer — siteId not applicable for walk-ins */}
       <BookingDetailDrawer
         bookingId={selectedBooking?.id ?? null}
-        siteId=""
         onClose={() => setSelectedBooking(null)}
         onActionSuccess={handleActionSuccess}
       />

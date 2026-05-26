@@ -121,7 +121,7 @@
   "overrideModal": {
     "title": "Override Status",
     "transitionLabel": "Transisi status",
-    "transitionPlaceholder": "— pilih transisi —",
+    "transitionPlaceholder": "Pilih transisi",
     "reasonLabel": "Alasan (wajib)",
     "reasonPlaceholder": "Masukkan alasan override...",
     "error": "Gagal override status. Coba lagi.",

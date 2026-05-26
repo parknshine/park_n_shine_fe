@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { usePhotoUpload } from "@/features/customer/hooks/use-photo-upload";
+import crewApi from "@/lib/axios-crew";
 import type { MediaKind } from "@/types/media";
 import { useTranslation } from "@/i18n";
 
@@ -43,10 +44,10 @@ export function BeforePhotosPage() {
 
   const uploadUrl = `/v1/crew/jobs/${jobId}/media`;
 
-  const frontUpload = usePhotoUpload({ uploadUrl });
-  const backUpload  = usePhotoUpload({ uploadUrl });
-  const leftUpload  = usePhotoUpload({ uploadUrl });
-  const rightUpload = usePhotoUpload({ uploadUrl });
+  const frontUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+  const backUpload  = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+  const leftUpload  = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+  const rightUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
 
   const uploadMap: Record<string, ReturnType<typeof usePhotoUpload>> = {
     front: frontUpload,

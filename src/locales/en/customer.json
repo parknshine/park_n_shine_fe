@@ -148,6 +148,14 @@
       "location": "Location",
       "price": "Price",
       "estimatedReady": "Estimated Completion"
+    },
+    "payment": {
+      "title": "Payment",
+      "subtitle": "Complete your payment to start the wash.",
+      "totalLabel": "Total Payment",
+      "pay": "Pay Now",
+      "processing": "Processing...",
+      "errorPay": "Payment failed. Please try again."
     }
   },
   "status": {

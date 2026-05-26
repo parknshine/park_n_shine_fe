@@ -18,20 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useBookingActions } from "@/features/admin/hooks";
+import { useBookingActions, useAdminCrew } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
-
-const MOCK_CREW: Record<string, Array<{ id: string; name: string }>> = {
-  "site-1": [
-    { id: "crew-1", name: "Budi Santoso" },
-    { id: "crew-2", name: "Agus Wijaya" },
-  ],
-  "site-2": [{ id: "crew-3", name: "Rudi Hartono" }],
-};
 
 interface ReassignModalProps {
   open: boolean;
-  siteId: string;
   bookingId: string;
   onClose: () => void;
   onSuccess: () => void;
@@ -39,14 +30,14 @@ interface ReassignModalProps {
 
 export function ReassignModal({
   open,
-  siteId,
   bookingId,
   onClose,
   onSuccess,
 }: ReassignModalProps) {
   const [crewId, setCrewId] = useState("");
-  const { reassign, isSubmitting, error } = useBookingActions(bookingId);
-  const crewOptions = MOCK_CREW[siteId] ?? [];
+  const { reassign, isSubmitting } = useBookingActions(bookingId);
+  const { crew } = useAdminCrew();
+  const crewOptions = crew.filter((c) => c.active);
   const { t } = useTranslation("admin");
 
   async function handleConfirm() {

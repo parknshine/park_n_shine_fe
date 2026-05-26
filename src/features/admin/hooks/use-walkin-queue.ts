@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-admin";
 import { queryKeys } from "@/lib/query-keys";
 import type { WalkInQueueResponse } from "@/features/admin/types";
 

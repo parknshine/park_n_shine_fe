@@ -47,17 +47,17 @@ export function StatusOverrideModal({
   onClose,
   onSuccess,
 }: StatusOverrideModalProps) {
-  const [nextStatus, setNextStatus] =
-    useState<StatusOverridePayload["nextStatus"] | "">("");
+  const [selectedLabel, setSelectedLabel] = useState("");
   const [reasonCode, setReasonCode] = useState("");
-  const { overrideStatus, isSubmitting, error } = useBookingActions(bookingId);
+  const { overrideStatus, isSubmitting } = useBookingActions(bookingId);
   const { t } = useTranslation("admin");
 
   async function handleConfirm() {
-    if (!nextStatus || !reasonCode.trim()) return;
+    const transition = VALID_TRANSITIONS.find((tr) => tr.label === selectedLabel);
+    if (!transition || !reasonCode.trim()) return;
     try {
-      await overrideStatus({ nextStatus, reasonCode: reasonCode.trim() });
-      setNextStatus("");
+      await overrideStatus({ nextStatus: transition.nextStatus, reasonCode: reasonCode.trim() });
+      setSelectedLabel("");
       setReasonCode("");
       onSuccess();
     } catch {
@@ -72,19 +72,18 @@ export function StatusOverrideModal({
           <DialogTitle>{t("overrideModal.title")}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-3 py-2">
-          <div className="space-y-1.5">
+        <div className='space-y-3 py-2'>
+          <div className='space-y-1.5'>
             <Label>{t("overrideModal.transitionLabel")}</Label>
-            <Select
-              value={nextStatus}
-              onValueChange={(v) => setNextStatus(v as StatusOverridePayload["nextStatus"])}
-            >
+            <Select value={selectedLabel} onValueChange={setSelectedLabel}>
               <SelectTrigger>
-                <SelectValue placeholder={t("overrideModal.transitionPlaceholder")} />
+                <SelectValue
+                  placeholder={t("overrideModal.transitionPlaceholder")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {VALID_TRANSITIONS.map((transition) => (
-                  <SelectItem key={transition.label} value={transition.nextStatus}>
+                  <SelectItem key={transition.label} value={transition.label}>
                     {transition.label}
                   </SelectItem>
                 ))}
@@ -92,28 +91,29 @@ export function StatusOverrideModal({
             </Select>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="reason">{t("overrideModal.reasonLabel")}</Label>
+          <div className='space-y-1.5'>
+            <Label htmlFor='reason'>{t("overrideModal.reasonLabel")}</Label>
             <Textarea
-              id="reason"
+              id='reason'
               placeholder={t("overrideModal.reasonPlaceholder")}
               value={reasonCode}
               onChange={(e) => setReasonCode(e.target.value)}
               rows={3}
             />
           </div>
-
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+          <Button variant='outline' onClick={onClose} disabled={isSubmitting}>
             {t("overrideModal.cancel")}
           </Button>
           <Button
             onClick={handleConfirm}
-            disabled={!nextStatus || !reasonCode.trim() || isSubmitting}
+            disabled={!selectedLabel || !reasonCode.trim() || isSubmitting}
           >
-            {isSubmitting ? t("overrideModal.saving") : t("overrideModal.confirm")}
+            {isSubmitting
+              ? t("overrideModal.saving")
+              : t("overrideModal.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

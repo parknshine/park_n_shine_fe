@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-admin";
 import { queryKeys, mutationKeys } from "@/lib/query-keys";
 import type { AdminCrewMember, CreateCrewPayload, UpdateCrewPayload } from "@/features/admin/types";
 

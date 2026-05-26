@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import type { AxiosInstance } from "axios";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { BookingMedia, UploadState } from "@/features/customer/types";
 import type { MediaKind } from "@/types/media";
@@ -19,6 +20,8 @@ interface UsePhotoUploadOptions {
    * Used by crew pages that upload to /v1/crew/jobs/{jobId}/media.
    */
   uploadUrl?: string;
+  /** Override the axios instance (e.g. crewApi for crew uploads). Defaults to customer api. */
+  apiClient?: AxiosInstance;
 }
 
 interface UploadPhotoOptions {
@@ -93,7 +96,9 @@ export function usePhotoUpload({
   signedToken,
   retryDelaysMs = DEFAULT_RETRY_DELAYS,
   uploadUrl,
+  apiClient,
 }: UsePhotoUploadOptions) {
+  const httpClient = apiClient ?? api;
   const queryClient = useQueryClient();
   const [state, setState] = useState<UploadState>({
     progress: 0,
@@ -123,7 +128,7 @@ export function usePhotoUpload({
             error: null,
           }));
 
-          const response = await api.post<BookingMedia>(
+          const response = await httpClient.post<BookingMedia>(
             endpoint,
             formData,
             {

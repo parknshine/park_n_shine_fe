@@ -41,13 +41,12 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
     onError: () => {
       setHasSubmitted(false);
     },
-    onSuccess: (paymentIntent) => {
+    onSuccess: (data) => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId),
       });
       const redirectUrl =
-        paymentIntent.redirectUrl ??
-        `/booking/${bookingId}/status?token=${signedToken}`;
+        data.redirectUrl ?? `/booking/${bookingId}/status?token=${signedToken}`;
       window.location.assign(redirectUrl);
     },
   });

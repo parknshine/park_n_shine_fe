@@ -1,10 +1,11 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Zap } from "lucide-react";
+import api from "@/lib/axios";
 import { AppShell } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { BookingSummaryCard } from "@/features/customer/components/booking-summary-card";
@@ -53,6 +54,8 @@ function WalkInConfirmContent() {
     enabled: !!bookingId && !!token,
   });
 
+  const [isSimulating, setIsSimulating] = useState(false);
+
   const { canSubmit, confirmAndRedirect, error, isSubmitting } =
     usePaymentActionV2(bookingId ?? "", token ?? "");
 
@@ -62,6 +65,22 @@ function WalkInConfirmContent() {
 
   if (!bookingId || !token || !lat || !lng || !loc || !plate || !slot) {
     return null;
+  }
+
+  async function handleSimulatePay() {
+    if (isSimulating) return;
+    setIsSimulating(true);
+    try {
+      await api.post(
+        `/v1/dev/bookings/${bookingId}/simulate-payment`,
+        { plate: plate!, slot: slot!, ...(phone ? { phone } : {}) },
+        { headers: { "X-Booking-Token": token } }
+      );
+      window.location.assign(`/booking/${bookingId}/status?token=${token}`);
+    } catch {
+      toast.error("Simulasi pembayaran gagal");
+      setIsSimulating(false);
+    }
   }
 
   function handlePay() {
@@ -126,6 +145,23 @@ function WalkInConfirmContent() {
             t("booking.confirm.pay")
           )}
         </Button>
+
+        {/* ── Dev-only: skip payment gateway ─────────────────────────────── */}
+        {process.env.NODE_ENV !== "production" && (
+          <button
+            type="button"
+            disabled={isSimulating}
+            onClick={handleSimulatePay}
+            className="flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
+          >
+            {isSimulating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Zap className="h-4 w-4" />
+            )}
+            {isSimulating ? "Memproses..." : "⚡ Simulasi Bayar (Dev Only)"}
+          </button>
+        )}
       </div>
     </AppShell>
   );

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-admin";
 import { queryKeys } from "@/lib/query-keys";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared";
@@ -16,14 +16,12 @@ import { useTranslation } from "@/i18n";
 
 interface BookingDetailDrawerProps {
   bookingId: string | null;
-  siteId: string;
   onClose: () => void;
   onActionSuccess: () => void;
 }
 
 export function BookingDetailDrawer({
   bookingId,
-  siteId,
   onClose,
   onActionSuccess,
 }: BookingDetailDrawerProps) {
@@ -241,7 +239,6 @@ export function BookingDetailDrawer({
         <>
           <ReassignModal
             open={activeModal === "reassign"}
-            siteId={siteId}
             bookingId={booking.id}
             onClose={() => setActiveModal(null)}
             onSuccess={() => { setActiveModal(null); onActionSuccess(); }}

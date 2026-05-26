@@ -119,6 +119,10 @@ function WalkInCaptureContent() {
     router.push(`/book/confirm?${params.toString()}`);
   }
 
+  useEffect(() => {
+    if (createMutation.isError) toast.error(t("booking.capture.errorCreate"));
+  }, [createMutation.isError, t]);
+
   if (createMutation.isPending || (!bookingId && !createMutation.isError)) {
     return (
       <AppShell surface="customer">
@@ -129,10 +133,6 @@ function WalkInCaptureContent() {
       </AppShell>
     );
   }
-
-  useEffect(() => {
-    if (createMutation.isError) toast.error(t("booking.capture.errorCreate"));
-  }, [createMutation.isError, t]);
 
   if (createMutation.isError) {
     return (

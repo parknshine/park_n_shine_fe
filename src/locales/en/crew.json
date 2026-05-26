@@ -85,7 +85,7 @@
     "title": "Wash Checklist",
     "subtitle": "Complete each step in order.",
     "progress": "{{done}}/{{total}} steps done",
-    "allDoneHint": "All steps complete! 🎉",
+    "allDoneHint": "All steps complete!",
     "continueButton": "Continue to Finish",
     "continueAriaLabel": "Continue to finish page",
     "item": {

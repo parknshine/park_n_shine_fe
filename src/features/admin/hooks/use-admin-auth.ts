@@ -2,7 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import api from "@/lib/axios";
+import api from "@/lib/axios-admin";
 import { mutationKeys } from "@/lib/query-keys";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
@@ -14,6 +14,7 @@ interface AdminLoginPayload {
 
 interface AdminLoginResponse {
   token: string;
+  refreshToken: string;
   email: string;
   sites: Array<{ id: string; name: string }>;
 }
@@ -36,7 +37,8 @@ export function useAdminAuth() {
       return response.data;
     },
     onSuccess: (data) => {
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("admin-token", data.token);
+      localStorage.setItem("admin-refresh-token", data.refreshToken);
       localStorage.setItem("admin-sites", JSON.stringify(data.sites));
       setUser(
         { id: data.email, email: data.email, name: "Admin" },
@@ -51,7 +53,8 @@ export function useAdminAuth() {
   });
 
   function logout() {
-    localStorage.removeItem("token");
+    localStorage.removeItem("admin-token");
+    localStorage.removeItem("admin-refresh-token");
     localStorage.removeItem("admin-sites");
     clearAuth();
     router.replace("/admin/login");

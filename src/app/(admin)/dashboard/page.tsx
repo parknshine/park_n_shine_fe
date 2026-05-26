@@ -104,7 +104,6 @@ function DashboardContent() {
       {/* Booking detail drawer */}
       <BookingDetailDrawer
         bookingId={selectedBooking?.id ?? null}
-        siteId={activeSiteId}
         onClose={() => setSelectedBooking(null)}
         onActionSuccess={handleActionSuccess}
       />

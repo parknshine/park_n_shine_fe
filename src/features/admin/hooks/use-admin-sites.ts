@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios";
+import api from "@/lib/axios-admin";
 import { queryKeys, mutationKeys } from "@/lib/query-keys";
 import { useUIStore } from "@/store/ui-store";
 import type {

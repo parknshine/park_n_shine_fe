@@ -79,8 +79,12 @@ export interface ConfirmBookingPayload {
 
 export interface PaymentIntentResponse {
   bookingId: string;
-  redirectUrl: string;
-  idempotencyKey: string;
+  status: string;
+  plate: string;
+  slot: string;
+  price: number;
+  payment: { message: string };
+  redirectUrl?: string;
 }
 
 export interface RatingPayload {

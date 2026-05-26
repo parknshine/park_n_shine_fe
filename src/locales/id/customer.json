@@ -148,6 +148,14 @@
       "location": "Lokasi",
       "price": "Harga",
       "estimatedReady": "Estimasi Selesai"
+    },
+    "payment": {
+      "title": "Pembayaran",
+      "subtitle": "Selesaikan pembayaran untuk memulai proses cuci.",
+      "totalLabel": "Total Pembayaran",
+      "pay": "Bayar Sekarang",
+      "processing": "Memproses...",
+      "errorPay": "Pembayaran gagal. Silakan coba lagi."
     }
   },
   "status": {

@@ -85,7 +85,7 @@
     "title": "Checklist Cuci",
     "subtitle": "Selesaikan setiap langkah secara berurutan.",
     "progress": "{{done}}/{{total}} langkah selesai",
-    "allDoneHint": "Semua langkah selesai! 🎉",
+    "allDoneHint": "Semua langkah selesai! ",
     "continueButton": "Lanjut ke Selesai",
     "continueAriaLabel": "Lanjut ke halaman selesai",
     "item": {

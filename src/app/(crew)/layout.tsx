@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
+import { useIsRestoring } from "@tanstack/react-query";
 import { AppShell } from "@/components/shared/app-shell";
 import { LanguageSwitcher } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -16,15 +17,16 @@ interface CrewLayoutProps {
 
 export function CrewLayout({ children }: CrewLayoutProps) {
   const router = useRouter();
+  const isRestoring = useIsRestoring();
   const { session, clearSession } = useCrewSession();
 
   useEffect(() => {
-    if (!session) {
+    if (!isRestoring && !session) {
       router.replace("/crew/login");
     }
-  }, [session, router]);
+  }, [session, router, isRestoring]);
 
-  if (!session) return null;
+  if (isRestoring || !session) return null;
 
   function handleLogout() {
     clearSession();

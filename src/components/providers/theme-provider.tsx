@@ -3,7 +3,8 @@
 import {
   createContext,
   useContext,
-  useSyncExternalStore,
+  // DARK MODE DISABLED — useSyncExternalStore used for dynamic theme detection
+  // useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -19,33 +20,39 @@ const ThemeContext = createContext<ThemeContextValue>({
   toggleTheme: () => {},
 });
 
-function subscribeToTheme(callback: () => void) {
-  const observer = new MutationObserver(callback);
-  observer.observe(document.documentElement, { attributeFilter: ["class"] });
-  return () => observer.disconnect();
-}
+// DARK MODE DISABLED — uncomment functions below to re-enable dynamic theme detection
+// function subscribeToTheme(callback: () => void) {
+//   const observer = new MutationObserver(callback);
+//   observer.observe(document.documentElement, { attributeFilter: ["class"] });
+//   return () => observer.disconnect();
+// }
 
-function getThemeSnapshot(): Theme {
-  return document.documentElement.classList.contains("dark") ? "dark" : "light";
-}
+// function getThemeSnapshot(): Theme {
+//   return document.documentElement.classList.contains("dark") ? "dark" : "light";
+// }
 
-function getServerSnapshot(): Theme {
-  return "light";
-}
+// function getServerSnapshot(): Theme {
+//   return "light";
+// }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const theme = useSyncExternalStore(
-    subscribeToTheme,
-    getThemeSnapshot,
-    getServerSnapshot,
-  );
+  // DARK MODE DISABLED — always use light theme
+  const theme: Theme = "light";
+
+  // DARK MODE DISABLED — toggle logic commented out; re-enable alongside useSyncExternalStore above
+  // const theme = useSyncExternalStore(
+  //   subscribeToTheme,
+  //   getThemeSnapshot,
+  //   getServerSnapshot,
+  // );
 
   const toggleTheme = () => {
-    const next = theme === "light" ? "dark" : "light";
-    document.documentElement.classList.toggle("dark", next === "dark");
-    try {
-      localStorage.setItem("theme", next);
-    } catch {}
+    // DARK MODE DISABLED — no-op; uncomment block below to restore toggle
+    // const next = theme === "light" ? "dark" : "light";
+    // document.documentElement.classList.toggle("dark", next === "dark");
+    // try {
+    //   localStorage.setItem("theme", next);
+    // } catch {}
   };
 
   return (
