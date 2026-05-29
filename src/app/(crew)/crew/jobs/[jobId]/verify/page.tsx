@@ -75,7 +75,7 @@ export function VerifyPlatePage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.back()}
+          onClick={() => router.replace(`/crew/jobs/${jobId}`)}
           prefix={<ChevronLeft className="h-4 w-4" />}
           className="-ml-2 mb-4 text-muted-foreground"
         >

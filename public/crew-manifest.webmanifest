@@ -1,0 +1,26 @@
+{
+  "name": "Park & Shine Crew",
+  "short_name": "P&S Crew",
+  "description": "Park & Shine crew operator app.",
+  "start_url": "/crew/home",
+  "scope": "/crew/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f766e",
+  "orientation": "portrait",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

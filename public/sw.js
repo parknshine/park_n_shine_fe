@@ -10,7 +10,11 @@ const APP_SHELL_URLS = [
 ];
 
 self.addEventListener("push", (event) => {
-  if (!event.data) return;
+  console.log("[SW] push received, data:", event.data?.text());
+  if (!event.data) {
+    console.log("[SW] no data, skipping");
+    return;
+  }
 
   let payload;
   try {
@@ -19,6 +23,7 @@ self.addEventListener("push", (event) => {
     payload = { title: "Park & Shine", body: event.data.text() };
   }
 
+  console.log("[SW] showing notification:", payload);
   const title = payload.title ?? "Park & Shine";
   const options = {
     body: payload.body ?? "",
@@ -29,7 +34,11 @@ self.addEventListener("push", (event) => {
     renotify: true,
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+      .then(() => console.log("[SW] notification shown"))
+      .catch((err) => console.error("[SW] showNotification error:", err))
+  );
 });
 
 self.addEventListener("notificationclick", (event) => {
@@ -100,11 +109,14 @@ async function networkFirst(request) {
 
   try {
     const response = await fetch(request);
-    cache.put(request, response.clone());
+    if (response.ok && response.status < 300) {
+      try { cache.put(request, response.clone()); } catch { /* streaming responses not cacheable */ }
+    }
     return response;
   } catch {
     const cachedResponse = await cache.match(request);
-    return cachedResponse ?? caches.match("/");
+    const fallback = cachedResponse ?? await caches.match("/");
+    return fallback ?? Response.error();
   }
 }
 
@@ -112,12 +124,12 @@ async function staleWhileRevalidate(request) {
   const cache = await caches.open(RUNTIME_CACHE);
   const cachedResponse = await cache.match(request);
 
-  const networkResponse = fetch(request)
-    .then((response) => {
-      cache.put(request, response.clone());
-      return response;
-    })
-    .catch(() => cachedResponse);
+  const networkPromise = fetch(request).then((response) => {
+    if (response.ok) {
+      try { cache.put(request, response.clone()); } catch { /* ignore */ }
+    }
+    return response;
+  }).catch(() => null);
 
-  return cachedResponse ?? networkResponse;
+  return cachedResponse ?? await networkPromise ?? Response.error();
 }

@@ -11,8 +11,8 @@ export interface RealtimeEvent {
 }
 
 interface UseRealtimeEventsOptions {
-  /** Full URL to the SSE endpoint including query params */
-  url: string;
+  /** Full URL or a function that returns the current URL (called on every connect attempt) */
+  url: string | (() => string);
   onEvent: (event: RealtimeEvent) => void;
   /** Set to false to pause the connection without unmounting */
   enabled?: boolean;
@@ -33,9 +33,11 @@ export function useRealtimeEvents({
     onEventRef.current = onEvent;
   }, [onEvent]);
 
+  const resolvedUrl = typeof url === "function" ? url() : url;
+
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_REALTIME_ENABLED !== "true") return;
-    if (!enabled || !url) return;
+    if (!enabled || !resolvedUrl) return;
 
     let es: EventSource | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout>;
@@ -44,7 +46,8 @@ export function useRealtimeEvents({
 
     function connect() {
       if (destroyed) return;
-      es = new EventSource(url);
+      const currentUrl = typeof url === "function" ? url() : url;
+      es = new EventSource(currentUrl);
 
       es.onopen = () => {
         delay = INITIAL_RECONNECT_DELAY_MS;
@@ -79,7 +82,7 @@ export function useRealtimeEvents({
       clearTimeout(reconnectTimer);
       es?.close();
     };
-  }, [url, enabled]);
+  }, [resolvedUrl, enabled]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 /** Decode crewId from the JWT stored in localStorage without a library */
@@ -88,8 +91,8 @@ export function getCrewIdFromToken(): string | null {
   const token = localStorage.getItem("crew-token");
   if (!token) return null;
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]!)) as { sub?: string };
-    return payload.sub ?? null;
+    const payload = JSON.parse(atob(token.split(".")[1]!)) as { crewId?: string };
+    return payload.crewId ?? null;
   } catch {
     return null;
   }

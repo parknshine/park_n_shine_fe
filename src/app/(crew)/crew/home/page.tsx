@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Bell, BriefcaseBusiness, Inbox, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { queryKeys } from "@/lib/query-keys";
 
 function getResumeTarget(job: CrewJob): string {
   const base = `/crew/jobs/${job.id}`;
-  if (job.status === "ASSIGNED") return `${base}/verify`;
+  if (job.status === "ASSIGNED") return base;
   if (job.status === "IN_PROGRESS") {
     const crewKinds = ["front", "back", "left", "right"];
     const hasAllPhotos = crewKinds.every((k) => job.media.some((m) => m.kind === k));
@@ -30,6 +30,8 @@ function getResumeTarget(job: CrewJob): string {
 
 export function CrewHomePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const noResume = searchParams.get("noResume") === "true";
   const queryClient = useQueryClient();
   const { claimNextJob, job, isLoading, hasNoJob, error, isNewlyClaimed } = useNextJob();
   const { count, hasJob } = useJobQueue();
@@ -40,11 +42,13 @@ export function CrewHomePage() {
   const showPushBanner =
     process.env.NEXT_PUBLIC_PUSH_ENABLED === "true" && permission === "default";
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
-  const crewToken = typeof window !== "undefined" ? (localStorage.getItem("crew-token") ?? "") : "";
-  const sseUrl = crewId ? `${baseUrl}/v1/crew/realtime/stream?token=${crewToken}` : "";
+  const getSseUrl = useCallback(() => {
+    const token = localStorage.getItem("crew-token") ?? "";
+    return crewId ? `${baseUrl}/v1/crew/realtime/stream?token=${token}` : "";
+  }, [baseUrl, crewId]);
 
   useRealtimeEvents({
-    url: sseUrl,
+    url: getSseUrl,
     enabled: !!crewId,
     onEvent: (event) => {
       if (event.type === "job_assigned" || event.type === "new_job") {
@@ -58,13 +62,13 @@ export function CrewHomePage() {
   });
 
   useEffect(() => {
-    if (!job) return;
+    if (!job || noResume) return;
     if (isNewlyClaimed) {
       router.replace(`/crew/jobs/${job.id}`);
     } else {
       router.replace(getResumeTarget(job));
     }
-  }, [job, isNewlyClaimed, router]);
+  }, [job, isNewlyClaimed, noResume, router]);
 
   useEffect(() => {
     if (error) toast.error(error);
@@ -74,6 +78,11 @@ export function CrewHomePage() {
     const claimed = await claimNextJob();
     if (claimed) {
       router.push(`/crew/jobs/${claimed.id}`);
+    } else {
+      toast(t("home.jobTakenByOther", { defaultValue: "Job sudah diambil crew lain, coba lagi." }), {
+        icon: "⚠️",
+      });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
     }
   }
 

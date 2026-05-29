@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Park & Shine",
-    short_name: "Park Shine",
-    description: "Waterless car wash PWA for booking, crew operations, and site supervision.",
+    short_name: "Park & Shine",
+    description: "Layanan cuci mobil tanpa air — pesan sekarang.",
     start_url: "/",
     scope: "/",
     display: "standalone",

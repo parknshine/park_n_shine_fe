@@ -149,7 +149,7 @@ export function CrewJobDetailPage() {
 
   function goBackToQueue() {
     queryClient.removeQueries({ queryKey: queryKeys.crew.nextJob() });
-    router.replace("/crew/home");
+    router.replace("/crew/home?noResume=true");
   }
 
   // ── Loading ──────────────────────────────────────────────────────────────
