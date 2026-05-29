@@ -8,16 +8,30 @@ import { Bell, BriefcaseBusiness, Inbox, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useJobQueue, useNextJob } from "@/features/crew/hooks";
+import type { CrewJob } from "@/features/crew/types";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 import { useRealtimeEvents, getCrewIdFromToken } from "@/lib/use-realtime-events";
 import { usePushNotification } from "@/lib/use-push-notification";
 import { queryKeys } from "@/lib/query-keys";
 
+function getResumeTarget(job: CrewJob): string {
+  const base = `/crew/jobs/${job.id}`;
+  if (job.status === "ASSIGNED") return `${base}/verify`;
+  if (job.status === "IN_PROGRESS") {
+    const crewKinds = ["front", "back", "left", "right"];
+    const hasAllPhotos = crewKinds.every((k) => job.media.some((m) => m.kind === k));
+    if (!hasAllPhotos) return `${base}/before-photos`;
+    const allDone = job.checklist.length > 0 && job.checklist.every((i) => !!i.completedAt);
+    return allDone ? `${base}/finish` : `${base}/checklist`;
+  }
+  return base;
+}
+
 export function CrewHomePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { claimNextJob, job, isLoading, hasNoJob, error } = useNextJob();
+  const { claimNextJob, job, isLoading, hasNoJob, error, isNewlyClaimed } = useNextJob();
   const { count, hasJob } = useJobQueue();
   const { t } = useTranslation("crew");
 
@@ -41,10 +55,13 @@ export function CrewHomePage() {
   });
 
   useEffect(() => {
-    if (job) {
+    if (!job) return;
+    if (isNewlyClaimed) {
       router.replace(`/crew/jobs/${job.id}`);
+    } else {
+      router.replace(getResumeTarget(job));
     }
-  }, [job, router]);
+  }, [job, isNewlyClaimed, router]);
 
   useEffect(() => {
     if (error) toast.error(error);
