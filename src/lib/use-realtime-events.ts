@@ -18,7 +18,7 @@ interface UseRealtimeEventsOptions {
   enabled?: boolean;
 }
 
-const EVENT_TYPES = ["booking_status_changed", "job_assigned"];
+const EVENT_TYPES = ["booking_status_changed", "job_assigned", "new_job"];
 const INITIAL_RECONNECT_DELAY_MS = 1_000;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 
@@ -28,7 +28,10 @@ export function useRealtimeEvents({
   enabled = true,
 }: UseRealtimeEventsOptions) {
   const onEventRef = useRef(onEvent);
-  onEventRef.current = onEvent;
+
+  useEffect(() => {
+    onEventRef.current = onEvent;
+  }, [onEvent]);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_REALTIME_ENABLED !== "true") return;

@@ -44,6 +44,7 @@ export interface ReportCrewPerformance {
   crewName: string;
   jobsCompleted: number;
   avgTurnaroundSeconds: number | null;
+  estimatedRevenue: number;
 }
 
 export interface AuditEntry {
@@ -130,6 +131,7 @@ export interface RotateQrResult {
 export interface AdminCrewMember {
   id: string;
   name: string;
+  phone: string | null;
   active: boolean;
   createdAt: string;
 }
@@ -154,12 +156,14 @@ export interface AdminShift {
 export interface CreateCrewPayload {
   name: string;
   pin: string;
+  phone?: string;
 }
 
 export interface UpdateCrewPayload {
   name?: string;
   pin?: string;
   active?: boolean;
+  phone?: string;
 }
 
 export interface CreateShiftPayload {

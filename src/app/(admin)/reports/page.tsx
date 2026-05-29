@@ -42,9 +42,9 @@ function exportToCSV(report: AdminReport, from: string, to: string) {
     ...Object.entries(report.bookings.byStatus).map(([s, c]) => `${s},${c}`),
     "",
     "Crew Performance",
-    "Name,Jobs Completed,Avg Turnaround (s)",
+    "Name,Jobs Completed,Avg Turnaround (s),Est. Revenue (IDR)",
     ...report.crew.map((c) =>
-      `${c.crewName},${c.jobsCompleted},${c.avgTurnaroundSeconds ?? ""}`
+      `${c.crewName},${c.jobsCompleted},${c.avgTurnaroundSeconds ?? ""},${c.estimatedRevenue}`
     ),
   ];
 
@@ -217,7 +217,7 @@ export default function ReportsPage() {
                           {formatTurnaround(member.avgTurnaroundSeconds)}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          {formatRupiah(member.jobsCompleted * (report.revenue.totalGross / (report.bookings.byStatus["CLOSED"] || 1)))}
+                          {formatRupiah(member.estimatedRevenue)}
                         </td>
                       </tr>
                     ))

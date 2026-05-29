@@ -47,9 +47,12 @@ export function CrewHomePage() {
     url: sseUrl,
     enabled: !!crewId,
     onEvent: (event) => {
-      if (event.type === "job_assigned") {
+      if (event.type === "job_assigned" || event.type === "new_job") {
         void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
-        toast.success(t("home.newJobNotification", { defaultValue: "New job assigned to you!" }));
+        const msg = event.type === "new_job"
+          ? t("home.newJobQueued", { defaultValue: "New job available in queue!" })
+          : t("home.newJobNotification", { defaultValue: "New job assigned to you!" });
+        toast.success(msg);
       }
     },
   });

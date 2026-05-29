@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { UserPlus, Pencil, ToggleLeft, ToggleRight } from "lucide-react";
+import { UserPlus, Pencil, ToggleLeft, ToggleRight, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -27,19 +27,25 @@ function CreateCrewModal({
   const { create, isCreating } = useAdminCrew();
   const [name, setName] = useState("");
   const [pin, setPin] = useState("");
+  const [phone, setPhone] = useState("");
 
   async function handleSubmit() {
     if (!name.trim() || !pin.match(/^\d{4,8}$/)) {
-      toast.error("Name required and PIN must be 4-8 digits.");
+      toast.error("Nama wajib diisi dan PIN harus 4-8 digit.");
+      return;
+    }
+    if (phone && !phone.match(/^(\+62|62|0)8\d{8,11}$/)) {
+      toast.error("Nomor WhatsApp tidak valid (contoh: 08123456789).");
       return;
     }
     try {
-      await create({ name: name.trim(), pin });
+      await create({ name: name.trim(), pin, ...(phone ? { phone } : {}) });
       setName("");
       setPin("");
+      setPhone("");
       onClose();
     } catch {
-      toast.error("Failed to create crew member.");
+      toast.error("Gagal menambah crew member.");
     }
   }
 
@@ -57,6 +63,20 @@ function CreateCrewModal({
           <div className="space-y-1">
             <Label htmlFor="crew-pin">PIN (4-8 digit)</Label>
             <Input id="crew-pin" type="password" inputMode="numeric" maxLength={8} value={pin} onChange={(e) => setPin(e.target.value)} placeholder="••••" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="crew-phone">
+              Nomor WhatsApp <span className="text-muted-foreground">(opsional)</span>
+            </Label>
+            <Input
+              id="crew-phone"
+              type="tel"
+              inputMode="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="08123456789"
+            />
+            <p className="text-xs text-muted-foreground">Digunakan untuk notifikasi job via WhatsApp.</p>
           </div>
         </div>
         <DialogFooter>
@@ -80,17 +100,29 @@ function EditCrewModal({
   const { update, isUpdating } = useAdminCrew();
   const [name, setName] = useState(crew.name);
   const [pin, setPin] = useState("");
+  const [phone, setPhone] = useState(crew.phone ?? "");
 
   async function handleSubmit() {
     if (pin && !pin.match(/^\d{4,8}$/)) {
-      toast.error("PIN must be 4-8 digits.");
+      toast.error("PIN harus 4-8 digit.");
+      return;
+    }
+    if (phone && !phone.match(/^(\+62|62|0)8\d{8,11}$/)) {
+      toast.error("Nomor WhatsApp tidak valid (contoh: 08123456789).");
       return;
     }
     try {
-      await update({ crewId: crew.id, payload: { name: name.trim(), ...(pin ? { pin } : {}) } });
+      await update({
+        crewId: crew.id,
+        payload: {
+          name: name.trim(),
+          ...(pin ? { pin } : {}),
+          phone: phone.trim() || undefined,
+        },
+      });
       onClose();
     } catch {
-      toast.error("Failed to update crew member.");
+      toast.error("Gagal mengupdate crew member.");
     }
   }
 
@@ -106,8 +138,21 @@ function EditCrewModal({
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label>PIN Baru (kosongkan jika tidak diubah)</Label>
+            <Label>PIN Baru <span className="text-muted-foreground">(kosongkan jika tidak diubah)</span></Label>
             <Input type="password" inputMode="numeric" maxLength={8} value={pin} onChange={(e) => setPin(e.target.value)} placeholder="••••" />
+          </div>
+          <div className="space-y-1">
+            <Label>
+              Nomor WhatsApp <span className="text-muted-foreground">(opsional)</span>
+            </Label>
+            <Input
+              type="tel"
+              inputMode="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="08123456789"
+            />
+            <p className="text-xs text-muted-foreground">Kosongkan untuk hapus nomor.</p>
           </div>
         </div>
         <DialogFooter>
@@ -143,6 +188,7 @@ export default function CrewPage() {
           <thead>
             <tr className="border-b bg-muted/50">
               <th className="px-4 py-2 text-left font-medium">Nama</th>
+              <th className="px-4 py-2 text-left font-medium">WhatsApp</th>
               <th className="px-4 py-2 text-left font-medium">Status</th>
               <th className="px-4 py-2 text-right font-medium">Aksi</th>
             </tr>
@@ -151,6 +197,21 @@ export default function CrewPage() {
             {crew.map((c) => (
               <tr key={c.id} className="border-b last:border-0">
                 <td className="px-4 py-3 font-medium">{c.name}</td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {c.phone ? (
+                    <a
+                      href={`https://wa.me/${c.phone.replace(/^\+/, "").replace(/^0/, "62")}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-primary hover:underline"
+                    >
+                      <Phone className="h-3 w-3" />
+                      {c.phone}
+                    </a>
+                  ) : (
+                    <span className="text-xs">—</span>
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   <Badge variant={c.active ? "default" : "secondary"}>
                     {c.active ? "Aktif" : "Nonaktif"}
@@ -175,7 +236,7 @@ export default function CrewPage() {
             ))}
             {crew.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
                   Belum ada crew member.
                 </td>
               </tr>
