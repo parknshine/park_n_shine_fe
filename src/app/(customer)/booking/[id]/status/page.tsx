@@ -40,7 +40,7 @@ export default function BookingStatusPage() {
       void checkPayment();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromPayment, token]);
+  }, [fromPayment, token, booking?.status]);
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
   const sseUrl = bookingId && token
