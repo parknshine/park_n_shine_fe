@@ -1,11 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useQueryState } from "nuqs";
-import { parseAsString } from "nuqs";
+import { useQueryState, parseAsString, parseAsBoolean } from "nuqs";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
+import { useCheckPayment } from "@/features/customer/hooks/use-check-payment";
 import { useRealtimeEvents } from "@/lib/use-realtime-events";
 import { usePushNotification } from "@/lib/use-push-notification";
 import { Bell } from "lucide-react";
@@ -18,6 +19,7 @@ import { useTranslation } from "@/i18n";
 export default function BookingStatusPage() {
   const { id: bookingId } = useParams<{ id: string }>();
   const [token] = useQueryState("token", parseAsString);
+  const [fromPayment] = useQueryState("fromPayment", parseAsBoolean.withDefault(false));
   const { t } = useTranslation("customer");
 
   const { booking, isLoading, error, refresh } = useBookingStatus({
@@ -25,6 +27,20 @@ export default function BookingStatusPage() {
     signedToken: token ?? "",
     enabled: !!bookingId && !!token,
   });
+
+  const { checkPayment, isChecking } = useCheckPayment({
+    bookingId,
+    signedToken: token ?? "",
+    onPaid: () => void refresh(),
+  });
+
+  // Auto-check immediately when landing from Midtrans payment redirect
+  useEffect(() => {
+    if (fromPayment && token && booking?.status === "PENDING") {
+      void checkPayment();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromPayment, token]);
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
   const sseUrl = bookingId && token
@@ -105,8 +121,9 @@ export default function BookingStatusPage() {
 
       {isPending && (
         <PaymentCheckButton
-          onCheck={refresh}
-          delayMs={30_000}
+          onCheck={checkPayment}
+          isChecking={isChecking}
+          delayMs={fromPayment ? 0 : 30_000}
         />
       )}
 

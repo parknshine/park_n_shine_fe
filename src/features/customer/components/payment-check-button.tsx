@@ -1,23 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PaymentCheckButtonProps {
-  onCheck: () => void;
+  onCheck: () => void | Promise<unknown>;
+  isChecking?: boolean;
   delayMs?: number;
   label?: string;
 }
 
 export function PaymentCheckButton({
   onCheck,
+  isChecking = false,
   delayMs = 30_000,
   label = "Cek Status Pembayaran",
 }: PaymentCheckButtonProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(delayMs === 0);
 
   useEffect(() => {
+    if (delayMs === 0) return;
     const timer = window.setTimeout(() => setIsVisible(true), delayMs);
     return () => window.clearTimeout(timer);
   }, [delayMs]);
@@ -29,10 +32,15 @@ export function PaymentCheckButton({
       variant="outline"
       size="sm"
       className="w-full"
-      prefix={<RefreshCw className="h-4 w-4" />}
-      onClick={onCheck}
+      disabled={isChecking}
+      onClick={() => void onCheck()}
     >
-      {label}
+      {isChecking ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : (
+        <RefreshCw className="mr-2 h-4 w-4" />
+      )}
+      {isChecking ? "Mengecek..." : label}
     </Button>
   );
 }
