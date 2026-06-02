@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import { API_ERROR_CODES } from "@/lib/api-error";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type {
   ConfirmBookingPayload,
@@ -30,7 +31,14 @@ export function usePaymentAction(bookingId: string, signedToken: string) {
       return response.data;
     },
     mutationKey: mutationKeys.customer.confirmPayment(bookingId),
-    onError: () => {
+    onError: (err: unknown) => {
+      const code = (err as { code?: string }).code;
+      // Booking already PENDING from a previous attempt — redirect to pay page to resume
+      if (code === API_ERROR_CODES.BOOKING_ALREADY_CONFIRMED) {
+        window.location.assign(`/booking/${bookingId}/pay?token=${signedToken}`);
+        return;
+      }
+      // Gateway failed: backend rolls booking back to DRAFT, allow retry on this page
       setHasSubmitted(false);
     },
     onSuccess: (paymentIntent) => {

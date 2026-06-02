@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
 import { useCheckPayment } from "@/features/customer/hooks/use-check-payment";
+import { usePaymentAutoPoll } from "@/features/customer/hooks/use-payment-auto-poll";
 import { useRealtimeEvents } from "@/lib/use-realtime-events";
 import { usePushNotification } from "@/lib/use-push-notification";
 import { Bell } from "lucide-react";
@@ -29,6 +30,14 @@ export default function BookingStatusPage() {
   const { checkPayment, isChecking } = useCheckPayment({
     bookingId,
     signedToken: token ?? "",
+    onPaid: () => void refresh(),
+  });
+
+  // Dev mode: auto-poll Midtrans as fallback when webhook/SSE not available.
+  // Prod: no-op — webhook → SSE handles updates via useRealtimeEvents above.
+  usePaymentAutoPoll({
+    enabled: !!booking && booking.status === BOOKING_STATUSES.PENDING,
+    onPoll: checkPayment,
     onPaid: () => void refresh(),
   });
 

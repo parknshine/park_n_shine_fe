@@ -60,5 +60,7 @@ export const mutationKeys = {
       ["customer", "booking", bookingId, "media"] as const,
     rate: (bookingId: string) =>
       ["customer", "booking", bookingId, "rate"] as const,
+    resumePayment: (bookingId: string) =>
+      ["customer", "booking", bookingId, "resume-payment"] as const,
   },
 } as const;

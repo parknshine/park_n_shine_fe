@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import { API_ERROR_CODES } from "@/lib/api-error";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { PaymentIntentResponse } from "@/features/customer/types";
 
@@ -38,7 +39,15 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
       return response.data;
     },
     mutationKey: mutationKeys.customer.confirmPayment(bookingId),
-    onError: () => {
+    onError: (err: unknown) => {
+      const code = (err as { code?: string }).code;
+      if (
+        code === API_ERROR_CODES.BOOKING_ALREADY_CONFIRMED ||
+        code === API_ERROR_CODES.PAYMENT_GATEWAY_FAILED
+      ) {
+        window.location.assign(`/booking/${bookingId}/pay?token=${signedToken}`);
+        return;
+      }
       setHasSubmitted(false);
     },
     onSuccess: (data) => {

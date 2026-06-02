@@ -3,3 +3,5 @@ export { usePaymentAction } from "./use-payment-action";
 export { usePhotoUpload } from "./use-photo-upload";
 export { useLocationPicker } from "./use-location-picker";
 export { usePaymentActionV2 } from "./use-payment-action-v2";
+export { useResumePayment } from "./use-resume-payment";
+export { usePaymentAutoPoll } from "./use-payment-auto-poll";
