@@ -586,8 +586,8 @@ export const adminSuccessExamples = {
       revenue: { totalGross: 3150000, currency: "IDR" },
       avgTurnaroundSeconds: 1320,
       crew: [
-        { crewId: "crew_01", crewName: "Budi", jobsCompleted: 22, avgTurnaroundSeconds: 1200 },
-        { crewId: "crew_02", crewName: "Sari", jobsCompleted: 17, avgTurnaroundSeconds: 1470 },
+        { crewId: "crew_01", crewName: "Budi", jobsCompleted: 22, avgTurnaroundSeconds: 1200, estimatedRevenue: 1650000 },
+        { crewId: "crew_02", crewName: "Sari", jobsCompleted: 17, avgTurnaroundSeconds: 1470, estimatedRevenue: 1275000 },
       ],
     },
     meta: META,

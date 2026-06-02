@@ -5,15 +5,16 @@ import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { API_ERROR_CODES } from "@/lib/api-error";
 import { mutationKeys } from "@/lib/query-keys";
-import type { PaymentIntentResponse } from "@/features/customer/types";
+import type { ResumePaymentResponse } from "@/features/customer/types";
 
 export function useResumePayment(bookingId: string, signedToken: string) {
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const mutation = useMutation({
     meta: { persist: false },
+    retry: 0,
     mutationFn: async () => {
-      const response = await api.post<PaymentIntentResponse>(
+      const response = await api.post<ResumePaymentResponse>(
         `/v1/bookings/${bookingId}/resume-payment`,
         {},
         { headers: { "X-Booking-Token": signedToken } }

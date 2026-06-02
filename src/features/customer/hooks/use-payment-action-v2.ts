@@ -24,6 +24,7 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
 
   const mutation = useMutation({
     meta: { persist: false },
+    retry: 0,
     mutationFn: async (payload: ConfirmBookingPayloadV2) => {
       const { plateText, slotText, ...rest } = payload;
       const response = await api.post<PaymentIntentResponse>(

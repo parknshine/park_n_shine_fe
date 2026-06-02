@@ -125,11 +125,13 @@ export default function BookingStatusPage() {
       )}
 
       {isPending && (
-        <PaymentCheckButton
-          onCheck={checkPayment}
-          isChecking={isChecking}
-          delayMs={30_000}
-        />
+        <div className="space-y-3">
+          <PaymentCheckButton
+            onCheck={checkPayment}
+            isChecking={isChecking}
+            delayMs={30_000}
+          />
+        </div>
       )}
 
       {isReady && (
