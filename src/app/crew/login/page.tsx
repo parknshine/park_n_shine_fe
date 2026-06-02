@@ -25,7 +25,7 @@ export function CrewLoginPage() {
   const [showPin, setShowPin] = useState(false);
 
   useEffect(() => {
-    if (session) {
+    if (session && localStorage.getItem("crew-token")) {
       router.replace("/crew/home");
     }
   }, [session, router]);
