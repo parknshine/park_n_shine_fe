@@ -6,8 +6,9 @@ import QRCode from "react-qr-code";
 import {
   CheckCircle2,
   Loader2,
+  LogOut,
   MessageCircle,
-  RefreshCw,
+  QrCode,
   WifiOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -103,11 +104,19 @@ function WhatsAppStatusBadge({ status }: { status: WaStatus }) {
       </span>
     );
   }
-  if (status === "connecting" || status === "qr_ready") {
+  if (status === "connecting") {
     return (
       <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600">
         <Loader2 className="h-4 w-4 animate-spin" />
-        {STATUS_LABEL[status]}
+        {STATUS_LABEL.connecting}
+      </span>
+    );
+  }
+  if (status === "qr_ready") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600">
+        <QrCode className="h-4 w-4" />
+        {STATUS_LABEL.qr_ready}
       </span>
     );
   }
@@ -120,19 +129,32 @@ function WhatsAppStatusBadge({ status }: { status: WaStatus }) {
 }
 
 function WhatsAppCard() {
-  const { state, isLoading, connect, isConnecting } = useAdminWhatsapp();
+  const { state, isLoading, connect, isConnecting, logout, isLoggingOut } = useAdminWhatsapp();
   const [showQr, setShowQr] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
-  // Auto-open modal when QR is ready
+  // Auto-open modal when QR is ready, unless user explicitly dismissed it
   const isQrReady = state.status === "qr_ready" && !!state.qr;
-  const modalOpen = showQr || isQrReady;
+  const modalOpen = showQr || (isQrReady && !dismissed);
 
   async function handleConnect() {
     try {
-      await connect();
+      setDismissed(false);
       setShowQr(true);
+      await connect();
     } catch {
       toast.error("Gagal memulai koneksi WhatsApp.");
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      await logout();
+      setShowQr(false);
+      setDismissed(false);
+      toast.success("WhatsApp berhasil logout.");
+    } catch {
+      toast.error("Gagal logout WhatsApp.");
     }
   }
 
@@ -152,18 +174,27 @@ function WhatsAppCard() {
           {!isLoading && <WhatsAppStatusBadge status={state.status} />}
         </div>
 
-        <div className="flex items-center gap-3">
-          {state.status === "connected" ? (
+        {state.status === "connected" && (
+          <div className="flex items-center gap-3">
             <Button
               size="sm"
               variant="outline"
-              onClick={handleConnect}
-              disabled={isConnecting}
+              className="text-destructive hover:text-destructive"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
             >
-              <RefreshCw className="mr-2 h-3.5 w-3.5" />
-              Re-pair
+              {isLoggingOut ? (
+                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <LogOut className="mr-2 h-3.5 w-3.5" />
+              )}
+              Logout WhatsApp
             </Button>
-          ) : (
+          </div>
+        )}
+
+        {state.status !== "connected" && (
+          <div className="flex items-center gap-3">
             <Button
               size="sm"
               onClick={handleConnect}
@@ -178,17 +209,17 @@ function WhatsAppCard() {
                 "Hubungkan WhatsApp"
               )}
             </Button>
-          )}
 
-          {isQrReady && (
-            <Button size="sm" variant="outline" onClick={() => setShowQr(true)}>
-              Lihat QR Code
-            </Button>
-          )}
-        </div>
+            {isQrReady && (
+              <Button size="sm" variant="outline" onClick={() => setShowQr(true)}>
+                Lihat QR Code
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
-      <Dialog open={modalOpen} onOpenChange={(open) => { if (!open) setShowQr(false); }}>
+      <Dialog open={modalOpen} onOpenChange={(open) => { if (!open) { setShowQr(false); setDismissed(true); } }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">

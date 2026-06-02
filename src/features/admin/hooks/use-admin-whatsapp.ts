@@ -38,10 +38,22 @@ export function useAdminWhatsapp() {
     },
   });
 
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const res = await api.post<WaState>("/v1/admin/whatsapp/logout");
+      return res.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["admin", "whatsapp", "status"] });
+    },
+  });
+
   return {
     state: query.data ?? { status: "disconnected" as WaStatus, qr: null },
     isLoading: query.isLoading,
     connect: connectMutation.mutateAsync,
     isConnecting: connectMutation.isPending,
+    logout: logoutMutation.mutateAsync,
+    isLoggingOut: logoutMutation.isPending,
   };
 }
