@@ -1,0 +1,73 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  REGION: asia-southeast1
+  SERVICE: park-n-shine-frontend
+  IMAGE: asia-southeast1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/park-n-shine/frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # required for Workload Identity Federation
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker asia-southeast1-docker.pkg.dev --quiet
+
+      - name: Build and push image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }} \
+            --build-arg NEXT_PUBLIC_VAPID_PUBLIC_KEY=${{ vars.NEXT_PUBLIC_VAPID_PUBLIC_KEY }} \
+            --build-arg NEXT_PUBLIC_REALTIME_ENABLED=true \
+            --build-arg NEXT_PUBLIC_PUSH_ENABLED=true \
+            --build-arg NEXT_PUBLIC_PAYMENT_POLL_INTERVAL_MS= \
+            -t ${{ env.IMAGE }}:${{ github.sha }} \
+            -t ${{ env.IMAGE }}:latest \
+            .
+          docker push ${{ env.IMAGE }}:${{ github.sha }}
+          docker push ${{ env.IMAGE }}:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE }} \
+            --image=${{ env.IMAGE }}:${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --service-account=${{ vars.GCP_RUN_SERVICE_ACCOUNT }} \
+            --min-instances=0 \
+            --max-instances=2 \
+            --memory=256Mi \
+            --cpu=1 \
+            --timeout=60 \
+            --concurrency=80 \
+            --quiet
+
+      - name: Show service URL
+        run: |
+          URL=$(gcloud run services describe ${{ env.SERVICE }} \
+            --region=${{ env.REGION }} \
+            --format='value(status.url)')
+          echo "✅ Frontend deployed: $URL"
+          echo "FRONTEND_URL=$URL" >> $GITHUB_STEP_SUMMARY
