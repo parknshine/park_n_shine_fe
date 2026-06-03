@@ -14,6 +14,7 @@ import { StatusOverrideModal } from "./status-override-modal";
 import { RefundModal } from "./refund-modal";
 import { useTranslation } from "@/i18n";
 import { formatAuditDetail } from "@/features/admin/utils/format-audit-detail";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface BookingDetailDrawerProps {
   bookingId: string | null;
@@ -58,6 +59,12 @@ export function BookingDetailDrawer({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div className="flex items-center gap-3">
+            {isLoading && (
+              <>
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </>
+            )}
             {booking && (
               <>
                 <span className="font-semibold text-foreground">
@@ -67,9 +74,6 @@ export function BookingDetailDrawer({
                   {booking.status}
                 </StatusBadge>
               </>
-            )}
-            {isLoading && (
-              <span className="text-sm text-muted-foreground">{t("drawer.loading")}</span>
             )}
           </div>
           <button
@@ -82,6 +86,7 @@ export function BookingDetailDrawer({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          {isLoading && <DrawerSkeleton />}
           {booking && (
             <>
               {/* Booking Info */}
@@ -261,6 +266,68 @@ export function BookingDetailDrawer({
         </>
       )}
     </>
+  );
+}
+
+function DrawerSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Booking Info */}
+      <section>
+        <Skeleton className="mb-3 h-3 w-24" />
+        <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <>
+              <Skeleton key={`label-${i}`} className="h-4 w-16" />
+              <Skeleton key={`value-${i}`} className="h-4 w-32" />
+            </>
+          ))}
+        </div>
+      </section>
+
+      {/* Status History */}
+      <section>
+        <Skeleton className="mb-3 h-3 w-28" />
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <Skeleton className="h-5 w-16 rounded-full" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Photos */}
+      <section>
+        <Skeleton className="mb-3 h-3 w-16" />
+        <div className="grid grid-cols-2 gap-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
+        </div>
+      </section>
+
+      {/* Actions */}
+      <section>
+        <Skeleton className="mb-3 h-3 w-16" />
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </div>
+      </section>
+
+      {/* Audit Log */}
+      <section>
+        <Skeleton className="mb-3 h-3 w-20" />
+        <div className="space-y-2">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full rounded-md" />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
 
