@@ -15,7 +15,7 @@ substitutions:
   _REPO: park-n-shine
   _SERVICE: park-n-shine
   _IMAGE: app
-  _NEXT_PUBLIC_API_URL: https://api.park-shine.sg
+  _NEXT_PUBLIC_API_URL: https://park-n-shine-api-784584743016.asia-southeast1.run.app
 
 options:
   logging: CLOUD_LOGGING_ONLY
@@ -23,6 +23,8 @@ options:
 
 steps:
   # 1. Build image, tagged with the commit SHA so we can roll back.
+  #    NEXT_PUBLIC_* must be passed as build-args — they are inlined into the
+  #    JS bundle by `next build` and cannot be overridden at runtime.
   - id: build
     name: gcr.io/cloud-builders/docker
     args:
@@ -33,6 +35,8 @@ steps:
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest
       - --cache-from
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest
+      - --build-arg
+      - NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}
       - .
 
   # 2. Push both tags to Artifact Registry.
