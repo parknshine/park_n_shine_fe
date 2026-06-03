@@ -2,8 +2,11 @@
 
 import { Check, Clock, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "@/i18n";
-import type { BookingStatus, BookingStatusEvent } from "@/features/customer/types";
+import { useTranslation, i18n } from "@/i18n";
+import type {
+  BookingStatus,
+  BookingStatusEvent,
+} from "@/features/customer/types";
 
 interface Step {
   status: BookingStatus;
@@ -41,17 +44,17 @@ const STEPS: Step[] = [
 
 // Maps each booking status to its step index in the stepper
 const STATUS_STEP: Record<BookingStatus, number> = {
-  DRAFT:       0,
-  PENDING:     1,
-  PAID:        2,
-  ASSIGNED:    3, // customer sees this as "crew on the way"
+  DRAFT: 0,
+  PENDING: 1,
+  PAID: 2,
+  ASSIGNED: 3, // customer sees this as "crew on the way"
   IN_PROGRESS: 3,
-  NEEDS_HELP:  3,
-  READY:       4,
-  CLOSED:      5,
-  EXPIRED:     1,
-  CANCELLED:   1,
-  STALE:       1,
+  NEEDS_HELP: 3,
+  READY: 4,
+  CLOSED: 5,
+  EXPIRED: 1,
+  CANCELLED: 1,
+  STALE: 1,
 };
 
 interface BookingStatusTimelineProps {
@@ -69,11 +72,28 @@ export function BookingStatusTimeline({
   const isTerminal =
     status === "EXPIRED" || status === "CANCELLED" || status === "CLOSED";
 
+  function formatTimestamp(iso: string): string {
+    const locale = i18n.language === "en" ? "en-GB" : "id-ID";
+    const d = new Date(iso);
+    const date = new Intl.DateTimeFormat(locale, {
+      weekday: "long",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(d);
+    const time = new Intl.DateTimeFormat(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(d);
+    return `${date} • ${time}`;
+  }
+
   // Build timestamp map from history: status → formatted time
   const timestampMap = new Map<BookingStatus, string>();
   statusHistory.forEach((e) => {
     if (!timestampMap.has(e.status)) {
-      timestampMap.set(e.status, e.changedAt);
+      timestampMap.set(e.status, formatTimestamp(e.changedAt));
     }
   });
 
@@ -83,42 +103,43 @@ export function BookingStatusTimeline({
   }
 
   return (
-    <ol aria-label="Booking progress">
+    <ol aria-label='Booking progress'>
       {STEPS.map((step, index) => {
         const stepIndex = index + 1;
-        const isDone = currentStep > stepIndex || (step.status === "CLOSED" && isTerminal && status === "CLOSED");
+        const isDone =
+          currentStep > stepIndex ||
+          (step.status === "CLOSED" && isTerminal && status === "CLOSED");
         const isActive = currentStep === stepIndex && !isTerminal;
         const isFuture = !isDone && !isActive;
         const isLast = index === STEPS.length - 1;
         const timestamp = timestampMap.get(step.status);
 
         return (
-          <li key={step.status} className="flex gap-3">
+          <li key={step.status} className='flex gap-3'>
             {/* Dot + connector line */}
-            <div className="flex flex-col items-center">
+            <div className='flex flex-col items-center'>
               <div
                 className={cn(
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
                   isDone && "border-primary bg-primary text-primary-foreground",
-                  isActive &&
-                    "border-primary bg-primary/10 text-primary",
+                  isActive && "border-primary bg-primary/10 text-primary",
                   isFuture &&
-                    "border-muted bg-background text-muted-foreground"
+                    "border-muted bg-background text-muted-foreground",
                 )}
               >
                 {isDone ? (
-                  <Check className="h-4 w-4" aria-hidden />
+                  <Check className='h-4 w-4' aria-hidden />
                 ) : isActive ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  <Loader2 className='h-4 w-4 animate-spin' aria-hidden />
                 ) : (
-                  <Clock className="h-4 w-4 opacity-40" aria-hidden />
+                  <Clock className='h-4 w-4 opacity-40' aria-hidden />
                 )}
               </div>
               {!isLast && (
                 <div
                   className={cn(
                     "my-1 w-0.5 flex-1",
-                    isDone ? "bg-primary" : "bg-muted"
+                    isDone ? "bg-primary" : "bg-muted",
                   )}
                   style={{ minHeight: 20 }}
                 />
@@ -132,7 +153,7 @@ export function BookingStatusTimeline({
                   "text-sm font-medium leading-tight",
                   isDone && "text-foreground",
                   isActive && "font-semibold text-primary",
-                  isFuture && "text-muted-foreground/50"
+                  isFuture && "text-muted-foreground/50",
                 )}
               >
                 {t(step.labelKey, { defaultValue: step.status })}
@@ -140,7 +161,9 @@ export function BookingStatusTimeline({
               <p
                 className={cn(
                   "mt-0.5 text-xs",
-                  isFuture ? "text-muted-foreground/40" : "text-muted-foreground"
+                  isFuture
+                    ? "text-muted-foreground/40"
+                    : "text-muted-foreground",
                 )}
               >
                 {timestamp ?? t(step.descKey, { defaultValue: "" })}
