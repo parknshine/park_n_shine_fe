@@ -1,0 +1,79 @@
+# Cloud Build pipeline: build image, push to Artifact Registry, deploy to Cloud Run.
+# Triggered on push to `main` (configure trigger in Cloud Build console).
+#
+# Required substitutions are defaulted below. Override per-trigger in the
+# console if you need different values (region, service name, API URL, etc).
+#
+# IAM the Cloud Build service account needs:
+#   - roles/artifactregistry.writer
+#   - roles/run.admin
+#   - roles/iam.serviceAccountUser  (to act as the Cloud Run runtime SA)
+#   - roles/logging.logWriter       (only if you set the `logging` option below)
+
+substitutions:
+  _REGION: asia-southeast1
+  _REPO: park-n-shine
+  _SERVICE: park-n-shine
+  _IMAGE: app
+  _NEXT_PUBLIC_API_URL: https://park-n-shine-api-784584743016.asia-southeast1.run.app
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
+steps:
+  # 1. Build image, tagged with the commit SHA so we can roll back.
+  #    NEXT_PUBLIC_* must be passed as build-args — they are inlined into the
+  #    JS bundle by `next build` and cannot be overridden at runtime.
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --tag
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$SHORT_SHA
+      - --tag
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest
+      - --cache-from
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest
+      - --build-arg
+      - NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}
+      - .
+
+  # 2. Push both tags to Artifact Registry.
+  - id: push-sha
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$SHORT_SHA
+
+  - id: push-latest
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest
+
+  # 3. Deploy the SHA-tagged image to Cloud Run.
+  - id: deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$SHORT_SHA
+      - --region=${_REGION}
+      - --platform=managed
+      - --port=3000
+      - --allow-unauthenticated
+      - --min-instances=1
+      - --max-instances=10
+      - --memory=512Mi
+      - --cpu=1
+      - --set-env-vars=NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}
+
+# Surface the image URI in build history.
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:$SHORT_SHA
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:latest
+
+timeout: 1800s
