@@ -87,6 +87,12 @@ export interface PaymentIntentResponse {
   redirectUrl?: string;
 }
 
+export interface ResumePaymentResponse {
+  bookingId: string;
+  snapToken: string;
+  redirectUrl: string;
+}
+
 export interface RatingPayload {
   score: 1 | 2 | 3 | 4 | 5;
   reason?: string;

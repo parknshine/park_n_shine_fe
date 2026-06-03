@@ -57,6 +57,13 @@ function BookConfirmContent() {
     enabled: !!bookingId && !!token,
   });
 
+  useEffect(() => {
+    if (!booking || !bookingId || !token) return;
+    if (booking.status !== "DRAFT") {
+      router.replace(`/booking/${bookingId}/pay?token=${token}`);
+    }
+  }, [booking, bookingId, token, router]);
+
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
 

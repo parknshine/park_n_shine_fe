@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useQueryState, parseAsString, parseAsBoolean } from "nuqs";
+import { useQueryState, parseAsString } from "nuqs";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
 import { useCheckPayment } from "@/features/customer/hooks/use-check-payment";
+import { usePaymentAutoPoll } from "@/features/customer/hooks/use-payment-auto-poll";
 import { useRealtimeEvents } from "@/lib/use-realtime-events";
 import { usePushNotification } from "@/lib/use-push-notification";
 import { Bell } from "lucide-react";
@@ -19,7 +19,6 @@ import { useTranslation } from "@/i18n";
 export default function BookingStatusPage() {
   const { id: bookingId } = useParams<{ id: string }>();
   const [token] = useQueryState("token", parseAsString);
-  const [fromPayment] = useQueryState("fromPayment", parseAsBoolean.withDefault(false));
   const { t } = useTranslation("customer");
 
   const { booking, isLoading, error, refresh } = useBookingStatus({
@@ -34,13 +33,13 @@ export default function BookingStatusPage() {
     onPaid: () => void refresh(),
   });
 
-  // Auto-check immediately when landing from Midtrans payment redirect
-  useEffect(() => {
-    if (fromPayment && token && booking?.status === "PENDING") {
-      void checkPayment();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromPayment, token, booking?.status]);
+  // Dev mode: auto-poll Midtrans as fallback when webhook/SSE not available.
+  // Prod: no-op — webhook → SSE handles updates via useRealtimeEvents above.
+  usePaymentAutoPoll({
+    enabled: !!booking && booking.status === BOOKING_STATUSES.PENDING,
+    onPoll: checkPayment,
+    onPaid: () => void refresh(),
+  });
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
   const sseUrl = bookingId && token
@@ -50,8 +49,14 @@ export default function BookingStatusPage() {
   useRealtimeEvents({
     url: sseUrl,
     enabled: !!bookingId && !!token,
-    onEvent: () => {
-      void refresh();
+    onEvent: (event) => {
+      if (
+        event.type === "payment_confirmed" ||
+        event.type === "payment_failed" ||
+        event.type === "booking_status_changed"
+      ) {
+        void refresh();
+      }
     },
   });
 
@@ -120,11 +125,13 @@ export default function BookingStatusPage() {
       )}
 
       {isPending && (
-        <PaymentCheckButton
-          onCheck={checkPayment}
-          isChecking={isChecking}
-          delayMs={fromPayment ? 0 : 30_000}
-        />
+        <div className="space-y-3">
+          <PaymentCheckButton
+            onCheck={checkPayment}
+            isChecking={isChecking}
+            delayMs={30_000}
+          />
+        </div>
       )}
 
       {isReady && (

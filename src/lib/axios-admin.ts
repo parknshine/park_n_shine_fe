@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ApiContractError, normalizeApiError } from "@/lib/api-error";
+import { useAuthStore } from "@/store/auth-store";
 
 const adminApi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "/api",
@@ -97,6 +98,8 @@ adminApi.interceptors.response.use(
         processQueue(refreshError, null);
         localStorage.removeItem("admin-token");
         localStorage.removeItem("admin-refresh-token");
+        localStorage.removeItem("admin-sites");
+        useAuthStore.getState().clearAuth();
         if (path !== "/admin/login") {
           window.location.href = "/admin/login";
         }

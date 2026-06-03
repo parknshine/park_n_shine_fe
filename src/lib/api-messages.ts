@@ -122,6 +122,14 @@ export const API_ERROR_MESSAGES = {
     "id-ID": "Akses admin diperlukan untuk membuka halaman ini.",
     "en-US": "Admin access is required to open this page.",
   },
+  [API_ERROR_CODES.ADMIN_INVALID_CREDENTIALS]: {
+    "id-ID": "Email atau kata sandi tidak valid.",
+    "en-US": "Invalid email or password.",
+  },
+  [API_ERROR_CODES.ADMIN_TOKEN_INVALID]: {
+    "id-ID": "Sesi admin sudah berakhir. Silakan masuk kembali.",
+    "en-US": "Admin session has expired. Please sign in again.",
+  },
   [API_ERROR_CODES.AUTH_FORBIDDEN]: {
     "id-ID": "Anda tidak memiliki izin untuk melakukan aksi ini.",
     "en-US": "You do not have permission to perform this action.",
@@ -134,6 +142,10 @@ export const API_ERROR_MESSAGES = {
     "id-ID": "Lengkapi semua foto kendaraan sebelum lanjut.",
     "en-US": "Complete all vehicle photos before continuing.",
   },
+  [API_ERROR_CODES.BOOKING_ALREADY_CONFIRMED]: {
+    "id-ID": "Booking ini sudah dikonfirmasi sebelumnya.",
+    "en-US": "This booking has already been confirmed.",
+  },
   [API_ERROR_CODES.BOOKING_CANCELLED]: {
     "id-ID": "Booking ini sudah dibatalkan.",
     "en-US": "This booking has been cancelled.",
@@ -145,6 +157,10 @@ export const API_ERROR_MESSAGES = {
   [API_ERROR_CODES.BOOKING_EXPIRED]: {
     "id-ID": "Booking sudah kadaluarsa.",
     "en-US": "This booking has expired.",
+  },
+  [API_ERROR_CODES.BOOKING_INVALID_STATUS_TRANSITION]: {
+    "id-ID": "Perubahan status ini tidak diizinkan.",
+    "en-US": "This status transition is not allowed.",
   },
   [API_ERROR_CODES.BOOKING_NOT_FOUND]: {
     "id-ID": "Booking tidak ditemukan.",

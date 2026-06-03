@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/features/admin/hooks";
+import adminApi from "@/lib/axios-admin";
 import { useTranslation } from "@/i18n";
 
 export default function AdminLoginPage() {
@@ -16,8 +17,10 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("admin-token");
-    if (token) router.replace("/dashboard");
+    if (!localStorage.getItem("admin-token")) return;
+    adminApi.get("/v1/admin/sites")
+      .then(() => router.replace("/dashboard"))
+      .catch(() => {});
   }, [router]);
   const { t } = useTranslation("admin");
 

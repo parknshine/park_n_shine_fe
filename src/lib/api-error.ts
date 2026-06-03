@@ -8,8 +8,12 @@ import {
 export const API_ERROR_CODES = {
   ACTIVE_JOB_RESUME_FAILED: "ACTIVE_JOB_RESUME_FAILED",
   ADMIN_AUTH_REQUIRED: "ADMIN_AUTH_REQUIRED",
+  ADMIN_INVALID_CREDENTIALS: "ADMIN_INVALID_CREDENTIALS",
+  ADMIN_TOKEN_INVALID: "ADMIN_TOKEN_INVALID",
   AUTH_FORBIDDEN: "AUTH_FORBIDDEN",
   AUTH_UNAUTHORIZED: "AUTH_UNAUTHORIZED",
+  BOOKING_ALREADY_CONFIRMED: "BOOKING_ALREADY_CONFIRMED",
+  BOOKING_INVALID_STATUS_TRANSITION: "BOOKING_INVALID_STATUS_TRANSITION",
   BEFORE_PHOTOS_REQUIRED: "BEFORE_PHOTOS_REQUIRED",
   BOOKING_CANCELLED: "BOOKING_CANCELLED",
   BOOKING_CUTOFF_PASSED: "BOOKING_CUTOFF_PASSED",
@@ -97,6 +101,22 @@ export const API_ERROR_DEFINITIONS: Record<ApiErrorCode, ApiErrorDefinition> = {
     severity: "error",
     surface: "admin",
   },
+  ADMIN_INVALID_CREDENTIALS: {
+    defaultHttpStatus: 401,
+    isRetryable: false,
+    messageKey: "errors.admin.invalidCredentials",
+    requirement: "FR-09",
+    severity: "error",
+    surface: "admin",
+  },
+  ADMIN_TOKEN_INVALID: {
+    defaultHttpStatus: 401,
+    isRetryable: false,
+    messageKey: "errors.admin.authRequired",
+    requirement: "FR-09",
+    severity: "error",
+    surface: "admin",
+  },
   AUTH_FORBIDDEN: {
     defaultHttpStatus: 403,
     isRetryable: false,
@@ -144,6 +164,22 @@ export const API_ERROR_DEFINITIONS: Record<ApiErrorCode, ApiErrorDefinition> = {
     requirement: "FR-04",
     severity: "warning",
     surface: "customer",
+  },
+  BOOKING_ALREADY_CONFIRMED: {
+    defaultHttpStatus: 409,
+    isRetryable: false,
+    messageKey: "errors.customer.bookingAlreadyConfirmed",
+    requirement: "FR-04",
+    severity: "warning",
+    surface: "customer",
+  },
+  BOOKING_INVALID_STATUS_TRANSITION: {
+    defaultHttpStatus: 409,
+    isRetryable: false,
+    messageKey: "errors.shared.invalidStatusTransition",
+    requirement: "GLOBAL",
+    severity: "error",
+    surface: "shared",
   },
   BOOKING_NOT_FOUND: {
     defaultHttpStatus: 404,
@@ -585,6 +621,25 @@ export function isApiErrorCode(code: unknown): code is ApiErrorCode {
   );
 }
 
+// Maps backend error codes that differ from frontend API_ERROR_CODES names
+const BACKEND_CODE_MAP: Record<string, string> = {
+  EXTERNAL_SERVICE_ERROR: "PAYMENT_GATEWAY_FAILED",
+  EXTERNAL_SERVICE_TIMEOUT: "PAYMENT_GATEWAY_FAILED",
+  EXTERNAL_SERVICE_UNAVAILABLE: "PAYMENT_GATEWAY_FAILED",
+  SITE_INTAKE_PAUSED: "INTAKE_PAUSED",
+  SITE_CUTOFF_REACHED: "BOOKING_CUTOFF_PASSED",
+  FILE_TOO_LARGE: "IMAGE_TOO_LARGE",
+  MEDIA_UPLOAD_FAILED: "UPLOAD_FAILED",
+  PAYMENT_ALREADY_EXISTS: "PAYMENT_INTENT_EXISTS",
+  IDEMPOTENCY_KEY_CONFLICT: "IDEMPOTENCY_CONFLICT",
+  VALIDATION_FAILED: "VALIDATION_ERROR",
+  RATE_LIMIT_EXCEEDED: "RATE_LIMITED",
+  UNAUTHORIZED_ACCESS: "AUTH_UNAUTHORIZED",
+  FORBIDDEN_ACCESS: "AUTH_FORBIDDEN",
+  CREW_REFRESH_TOKEN_INVALID: "CREW_SESSION_EXPIRED",
+  QR_ALREADY_ROTATED: "QR_ROTATED",
+};
+
 export function normalizeApiError(error: unknown): ApiContractError {
   if (error instanceof ApiContractError) {
     return error;
@@ -595,6 +650,26 @@ export function normalizeApiError(error: unknown): ApiContractError {
       return new ApiContractError({
         ...error.response.data,
         httpStatus: error.response.status,
+      });
+    }
+
+    // Backend wraps error details under an `error` key:
+    // { success: false, error: { code, message, ... } }
+    const responseData = error.response?.data;
+    if (
+      responseData &&
+      typeof responseData === "object" &&
+      responseData.success === false &&
+      responseData.error &&
+      typeof responseData.error === "object"
+    ) {
+      const errBody = responseData.error as Record<string, unknown>;
+      const rawCode = typeof errBody.code === "string" ? errBody.code : null;
+      return new ApiContractError({
+        code: rawCode ? ((BACKEND_CODE_MAP[rawCode] ?? rawCode) as ApiErrorCode) : mapHttpStatusToErrorCode(error.response?.status),
+        message: typeof errBody.message === "string" ? errBody.message : error.message,
+        success: false,
+        httpStatus: error.response?.status,
       });
     }
 

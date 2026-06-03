@@ -54,6 +54,14 @@ function WalkInConfirmContent() {
     enabled: !!bookingId && !!token,
   });
 
+  // If booking already confirmed (PENDING or beyond), go straight to pay page
+  useEffect(() => {
+    if (!booking || !bookingId || !token) return;
+    if (booking.status !== "DRAFT") {
+      router.replace(`/booking/${bookingId}/pay?token=${token}`);
+    }
+  }, [booking, bookingId, token, router]);
+
   const [isSimulating, setIsSimulating] = useState(false);
 
   const { canSubmit, confirmAndRedirect, error, isSubmitting } =
