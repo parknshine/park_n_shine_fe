@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Manrope, Inter } from "next/font/google";
-import Script from "next/script";
+import { Geist, Geist_Mono, Manrope, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/providers/toaster";
@@ -30,6 +29,12 @@ const inter = Inter({
   weight: ["400", "600", "700"],
 });
 
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
 export const metadata: Metadata = {
   title: {
     default: "Park & Shine",
@@ -51,7 +56,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d9488",
+  themeColor: "#006289",
   colorScheme: "light",
   minimumScale: 1,
   initialScale: 1,
@@ -66,7 +71,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head />
-      <body className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${inter.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${inter.variable} ${plusJakartaSans.variable} antialiased`}>
         {/* DARK MODE DISABLED — script below reads localStorage/system preference and applies dark class */}
         {/* <Script
           id="theme-init"

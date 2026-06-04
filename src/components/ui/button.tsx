@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import type { ButtonVariant, ButtonSize } from "@/types";
 
 const variantClasses: Record<ButtonVariant, string> = {
-  default: "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
+  default: "bg-[linear-gradient(180deg,var(--primary-bright),var(--primary))] text-primary-foreground shadow-[var(--shadow-soft)] hover:-translate-y-0.5 active:translate-y-0",
   outline: "border border-border bg-transparent text-foreground shadow-sm hover:bg-muted",
   ghost: "bg-transparent text-foreground hover:bg-muted",
   destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
@@ -43,7 +43,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseClass = cn(
-    "inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+    "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-inherit",
     variantClasses[variant],
     sizeClasses[size],
     className

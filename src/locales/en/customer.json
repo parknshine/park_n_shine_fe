@@ -6,17 +6,17 @@
   },
   "landingPage": {
     "nav": {
-      "services": "Services",
+      "services": "Process",
       "pricing": "Pricing",
       "about": "About",
       "bookNow": "Book Now"
     },
     "hero": {
-      "heading": "Your Car Shines\nWhile You Shop",
-      "description": "Professional cleaning at your favorite parking spot. High-end enterprise discipline brought to everyday convenience.",
+      "heading": "A Cleaner Car\nWithout The\nExtra Trip.",
+      "description": "Skip the drive to a car wash. Park & Shine cleans your car where you already are, so you can spend less time waiting and more time with the people who matter most.",
       "viewServices": "View Services",
       "findLocations": "Find Locations",
-      "imageAlt": "Family standing near their clean blue car in a parking garage"
+      "imageAlt": "Family standing beside their car in a bright indoor parking area"
     },
     "howItWorks": {
       "title": "How the Magic Happens",
@@ -74,7 +74,7 @@
     },
     "footer": {
       "tagline": "Premium commercial automotive care delivered where you park.",
-      "copyright": "© 2024 Park & Shine. Commercial Clean Automotive Care.",
+      "copyright": "© 2026 Park & Shine. All rights reserved.",
       "companyHeading": "Company",
       "about": "About",
       "locations": "Locations",
@@ -92,6 +92,8 @@
   },
   "upload": {
     "select": "Take Photo",
+    "gallery": "Choose from Gallery",
+    "retake": "Retake",
     "retry": "Retry",
     "uploading": "Uploading...",
     "retrying": "Retrying..."

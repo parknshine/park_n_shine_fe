@@ -6,17 +6,17 @@
   },
   "landingPage": {
     "nav": {
-      "services": "Layanan",
+      "services": "Proses",
       "pricing": "Harga",
       "about": "Tentang",
       "bookNow": "Pesan Sekarang"
     },
     "hero": {
-      "heading": "Mobilmu Bersih\nSementara Kamu\nBelanja",
-      "description": "Layanan cuci profesional di tempat parkir favoritmu. Disiplin kelas atas untuk kenyamanan sehari-hari.",
+      "heading": "Mobil Lebih Bersih\nTanpa Perlu\nPergi Jauh.",
+      "description": "Tidak perlu pergi ke tempat cuci mobil. Park & Shine membersihkan mobilmu di tempat kamu berada, jadi kamu bisa menghabiskan lebih sedikit waktu menunggu dan lebih banyak waktu bersama orang-orang tersayang.",
       "viewServices": "Lihat Layanan",
       "findLocations": "Temukan Lokasi",
-      "imageAlt": "Keluarga berdiri di samping mobil biru bersih di parkiran"
+      "imageAlt": "Keluarga berdiri di samping mobil mereka di area parkir indoor yang terang"
     },
     "howItWorks": {
       "title": "Bagaimana Cara Kerjanya",
@@ -74,7 +74,7 @@
     },
     "footer": {
       "tagline": "Perawatan otomotif komersial premium di tempat kamu parkir.",
-      "copyright": "© 2024 Park & Shine. Commercial Clean Automotive Care.",
+      "copyright": "© 2026 Park & Shine. Hak cipta dilindungi.",
       "companyHeading": "Perusahaan",
       "about": "Tentang",
       "locations": "Lokasi",
@@ -92,6 +92,8 @@
   },
   "upload": {
     "select": "Ambil Foto",
+    "gallery": "Pilih dari Galeri",
+    "retake": "Foto Ulang",
     "retry": "Coba Lagi",
     "uploading": "Mengunggah...",
     "retrying": "Mencoba ulang..."

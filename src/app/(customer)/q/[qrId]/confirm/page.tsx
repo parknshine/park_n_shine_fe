@@ -3,7 +3,6 @@
 import { Suspense, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
-import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/shared";
 import { BookingSummaryCard } from "@/features/customer/components/booking-summary-card";
 import { PayButton } from "@/features/customer/components/pay-button";
@@ -68,15 +67,6 @@ function ConfirmContent() {
           currency={booking?.currency}
           estimatedReadyAt={booking?.estimatedReadyAt}
         />
-
-        <button
-          type="button"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-2 hover:underline"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Ubah foto
-        </button>
 
         <PayButton
           bookingId={bookingId}

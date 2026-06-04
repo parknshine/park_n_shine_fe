@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, Phone, Zap } from "lucide-react";
+import { Loader2, Phone, Zap } from "lucide-react";
 import api from "@/lib/axios";
 import { useTranslation } from "@/i18n";
 import { AppShell } from "@/components/shared";
@@ -165,15 +165,6 @@ function BookConfirmContent() {
             </CardContent>
           </Card>
         )}
-
-        <button
-          type="button"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-2 hover:underline"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {t("booking.confirm.back")}
-        </button>
 
         <Button
           size="lg"

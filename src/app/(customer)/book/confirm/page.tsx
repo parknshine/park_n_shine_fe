@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
-import { ArrowLeft, Loader2, Zap } from "lucide-react";
+import { Loader2, Zap } from "lucide-react";
 import api from "@/lib/axios";
 import { AppShell } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -128,15 +128,6 @@ function WalkInConfirmContent() {
         />
 
         <BookingLocationCard locationName={loc ?? ""} phone={phone ?? undefined} />
-
-        <button
-          type="button"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-2 hover:underline"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {t("booking.confirm.back")}
-        </button>
 
         <Button
           size="lg"
