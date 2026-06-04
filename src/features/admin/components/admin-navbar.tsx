@@ -139,7 +139,7 @@ export function AdminNavbar() {
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
             {avatarLetter}
           </div>
-          <span className="hidden max-w-[140px] truncate text-xs text-muted-foreground sm:block">
+          <span className="hidden max-w-35 truncate text-xs text-muted-foreground sm:block">
             {email}
           </span>
         </div>
