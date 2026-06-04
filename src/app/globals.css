@@ -42,7 +42,7 @@
 /* ─── Tailwind theme mapping ────────────────────────────────────────────────── */
 @theme inline {
   --font-sans: var(--font-plus-jakarta-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --color-background:              var(--background);
   --color-foreground:              var(--foreground);
@@ -275,16 +275,14 @@ img {
 
 .hero-visual {
   position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: 0 32px 50px rgba(0, 98, 137, 0.16);
 }
 
 .hero-visual img {
-  position: relative;
-  z-index: 1;
-  aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: 2rem;
-  box-shadow: 0 32px 50px rgba(0, 98, 137, 0.16);
-  width: 100%;
 }
 
 .hero-glow {
@@ -379,8 +377,6 @@ img {
 }
 
 .panel-image img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
 }
 
@@ -812,7 +808,6 @@ img {
     font-size: 2.6rem;
   }
 
-  .hero-visual img,
   .plan-card,
   .tracker-card,
   .comic-card {

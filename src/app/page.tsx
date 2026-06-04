@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
@@ -73,8 +74,7 @@ export default function Home() {
       <header className="topbar">
         <nav className="nav shell">
           <a className="brand" href="#top">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="brand-logo" src={imgParkShineLogo} alt="Park and Shine Car Wash logo" />
+            <Image className="brand-logo" src={imgParkShineLogo} alt="Park and Shine Car Wash logo" width={48} height={48} />
             <span>Park &amp; Shine</span>
           </a>
 
@@ -212,8 +212,7 @@ export default function Home() {
           <div className="hero-visual">
             <div className="hero-glow hero-glow-yellow" />
             <div className="hero-glow hero-glow-blue" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imgHero} alt={t("landingPage.hero.imageAlt")} />
+            <Image src={imgHero} alt={t("landingPage.hero.imageAlt")} fill priority sizes="(max-width: 1050px) 100vw, 52vw" />
           </div>
         </section>
 
@@ -229,8 +228,7 @@ export default function Home() {
                 <article key={step} className={`comic-card ${tilt}`}>
                   <span className="panel-step">{step}</span>
                   <div className="panel-image">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={image} alt="" />
+                    <Image src={image} alt="" fill sizes="(max-width: 800px) 50vw, 25vw" />
                   </div>
                   <div className="speech-bubble">
                     <h3>{t(`landingPage.howItWorks.card${step}.title`)}</h3>
