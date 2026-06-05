@@ -76,7 +76,7 @@ export function BookingSummaryCard({
             <div>
               <p className="text-xs text-muted-foreground">{t("booking.summary.price")}</p>
               <p className="font-semibold text-foreground">
-                {currency === "IDR" ? formatIDR(priceAmount) : String(priceAmount)}
+                {formatIDR(priceAmount)}
               </p>
             </div>
           </div>

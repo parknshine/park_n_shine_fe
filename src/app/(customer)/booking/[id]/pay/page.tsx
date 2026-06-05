@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useQueryState, parseAsString } from "nuqs";
-import { useParams } from "next/navigation";
 import { Copy, CheckCircle, RefreshCw, AlertCircle, Wallet } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
 import { useCheckPayment } from "@/features/customer/hooks/use-check-payment";
 import { usePaymentAutoPoll } from "@/features/customer/hooks/use-payment-auto-poll";
 import { BOOKING_STATUSES } from "@/features/customer/types";
+import { BookingExpiredModal } from "@/features/customer/components/booking-expired-modal";
 import { AppShell } from "@/components/shared";
 import type {
   BookingStatus,
@@ -130,7 +130,7 @@ function PaymentInstructionsUI({
   instructions: PaymentInstructions;
   onChangeMethod: () => void;
 }) {
-  const expired = isExpired(instructions.expiryTime);
+  const expired = "expiryTime" in instructions && isExpired(instructions.expiryTime);
 
   if (expired) {
     return (
@@ -221,6 +221,29 @@ function PaymentInstructionsUI({
     );
   }
 
+  // ── Credit card / Snap redirect ──
+  if (instructions.type === "REDIRECT") {
+    return (
+      <div className="bg-primary rounded-2xl p-6 flex flex-col items-center gap-4 text-center">
+        <div className="w-14 h-14 rounded-full bg-primary-foreground/10 flex items-center justify-center">
+          <Wallet className="w-7 h-7 text-primary-foreground" />
+        </div>
+        <div>
+          <p className="font-semibold text-primary-foreground mb-1">Bayar dengan Kartu</p>
+          <p className="text-sm text-primary-foreground/70">
+            Klik tombol di bawah untuk membuka halaman pembayaran dan memasukkan detail kartu kredit / debit kamu.
+          </p>
+        </div>
+        <a
+          href={instructions.redirectUrl}
+          className="w-full py-3 rounded-xl bg-primary-foreground text-primary text-sm font-semibold text-center hover:bg-primary-foreground/90 transition-colors"
+        >
+          Bayar Sekarang
+        </a>
+      </div>
+    );
+  }
+
   // ── E-Wallet deeplink ──
   if (instructions.type === "EWALLET") {
     return (
@@ -302,6 +325,8 @@ export default function PayPage() {
   }
 
   return (
+    <>
+    <BookingExpiredModal open={booking?.status === BOOKING_STATUSES.EXPIRED} />
     <AppShell surface="customer" className="pb-32">
       <div className="space-y-5">
         {/* ── Page heading ──────────────────────────────────────────── */}
@@ -401,5 +426,6 @@ export default function PayPage() {
         </div>
       </div>
     </AppShell>
+    </>
   );
 }

@@ -10,10 +10,10 @@ export function useChargePayment(bookingId: string, signedToken: string) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (paymentMethod: string) => {
+    mutationFn: async ({ paymentMethod, finishUrl }: { paymentMethod: string; finishUrl?: string }) => {
       const response = await api.post<PaymentInstructions>(
         `/v1/bookings/${bookingId}/charge`,
-        { paymentMethod },
+        { paymentMethod, ...(finishUrl ? { finishUrl } : {}) },
         { headers: { "X-Booking-Token": signedToken } },
       );
       return response.data;
@@ -24,8 +24,6 @@ export function useChargePayment(bookingId: string, signedToken: string) {
       });
     },
   });
-
-  console.log("mutation", mutation);
 
   return {
     charge: mutation.mutate,
