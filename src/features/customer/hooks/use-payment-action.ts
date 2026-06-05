@@ -41,14 +41,11 @@ export function usePaymentAction(bookingId: string, signedToken: string) {
       // Gateway failed: backend rolls booking back to DRAFT, allow retry on this page
       setHasSubmitted(false);
     },
-    onSuccess: (paymentIntent) => {
+    onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId),
       });
-      const redirectUrl =
-        paymentIntent.redirectUrl ??
-        `/booking/${bookingId}/status?token=${signedToken}`;
-      window.location.assign(redirectUrl);
+      window.location.assign(`/booking/${bookingId}/status?token=${signedToken}`);
     },
   });
 

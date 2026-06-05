@@ -654,8 +654,23 @@ export function normalizeApiError(error: unknown): ApiContractError {
     }
 
     // Backend wraps error details under an `error` key:
-    // { success: false, error: { code, message, ... } }
+    // { success: false, error: { code, message, ... } } or { success: false, error: "message string" }
     const responseData = error.response?.data;
+    if (
+      responseData &&
+      typeof responseData === "object" &&
+      responseData.success === false &&
+      responseData.error &&
+      typeof responseData.error === "string"
+    ) {
+      return new ApiContractError({
+        code: mapHttpStatusToErrorCode(error.response?.status),
+        message: responseData.error,
+        success: false,
+        httpStatus: error.response?.status,
+      });
+    }
+
     if (
       responseData &&
       typeof responseData === "object" &&

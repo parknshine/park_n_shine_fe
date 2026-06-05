@@ -16,6 +16,7 @@ import { isValidPhone } from "@/features/customer/utils/phone";
 import type { CustomerBooking } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
+import { Input } from "@/components/ui/input";
 
 export default function WalkInCapturePage() {
   return (
@@ -125,10 +126,12 @@ function WalkInCaptureContent() {
 
   if (createMutation.isPending || (!bookingId && !createMutation.isError)) {
     return (
-      <AppShell surface="customer">
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">{t("state.preparing", { ns: "common" })}</p>
+      <AppShell surface='customer'>
+        <div className='flex min-h-[60vh] flex-col items-center justify-center gap-3'>
+          <Loader2 className='h-8 w-8 animate-spin text-primary' />
+          <p className='text-sm text-muted-foreground'>
+            {t("state.preparing", { ns: "common" })}
+          </p>
         </div>
       </AppShell>
     );
@@ -136,8 +139,8 @@ function WalkInCaptureContent() {
 
   if (createMutation.isError) {
     return (
-      <AppShell surface="customer">
-        <div className="space-y-4 pt-10 text-center">
+      <AppShell surface='customer'>
+        <div className='space-y-4 pt-10 text-center'>
           <Button
             onClick={() => {
               hasCreatedRef.current = false;
@@ -151,28 +154,41 @@ function WalkInCaptureContent() {
     );
   }
 
-  const isOfflinePaused = plateUpload.isOfflinePaused || slotUpload.isOfflinePaused;
+  const isOfflinePaused =
+    plateUpload.isOfflinePaused || slotUpload.isOfflinePaused;
 
   return (
-    <AppShell surface="customer">
-      <div className="space-y-6">
+    <AppShell surface='customer'>
+      <div className='space-y-5'>
         <OfflineBanner visible={isOfflinePaused} />
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {t("booking.step", { current: 2, total: 3 })}
-          </p>
-          <h1 className="mt-1 text-2xl font-bold text-foreground">
-            {t("booking.capture.title")}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("booking.capture.subtitle")}
-          </p>
+
+        <div className='flex items-start gap-3'>
+          {/* <button
+            type="button"
+            className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition hover:bg-muted hover:text-foreground"
+            onClick={() => router.back()}
+            aria-label={t("action.back", { ns: "common" })}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button> */}
+
+          <div className='min-w-0 flex-1'>
+            <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+              {t("booking.step", { current: 2, total: 3 })}
+            </p>
+            <h1 className='mt-1 text-2xl font-bold leading-tight text-foreground'>
+              {t("booking.capture.title")}
+            </h1>
+            <p className='mt-1 text-sm text-muted-foreground'>
+              {t("booking.capture.subtitle")}
+            </p>
+          </div>
         </div>
 
-        <div className="space-y-4">
+        <div className='space-y-3'>
           <PhotoUploadField
-            id="plate-photo"
-            kind="plate"
+            id='plate-photo'
+            kind='plate'
             label={t("booking.capture.platePhotoLabel")}
             state={plateUpload}
             onSelect={(file, kind) => plateUpload.uploadPhoto({ file, kind })}
@@ -180,7 +196,7 @@ function WalkInCaptureContent() {
           />
           {plateUpload.status === "success" && (
             <OcrEditField
-              id="plate-text"
+              id='plate-text'
               label={t("booking.capture.plateOcrLabel")}
               value={plateText}
               onChange={setPlateText}
@@ -189,8 +205,8 @@ function WalkInCaptureContent() {
           )}
 
           <PhotoUploadField
-            id="slot-photo"
-            kind="slot"
+            id='slot-photo'
+            kind='slot'
             label={t("booking.capture.slotPhotoLabel")}
             state={slotUpload}
             onSelect={(file, kind) => slotUpload.uploadPhoto({ file, kind })}
@@ -198,7 +214,7 @@ function WalkInCaptureContent() {
           />
           {slotUpload.status === "success" && (
             <OcrEditField
-              id="slot-text"
+              id='slot-text'
               label={t("booking.capture.slotOcrLabel")}
               value={slotText}
               onChange={setSlotText}
@@ -206,37 +222,40 @@ function WalkInCaptureContent() {
             />
           )}
 
-          <div className="space-y-1.5">
+          <div className='space-y-1.5 rounded-lg border border-border bg-card p-4 shadow-sm'>
             <label
-              htmlFor="phone"
-              className="text-sm font-medium text-foreground"
+              htmlFor='phone'
+              className='text-sm font-medium text-foreground'
             >
               {t("booking.capture.phoneLabel")}
             </label>
-            <input
-              id="phone"
-              type="tel"
-              inputMode="tel"
+            <Input
+              id='phone'
+              type='text'
+              inputMode='numeric'
+              pattern='[0-9]*'
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
               placeholder={t("booking.capture.phonePlaceholder")}
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className='w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
             />
-            <p className="text-xs text-muted-foreground">
+            <p className='text-xs text-muted-foreground'>
               {t("booking.capture.phoneHelper")}
             </p>
           </div>
         </div>
 
-        <Button
-          size="lg"
-          className="w-full rounded-full"
-          disabled={!canContinue}
-          suffix={<ArrowRight className="h-4 w-4" />}
-          onClick={handleContinue}
-        >
-          {t("action.next", { ns: "common" })}
-        </Button>
+        <div className='pt-1'>
+          <Button
+            size='lg'
+            className='w-full rounded-full'
+            disabled={!canContinue}
+            suffix={<ArrowRight className='h-4 w-4' />}
+            onClick={handleContinue}
+          >
+            {t("action.next", { ns: "common" })}
+          </Button>
+        </div>
       </div>
     </AppShell>
   );

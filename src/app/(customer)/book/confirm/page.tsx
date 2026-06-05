@@ -54,11 +54,15 @@ function WalkInConfirmContent() {
     enabled: !!bookingId && !!token,
   });
 
-  // If booking already confirmed (PENDING or beyond), go straight to pay page
+  // Route based on current booking state
   useEffect(() => {
     if (!booking || !bookingId || !token) return;
-    if (booking.status !== "DRAFT") {
-      router.replace(`/booking/${bookingId}/pay?token=${token}`);
+    if (booking.status === "PENDING") {
+      // PENDING but no payment method chosen yet — go to payment method selection
+      router.replace(`/booking/${bookingId}/payment-method?token=${token}`);
+    } else if (booking.status !== "DRAFT") {
+      // PAID or beyond — go to status page
+      router.replace(`/booking/${bookingId}/status?token=${token}`);
     }
   }, [booking, bookingId, token, router]);
 
@@ -82,7 +86,7 @@ function WalkInConfirmContent() {
       await api.post(
         `/v1/dev/bookings/${bookingId}/simulate-payment`,
         { plate: plate!, slot: slot!, ...(phone ? { phone } : {}) },
-        { headers: { "X-Booking-Token": token } }
+        { headers: { "X-Booking-Token": token } },
       );
       window.location.assign(`/booking/${bookingId}/status?token=${token}`);
     } catch {
@@ -104,63 +108,81 @@ function WalkInConfirmContent() {
   }
 
   return (
-    <AppShell surface="customer">
-      <div className="space-y-6">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {t("booking.step", { current: 3, total: 3 })}
-          </p>
-          <h1 className="mt-1 text-2xl font-bold text-foreground">
-            {t("booking.confirm.title")}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("booking.confirm.subtitle")}
-          </p>
+    <AppShell surface='customer'>
+      <div className='space-y-6'>
+        <div className='flex items-start gap-3'>
+          {/* <button
+            type="button"
+            className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition hover:bg-muted hover:text-foreground"
+            onClick={() => router.back()}
+            aria-label={t("booking.confirm.back")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button> */}
+
+          <div className='min-w-0 flex-1'>
+            <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+              {t("booking.step", { current: 3, total: 3 })}
+            </p>
+            <h1 className='mt-1 text-2xl font-bold leading-tight text-foreground'>
+              {t("booking.confirm.title")}
+            </h1>
+            <p className='mt-1 text-sm text-muted-foreground'>
+              {t("booking.confirm.subtitle")}
+            </p>
+          </div>
         </div>
 
-        <BookingSummaryCard
-          plate={plate}
-          slot={slot}
-          siteName={booking?.siteName}
-          priceAmount={booking?.priceAmount}
-          currency={booking?.currency}
-          estimatedReadyAt={booking?.estimatedReadyAt}
-        />
+        <div className='space-y-3'>
+          <BookingSummaryCard
+            plate={plate}
+            slot={slot}
+            siteName={booking?.siteName}
+            priceAmount={booking?.priceAmount}
+            currency={booking?.currency}
+            estimatedReadyAt={booking?.estimatedReadyAt}
+          />
 
-        <BookingLocationCard locationName={loc ?? ""} phone={phone ?? undefined} />
+          <BookingLocationCard
+            locationName={loc ?? ""}
+            phone={phone ?? undefined}
+          />
+        </div>
 
-        <Button
-          size="lg"
-          className="w-full rounded-full"
-          disabled={!canSubmit}
-          onClick={handlePay}
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t("booking.confirm.processing")}
-            </>
-          ) : (
-            t("booking.confirm.pay")
-          )}
-        </Button>
-
-        {/* ── Dev-only: skip payment gateway ─────────────────────────────── */}
-        {process.env.NODE_ENV !== "production" && (
-          <button
-            type="button"
-            disabled={isSimulating}
-            onClick={handleSimulatePay}
-            className="flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
+        <div className='space-y-3 pt-1'>
+          <Button
+            size='lg'
+            className='w-full rounded-full'
+            disabled={!canSubmit}
+            onClick={handlePay}
           >
-            {isSimulating ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+            {isSubmitting ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                {t("booking.confirm.processing")}
+              </>
             ) : (
-              <Zap className="h-4 w-4" />
+              t("booking.confirm.pay")
             )}
-            {isSimulating ? "Memproses..." : "⚡ Simulasi Bayar (Dev Only)"}
-          </button>
-        )}
+          </Button>
+
+          {/* ── Dev-only: skip payment gateway ─────────────────────────────── */}
+          {process.env.NODE_ENV !== "production" && (
+            <button
+              type='button'
+              disabled={isSimulating}
+              onClick={handleSimulatePay}
+              className='flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400'
+            >
+              {isSimulating ? (
+                <Loader2 className='h-4 w-4 animate-spin' />
+              ) : (
+                <Zap className='h-4 w-4' />
+              )}
+              {isSimulating ? "Memproses..." : "⚡ Simulasi Bayar (Dev Only)"}
+            </button>
+          )}
+        </div>
       </div>
     </AppShell>
   );

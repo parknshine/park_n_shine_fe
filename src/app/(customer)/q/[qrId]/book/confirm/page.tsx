@@ -59,8 +59,10 @@ function BookConfirmContent() {
 
   useEffect(() => {
     if (!booking || !bookingId || !token) return;
-    if (booking.status !== "DRAFT") {
-      router.replace(`/booking/${bookingId}/pay?token=${token}`);
+    if (booking.status === "PENDING") {
+      router.replace(`/booking/${bookingId}/payment-method?token=${token}`);
+    } else if (booking.status !== "DRAFT") {
+      router.replace(`/booking/${bookingId}/status?token=${token}`);
     }
   }, [booking, bookingId, token, router]);
 
@@ -79,7 +81,7 @@ function BookConfirmContent() {
             "Idempotency-Key": bookingId,
             "X-Booking-Token": token,
           },
-        }
+        },
       );
       return response.data;
     },
@@ -89,14 +91,11 @@ function BookConfirmContent() {
       const msg = err instanceof Error ? err.message : "payment_confirm_failed";
       toast.error(msg);
     },
-    onSuccess: (paymentIntent) => {
+    onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId ?? ""),
       });
-      const redirectUrl =
-        paymentIntent.redirectUrl ??
-        `/booking/${bookingId}/status?token=${token}`;
-      window.location.assign(redirectUrl);
+      window.location.assign(`/booking/${bookingId}/payment-method?token=${token}`);
     },
   });
 
@@ -107,7 +106,11 @@ function BookConfirmContent() {
   function handlePay() {
     if (mutation.isPending || hasSubmitted) return;
     setHasSubmitted(true);
-    mutation.mutate({ plateText: plate!, slotText: slot!, ...(phone ? { phone } : {}) });
+    mutation.mutate({
+      plateText: plate!,
+      slotText: slot!,
+      ...(phone ? { phone } : {}),
+    });
   }
 
   async function handleSimulatePay() {
@@ -117,7 +120,7 @@ function BookConfirmContent() {
       await api.post(
         `/v1/dev/bookings/${bookingId}/simulate-payment`,
         { plate: plate!, slot: slot!, ...(phone ? { phone } : {}) },
-        { headers: { "X-Booking-Token": token } }
+        { headers: { "X-Booking-Token": token } },
       );
       window.location.assign(`/booking/${bookingId}/status?token=${token}`);
     } catch {
@@ -129,16 +132,16 @@ function BookConfirmContent() {
   const canSubmit = !mutation.isPending && !hasSubmitted;
 
   return (
-    <AppShell surface="customer">
-      <div className="space-y-6">
+    <AppShell surface='customer'>
+      <div className='space-y-6'>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
             {t("booking.step", { current: 2, total: 2 })}
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-foreground">
+          <h1 className='mt-1 text-2xl font-bold text-foreground'>
             {t("booking.confirm.title")}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className='mt-1 text-sm text-muted-foreground'>
             {t("booking.confirm.subtitle")}
           </p>
         </div>
@@ -154,12 +157,14 @@ function BookConfirmContent() {
 
         {phone && (
           <Card>
-            <CardContent className="pt-5">
-              <div className="flex items-center gap-3">
-                <Phone className="h-5 w-5 shrink-0 text-primary" />
+            <CardContent className='pt-5'>
+              <div className='flex items-center gap-3'>
+                <Phone className='h-5 w-5 shrink-0 text-primary' />
                 <div>
-                  <p className="text-xs text-muted-foreground">{t("booking.capture.phoneLabel")}</p>
-                  <p className="font-semibold text-foreground">{phone}</p>
+                  <p className='text-xs text-muted-foreground'>
+                    {t("booking.capture.phoneLabel")}
+                  </p>
+                  <p className='font-semibold text-foreground'>{phone}</p>
                 </div>
               </div>
             </CardContent>
@@ -167,14 +172,14 @@ function BookConfirmContent() {
         )}
 
         <Button
-          size="lg"
-          className="w-full rounded-full"
+          size='lg'
+          className='w-full rounded-full'
           disabled={!canSubmit}
           onClick={handlePay}
         >
           {mutation.isPending ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
               {t("booking.confirm.processing")}
             </>
           ) : (
@@ -185,15 +190,15 @@ function BookConfirmContent() {
         {/* ── Dev-only: skip payment gateway ─────────────────────────────── */}
         {process.env.NODE_ENV !== "production" && (
           <button
-            type="button"
+            type='button'
             disabled={isSimulating}
             onClick={handleSimulatePay}
-            className="flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
+            className='flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400'
           >
             {isSimulating ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className='h-4 w-4 animate-spin' />
             ) : (
-              <Zap className="h-4 w-4" />
+              <Zap className='h-4 w-4' />
             )}
             {isSimulating ? "Memproses..." : "⚡ Simulasi Bayar (Dev Only)"}
           </button>

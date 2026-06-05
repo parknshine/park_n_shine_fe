@@ -42,22 +42,18 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
     mutationKey: mutationKeys.customer.confirmPayment(bookingId),
     onError: (err: unknown) => {
       const code = (err as { code?: string }).code;
-      if (
-        code === API_ERROR_CODES.BOOKING_ALREADY_CONFIRMED ||
-        code === API_ERROR_CODES.PAYMENT_GATEWAY_FAILED
-      ) {
-        window.location.assign(`/booking/${bookingId}/pay?token=${signedToken}`);
+      if (code === API_ERROR_CODES.BOOKING_ALREADY_CONFIRMED) {
+        // Booking already PENDING — go straight to payment method selection
+        window.location.assign(`/booking/${bookingId}/payment-method?token=${signedToken}`);
         return;
       }
       setHasSubmitted(false);
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId),
       });
-      const redirectUrl =
-        data.redirectUrl ?? `/booking/${bookingId}/status?token=${signedToken}`;
-      window.location.assign(redirectUrl);
+      window.location.assign(`/booking/${bookingId}/payment-method?token=${signedToken}`);
     },
   });
 

@@ -91,10 +91,10 @@ export function PhotoUploadField({
       {/* Hidden inputs */}
       <input
         id={`${id}-camera`}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        className="sr-only"
+        type='file'
+        accept='image/*'
+        capture='environment'
+        className='sr-only'
         disabled={isBusy}
         onChange={handleFileChange}
       />
@@ -145,8 +145,8 @@ export function PhotoUploadField({
 
           {/* Success badge */}
           {state.status === "success" && (
-            <div className="absolute right-2 bottom-2 rounded-full bg-green-500 p-1 shadow-sm">
-              <CheckCircle className="h-4 w-4 text-white" />
+            <div className='absolute right-2 bottom-2 rounded-full bg-green-500 p-1 shadow-sm'>
+              <CheckCircle className='h-4 w-4 text-white' />
             </div>
           )}
 
@@ -175,9 +175,9 @@ export function PhotoUploadField({
           <span>{state.error}</span>
           {onRetry && (
             <Button
-              size="sm"
-              variant="ghost"
-              prefix={<RotateCcw className="h-4 w-4" />}
+              size='sm'
+              variant='ghost'
+              prefix={<RotateCcw className='h-4 w-4' />}
               onClick={onRetry}
             >
               {resolvedLabels.retry}

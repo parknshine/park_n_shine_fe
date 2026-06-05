@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { queryKeys } from "@/lib/query-keys";
-import type { BookingStatus, CustomerBooking } from "@/features/customer/types";
+import type { BookingStatus, CustomerBooking, PaymentInstructions } from "@/features/customer/types";
 
 // Statuses that are meaningful to the customer.
 // Internal / crew-operational statuses are hidden from the timeline.
@@ -38,8 +38,11 @@ export function useBookingStatus({
         status: CustomerBooking["status"];
         plate?: string | null;
         slot?: string | null;
+        phone?: string | null;
         price?: number;
         siteName: string;
+        paymentMethod?: string | null;
+        paymentInstructions?: PaymentInstructions | null;
         timeline?: { status: CustomerBooking["status"]; timestamp: string }[];
       }>(`/v1/bookings/${bookingId}`, {
         headers: { "X-Booking-Token": signedToken },
@@ -52,7 +55,10 @@ export function useBookingStatus({
         siteName: d.siteName,
         plateText: d.plate ?? null,
         slotText: d.slot ?? null,
+        phone: d.phone ?? null,
         priceAmount: d.price,
+        paymentMethod: d.paymentMethod ?? null,
+        paymentInstructions: d.paymentInstructions ?? null,
         media: [],
         statusHistory: (d.timeline ?? [])
           .filter((t) => CUSTOMER_VISIBLE_STATUSES.has(t.status))

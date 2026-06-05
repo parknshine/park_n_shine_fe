@@ -7,6 +7,7 @@ const BACK_PAGES = [
   /^\/book\/location$/,
   /^\/book\/capture$/,
   /^\/book\/confirm$/,
+  // /^\/booking\/[^/]+\/payment-method$/,
   /^\/q\/[^/]+\/book\/capture$/,
   /^\/q\/[^/]+\/book\/confirm$/,
   /^\/q\/[^/]+\/capture$/,

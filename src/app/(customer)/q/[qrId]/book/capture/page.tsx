@@ -18,6 +18,7 @@ import type {
   CreateBookingPayload,
   CustomerBooking,
 } from "@/features/customer/types";
+import { Input } from "@/components/ui/input";
 
 export default function BookCapturePage() {
   const { t } = useTranslation("customer");
@@ -136,25 +137,38 @@ export default function BookCapturePage() {
     );
   }
 
-  const isOfflinePaused = plateUpload.isOfflinePaused || slotUpload.isOfflinePaused;
+  const isOfflinePaused =
+    plateUpload.isOfflinePaused || slotUpload.isOfflinePaused;
 
   return (
     <AppShell surface='customer'>
-      <div className='space-y-6'>
+      <div className='space-y-5'>
         <OfflineBanner visible={isOfflinePaused} />
-        <div>
-          <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
-            {t("booking.step", { current: 1, total: 2 })}
-          </p>
-          <h1 className='mt-1 text-2xl font-bold text-foreground'>
-            {t("booking.capture.title")}
-          </h1>
-          <p className='mt-1 text-sm text-muted-foreground'>
-            {t("booking.capture.subtitle")}
-          </p>
+
+        <div className='flex items-start gap-3'>
+          {/* <button
+            type='button'
+            className='mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition hover:bg-muted hover:text-foreground'
+            onClick={() => router.back()}
+            aria-label={t("action.back", { ns: "common" })}
+          >
+            <ArrowLeft className='h-4 w-4' />
+          </button> */}
+
+          <div className='min-w-0 flex-1'>
+            <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+              {t("booking.step", { current: 1, total: 2 })}
+            </p>
+            <h1 className='mt-1 text-2xl font-bold leading-tight text-foreground'>
+              {t("booking.capture.title")}
+            </h1>
+            <p className='mt-1 text-sm text-muted-foreground'>
+              {t("booking.capture.subtitle")}
+            </p>
+          </div>
         </div>
 
-        <div className='space-y-4'>
+        <div className='space-y-3'>
           <PhotoUploadField
             id='plate-photo'
             kind='plate'
@@ -191,19 +205,20 @@ export default function BookCapturePage() {
             />
           )}
 
-          <div className='space-y-1.5'>
+          <div className='space-y-1.5 rounded-lg border border-border bg-card p-4 shadow-sm'>
             <label
               htmlFor='phone'
               className='text-sm font-medium text-foreground'
             >
               {t("booking.capture.phoneLabel")}
             </label>
-            <input
+            <Input
               id='phone'
-              type='tel'
-              inputMode='tel'
+              type='text'
+              inputMode='numeric'
+              pattern='[0-9]*'
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
               placeholder={t("booking.capture.phonePlaceholder")}
               className='w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
             />
@@ -213,15 +228,17 @@ export default function BookCapturePage() {
           </div>
         </div>
 
-        <Button
-          size='lg'
-          className='w-full rounded-full'
-          disabled={!canContinue}
-          suffix={<ArrowRight className='h-4 w-4' />}
-          onClick={handleContinue}
-        >
-          {t("action.next", { ns: "common" })}
-        </Button>
+        <div className='pt-1'>
+          <Button
+            size='lg'
+            className='w-full rounded-full'
+            disabled={!canContinue}
+            suffix={<ArrowRight className='h-4 w-4' />}
+            onClick={handleContinue}
+          >
+            {t("action.next", { ns: "common" })}
+          </Button>
+        </div>
       </div>
     </AppShell>
   );

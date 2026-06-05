@@ -53,6 +53,12 @@ export interface BookingStatusEvent {
   labelKey: string;
 }
 
+export type PaymentInstructions =
+  | { type: "VA"; bank: string; vaNumber: string; expiryTime: string }
+  | { type: "MANDIRI"; companyCode: string; billCode: string; expiryTime: string }
+  | { type: "QRIS"; qrUrl: string; expiryTime: string }
+  | { type: "EWALLET"; provider: string; deepLinkUrl: string; expiryTime: string };
+
 export interface CustomerBooking {
   id: string;
   signedToken: string;
@@ -60,9 +66,12 @@ export interface CustomerBooking {
   siteName: string;
   plateText?: string | null;
   slotText?: string | null;
+  phone?: string | null;
   priceAmount?: number;
   currency?: "IDR";
   estimatedReadyAt?: string | null;
+  paymentMethod: string | null;
+  paymentInstructions: PaymentInstructions | null;
   media: BookingMedia[];
   statusHistory: BookingStatusEvent[];
 }
@@ -84,7 +93,6 @@ export interface PaymentIntentResponse {
   slot: string;
   price: number;
   payment: { message: string };
-  redirectUrl?: string;
 }
 
 export interface ResumePaymentResponse {
