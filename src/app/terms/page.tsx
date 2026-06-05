@@ -16,7 +16,7 @@ export default function TermsPage() {
         className="bg-white border-b border-[#e8e8e8] sticky top-0 z-50"
         style={{ boxShadow: "0px 1px 1px rgba(0,0,0,0.05)" }}
       >
-        <div className="max-w-[1366px] mx-auto px-4 md:px-12 py-4 flex items-center justify-between">
+        <div className="max-w-341.5 mx-auto px-4 md:px-12 py-4 flex items-center justify-between">
           <Link
             href="/"
             className="text-[#0036a4] text-xl md:text-2xl whitespace-nowrap"

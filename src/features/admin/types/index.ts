@@ -92,6 +92,8 @@ export interface AdminSiteDetail {
   timezone: string;
   intakePaused: boolean;
   cutoffTime: string | null;
+  lat?: number | null;
+  lng?: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -109,6 +111,8 @@ export interface CreateSitePayload {
   address: string;
   timezone: string;
   cutoffTime?: string | null;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export interface UpdateSitePayload {
@@ -117,6 +121,8 @@ export interface UpdateSitePayload {
   timezone?: string;
   cutoffTime?: string | null;
   intakePaused?: boolean;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export interface GenerateQrPayload {

@@ -16,7 +16,9 @@
       "description": "Skip the drive to a car wash. Park & Shine cleans your car where you already are, so you can spend less time waiting and more time with the people who matter most.",
       "viewServices": "View Services",
       "findLocations": "Find Locations",
-      "imageAlt": "Family standing beside their car in a bright indoor parking area"
+      "imageAlt": "Family standing beside their car in a bright indoor parking area",
+      "btnBookNow": "Book a Wash",
+      "btnViewPricing": "View Pricing"
     },
     "howItWorks": {
       "title": "How the Magic Happens",
@@ -113,11 +115,26 @@
       "cancelled": "Cancelled"
     },
     "stepper": {
-      "pending":     { "label": "Awaiting Payment",    "desc": "Complete payment to confirm your booking" },
-      "paid":        { "label": "Payment Confirmed",   "desc": "Your booking is confirmed, crew will be assigned" },
-      "in_progress": { "label": "Being Washed",        "desc": "Our crew is washing your car" },
-      "ready":       { "label": "Car Ready!",          "desc": "Your car is ready for pickup" },
-      "closed":      { "label": "Completed",           "desc": "Thank you for using Park & Shine" }
+      "pending": {
+        "label": "Awaiting Payment",
+        "desc": "Complete payment to confirm your booking"
+      },
+      "paid": {
+        "label": "Payment Confirmed",
+        "desc": "Your booking is confirmed, crew will be assigned"
+      },
+      "in_progress": {
+        "label": "Being Washed",
+        "desc": "Our crew is washing your car"
+      },
+      "ready": {
+        "label": "Car Ready!",
+        "desc": "Your car is ready for pickup"
+      },
+      "closed": {
+        "label": "Completed",
+        "desc": "Thank you for using Park & Shine"
+      }
     },
     "step": "Step {{current}} of {{total}}",
     "location": {

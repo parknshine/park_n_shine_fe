@@ -9,7 +9,7 @@ interface AuditLogTableProps {
   onRowClick?: (entry: AuditEntry) => void;
 }
 
-export function AuditLogTable({ entries, onRowClick }: AuditLogTableProps) {
+export function AuditLogTable({ entries, onRowClick }: Readonly<AuditLogTableProps>) {
   const { t } = useTranslation("admin");
 
   const columns = [
