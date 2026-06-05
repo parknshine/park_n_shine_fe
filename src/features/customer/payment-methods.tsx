@@ -78,12 +78,6 @@ export const PAYMENT_METHOD_MAP: Record<string, PaymentMethodDef> = {
     subtitle: "Virtual Account BSI",
     logoUrl: `${CDN}/2026/01/e532a2a311c008bd57860e0d2421a1b1_9cef30936521d99ed6cfc577a02a98bd_compressed.png`,
   },
-  BTN: {
-    code: "BTN",
-    name: "Bank BTN",
-    subtitle: "Virtual Account BTN",
-    logoUrl: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%23003082'/%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='13' font-weight='800' font-family='sans-serif'%3EBTN%3C/text%3E%3C/svg%3E`,
-  },
 };
 
 export const PAYMENT_CATEGORIES: { label: string; methods: PaymentMethodDef[] }[] = [
@@ -112,7 +106,6 @@ export const PAYMENT_CATEGORIES: { label: string; methods: PaymentMethodDef[] }[
       PAYMENT_METHOD_MAP.CIMB,
       PAYMENT_METHOD_MAP.MANDIRI,
       PAYMENT_METHOD_MAP.BSI,
-      PAYMENT_METHOD_MAP.BTN,
     ],
   },
 ];
