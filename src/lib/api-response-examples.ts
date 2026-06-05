@@ -608,8 +608,8 @@ export const adminSuccessExamples = {
       revenue: { totalGross: 3150000, currency: "IDR" },
       avgTurnaroundSeconds: 1320,
       crew: [
-        { crewId: "crew_01", crewName: "Budi", jobsCompleted: 22, avgTurnaroundSeconds: 1200, estimatedRevenue: 1650000 },
-        { crewId: "crew_02", crewName: "Sari", jobsCompleted: 17, avgTurnaroundSeconds: 1470, estimatedRevenue: 1275000 },
+        { crewId: "crew_01", crewName: "Budi", jobsCompleted: 22, avgTurnaroundSeconds: 1200, estimatedRevenue: 1650000, staleCount: 1, needsHelpCount: 2, reliabilityScore: 0.95 },
+        { crewId: "crew_02", crewName: "Sari", jobsCompleted: 17, avgTurnaroundSeconds: 1470, estimatedRevenue: 1275000, staleCount: 0, needsHelpCount: 1, reliabilityScore: 0.98 },
       ],
     },
     meta: META,

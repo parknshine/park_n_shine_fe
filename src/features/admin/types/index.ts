@@ -30,7 +30,7 @@ export interface RefundPayload {
 }
 
 export interface StatusOverridePayload {
-  nextStatus: Extract<BookingStatus, "PAID" | "CANCELLED">;
+  nextStatus: Extract<BookingStatus, "PAID" | "CANCELLED" | "STALE" | "ASSIGNED" | "IN_PROGRESS">;
   reasonCode: string;
 }
 
@@ -45,6 +45,9 @@ export interface ReportCrewPerformance {
   jobsCompleted: number;
   avgTurnaroundSeconds: number | null;
   estimatedRevenue: number;
+  staleCount: number;
+  needsHelpCount: number;
+  reliabilityScore: number | null;
 }
 
 export interface AuditEntry {

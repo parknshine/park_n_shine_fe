@@ -62,6 +62,15 @@
       "right": "Kanan",
       "before": "Sebelum",
       "after": "Sesudah"
+    },
+    "staleModal": {
+      "title": "Waktu Pengerjaan Habis",
+      "description": "Waktu ETA untuk job ini telah habis. Silakan pilih tindakan berikut:",
+      "requestHelp": "Minta Bantuan",
+      "requestHelpDesc": "Tandai job sebagai butuh bantuan. Admin akan segera menghubungi kamu.",
+      "markStale": "Tandai Stale",
+      "markStaleDesc": "Tandai job sebagai stale. Job tetap tercatat dan admin dapat menugaskan ulang.",
+      "submitting": "Memproses..."
     }
   },
   "verify": {

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRealtimeEvents, getCrewIdFromToken } from "@/lib/use-realtime-events";
+import { JobStaleModal } from "@/features/crew/components";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowRight, ChevronLeft, Clock, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -151,6 +153,28 @@ export function CrewJobDetailPage() {
     queryClient.removeQueries({ queryKey: queryKeys.crew.nextJob() });
     router.replace("/crew/home?noResume=true");
   }
+
+  const [showStaleModal, setShowStaleModal] = useState(false);
+  const crewId = getCrewIdFromToken();
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+
+  useRealtimeEvents({
+    url: () => {
+      if (!crewId) return "";
+      const token = localStorage.getItem("crew-token") ?? "";
+      return `${baseUrl}/v1/crew/realtime/stream?token=${token}`;
+    },
+    enabled: !!crewId && !!job && job.status === "ASSIGNED",
+    onEvent: (event) => {
+      if (
+        event.type === "booking_status_changed" &&
+        event.status === "STALE" &&
+        event.bookingId === jobId
+      ) {
+        setShowStaleModal(true);
+      }
+    },
+  });
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
@@ -308,6 +332,16 @@ export function CrewJobDetailPage() {
           </Button>
         </div>
       </div>
+      {showStaleModal && (
+        <JobStaleModal
+          open={showStaleModal}
+          jobId={jobId}
+          onDone={() => {
+            setShowStaleModal(false);
+            goBackToQueue();
+          }}
+        />
+      )}
     </>
   );
 }

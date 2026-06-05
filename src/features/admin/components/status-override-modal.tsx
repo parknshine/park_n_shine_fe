@@ -24,13 +24,20 @@ import type { BookingStatus } from "@/features/customer/types";
 import type { StatusOverridePayload } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 
-const VALID_TRANSITIONS: Array<{
+const ALL_TRANSITIONS: Array<{
   label: string;
+  fromStatus: string;
   nextStatus: StatusOverridePayload["nextStatus"];
 }> = [
-  { label: "PENDING → PAID", nextStatus: "PAID" },
-  { label: "PENDING → CANCELLED", nextStatus: "CANCELLED" },
-  { label: "PAID → CANCELLED", nextStatus: "CANCELLED" },
+  { label: "PENDING → PAID",         fromStatus: "PENDING",    nextStatus: "PAID" },
+  { label: "PENDING → CANCELLED",    fromStatus: "PENDING",    nextStatus: "CANCELLED" },
+  { label: "PAID → CANCELLED",       fromStatus: "PAID",       nextStatus: "CANCELLED" },
+  { label: "ASSIGNED → STALE",       fromStatus: "ASSIGNED",   nextStatus: "STALE" },
+  { label: "ASSIGNED → CANCELLED",   fromStatus: "ASSIGNED",   nextStatus: "CANCELLED" },
+  { label: "STALE → ASSIGNED",       fromStatus: "STALE",      nextStatus: "ASSIGNED" },
+  { label: "STALE → CANCELLED",      fromStatus: "STALE",      nextStatus: "CANCELLED" },
+  { label: "NEEDS_HELP → STALE",     fromStatus: "NEEDS_HELP", nextStatus: "STALE" },
+  { label: "NEEDS_HELP → CANCELLED", fromStatus: "NEEDS_HELP", nextStatus: "CANCELLED" },
 ];
 
 interface StatusOverrideModalProps {
@@ -44,6 +51,7 @@ interface StatusOverrideModalProps {
 export function StatusOverrideModal({
   open,
   bookingId,
+  currentStatus,
   onClose,
   onSuccess,
 }: StatusOverrideModalProps) {
@@ -51,6 +59,10 @@ export function StatusOverrideModal({
   const [reasonCode, setReasonCode] = useState("");
   const { overrideStatus, isSubmitting } = useBookingActions(bookingId);
   const { t } = useTranslation("admin");
+
+  const VALID_TRANSITIONS = ALL_TRANSITIONS.filter(
+    (tr) => tr.fromStatus === currentStatus
+  );
 
   async function handleConfirm() {
     const transition = VALID_TRANSITIONS.find((tr) => tr.label === selectedLabel);

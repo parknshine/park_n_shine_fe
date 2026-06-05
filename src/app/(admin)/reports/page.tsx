@@ -10,6 +10,7 @@ import { useAdminReport } from "@/features/admin/hooks";
 import { useUIStore } from "@/store/ui-store";
 import type { AdminReport } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
+import { cn } from "@/lib/utils";
 
 function toISODate(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -42,9 +43,9 @@ function exportToCSV(report: AdminReport, from: string, to: string) {
     ...Object.entries(report.bookings.byStatus).map(([s, c]) => `${s},${c}`),
     "",
     "Crew Performance",
-    "Name,Jobs Completed,Avg Turnaround (s),Est. Revenue (IDR)",
+    "Name,Jobs,Stale,Needs Help,Reliability (%),Avg Turnaround (s),Est. Revenue (IDR)",
     ...report.crew.map((c) =>
-      `${c.crewName},${c.jobsCompleted},${c.avgTurnaroundSeconds ?? ""},${c.estimatedRevenue}`
+      `${c.crewName},${c.jobsCompleted},${c.staleCount},${c.needsHelpCount},${c.reliabilityScore ?? ""},${c.avgTurnaroundSeconds ?? ""},${c.estimatedRevenue}`
     ),
   ];
 
@@ -194,6 +195,15 @@ export default function ReportsPage() {
                       {t("reports.crew.jobs")}
                     </th>
                     <th className="px-4 py-3 text-right font-medium text-muted-foreground">
+                      {t("reports.crew.stale")}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
+                      {t("reports.crew.needsHelp")}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
+                      {t("reports.crew.reliability")}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
                       {t("reports.crew.avgTurnaround")}
                     </th>
                     <th className="px-4 py-3 text-right font-medium text-muted-foreground">
@@ -204,7 +214,7 @@ export default function ReportsPage() {
                 <tbody className="divide-y divide-border">
                   {report.crew.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">
+                      <td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">
                         {t("reports.noData")}
                       </td>
                     </tr>
@@ -213,6 +223,49 @@ export default function ReportsPage() {
                       <tr key={member.crewId} className="hover:bg-muted/30">
                         <td className="px-4 py-3 font-medium">{member.crewName}</td>
                         <td className="px-4 py-3 text-right">{member.jobsCompleted}</td>
+                        <td className={cn(
+                          "px-4 py-3 text-right font-mono text-xs",
+                          member.staleCount > 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground"
+                        )}>
+                          {member.staleCount}
+                        </td>
+                        <td className={cn(
+                          "px-4 py-3 text-right font-mono text-xs",
+                          member.needsHelpCount > 0 ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"
+                        )}>
+                          {member.needsHelpCount}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {member.reliabilityScore == null ? (
+                            <span className="text-muted-foreground">—</span>
+                          ) : (
+                            <div className="flex items-center justify-end gap-2">
+                              <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
+                                <div
+                                  className={cn(
+                                    "h-full rounded-full",
+                                    member.reliabilityScore >= 80
+                                      ? "bg-green-500"
+                                      : member.reliabilityScore >= 60
+                                        ? "bg-amber-500"
+                                        : "bg-red-500"
+                                  )}
+                                  style={{ width: `${member.reliabilityScore}%` }}
+                                />
+                              </div>
+                              <span className={cn(
+                                "font-mono text-xs",
+                                member.reliabilityScore >= 80
+                                  ? "text-green-600 dark:text-green-400"
+                                  : member.reliabilityScore >= 60
+                                    ? "text-amber-600 dark:text-amber-400"
+                                    : "text-red-600 dark:text-red-400"
+                              )}>
+                                {member.reliabilityScore.toFixed(1)}%
+                              </span>
+                            </div>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-right font-mono text-xs">
                           {formatTurnaround(member.avgTurnaroundSeconds)}
                         </td>

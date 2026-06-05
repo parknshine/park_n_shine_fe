@@ -62,6 +62,15 @@
       "right": "Right",
       "before": "Before",
       "after": "After"
+    },
+    "staleModal": {
+      "title": "Job Time Expired",
+      "description": "The ETA for this job has elapsed. Please choose an action:",
+      "requestHelp": "Request Help",
+      "requestHelpDesc": "Mark job as needing assistance. An admin will follow up with you.",
+      "markStale": "Mark as Stale",
+      "markStaleDesc": "Mark job as stale. The job remains recorded and admin can reassign it.",
+      "submitting": "Processing..."
     }
   },
   "verify": {

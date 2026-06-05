@@ -63,7 +63,10 @@
       "name": "Crew",
       "jobs": "Jobs",
       "avgTurnaround": "Avg Turnaround",
-      "revenue": "Est. Revenue"
+      "revenue": "Est. Revenue",
+      "stale": "Stale",
+      "needsHelp": "Needs Help",
+      "reliability": "Reliability"
     }
   },
   "settings": {
