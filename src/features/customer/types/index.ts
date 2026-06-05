@@ -65,6 +65,7 @@ export interface CustomerBooking {
   signedToken: string;
   status: BookingStatus;
   siteName: string;
+  siteAddress?: string | null;
   plateText?: string | null;
   slotText?: string | null;
   phone?: string | null;

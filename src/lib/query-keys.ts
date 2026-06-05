@@ -21,6 +21,7 @@ export const queryKeys = {
   },
   customer: {
     booking: (bookingId: string) => ["customer", "booking", bookingId] as const,
+    sites: () => ["customer", "sites"] as const,
   },
 } as const;
 

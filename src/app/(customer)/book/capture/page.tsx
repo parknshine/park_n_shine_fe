@@ -11,12 +11,19 @@ import { AppShell, OfflineBanner } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { OcrEditField } from "@/features/customer/components/ocr-edit-field";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
-import { usePhotoUpload } from "@/features/customer/hooks";
+import { usePhotoUpload, usePublicSites } from "@/features/customer/hooks";
 import { isValidPhone } from "@/features/customer/utils/phone";
 import type { CustomerBooking } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function WalkInCapturePage() {
   return (
@@ -37,8 +44,11 @@ function WalkInCaptureContent() {
     loc: parseAsString,
   });
 
+  const { sites, isLoading: isSitesLoading } = usePublicSites();
+
   const [plateText, setPlateText] = useState("");
   const [slotText, setSlotText] = useState("");
+  const [location, setLocation] = useState("");
   const [phone, setPhone] = useState("");
 
   const hasCreatedRef = useRef(false);
@@ -57,22 +67,16 @@ function WalkInCaptureContent() {
   const bookingId = createMutation.data?.id ?? null;
   const signedToken = createMutation.data?.signedToken ?? null;
 
-  // Redirect back if location params are missing; create booking once on mount
   useEffect(() => {
-    if (!lat || !lng || !loc) {
-      router.replace("/book/location");
-      return;
-    }
     if (!hasCreatedRef.current) {
       hasCreatedRef.current = true;
       createMutation.mutate();
     }
     return () => {
-      // Reset on unmount so React Strict Mode remount re-fires the mutation
       hasCreatedRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lat, lng, loc]);
+  }, []);
 
   const plateUpload = usePhotoUpload({
     bookingId: bookingId ?? "",
@@ -103,16 +107,20 @@ function WalkInCaptureContent() {
     slotUpload.status === "success" &&
     plateText.trim().length > 0 &&
     slotText.trim().length > 0 &&
+    location.length > 0 &&
     (phone === "" || isValidPhone(phone));
 
   function handleContinue() {
     if (!bookingId || !signedToken) return;
+    const selectedSite = sites.find((s) => s.id === location);
     const params = new URLSearchParams({
       bookingId,
       token: signedToken,
       lat: lat ?? "",
       lng: lng ?? "",
-      loc: loc ?? "",
+      loc: selectedSite?.name ?? loc ?? "",
+      addr: selectedSite?.address ?? "",
+      siteId: selectedSite?.id ?? "",
       phone: phone.trim(),
       plate: plateText.trim().toUpperCase(),
       slot: slotText.trim().toUpperCase(),
@@ -129,7 +137,7 @@ function WalkInCaptureContent() {
       <AppShell surface='customer'>
         <div className='flex min-h-[60vh] flex-col items-center justify-center gap-3'>
           <Loader2 className='h-8 w-8 animate-spin text-primary' />
-          <p className='text-sm text-muted-foreground'>
+          <p className='text-sm text-muted-foreground' suppressHydrationWarning>
             {t("state.preparing", { ns: "common" })}
           </p>
         </div>
@@ -174,7 +182,7 @@ function WalkInCaptureContent() {
 
           <div className='min-w-0 flex-1'>
             <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
-              {t("booking.step", { current: 2, total: 3 })}
+              {t("booking.step", { current: 1, total: 2 })}
             </p>
             <h1 className='mt-1 text-2xl font-bold leading-tight text-foreground'>
               {t("booking.capture.title")}
@@ -221,6 +229,37 @@ function WalkInCaptureContent() {
               placeholder={t("booking.capture.slotPlaceholder")}
             />
           )}
+
+          <div className='space-y-1.5 rounded-lg border border-border bg-card p-4 shadow-sm'>
+            <label className='text-sm font-medium text-foreground'>
+              {t("booking.capture.locationLabel")}
+            </label>
+            <Select
+              value={location}
+              onValueChange={setLocation}
+              disabled={isSitesLoading}
+            >
+              <SelectTrigger className='w-full'>
+                <SelectValue
+                  placeholder={
+                    isSitesLoading
+                      ? t("booking.capture.locationLoading")
+                      : t("booking.capture.locationPlaceholder")
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {sites.map((site) => (
+                  <SelectItem key={site.id} value={site.id}>
+                    {site.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className='text-xs text-muted-foreground'>
+              {t("booking.capture.locationHelper")}
+            </p>
+          </div>
 
           <div className='space-y-1.5 rounded-lg border border-border bg-card p-4 shadow-sm'>
             <label

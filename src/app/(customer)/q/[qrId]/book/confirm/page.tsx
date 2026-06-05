@@ -5,13 +5,13 @@ import { toast } from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Phone, Zap } from "lucide-react";
+import { Loader2, Zap } from "lucide-react";
 import api from "@/lib/axios";
 import { useTranslation } from "@/i18n";
 import { AppShell } from "@/components/shared";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { BookingSummaryCard } from "@/features/customer/components/booking-summary-card";
+import { BookingLocationCard } from "@/features/customer/components/booking-location-card";
 import { useBookingStatus } from "@/features/customer/hooks";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { PaymentIntentResponse } from "@/features/customer/types";
@@ -149,26 +149,17 @@ function BookConfirmContent() {
         <BookingSummaryCard
           plate={plate}
           slot={slot}
-          siteName={booking?.siteName}
           priceAmount={booking?.priceAmount}
           currency={booking?.currency}
           estimatedReadyAt={booking?.estimatedReadyAt}
         />
 
-        {phone && (
-          <Card>
-            <CardContent className='pt-5'>
-              <div className='flex items-center gap-3'>
-                <Phone className='h-5 w-5 shrink-0 text-primary' />
-                <div>
-                  <p className='text-xs text-muted-foreground'>
-                    {t("booking.capture.phoneLabel")}
-                  </p>
-                  <p className='font-semibold text-foreground'>{phone}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {booking?.siteName && (
+          <BookingLocationCard
+            locationName={booking.siteName}
+            locationAddress={booking.siteAddress ?? undefined}
+            phone={phone ?? undefined}
+          />
         )}
 
         <Button

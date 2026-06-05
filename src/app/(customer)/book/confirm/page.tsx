@@ -29,23 +29,25 @@ function WalkInConfirmContent() {
   const router = useRouter();
   const { t } = useTranslation("customer");
 
-  const [{ bookingId, token, lat, lng, loc, phone, plate, slot }] =
+  const [{ bookingId, token, lat, lng, loc, addr, siteId, phone, plate, slot }] =
     useQueryStates({
       bookingId: parseAsString,
       token: parseAsString,
       lat: parseAsString,
       lng: parseAsString,
       loc: parseAsString,
+      addr: parseAsString,
+      siteId: parseAsString,
       phone: parseAsString,
       plate: parseAsString,
       slot: parseAsString,
     });
 
   useEffect(() => {
-    if (!bookingId || !token || !lat || !lng || !loc || !plate || !slot) {
-      router.replace("/book/location");
+    if (!bookingId || !token || !plate || !slot) {
+      router.replace("/book/capture");
     }
-  }, [bookingId, token, lat, lng, loc, plate, slot, router]);
+  }, [bookingId, token, plate, slot, router]);
 
   const { booking } = useBookingStatus({
     bookingId: bookingId ?? "",
@@ -75,7 +77,7 @@ function WalkInConfirmContent() {
     if (error) toast.error(error);
   }, [error]);
 
-  if (!bookingId || !token || !lat || !lng || !loc || !plate || !slot) {
+  if (!bookingId || !token || !plate || !slot) {
     return null;
   }
 
@@ -85,10 +87,10 @@ function WalkInConfirmContent() {
     try {
       await api.post(
         `/v1/dev/bookings/${bookingId}/simulate-payment`,
-        { plate: plate!, slot: slot!, ...(phone ? { phone } : {}) },
+        { plate: plate, slot: slot, ...(phone ? { phone } : {}) },
         { headers: { "X-Booking-Token": token } },
       );
-      window.location.assign(`/booking/${bookingId}/status?token=${token}`);
+      globalThis.location.assign(`/booking/${bookingId}/status?token=${token}`);
     } catch {
       toast.error("Simulasi pembayaran gagal");
       setIsSimulating(false);
@@ -100,9 +102,9 @@ function WalkInConfirmContent() {
       plateText: plate!,
       slotText: slot!,
       ...(phone ? { phone } : {}),
-      locationLat: parseFloat(lat!),
-      locationLng: parseFloat(lng!),
-      locationName: loc!,
+      ...(lat && lng ? { locationLat: Number.parseFloat(lat), locationLng: Number.parseFloat(lng) } : {}),
+      ...(loc ? { locationName: loc } : {}),
+      ...(siteId ? { siteId } : {}),
     };
     void confirmAndRedirect(payload);
   }
@@ -122,7 +124,7 @@ function WalkInConfirmContent() {
 
           <div className='min-w-0 flex-1'>
             <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
-              {t("booking.step", { current: 3, total: 3 })}
+              {t("booking.step", { current: 2, total: 2 })}
             </p>
             <h1 className='mt-1 text-2xl font-bold leading-tight text-foreground'>
               {t("booking.confirm.title")}
@@ -137,7 +139,6 @@ function WalkInConfirmContent() {
           <BookingSummaryCard
             plate={plate}
             slot={slot}
-            siteName={booking?.siteName}
             priceAmount={booking?.priceAmount}
             currency={booking?.currency}
             estimatedReadyAt={booking?.estimatedReadyAt}
@@ -145,6 +146,7 @@ function WalkInConfirmContent() {
 
           <BookingLocationCard
             locationName={loc ?? ""}
+            locationAddress={addr ?? undefined}
             phone={phone ?? undefined}
           />
         </div>

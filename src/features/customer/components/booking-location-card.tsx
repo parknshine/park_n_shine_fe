@@ -6,11 +6,13 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface BookingLocationCardProps {
   locationName: string;
+  locationAddress?: string;
   phone?: string;
 }
 
 export function BookingLocationCard({
   locationName,
+  locationAddress,
   phone,
 }: BookingLocationCardProps) {
   const { t } = useTranslation("customer");
@@ -22,9 +24,14 @@ export function BookingLocationCard({
           <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
           <div>
             <p className="text-xs text-muted-foreground">{t("booking.location.title")}</p>
-            <p className="line-clamp-3 text-sm font-semibold text-foreground">
+            <p className="text-sm font-semibold text-foreground">
               {locationName}
             </p>
+            {locationAddress && (
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {locationAddress}
+              </p>
+            )}
           </div>
         </div>
 

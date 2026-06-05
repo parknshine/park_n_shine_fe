@@ -27,7 +27,14 @@
     "searching": "Mencari Job…",
     "jobWaiting_one": "{{count}} job menunggu",
     "jobWaiting_other": "{{count}} job menunggu",
-    "claimHintReady": "Tekan untuk mengambil job yang tersedia"
+    "claimHintReady": "Tekan untuk mengambil job yang tersedia",
+    "notifTitle": "Aktifkan Notifikasi Job",
+    "notifDescription": "Dapatkan notifikasi segera saat job baru masuk",
+    "notifButton": "Aktifkan Notifikasi",
+    "notifGranted": "Notifikasi aktif",
+    "notifGrantedDescription": "Kamu akan diberitahu saat job baru tersedia",
+    "notifDenied": "Notifikasi diblokir",
+    "notifDeniedDescription": "Aktifkan notifikasi di pengaturan browser untuk menerima pemberitahuan job"
   },
   "job": {
     "loading": "Memuat data job",

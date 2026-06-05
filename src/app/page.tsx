@@ -115,7 +115,7 @@ export default function Home() {
             ))}
 
             <div className='nav-actions'>
-              <a className='button button-small' href='/book/location'>
+              <a className='button button-small' href='/book/capture'>
                 {t("landingPage.nav.bookNow")}
               </a>
 
@@ -229,7 +229,7 @@ export default function Home() {
             </h1>
             <p>{t("landingPage.hero.description")}</p>
             <div className='hero-actions'>
-              <a className='button' href='/book/location'>
+              <a className='button' href='/book/capture'>
                 {t("landingPage.hero.btnBookNow")}
               </a>
               <a className='button button-muted' href='#pricing'>
@@ -337,7 +337,7 @@ export default function Home() {
             </div>
 
             <div className='tracker-action'>
-              <a className='button' href='/book/location'>
+              <a className='button' href='/book/capture'>
                 {t("landingPage.track.bookNow")}
               </a>
             </div>
@@ -376,7 +376,7 @@ export default function Home() {
         >
           {t("landingPage.nav.services")}
         </a>
-        <a className='dock-link dock-link-cta' href='/book/location'>
+        <a className='dock-link dock-link-cta' href='/book/capture'>
           {t("landingPage.nav.bookNow")}
         </a>
       </nav>

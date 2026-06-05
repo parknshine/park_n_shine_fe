@@ -17,7 +17,7 @@ export function OcrEditField({
   placeholder,
 }: OcrEditFieldProps) {
   return (
-    <div className="space-y-1.5 p-3 bg-card rounded-lg">
+    <div className="space-y-1.5 rounded-lg border border-border bg-card p-4 shadow-sm">
       <label
         htmlFor={id}
         className="text-xs font-medium text-muted-foreground"

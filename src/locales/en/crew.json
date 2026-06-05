@@ -27,7 +27,14 @@
     "searching": "Searching for Job…",
     "jobWaiting_one": "{{count}} job waiting",
     "jobWaiting_other": "{{count}} jobs waiting",
-    "claimHintReady": "Tap to claim the next available job"
+    "claimHintReady": "Tap to claim the next available job",
+    "notifTitle": "Enable Job Notifications",
+    "notifDescription": "Get notified instantly when new jobs arrive",
+    "notifButton": "Enable Notifications",
+    "notifGranted": "Notifications enabled",
+    "notifGrantedDescription": "You'll be notified when new jobs arrive",
+    "notifDenied": "Notifications blocked",
+    "notifDeniedDescription": "Enable notifications in your browser settings to receive job alerts"
   },
   "job": {
     "loading": "Loading job data",

@@ -41,6 +41,7 @@ export function useBookingStatus({
         phone?: string | null;
         price?: number;
         siteName: string;
+        siteAddress?: string | null;
         paymentMethod?: string | null;
         paymentInstructions?: PaymentInstructions | null;
         timeline?: { status: CustomerBooking["status"]; timestamp: string }[];
@@ -53,6 +54,7 @@ export function useBookingStatus({
         signedToken,
         status: d.status,
         siteName: d.siteName,
+        siteAddress: d.siteAddress ?? null,
         plateText: d.plate ?? null,
         slotText: d.slot ?? null,
         phone: d.phone ?? null,

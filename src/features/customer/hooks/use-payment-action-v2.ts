@@ -12,9 +12,10 @@ export interface ConfirmBookingPayloadV2 {
   plateText: string;
   slotText: string;
   phone?: string;
-  locationLat: number;
-  locationLng: number;
-  locationName: string;
+  locationLat?: number;
+  locationLng?: number;
+  locationName?: string;
+  siteId?: string;
 }
 
 export function usePaymentActionV2(bookingId: string, signedToken: string) {

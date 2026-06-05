@@ -19,6 +19,13 @@ import type {
   CustomerBooking,
 } from "@/features/customer/types";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function BookCapturePage() {
   const { t } = useTranslation("customer");
@@ -47,6 +54,7 @@ export default function BookCapturePage() {
 
   const bookingId = createMutation.data?.id ?? null;
   const signedToken = createMutation.data?.signedToken ?? null;
+  const siteName = createMutation.data?.siteName ?? null;
 
   useEffect(() => {
     if (!hasCreatedRef.current) {
@@ -204,6 +212,24 @@ export default function BookCapturePage() {
               placeholder={t("booking.capture.slotPlaceholder")}
             />
           )}
+
+          <div className='space-y-1.5 rounded-lg border border-border bg-card p-4 shadow-sm'>
+            <label className='text-sm font-medium text-foreground'>
+              {t("booking.capture.locationLabel")}
+            </label>
+            <Select disabled value={siteName ?? undefined}>
+              <SelectTrigger className='w-full'>
+                <SelectValue
+                  placeholder={t("booking.capture.locationDisabledPlaceholder")}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {siteName && (
+                  <SelectItem value={siteName}>{siteName}</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className='space-y-1.5 rounded-lg border border-border bg-card p-4 shadow-sm'>
             <label

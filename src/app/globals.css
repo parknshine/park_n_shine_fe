@@ -72,9 +72,17 @@ html {
   overflow-x: hidden;
 }
 
+/* Prevent layout shift when Radix UI locks body scroll on desktop.
+   react-remove-scroll-bar injects body[data-scroll-locked] { margin-right: Xpx !important }.
+   scrollbar-gutter:stable keeps the gutter reserved, so no compensation is needed. */
+html body[data-scroll-locked] {
+  margin-right: 0 !important;
+}
+
 body {
   margin: 0;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
   min-height: 100dvh;
   font-family: var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif;
   color: var(--text);

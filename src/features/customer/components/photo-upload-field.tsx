@@ -85,7 +85,7 @@ export function PhotoUploadField({
         : null;
 
   return (
-    <div className="rounded-lg border border-border p-4 space-y-3">
+    <div className="rounded-lg border border-border p-4 space-y-3 bg-card shadow-sm">
       <label className="text-sm font-semibold text-foreground">{label}</label>
 
       {/* Hidden inputs */}

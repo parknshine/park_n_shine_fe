@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, BriefcaseBusiness, Inbox, Loader2 } from "lucide-react";
+import { Bell, BellOff, BriefcaseBusiness, CheckCircle2, Inbox, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useJobQueue, useNextJob } from "@/features/crew/hooks";
@@ -39,8 +39,7 @@ export function CrewHomePage() {
 
   const crewId = useMemo(() => getCrewIdFromToken(), []);
   const { permission, subscribe: subscribePush } = usePushNotification({ type: "crew" });
-  const showPushBanner =
-    process.env.NEXT_PUBLIC_PUSH_ENABLED === "true" && permission === "default";
+  const pushEnabled = process.env.NEXT_PUBLIC_PUSH_ENABLED === "true";
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
   const getSseUrl = useCallback(() => {
     const token = localStorage.getItem("crew-token") ?? "";
@@ -88,15 +87,55 @@ export function CrewHomePage() {
 
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-44px)] max-w-md flex-col px-4 pb-8 pt-10">
-      {/* Push notification opt-in banner */}
-      {showPushBanner && (
-        <button
-          onClick={() => void subscribePush()}
-          className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground transition-colors hover:bg-muted"
-        >
-          <Bell className="h-4 w-4 shrink-0 text-primary" />
-          <span>{t("home.enableNotifications", { defaultValue: "Enable notifications for new jobs" })}</span>
-        </button>
+      {/* Push notification card */}
+      {pushEnabled && permission !== "unsupported" && (
+        <div className={cn(
+          "mb-4 rounded-xl border p-4",
+          permission === "granted" && "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30",
+          permission === "denied" && "border-destructive/20 bg-destructive/5",
+          permission === "default" && "border-primary/20 bg-primary/5",
+        )}>
+          <div className="flex items-start gap-3">
+            <div className={cn(
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+              permission === "granted" && "bg-emerald-100 dark:bg-emerald-900/50",
+              permission === "denied" && "bg-destructive/10",
+              permission === "default" && "bg-primary/10",
+            )}>
+              {permission === "granted" && <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
+              {permission === "denied" && <BellOff className="h-4 w-4 text-destructive" />}
+              {permission === "default" && <Bell className="h-4 w-4 text-primary" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={cn(
+                "text-sm font-semibold",
+                permission === "granted" && "text-emerald-700 dark:text-emerald-300",
+                permission === "denied" && "text-destructive",
+                permission === "default" && "text-foreground",
+              )}>
+                {permission === "granted" && t("home.notifGranted")}
+                {permission === "denied" && t("home.notifDenied")}
+                {permission === "default" && t("home.notifTitle")}
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {permission === "granted" && t("home.notifGrantedDescription")}
+                {permission === "denied" && t("home.notifDeniedDescription")}
+                {permission === "default" && t("home.notifDescription")}
+              </p>
+            </div>
+          </div>
+          {(permission === "default" || permission === "denied") && (
+            <Button
+              size="sm"
+              variant={permission === "denied" ? "outline" : "default"}
+              className="mt-3 w-full"
+              onClick={subscribePush}
+            >
+              <Bell className="h-4 w-4" />
+              {t("home.notifButton")}
+            </Button>
+          )}
+        </div>
       )}
 
       {/* Section header */}
