@@ -29,11 +29,11 @@ interface LocationMapProps {
   onPositionChange: (lat: number, lng: number) => void;
 }
 
-/** Programmatically re-centers the map when lat/lng props change */
+/** Smoothly flies to new coordinates when lat/lng props change */
 function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
   useEffect(() => {
-    map.setView([lat, lng], map.getZoom());
+    map.flyTo([lat, lng], Math.max(map.getZoom(), 14));
   }, [lat, lng, map]);
   return null;
 }

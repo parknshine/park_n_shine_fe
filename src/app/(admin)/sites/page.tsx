@@ -142,6 +142,9 @@ function CreateSiteModal({
       {pickerOpen && (
         <LocationPickerModal
           onClose={() => setPickerOpen(false)}
+          initialLat={form.lat}
+          initialLng={form.lng}
+          initialAddress={form.address || undefined}
           onConfirm={(result) => {
             setForm((f) => ({
               ...f,
@@ -293,6 +296,7 @@ function EditSiteModal({
           onClose={() => setPickerOpen(false)}
           initialLat={form.lat}
           initialLng={form.lng}
+          initialAddress={form.address || undefined}
           onConfirm={(result) => {
             setForm((f) => ({
               ...f,

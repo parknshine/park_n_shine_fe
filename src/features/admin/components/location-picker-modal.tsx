@@ -45,6 +45,7 @@ interface LocationPickerModalProps {
   onConfirm: (result: LocationPickResult) => void;
   initialLat?: number | null;
   initialLng?: number | null;
+  initialAddress?: string;
 }
 
 const DEFAULT_LAT = -6.2;
@@ -59,8 +60,9 @@ export function LocationPickerModal({
   onConfirm,
   initialLat,
   initialLng,
+  initialAddress,
 }: LocationPickerModalProps) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialAddress ?? "");
   const [results, setResults] = useState<NominatimResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -74,7 +76,8 @@ export function LocationPickerModal({
   const abortRef = useRef<AbortController | null>(null);
   const reverseDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reverseAbortRef = useRef<AbortController | null>(null);
-  const skipNextSearchRef = useRef(false);
+  // skip initial search if we already have coordinates (map opens at saved location)
+  const skipNextSearchRef = useRef(initialLat != null && initialLng != null);
 
   async function search(q: string, signal: AbortSignal) {
     setIsSearching(true);
@@ -158,6 +161,7 @@ export function LocationPickerModal({
     setMarkerLat(parseFloat(result.lat));
     setMarkerLng(parseFloat(result.lon));
     setResults([]);
+    skipNextSearchRef.current = true;
     setQuery(result.display_name);
   }
 
@@ -194,7 +198,7 @@ export function LocationPickerModal({
           </div>
 
           {results.length > 0 && (
-            <ul className="absolute z-10 mt-1 w-full rounded-md border border-border bg-background shadow-md">
+            <ul className="absolute z-50 mt-1 w-full rounded-md border border-border bg-background shadow-md">
               {results.map((r) => (
                 <li key={r.place_id}>
                   <button
@@ -222,18 +226,20 @@ export function LocationPickerModal({
           )}
         </div>
 
-        <LocationMap
-          lat={markerLat}
-          lng={markerLng}
-          onPositionChange={(lat, lng) => {
-            setMarkerLat(lat);
-            setMarkerLng(lng);
-            if (reverseDebounceRef.current) clearTimeout(reverseDebounceRef.current);
-            reverseDebounceRef.current = setTimeout(() => {
-              void reverseGeocode(lat, lng);
-            }, REVERSE_DEBOUNCE_MS);
-          }}
-        />
+        <div className="relative z-0">
+          <LocationMap
+            lat={markerLat}
+            lng={markerLng}
+            onPositionChange={(lat, lng) => {
+              setMarkerLat(lat);
+              setMarkerLng(lng);
+              if (reverseDebounceRef.current) clearTimeout(reverseDebounceRef.current);
+              reverseDebounceRef.current = setTimeout(() => {
+                void reverseGeocode(lat, lng);
+              }, REVERSE_DEBOUNCE_MS);
+            }}
+          />
+        </div>
 
         <div className="flex gap-2">
           <Button
