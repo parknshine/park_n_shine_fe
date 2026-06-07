@@ -1,3 +1,5 @@
+"use client";
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
@@ -6,11 +8,12 @@ import type { User } from "@/types";
 interface AuthState {
   user: User | null;
   token: string | null;
+  role: "super_admin" | "admin" | null;
   isAuthenticated: boolean;
 }
 
 interface AuthActions {
-  setUser: (user: User, token: string) => void;
+  setUser: (user: User, token: string, role: "super_admin" | "admin") => void;
   clearAuth: () => void;
   updateUser: (partial: Partial<User>) => void;
 }
@@ -21,13 +24,15 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       // state
       user: null,
       token: null,
+      role: null,
       isAuthenticated: false,
 
       // actions
-      setUser: (user, token) =>
+      setUser: (user, token, role) =>
         set((state) => {
           state.user = user;
           state.token = token;
+          state.role = role;
           state.isAuthenticated = true;
         }),
 
@@ -35,6 +40,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         set((state) => {
           state.user = null;
           state.token = null;
+          state.role = null;
           state.isAuthenticated = false;
         }),
 

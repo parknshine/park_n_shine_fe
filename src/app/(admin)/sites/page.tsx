@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronRight, PauseCircle, PlayCircle, MapPin } from "lucide-react";
+import { Plus, ChevronRight, PauseCircle, PlayCircle, MapPin, QrCode, Printer } from "lucide-react";
+import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,56 @@ import type {
   UpdateSitePayload,
 } from "@/features/admin/types";
 import { LocationPickerModal } from "@/features/admin/components/location-picker-modal";
+
+function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
+  const url = globalThis.window === undefined ? "" : globalThis.window.location.origin;
+
+  function handlePrint() {
+    const svg = globalThis.document.getElementById("generic-site-qr")?.outerHTML ?? "";
+    const html = [
+      "<!DOCTYPE html><html><head>",
+      "<title>Park &amp; Shine — Site QR</title>",
+      "<style>body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;font-family:sans-serif;}",
+      "h2{font-size:16px;margin-bottom:12px;}p{font-size:11px;color:#666;margin-top:8px;}</style>",
+      "</head><body>",
+      "<h2>Park &amp; Shine</h2>",
+      svg,
+      `<p>${url}</p>`,
+      "<script>window.onload=function(){window.print();window.close();}</script>",
+      "</body></html>",
+    ].join("");
+
+    const blob = new Blob([html], { type: "text/html" });
+    const blobUrl = URL.createObjectURL(blob);
+    const win = globalThis.window.open(blobUrl, "_blank", "width=400,height=500");
+    win?.addEventListener("unload", () => URL.revokeObjectURL(blobUrl));
+  }
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
+      <div className="w-full max-w-sm rounded-lg border border-border bg-background p-6 shadow-lg space-y-5">
+        <div className="space-y-1">
+          <h2 className="text-base font-semibold text-foreground">Generic Site QR</h2>
+          <p className="text-xs text-muted-foreground">
+            Scan to open the Park &amp; Shine booking page.
+          </p>
+        </div>
+
+        <div className="flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/30 p-6">
+          <QRCode id="generic-site-qr" value={url} size={180} />
+          <p className="text-xs text-muted-foreground break-all text-center">{url}</p>
+        </div>
+
+        <div className="flex gap-2">
+          <Button onClick={handlePrint} className="flex-1 gap-2">
+            <Printer className="h-4 w-4" /> Print QR
+          </Button>
+          <Button variant="outline" onClick={onClose}>Close</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface CreateFormState {
   name: string;
@@ -316,6 +367,7 @@ export default function SitesPage() {
   const router = useRouter();
   const { sites, isLoading, create, isCreating, update, isUpdating } = useAdminSites();
   const [showCreate, setShowCreate] = useState(false);
+  const [showGenericQr, setShowGenericQr] = useState(false);
   const [editSite, setEditSite] = useState<AdminSiteDetail | null>(null);
   return (
     <div className='space-y-6'>
@@ -328,9 +380,14 @@ export default function SitesPage() {
             Manage parking sites and their QR codes
           </p>
         </div>
-        <Button onClick={() => setShowCreate(true)}>
-          <Plus className='mr-2 h-4 w-4' /> New Site
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setShowGenericQr(true)}>
+            <QrCode className='mr-2 h-4 w-4' /> Generic Site QR
+          </Button>
+          <Button onClick={() => setShowCreate(true)}>
+            <Plus className='mr-2 h-4 w-4' /> New Site
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -399,6 +456,10 @@ export default function SitesPage() {
           onUpdate={update}
           isUpdating={isUpdating}
         />
+      )}
+
+      {showGenericQr && (
+        <GenericSiteQrModal onClose={() => setShowGenericQr(false)} />
       )}
     </div>
   );

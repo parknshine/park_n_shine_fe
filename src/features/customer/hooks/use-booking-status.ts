@@ -31,7 +31,6 @@ export function useBookingStatus({
 }: UseBookingStatusOptions) {
   const query = useQuery({
     enabled,
-    meta: { persist: false },
     queryFn: async () => {
       const response = await api.get<{
         bookingId: string;

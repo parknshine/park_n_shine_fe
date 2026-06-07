@@ -27,7 +27,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
             mutation.options.meta?.persist === true,
           shouldDehydrateQuery: (query) =>
             query.state.status === "success" &&
-            query.options.meta?.persist !== false,
+            query.options.meta?.persist === true,
         },
         persister,
       }}

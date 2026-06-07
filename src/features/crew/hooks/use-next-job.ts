@@ -16,7 +16,6 @@ export function useNextJob() {
       return response.data ?? null;
     },
     staleTime: Infinity,
-    meta: { persist: false },
   });
 
   const mutation = useMutation({

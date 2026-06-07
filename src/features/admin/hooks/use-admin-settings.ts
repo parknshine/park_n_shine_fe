@@ -19,7 +19,7 @@ export function useAdminSettings() {
   const saveMutation = useMutation({
     meta: { persist: false },
     mutationKey: mutationKeys.admin.saveSettings(),
-    mutationFn: async (payload: { staleJobTimeoutMinutes: number }) => {
+    mutationFn: async (payload: Partial<Pick<AdminSettings, "staleJobTimeoutMinutes" | "whatsappNumber">>) => {
       const response = await api.post<AdminSettings>("/v1/admin/settings", payload);
       return response.data;
     },

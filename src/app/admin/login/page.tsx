@@ -3,26 +3,26 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/features/admin/hooks";
-import adminApi from "@/lib/axios-admin";
 import { useTranslation } from "@/i18n";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const { login, isSubmitting, error } = useAdminAuth();
+  const { login, isSubmitting } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const { t } = useTranslation("admin");
+
+  const hasToken = globalThis.window !== undefined && !!localStorage.getItem("admin-token");
 
   useEffect(() => {
-    if (!localStorage.getItem("admin-token")) return;
-    adminApi.get("/v1/admin/sites")
-      .then(() => router.replace("/dashboard"))
-      .catch(() => {});
-  }, [router]);
-  const { t } = useTranslation("admin");
+    if (hasToken) router.replace("/dashboard");
+  }, [hasToken, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,6 +32,8 @@ export default function AdminLoginPage() {
       toast.error(t("login.loginFailed"));
     }
   }
+
+  if (hasToken) return null;
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-background px-4">
@@ -59,15 +61,27 @@ export default function AdminLoginPage() {
 
           <div className="space-y-1.5">
             <Label htmlFor="password">{t("login.passwordLabel")}</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <Button

@@ -27,7 +27,7 @@ import { useTranslation } from "@/i18n";
 
 interface SettingsFormProps {
   settings: AdminSettings;
-  save: (data: { staleJobTimeoutMinutes: number }) => Promise<unknown>;
+  save: (data: Partial<Pick<AdminSettings, "staleJobTimeoutMinutes" | "whatsappNumber">>) => Promise<unknown>;
   isSaving: boolean;
 }
 
@@ -83,6 +83,48 @@ function SettingsForm({ settings, save, isSaving }: SettingsFormProps) {
           {t("settings.staleTimeout.resetLabel")}
         </button>
       </div>
+    </div>
+  );
+}
+
+function WhatsAppNumberCard({
+  settings,
+  save,
+  isSaving,
+}: SettingsFormProps) {
+  const [number, setNumber] = useState(settings.whatsappNumber);
+
+  async function handleSave() {
+    try {
+      await save({ whatsappNumber: number });
+      toast.success("Nomor WhatsApp berhasil disimpan.");
+    } catch {
+      toast.error("Gagal menyimpan nomor WhatsApp.");
+    }
+  }
+
+  return (
+    <div className="rounded-lg border border-border p-4 space-y-4">
+      <div>
+        <h2 className="text-sm font-semibold text-foreground">Nomor WhatsApp Support</h2>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Nomor ini digunakan untuk tombol WhatsApp di halaman customer. Format: 628xxxxxxxxxx (tanpa +).
+        </p>
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="wa-number-input">Nomor WhatsApp</Label>
+        <Input
+          id="wa-number-input"
+          type="tel"
+          placeholder="628123456789"
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+          className="w-56"
+        />
+      </div>
+      <Button onClick={handleSave} disabled={isSaving}>
+        {isSaving ? "Menyimpan..." : "Simpan"}
+      </Button>
     </div>
   );
 }
@@ -264,12 +306,20 @@ export default function SettingsPage() {
       {isLoading || !settings ? (
         <p className="text-sm text-muted-foreground">{t("settings.loading")}</p>
       ) : (
-        <SettingsForm
-          key={settings.staleJobTimeoutMinutes}
-          settings={settings}
-          save={save}
-          isSaving={isSaving}
-        />
+        <>
+          <SettingsForm
+            key={settings.staleJobTimeoutMinutes}
+            settings={settings}
+            save={save}
+            isSaving={isSaving}
+          />
+          <WhatsAppNumberCard
+            key={settings.whatsappNumber}
+            settings={settings}
+            save={save}
+            isSaving={isSaving}
+          />
+        </>
       )}
 
       <WhatsAppCard />

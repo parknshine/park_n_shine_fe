@@ -24,7 +24,7 @@ export default function AuditPage() {
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const { t } = useTranslation("admin");
 
-  const { entries, isLoading } = useAuditLog(activeSiteId ?? "", { action });
+  const { entries, isLoading, isFetching } = useAuditLog(activeSiteId ?? "", { action });
 
   function handleRowClick(entry: AuditEntry) {
     setSelectedBookingId(entry.bookingId);
@@ -67,7 +67,14 @@ export default function AuditPage() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">{t("audit.loading")}</p>
       ) : (
-        <AuditLogTable entries={entries} onRowClick={handleRowClick} />
+        <div className="relative">
+          {isFetching && (
+            <p className="absolute right-0 top-0 text-xs text-muted-foreground">
+              {t("audit.loading")}
+            </p>
+          )}
+          <AuditLogTable entries={entries} onRowClick={handleRowClick} />
+        </div>
       )}
 
       <BookingDetailDrawer

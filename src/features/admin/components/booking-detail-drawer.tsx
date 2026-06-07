@@ -13,6 +13,7 @@ import { ReassignModal } from "./reassign-modal";
 import { StatusOverrideModal } from "./status-override-modal";
 import { RefundModal } from "./refund-modal";
 import { useTranslation } from "@/i18n";
+import { useAuthStore } from "@/store/auth-store";
 import { formatAuditDetail } from "@/features/admin/utils/format-audit-detail";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -31,6 +32,7 @@ export function BookingDetailDrawer({
     "reassign" | "override" | "refund" | null
   >(null);
   const { t } = useTranslation("admin");
+  const role = useAuthStore((s) => s.role);
 
   const { data: booking, isLoading } = useQuery({
     enabled: !!bookingId,
@@ -198,14 +200,16 @@ export function BookingDetailDrawer({
                   >
                     {t("drawer.overrideStatus")}
                   </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    disabled={["DRAFT", "PENDING", "CLOSED", "CANCELLED", "EXPIRED"].includes(booking.status)}
-                    onClick={() => setActiveModal("refund")}
-                  >
-                    {t("drawer.refund")}
-                  </Button>
+                  {role === "super_admin" && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={["DRAFT", "PENDING", "CLOSED", "CANCELLED", "EXPIRED"].includes(booking.status)}
+                      onClick={() => setActiveModal("refund")}
+                    >
+                      {t("drawer.refund")}
+                    </Button>
+                  )}
                 </div>
               </section>
 

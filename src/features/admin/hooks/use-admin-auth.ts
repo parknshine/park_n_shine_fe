@@ -15,7 +15,10 @@ interface AdminLoginPayload {
 interface AdminLoginResponse {
   token: string;
   refreshToken: string;
+  id: string;
   email: string;
+  name: string;
+  role: "super_admin" | "admin";
   sites: Array<{ id: string; name: string }>;
 }
 
@@ -30,10 +33,7 @@ export function useAdminAuth() {
     meta: { persist: false },
     mutationKey: mutationKeys.admin.login(),
     mutationFn: async (payload: AdminLoginPayload) => {
-      const response = await api.post<AdminLoginResponse>(
-        "/v1/admin/sessions",
-        payload
-      );
+      const response = await api.post<AdminLoginResponse>("/v1/admin/sessions", payload);
       return response.data;
     },
     onSuccess: (data) => {
@@ -41,8 +41,9 @@ export function useAdminAuth() {
       localStorage.setItem("admin-refresh-token", data.refreshToken);
       localStorage.setItem("admin-sites", JSON.stringify(data.sites));
       setUser(
-        { id: data.email, email: data.email, name: "Admin" },
-        data.token
+        { id: data.id, email: data.email, name: data.name, role: data.role },
+        data.token,
+        data.role,
       );
       setSites(data.sites);
       if (data.sites.length > 0) {

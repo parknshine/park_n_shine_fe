@@ -43,6 +43,7 @@
     "toLabel": "Sampai",
     "loading": "Memuat...",
     "apply": "Terapkan",
+    "clearFilter": "Hapus Filter",
     "exportCsv": "Export CSV",
     "noData": "Tidak ada data untuk rentang ini.",
     "totalRow": "Total",

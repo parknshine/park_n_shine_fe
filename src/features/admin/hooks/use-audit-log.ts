@@ -28,16 +28,17 @@ export function useAuditLog(siteId: string, filters: AuditLogFilters = {}) {
     },
   });
 
-  const error =
-    query.error instanceof Error
-      ? query.error.message
-      : query.error
-        ? "audit_log_fetch_failed"
-        : null;
+  let error: string | null = null;
+  if (query.error instanceof Error) {
+    error = query.error.message;
+  } else if (query.error) {
+    error = "audit_log_fetch_failed";
+  }
 
   return {
     entries: query.data ?? [],
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
     error,
   };
 }

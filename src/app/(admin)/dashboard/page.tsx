@@ -42,7 +42,6 @@ function DashboardContent() {
   }, [searchParams, queue, router]);
 
   function handleActionSuccess() {
-    setSelectedBooking(null);
     void refresh();
   }
 

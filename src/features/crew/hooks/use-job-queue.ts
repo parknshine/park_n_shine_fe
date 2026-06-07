@@ -17,7 +17,6 @@ interface JobQueueData {
  */
 export function useJobQueue() {
   const query = useQuery<JobQueueData>({
-    meta: { persist: false },
     queryKey: queryKeys.crew.queue(),
     queryFn: async () => {
       const response = await api.get<JobQueueData>("/v1/crew/jobs/queue");

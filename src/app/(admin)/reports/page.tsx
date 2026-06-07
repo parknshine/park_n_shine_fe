@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download } from "lucide-react";
+import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,10 +62,10 @@ export default function ReportsPage() {
   const activeSiteId = useUIStore((s) => s.activeSiteId);
   const { t } = useTranslation("admin");
 
-  const [from, setFrom] = useState(() => toISODate(new Date(Date.now() - 7 * 86400_000)));
-  const [to, setTo] = useState(() => toISODate(new Date()));
-  const [appliedFrom, setAppliedFrom] = useState(() => toISODate(new Date(Date.now() - 7 * 86400_000)));
-  const [appliedTo, setAppliedTo] = useState(() => toISODate(new Date()));
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [appliedFrom, setAppliedFrom] = useState("");
+  const [appliedTo, setAppliedTo] = useState("");
 
   const { report, isLoading } = useAdminReport(
     activeSiteId ?? "",
@@ -73,9 +73,18 @@ export default function ReportsPage() {
     appliedTo
   );
 
+  const hasFilter = appliedFrom !== "" || appliedTo !== "";
+
   function handleApply() {
     setAppliedFrom(from);
     setAppliedTo(to);
+  }
+
+  function handleClear() {
+    setFrom("");
+    setTo("");
+    setAppliedFrom("");
+    setAppliedTo("");
   }
 
   if (!activeSiteId) {
@@ -121,6 +130,12 @@ export default function ReportsPage() {
         <Button onClick={handleApply} disabled={isLoading}>
           {isLoading ? t("reports.loading") : t("reports.apply")}
         </Button>
+        {hasFilter && (
+          <Button variant="ghost" onClick={handleClear} disabled={isLoading}>
+            <X className="mr-1.5 h-3.5 w-3.5" />
+            {t("reports.clearFilter")}
+          </Button>
+        )}
         <Button
           variant="outline"
           disabled={!report || isLoading}

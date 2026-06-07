@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { BarChart2, LayoutGrid, PersonStanding, QrCode, ScrollText, Settings, Users } from "lucide-react";
+import { BarChart2, LayoutGrid, QrCode, ScrollText, Settings, Shield, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
+import { useAuthStore } from "@/store/auth-store";
 import { useTranslation } from "@/i18n";
 import { Combobox } from "@/components/ui/combobox";
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-  { href: "/walkin", label: "Walk-In Queue", icon: PersonStanding },
   { href: "/sites", label: "Sites & QR", icon: QrCode },
   { href: "/reports", label: "Reports", icon: BarChart2 },
   { href: "/audit", label: "Audit Trail", icon: ScrollText },
@@ -18,21 +19,40 @@ const NAV_ITEMS = [
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
+const SUPER_ADMIN_NAV_ITEMS = [
+  { href: "/users", label: "Admin Users", icon: Shield },
+] as const;
+
 export function AdminSidebar() {
   const pathname = usePathname();
   const sites = useUIStore((s) => s.sites);
   const activeSiteId = useUIStore((s) => s.activeSiteId);
   const setActiveSiteId = useUIStore((s) => s.setActiveSiteId);
+  const role = useAuthStore((s) => s.role);
   const { t } = useTranslation("admin");
+
+  const navItems = [
+    ...BASE_NAV_ITEMS,
+    ...(role === "super_admin" ? SUPER_ADMIN_NAV_ITEMS : []),
+  ];
 
   return (
     <aside className="flex h-full w-56 flex-col border-r border-border bg-background">
       {/* Logo */}
-      <div className="border-b border-border px-4 py-4">
-        <p className="text-sm font-bold tracking-tight text-foreground">
-          Park &amp; Shine
-        </p>
-        <p className="text-xs text-muted-foreground">{t("common.adminConsole")}</p>
+      <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-4">
+        <Image
+          src="/park_n_shine_logo.jpeg.png"
+          alt="Park & Shine logo"
+          width={28}
+          height={28}
+          className="shrink-0 rounded-md"
+        />
+        <div>
+          <p className="text-sm font-bold tracking-tight text-foreground leading-none">
+            Park &amp; Shine
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">{t("common.adminConsole")}</p>
+        </div>
       </div>
 
       {/* Site selector */}
@@ -52,7 +72,7 @@ export function AdminSidebar() {
 
       {/* Nav */}
       <nav className="flex-1 space-y-1 px-2 py-3">
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href;
           return (
             <Link
@@ -71,7 +91,6 @@ export function AdminSidebar() {
           );
         })}
       </nav>
-
     </aside>
   );
 }

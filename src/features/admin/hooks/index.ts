@@ -1,5 +1,4 @@
 export { useAdminAuth } from "./use-admin-auth";
-export { useWalkInQueue } from "./use-walkin-queue";
 export { useAdminQueue } from "./use-admin-queue";
 export { useBookingActions } from "./use-booking-actions";
 export { useAdminReport } from "./use-admin-report";

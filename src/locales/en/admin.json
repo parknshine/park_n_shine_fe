@@ -43,6 +43,7 @@
     "toLabel": "To",
     "loading": "Loading...",
     "apply": "Apply",
+    "clearFilter": "Clear Filter",
     "exportCsv": "Export CSV",
     "noData": "No data for this date range.",
     "totalRow": "Total",

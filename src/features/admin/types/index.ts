@@ -17,12 +17,6 @@ export interface AdminQueueResponse {
   escalations: AdminQueueBooking[];
 }
 
-export interface WalkInQueueResponse {
-  fetchedAt: string;
-  groups: AdminQueueStatusGroup[];
-  escalations: AdminQueueBooking[];
-}
-
 export interface RefundPayload {
   amountType: "full" | "partial";
   amount?: number;
@@ -77,6 +71,7 @@ export interface AdminReport {
 
 export interface AdminSettings {
   staleJobTimeoutMinutes: number;
+  whatsappNumber: string;
 }
 
 export interface AdminSite {

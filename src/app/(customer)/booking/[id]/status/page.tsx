@@ -15,11 +15,13 @@ import { PaymentCheckButton } from "@/features/customer/components/payment-check
 import { BookingStatusTimeline } from "@/features/customer/components/booking-status-timeline";
 import { BOOKING_STATUSES } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
+import { usePublicSettings } from "@/features/customer/hooks/use-public-settings";
 
 export default function BookingStatusPage() {
   const { id: bookingId } = useParams<{ id: string }>();
   const [token] = useQueryState("token", parseAsString);
   const { t } = useTranslation("customer");
+  const { whatsappNumber } = usePublicSettings();
 
   const { booking, isLoading, error, refresh } = useBookingStatus({
     bookingId,
@@ -103,8 +105,9 @@ export default function BookingStatusPage() {
   const isReady = booking.status === BOOKING_STATUSES.READY;
   const isNeedsHelp = booking.status === BOOKING_STATUSES.NEEDS_HELP;
 
-  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "6281234567890";
-  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(t("status.whatsAppMessage", { bookingId }))}`;
+  const waUrl = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(t("status.whatsAppMessage", { bookingId }))}`
+    : undefined;
 
   return (
     <div className="mx-auto max-w-md space-y-6 px-4 py-8">

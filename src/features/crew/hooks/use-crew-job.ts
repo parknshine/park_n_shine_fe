@@ -8,7 +8,6 @@ import type { CrewJob } from "@/features/crew/types";
 export function useCrewJob(jobId: string) {
   const jobQuery = useQuery<CrewJob | null>({
     enabled: !!jobId,
-    meta: { persist: false },
     queryFn: async () => {
       const response = await api.get<CrewJob>(`/v1/crew/jobs/${jobId}`);
       return response.data;
