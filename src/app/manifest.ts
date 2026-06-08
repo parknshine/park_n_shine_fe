@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Layanan cuci mobil tanpa air — pesan sekarang.",
     start_url: "/",
     scope: "/",
-    display: "standalone",
+    display: "browser",
     background_color: "#f8fafc",
     theme_color: "#0f766e",
     orientation: "portrait",
