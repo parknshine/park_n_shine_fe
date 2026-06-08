@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Shield, Plus, Pencil, RotateCcw, UserX } from "lucide-react";
+import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +30,7 @@ type ModalState =
   | null;
 
 export default function AdminUsersPage() {
+  const { t } = useTranslation("admin");
   const { data: users, isLoading } = useAdminUsers();
   const createUser = useCreateAdminUser();
   const updateUser = useUpdateAdminUser();
@@ -87,7 +89,7 @@ export default function AdminUsersPage() {
   }
 
   async function handleDeactivate(id: string) {
-    if (!confirm("Deactivate this admin user?")) return;
+    if (!confirm(t("usersPage.confirm.deactivate"))) return;
     await deactivateUser.mutateAsync(id);
   }
 
@@ -96,26 +98,26 @@ export default function AdminUsersPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-primary" />
-          <h1 className="text-xl font-semibold">Admin Users</h1>
+          <h1 className="text-xl font-semibold">{t("usersPage.title")}</h1>
         </div>
         <Button onClick={openCreate} size="sm">
           <Plus className="mr-2 h-4 w-4" />
-          Add Admin
+          {t("usersPage.addAdmin")}
         </Button>
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading...</p>
+        <p className="text-sm text-muted-foreground">{t("usersPage.loading")}</p>
       ) : (
         <div className="rounded-md border border-border">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/50">
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Name</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Email</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Role</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
-                <th className="px-4 py-3 text-right font-medium text-muted-foreground">Actions</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("usersPage.table.name")}</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("usersPage.table.email")}</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("usersPage.table.role")}</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("usersPage.table.status")}</th>
+                <th className="px-4 py-3 text-right font-medium text-muted-foreground">{t("usersPage.table.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -130,7 +132,7 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="px-4 py-3">
                     <Badge variant={user.active ? "default" : "destructive"}>
-                      {user.active ? "Active" : "Inactive"}
+                      {user.active ? t("usersPage.status.active") : t("usersPage.status.inactive")}
                     </Badge>
                   </td>
                   <td className="px-4 py-3">
@@ -159,10 +161,10 @@ export default function AdminUsersPage() {
       {modal?.type === "create" && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-md rounded-lg bg-background border border-border p-6 shadow-lg space-y-4">
-            <h2 className="text-base font-semibold text-foreground">Add Admin User</h2>
+            <h2 className="text-base font-semibold text-foreground">{t("usersPage.add.title")}</h2>
             <form onSubmit={handleCreate} className="space-y-3">
               <div className="space-y-1">
-                <Label htmlFor="create-name">Name</Label>
+                <Label htmlFor="create-name">{t("usersPage.add.nameLabel")}</Label>
                 <Input
                   id="create-name"
                   value={form.name}
@@ -171,7 +173,7 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="create-email">Email</Label>
+                <Label htmlFor="create-email">{t("usersPage.add.emailLabel")}</Label>
                 <Input
                   id="create-email"
                   type="email"
@@ -181,7 +183,7 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="create-password">Password</Label>
+                <Label htmlFor="create-password">{t("usersPage.add.passwordLabel")}</Label>
                 <Input
                   id="create-password"
                   type="password"
@@ -191,7 +193,7 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="create-role">Role</Label>
+                <Label htmlFor="create-role">{t("usersPage.add.roleLabel")}</Label>
                 <Select value={form.role} onValueChange={(v) => setForm((f) => ({ ...f, role: v as "super_admin" | "admin" }))}>
                   <SelectTrigger id="create-role"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -202,10 +204,10 @@ export default function AdminUsersPage() {
               </div>
               <div className="flex gap-2 pt-2">
                 <Button type="submit" disabled={createUser.isPending}>
-                  {createUser.isPending ? "Creating..." : "Create"}
+                  {createUser.isPending ? t("usersPage.add.creating") : t("usersPage.add.create")}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setModal(null)}>
-                  Cancel
+                  {t("usersPage.add.cancel")}
                 </Button>
               </div>
             </form>
@@ -217,10 +219,10 @@ export default function AdminUsersPage() {
       {modal?.type === "edit" && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-md rounded-lg bg-background border border-border p-6 shadow-lg space-y-4">
-            <h2 className="text-base font-semibold text-foreground">Edit Admin User</h2>
+            <h2 className="text-base font-semibold text-foreground">{t("usersPage.edit.title")}</h2>
             <form onSubmit={handleEdit} className="space-y-3">
               <div className="space-y-1">
-                <Label htmlFor="edit-name">Name</Label>
+                <Label htmlFor="edit-name">{t("usersPage.edit.nameLabel")}</Label>
                 <Input
                   id="edit-name"
                   value={form.name}
@@ -229,7 +231,7 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="edit-email">Email</Label>
+                <Label htmlFor="edit-email">{t("usersPage.edit.emailLabel")}</Label>
                 <Input
                   id="edit-email"
                   type="email"
@@ -239,7 +241,7 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="edit-role">Role</Label>
+                <Label htmlFor="edit-role">{t("usersPage.edit.roleLabel")}</Label>
                 <Select value={form.role} onValueChange={(v) => setForm((f) => ({ ...f, role: v as "super_admin" | "admin" }))}>
                   <SelectTrigger id="edit-role"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -250,10 +252,10 @@ export default function AdminUsersPage() {
               </div>
               <div className="flex gap-2 pt-2">
                 <Button type="submit" disabled={updateUser.isPending}>
-                  {updateUser.isPending ? "Saving..." : "Save"}
+                  {updateUser.isPending ? t("usersPage.edit.saving") : t("usersPage.edit.save")}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setModal(null)}>
-                  Cancel
+                  {t("usersPage.edit.cancel")}
                 </Button>
               </div>
             </form>
@@ -265,10 +267,10 @@ export default function AdminUsersPage() {
       {modal?.type === "reset" && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-md rounded-lg bg-background border border-border p-6 shadow-lg space-y-4">
-            <h2 className="text-base font-semibold text-foreground">Reset Password</h2>
+            <h2 className="text-base font-semibold text-foreground">{t("usersPage.resetPassword.title")}</h2>
             <form onSubmit={handleReset} className="space-y-3">
               <div className="space-y-1">
-                <Label htmlFor="reset-password">New Password (min 8 characters)</Label>
+                <Label htmlFor="reset-password">{t("usersPage.resetPassword.passwordLabel")}</Label>
                 <Input
                   id="reset-password"
                   type="password"
@@ -279,10 +281,10 @@ export default function AdminUsersPage() {
               </div>
               <div className="flex gap-2 pt-2">
                 <Button type="submit" disabled={resetPassword.isPending || newPassword.length < 8}>
-                  {resetPassword.isPending ? "Resetting..." : "Reset"}
+                  {resetPassword.isPending ? t("usersPage.resetPassword.resetting") : t("usersPage.resetPassword.reset")}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setModal(null)}>
-                  Cancel
+                  {t("usersPage.resetPassword.cancel")}
                 </Button>
               </div>
             </form>

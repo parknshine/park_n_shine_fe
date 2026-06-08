@@ -5,8 +5,10 @@ import { useParams } from "next/navigation";
 import QRCode from "qrcode";
 import api from "@/lib/axios-admin";
 import type { AdminSiteDetail, AdminQrCode } from "@/features/admin/types";
+import { useTranslation } from "@/i18n";
 
 export default function QrPrintPage() {
+  const { t } = useTranslation("admin");
   const { siteId, qrId } = useParams<{ siteId: string; qrId: string }>();
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [site, setSite] = useState<AdminSiteDetail | null>(null);
@@ -46,7 +48,7 @@ export default function QrPrintPage() {
   if (isLoading) {
     return (
       <div className='flex h-screen items-center justify-center'>
-        <p className='text-muted-foreground text-sm'>Preparing QR code...</p>
+        <p className='text-muted-foreground text-sm'>{t("printPage.loading")}</p>
       </div>
     );
   }
@@ -54,7 +56,7 @@ export default function QrPrintPage() {
   if (!qr || !site || !qrDataUrl) {
     return (
       <div className='flex h-screen items-center justify-center'>
-        <p className='text-destructive text-sm'>QR code not found.</p>
+        <p className='text-destructive text-sm'>{t("printPage.notFound")}</p>
       </div>
     );
   }
@@ -71,13 +73,13 @@ export default function QrPrintPage() {
       {/* Print action bar */}
       <div className='no-print flex items-center justify-between border-b border-border px-6 py-3'>
         <p className='text-sm text-muted-foreground'>
-          Print preview — {qr.label}
+          {t("printPage.preview")} — {qr.label}
         </p>
         <button
           onClick={() => window.print()}
           className='rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
         >
-          Print / Save as PDF
+          {t("printPage.print")}
         </button>
       </div>
 
@@ -87,7 +89,7 @@ export default function QrPrintPage() {
           {/* Logo / brand */}
           <div className='text-center'>
             <p className='text-2xl font-black tracking-tight'>
-              Park &amp; Shine
+              {t("printPage.brand")}
             </p>
             <p className='text-sm text-muted-foreground'>{site.name}</p>
           </div>
@@ -104,7 +106,7 @@ export default function QrPrintPage() {
           <div className='text-center'>
             <p className='text-3xl font-bold tracking-tight'>{qr.label}</p>
             <p className='mt-1 text-xs text-muted-foreground'>
-              Scan to book car wash service
+              {t("printPage.instruction")}
             </p>
           </div>
 

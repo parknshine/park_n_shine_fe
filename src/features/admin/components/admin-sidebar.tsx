@@ -10,19 +10,6 @@ import { useAuthStore } from "@/store/auth-store";
 import { useTranslation } from "@/i18n";
 import { Combobox } from "@/components/ui/combobox";
 
-const BASE_NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-  { href: "/sites", label: "Sites & QR", icon: QrCode },
-  { href: "/reports", label: "Reports", icon: BarChart2 },
-  { href: "/audit", label: "Audit Trail", icon: ScrollText },
-  { href: "/crew", label: "Crew", icon: Users },
-  { href: "/settings", label: "Settings", icon: Settings },
-] as const;
-
-const SUPER_ADMIN_NAV_ITEMS = [
-  { href: "/users", label: "Admin Users", icon: Shield },
-] as const;
-
 export function AdminSidebar() {
   const pathname = usePathname();
   const sites = useUIStore((s) => s.sites);
@@ -30,6 +17,19 @@ export function AdminSidebar() {
   const setActiveSiteId = useUIStore((s) => s.setActiveSiteId);
   const role = useAuthStore((s) => s.role);
   const { t } = useTranslation("admin");
+
+  const BASE_NAV_ITEMS = [
+    { href: "/dashboard", label: t("sidebar.dashboard"), icon: LayoutGrid },
+    { href: "/sites", label: t("sidebar.sitesQr"), icon: QrCode },
+    { href: "/reports", label: t("sidebar.reports"), icon: BarChart2 },
+    { href: "/audit", label: t("sidebar.auditTrail"), icon: ScrollText },
+    { href: "/crew", label: t("sidebar.crew"), icon: Users },
+    { href: "/settings", label: t("sidebar.settings"), icon: Settings },
+  ];
+
+  const SUPER_ADMIN_NAV_ITEMS = [
+    { href: "/users", label: t("sidebar.adminUsers"), icon: Shield },
+  ];
 
   const navItems = [
     ...BASE_NAV_ITEMS,

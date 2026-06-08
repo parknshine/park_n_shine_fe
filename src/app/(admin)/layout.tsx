@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { AdminSidebar, AdminNavbar } from "@/features/admin/components";
 import { useAdminSites } from "@/features/admin/hooks";
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
   const router = useRouter();
 
   useEffect(() => {

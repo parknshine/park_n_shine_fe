@@ -13,11 +13,11 @@
     },
     "hero": {
       "heading": "A Cleaner Car\nWithout The\nExtra Trip.",
-      "description": "Skip the drive to a car wash. Park & Shine cleans your car where you already are, so you can spend less time waiting and more time with the people who matter most.",
+      "description": "Skip the drive to a car wash. Park & Shine cleans your car while you shop, so you can spend less time waiting and more time with the people who matter most.",
       "viewServices": "View Services",
       "findLocations": "Find Locations",
       "imageAlt": "Family standing beside their car in a bright indoor parking area",
-      "btnBookNow": "Book a Wash",
+      "btnBookNow": "Book Now",
       "btnViewPricing": "View Pricing"
     },
     "howItWorks": {
@@ -51,14 +51,14 @@
       "feature5": "Eco-friendly cleaning using under 1L of water per wash vs existing that uses 100L"
     },
     "track": {
-      "title": "Track Your Wash",
+      "title": "Track Your Order",
       "description": "From parking to final shine in only 30 minutes, Park & Shine keeps the experience smooth and easy to follow. Perfect for drivers booking on the go.",
       "step1": "Park",
       "step2": "Take 2 Pictures",
       "step3": "Make Payment",
-      "step4": "Crew Starts Washing",
+      "step4": "Crew is Washing",
       "step5": "Car Is Ready!",
-      "bookNow": "Book a Wash"
+      "bookNow": "Book Now"
     },
     "integration": {
       "title": "Seamless Integration",
@@ -186,7 +186,39 @@
       "totalLabel": "Total Payment",
       "pay": "Pay Now",
       "processing": "Processing...",
-      "errorPay": "Payment failed. Please try again."
+      "errorPay": "Payment failed. Please try again.",
+      "completeTitle": "Complete Payment",
+      "copied": "Copied",
+      "copy": "Copy",
+      "validUntil": "Valid until",
+      "expiredTitle": "Payment Expired",
+      "expiredDesc": "Please select a new payment method to continue.",
+      "changeMethod": "Change Payment Method",
+      "bankLabel": "Bank",
+      "vaLabel": "Virtual Account Number",
+      "companyCodeLabel": "Company Code",
+      "billCodeLabel": "Bill Code",
+      "scanQris": "Scan the QR above using any digital wallet",
+      "payWithCard": "Pay with Card",
+      "payWithCardDesc": "Click the button below to open the payment page and enter your credit / debit card details.",
+      "completeIn": "Complete in",
+      "openApp": "Click the button below to open the",
+      "andComplete": "and complete the payment.",
+      "openProvider": "Open",
+      "howToPay": "How to Pay",
+      "howToPayMandiri": "How to Pay via Mandiri",
+      "vaStep1": "Open mobile banking app or ATM",
+      "vaStep2": "Select Transfer → Virtual Account",
+      "vaStep3": "Enter the VA number above",
+      "vaStep4": "Confirm and complete the payment",
+      "mandiriStep1": "Open Livin' by Mandiri or Mandiri ATM",
+      "mandiriStep2": "Select Pay → Multipayment",
+      "mandiriStep3": "Enter the Company Code above",
+      "mandiriStep4": "Enter the Bill Code above",
+      "mandiriStep5": "Confirm the payment",
+      "alreadyPaid": "Already made a payment?",
+      "updateStatus": "Update Payment Status",
+      "checking": "Checking status..."
     }
   },
   "status": {

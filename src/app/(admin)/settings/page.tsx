@@ -92,27 +92,28 @@ function WhatsAppNumberCard({
   save,
   isSaving,
 }: SettingsFormProps) {
+  const { t } = useTranslation("admin");
   const [number, setNumber] = useState(settings.whatsappNumber);
 
   async function handleSave() {
     try {
       await save({ whatsappNumber: number });
-      toast.success("Nomor WhatsApp berhasil disimpan.");
+      toast.success(t("settingsWhatsapp.toast.saveSuccess"));
     } catch {
-      toast.error("Gagal menyimpan nomor WhatsApp.");
+      toast.error(t("settingsWhatsapp.toast.saveFailed"));
     }
   }
 
   return (
     <div className="rounded-lg border border-border p-4 space-y-4">
       <div>
-        <h2 className="text-sm font-semibold text-foreground">Nomor WhatsApp Support</h2>
+        <h2 className="text-sm font-semibold text-foreground">{t("settingsWhatsapp.supportTitle")}</h2>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Nomor ini digunakan untuk tombol WhatsApp di halaman customer. Format: 628xxxxxxxxxx (tanpa +).
+          {t("settingsWhatsapp.supportDesc")}
         </p>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="wa-number-input">Nomor WhatsApp</Label>
+        <Label htmlFor="wa-number-input">{t("settingsWhatsapp.supportLabel")}</Label>
         <Input
           id="wa-number-input"
           type="tel"
@@ -123,26 +124,20 @@ function WhatsAppNumberCard({
         />
       </div>
       <Button onClick={handleSave} disabled={isSaving}>
-        {isSaving ? "Menyimpan..." : "Simpan"}
+        {isSaving ? t("settingsWhatsapp.saving") : t("settingsWhatsapp.save")}
       </Button>
     </div>
   );
 }
 
-const STATUS_LABEL: Record<WaStatus, string> = {
-  disabled:     "Tidak aktif",
-  disconnected: "Terputus",
-  connecting:   "Menghubungkan...",
-  qr_ready:     "Scan QR Code",
-  connected:    "Terhubung",
-};
-
 function WhatsAppStatusBadge({ status }: { status: WaStatus }) {
+  const { t } = useTranslation("admin");
+
   if (status === "connected") {
     return (
       <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600">
         <CheckCircle2 className="h-4 w-4" />
-        {STATUS_LABEL.connected}
+        {t("settingsWhatsapp.status.connected")}
       </span>
     );
   }
@@ -150,7 +145,7 @@ function WhatsAppStatusBadge({ status }: { status: WaStatus }) {
     return (
       <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600">
         <Loader2 className="h-4 w-4 animate-spin" />
-        {STATUS_LABEL.connecting}
+        {t("settingsWhatsapp.status.connecting")}
       </span>
     );
   }
@@ -158,19 +153,20 @@ function WhatsAppStatusBadge({ status }: { status: WaStatus }) {
     return (
       <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600">
         <QrCode className="h-4 w-4" />
-        {STATUS_LABEL.qr_ready}
+        {t("settingsWhatsapp.status.scanQr")}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
       <WifiOff className="h-4 w-4" />
-      {STATUS_LABEL[status] ?? status}
+      {status === "disabled" ? t("settingsWhatsapp.status.inactive") : t("settingsWhatsapp.status.disconnected")}
     </span>
   );
 }
 
 function WhatsAppCard() {
+  const { t } = useTranslation("admin");
   const { state, isLoading, connect, isConnecting, logout, isLoggingOut } = useAdminWhatsapp();
   const [showQr, setShowQr] = useState(false);
 
@@ -183,7 +179,7 @@ function WhatsAppCard() {
       setShowQr(true);
       await connect();
     } catch {
-      toast.error("Gagal memulai koneksi WhatsApp.");
+      toast.error(t("settingsWhatsapp.toast.connectFailed"));
     }
   }
 
@@ -191,9 +187,9 @@ function WhatsAppCard() {
     try {
       await logout();
       setShowQr(false);
-      toast.success("WhatsApp berhasil logout.");
+      toast.success(t("settingsWhatsapp.toast.logoutSuccess"));
     } catch {
-      toast.error("Gagal logout WhatsApp.");
+      toast.error(t("settingsWhatsapp.toast.logoutFailed"));
     }
   }
 
@@ -204,10 +200,10 @@ function WhatsAppCard() {
           <div>
             <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <MessageCircle className="h-4 w-4 text-green-600" />
-              WhatsApp Notifikasi
+              {t("settingsWhatsapp.notificationTitle")}
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Kirim notifikasi job ke crew via WhatsApp. Gunakan nomor yang sudah terdaftar WhatsApp.
+              {t("settingsWhatsapp.notificationDesc")}
             </p>
           </div>
           {!isLoading && <WhatsAppStatusBadge status={state.status} />}
@@ -227,7 +223,7 @@ function WhatsAppCard() {
               ) : (
                 <LogOut className="mr-2 h-3.5 w-3.5" />
               )}
-              Logout WhatsApp
+              {t("settingsWhatsapp.logout")}
             </Button>
           </div>
         )}
@@ -242,16 +238,16 @@ function WhatsAppCard() {
               {isConnecting || state.status === "connecting" ? (
                 <>
                   <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                  Menghubungkan...
+                  {t("settingsWhatsapp.connecting")}
                 </>
               ) : (
-                "Hubungkan WhatsApp"
+                t("settingsWhatsapp.connect")
               )}
             </Button>
 
             {isQrReady && (
               <Button size="sm" variant="outline" onClick={() => setShowQr(true)}>
-                Lihat QR Code
+                {t("settingsWhatsapp.viewQr")}
               </Button>
             )}
           </div>
@@ -263,12 +259,12 @@ function WhatsAppCard() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-green-600" />
-              Scan QR Code WhatsApp
+              {t("settingsWhatsapp.qrDialog.title")}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">
-              Buka <strong>WhatsApp</strong> di HP → ⋮ → <strong>Linked Devices</strong> → <strong>Link a Device</strong>, lalu scan QR ini.
+              {t("settingsWhatsapp.qrDialog.instructions")}
             </p>
             <div className="flex justify-center rounded-lg bg-white p-4">
               {state.qr ? (
@@ -280,7 +276,7 @@ function WhatsAppCard() {
               )}
             </div>
             <p className="text-center text-xs text-muted-foreground">
-              QR code otomatis refresh setiap ~20 detik.
+              {t("settingsWhatsapp.qrDialog.autoRefresh")}
             </p>
           </div>
         </DialogContent>

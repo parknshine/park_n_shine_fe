@@ -112,7 +112,8 @@
   "queueGroup": {
     "seconds": "{{n}}d",
     "minutes": "{{n}}m",
-    "hours": "{{h}}j {{m}}m"
+    "hours": "{{h}}j {{m}}m",
+    "unassigned": "Unassigned"
   },
   "reassignModal": {
     "title": "Reassign Crew",
@@ -183,5 +184,280 @@
     "subtitle": "Booking tanpa site — berbasis GPS atau belum ditetapkan",
     "loading": "Memuat antrian walk-in...",
     "emptyQueue": "Tidak ada booking walk-in saat ini."
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "sitesQr": "Sites & QR",
+    "reports": "Reports",
+    "auditTrail": "Audit Trail",
+    "crew": "Crew",
+    "settings": "Settings",
+    "adminUsers": "Admin Users"
+  },
+  "crewPage": {
+    "title": "Crew Members",
+    "addCrew": "Tambah Crew",
+    "loading": "Loading...",
+    "empty": "Belum ada crew member.",
+    "table": {
+      "name": "Nama",
+      "whatsapp": "WhatsApp",
+      "status": "Status",
+      "actions": "Aksi"
+    },
+    "status": {
+      "active": "Aktif",
+      "inactive": "Nonaktif"
+    },
+    "add": {
+      "title": "Tambah Crew Member",
+      "nameLabel": "Nama",
+      "namePlaceholder": "Nama lengkap",
+      "pinLabel": "PIN (4-8 digit)",
+      "whatsappLabel": "Nomor WhatsApp",
+      "whatsappOptional": "(opsional)",
+      "whatsappHelper": "Digunakan untuk notifikasi job via WhatsApp.",
+      "cancel": "Batal",
+      "saving": "Menyimpan...",
+      "save": "Simpan"
+    },
+    "edit": {
+      "title": "Edit Crew Member",
+      "nameLabel": "Nama",
+      "pinLabel": "PIN Baru",
+      "pinHint": "(kosongkan jika tidak diubah)",
+      "whatsappLabel": "Nomor WhatsApp",
+      "whatsappOptional": "(opsional)",
+      "whatsappHelper": "Kosongkan untuk hapus nomor.",
+      "cancel": "Batal",
+      "saving": "Menyimpan...",
+      "save": "Simpan"
+    },
+    "confirm": {
+      "deactivate": "Nonaktifkan crew member \"{{name}}\"?"
+    },
+    "toast": {
+      "nameRequired": "Nama wajib diisi dan PIN harus 4-8 digit.",
+      "invalidWhatsapp": "Nomor WhatsApp tidak valid (contoh: 08123456789).",
+      "addFailed": "Gagal menambah crew member.",
+      "pinRequired": "PIN harus 4-8 digit.",
+      "updateFailed": "Gagal mengupdate crew member.",
+      "deactivated": "Crew member dinonaktifkan.",
+      "deactivateFailed": "Gagal menonaktifkan crew member."
+    }
+  },
+  "sitesPage": {
+    "title": "Sites & QR Codes",
+    "subtitle": "Kelola parking sites dan QR code mereka",
+    "genericQr": "Generic Site QR",
+    "newSite": "New Site",
+    "loading": "Loading...",
+    "empty": "No sites yet. Create one to get started.",
+    "status": {
+      "paused": "Paused",
+      "active": "Active"
+    },
+    "actions": {
+      "edit": "Edit",
+      "manageQr": "Manage QR"
+    },
+    "genericQrModal": {
+      "title": "Generic Site QR",
+      "description": "Scan to open the Park & Shine booking page.",
+      "printQr": "Print QR",
+      "close": "Close"
+    },
+    "create": {
+      "title": "New Site",
+      "nameLabel": "Name",
+      "addressLabel": "Address",
+      "timezoneLabel": "Timezone",
+      "cutoffLabel": "Cutoff Time (HH:MM, optional)",
+      "creating": "Creating...",
+      "create": "Create Site",
+      "cancel": "Cancel"
+    },
+    "editModal": {
+      "title": "Edit Site",
+      "nameLabel": "Name",
+      "addressLabel": "Address",
+      "timezoneLabel": "Timezone",
+      "cutoffLabel": "Cutoff Time (HH:MM, optional)",
+      "saving": "Saving...",
+      "save": "Save Changes",
+      "cancel": "Cancel"
+    }
+  },
+  "siteDetail": {
+    "title": "QR Codes",
+    "subtitle": "Kelola QR code untuk site ini",
+    "shifts": "Shifts",
+    "generateQr": "Generate QR",
+    "loading": "Loading...",
+    "activeSection": "Active",
+    "emptyActive": "No active QR codes",
+    "created": "Created",
+    "print": "Print",
+    "rotate": "Rotate",
+    "rotatedSection": "Rotated",
+    "rotatedLabel": "Rotated",
+    "rotatedBadge": "Rotated",
+    "generateModal": {
+      "title": "Generate New QR Code",
+      "slotLabel": "Slot Label (e.g. \"Slot A1\")",
+      "generating": "Generating...",
+      "generate": "Generate & Print",
+      "cancel": "Cancel"
+    },
+    "rotateConfirm": {
+      "title": "Rotate QR Code?",
+      "message": "The current QR for \"{{slot}}\" will be invalidated and a new one generated. Customers scanning the old QR will see an error.",
+      "rotating": "Rotating...",
+      "confirm": "Yes, Rotate",
+      "cancel": "Cancel"
+    }
+  },
+  "shiftsPage": {
+    "title": "Shifts",
+    "subtitle": "Kelola shift untuk site",
+    "createShift": "Buat Shift",
+    "loading": "Memuat shift...",
+    "empty": "Belum ada shift.",
+    "table": {
+      "code": "Kode Shift",
+      "time": "Waktu",
+      "crew": "Crew",
+      "status": "Status",
+      "actions": "Aksi"
+    },
+    "status": {
+      "active": "Aktif",
+      "completed": "Selesai",
+      "ongoing": "Berlangsung"
+    },
+    "actions": {
+      "hideCode": "Sembunyikan kode",
+      "showCode": "Tampilkan kode",
+      "closeShift": "Tutup Shift"
+    },
+    "create": {
+      "title": "Buat Shift Baru",
+      "description": "Pilih crew yang bertugas pada shift ini:",
+      "loading": "Memuat crew...",
+      "empty": "Tidak ada crew aktif yang tersedia.",
+      "selected": "{{count}} crew dipilih",
+      "cancel": "Batal",
+      "creating": "Membuat...",
+      "create": "Buat Shift"
+    },
+    "created": {
+      "title": "Shift Berhasil Dibuat",
+      "description": "Salin kode ini dan bagikan ke crew:",
+      "copied": "Kode berhasil disalin!",
+      "close": "Tutup"
+    },
+    "closeConfirm": {
+      "title": "Tutup Shift?",
+      "message": "Shift dengan kode \"{{code}}\" akan ditutup. Tindakan ini tidak dapat dibatalkan.",
+      "cancel": "Batal",
+      "closing": "Menutup...",
+      "confirm": "Ya, Tutup Shift"
+    },
+    "toast": {
+      "createFailed": "Gagal membuat shift. Silakan coba lagi."
+    }
+  },
+  "usersPage": {
+    "title": "Admin Users",
+    "addAdmin": "Add Admin",
+    "loading": "Loading...",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "add": {
+      "title": "Add Admin User",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "roleLabel": "Role",
+      "creating": "Creating...",
+      "create": "Create",
+      "cancel": "Cancel"
+    },
+    "edit": {
+      "title": "Edit Admin User",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "roleLabel": "Role",
+      "saving": "Saving...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "passwordLabel": "New Password (min 8 characters)",
+      "resetting": "Resetting...",
+      "reset": "Reset",
+      "cancel": "Cancel"
+    },
+    "confirm": {
+      "deactivate": "Deactivate this admin user?"
+    }
+  },
+  "settingsWhatsapp": {
+    "supportTitle": "Nomor WhatsApp Support",
+    "supportDesc": "Nomor ini digunakan untuk tombol WhatsApp di halaman customer. Format: 628xxxxxxxxxx (tanpa +).",
+    "supportLabel": "Nomor WhatsApp",
+    "saving": "Menyimpan...",
+    "save": "Simpan",
+    "status": {
+      "inactive": "Tidak aktif",
+      "disconnected": "Terputus",
+      "connecting": "Menghubungkan...",
+      "scanQr": "Scan QR Code",
+      "connected": "Terhubung"
+    },
+    "notificationTitle": "WhatsApp Notifikasi",
+    "notificationDesc": "Kirim notifikasi job ke crew via WhatsApp. Gunakan nomor yang sudah terdaftar WhatsApp.",
+    "logout": "Logout WhatsApp",
+    "connecting": "Menghubungkan...",
+    "connect": "Hubungkan WhatsApp",
+    "viewQr": "Lihat QR Code",
+    "qrDialog": {
+      "title": "Scan QR Code WhatsApp",
+      "instructions": "Buka WhatsApp di HP → ⋮ → Linked Devices → Link a Device, lalu scan QR ini.",
+      "autoRefresh": "QR code otomatis refresh setiap ~20 detik."
+    },
+    "toast": {
+      "saveSuccess": "Nomor WhatsApp berhasil disimpan.",
+      "saveFailed": "Gagal menyimpan nomor WhatsApp.",
+      "connectFailed": "Gagal memulai koneksi WhatsApp.",
+      "logoutSuccess": "WhatsApp berhasil logout.",
+      "logoutFailed": "Gagal logout WhatsApp."
+    }
+  },
+  "locationPicker": {
+    "title": "Pick location from map",
+    "searchPlaceholder": "Search mall or address…",
+    "noResults": "No results found. Try a different search.",
+    "searchFailed": "Search failed. Please try again.",
+    "useLocation": "Use this location",
+    "cancel": "Cancel"
+  },
+  "printPage": {
+    "loading": "Preparing QR code...",
+    "notFound": "QR code not found.",
+    "preview": "Print preview",
+    "print": "Print / Save as PDF",
+    "brand": "Park & Shine",
+    "instruction": "Scan to book car wash service"
   }
 }

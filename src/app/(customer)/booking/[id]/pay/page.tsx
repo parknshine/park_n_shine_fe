@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useQueryState, parseAsString } from "nuqs";
 import { Copy, CheckCircle, RefreshCw, AlertCircle, Wallet } from "lucide-react";
+import { useTranslation } from "@/i18n";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
 import { useCheckPayment } from "@/features/customer/hooks/use-check-payment";
 import { usePaymentAutoPoll } from "@/features/customer/hooks/use-payment-auto-poll";
@@ -14,6 +15,8 @@ import type {
   BookingStatus,
   PaymentInstructions,
 } from "@/features/customer/types";
+
+type TFunction = (key: string) => string;
 
 const PAID_STATUSES = new Set<BookingStatus>([
   BOOKING_STATUSES.PAID,
@@ -42,7 +45,7 @@ function formatExpiry(expiryTime: string): string {
 
 // ─── Copy button ──────────────────────────────────────────────────────────────
 
-function CopyButton({ value }: { value: string }) {
+function CopyButton({ value, t }: Readonly<{ value: string; t: TFunction }>) {
   const [copied, setCopied] = useState(false);
   function handleCopy() {
     void navigator.clipboard.writeText(value);
@@ -62,12 +65,12 @@ function CopyButton({ value }: { value: string }) {
       {copied ? (
         <>
           <CheckCircle className="w-3.5 h-3.5" />
-          Tersalin
+          {t("booking.payment.copied")}
         </>
       ) : (
         <>
           <Copy className="w-3.5 h-3.5" />
-          Salin
+          {t("booking.payment.copy")}
         </>
       )}
     </button>
@@ -81,12 +84,14 @@ function InfoRow({
   value,
   mono = false,
   copyValue,
-}: {
+  t,
+}: Readonly<{
   label: string;
   value: string;
   mono?: boolean;
   copyValue?: string;
-}) {
+  t: TFunction;
+}>) {
   return (
     <div className="flex items-center justify-between gap-3 px-4 py-3.5">
       <div className="flex-1 min-w-0">
@@ -102,19 +107,19 @@ function InfoRow({
           {value}
         </p>
       </div>
-      {copyValue && <CopyButton value={copyValue} />}
+      {copyValue && <CopyButton value={copyValue} t={t} />}
     </div>
   );
 }
 
 // ─── Expiry badge ─────────────────────────────────────────────────────────────
 
-function ExpiryBadge({ expiryTime }: { expiryTime: string }) {
+function ExpiryBadge({ expiryTime, t }: { expiryTime: string; t: TFunction }) {
   return (
     <div className="flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl">
       <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
       <p className="text-xs text-amber-700 font-medium">
-        Berlaku hingga{" "}
+        {t("booking.payment.validUntil")}{" "}
         <span className="font-semibold">{formatExpiry(expiryTime)}</span>
       </p>
     </div>
@@ -126,10 +131,12 @@ function ExpiryBadge({ expiryTime }: { expiryTime: string }) {
 function PaymentInstructionsUI({
   instructions,
   onChangeMethod,
-}: {
+  t,
+}: Readonly<{
   instructions: PaymentInstructions;
   onChangeMethod: () => void;
-}) {
+  t: TFunction;
+}>) {
   const expired = "expiryTime" in instructions && isExpired(instructions.expiryTime);
 
   if (expired) {
@@ -140,17 +147,17 @@ function PaymentInstructionsUI({
         </div>
         <div>
           <p className="font-semibold text-foreground mb-1">
-            Waktu Pembayaran Habis
+            {t("booking.payment.expiredTitle")}
           </p>
           <p className="text-sm text-muted-foreground">
-            Silakan pilih metode pembayaran baru untuk melanjutkan.
+            {t("booking.payment.expiredDesc")}
           </p>
         </div>
         <button
           onClick={onChangeMethod}
           className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
         >
-          Ganti Metode Pembayaran
+          {t("booking.payment.changeMethod")}
         </button>
       </div>
     );
@@ -161,17 +168,18 @@ function PaymentInstructionsUI({
     return (
       <div className="flex flex-col gap-3">
         <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-          <InfoRow label="Bank" value={instructions.bank} />
+          <InfoRow label={t("booking.payment.bankLabel")} value={instructions.bank} t={t} />
           <div className="border-t border-border">
             <InfoRow
-              label="Nomor Virtual Account"
+              label={t("booking.payment.vaLabel")}
               value={instructions.vaNumber}
               mono
               copyValue={instructions.vaNumber}
+              t={t}
             />
           </div>
         </div>
-        <ExpiryBadge expiryTime={instructions.expiryTime} />
+        <ExpiryBadge expiryTime={instructions.expiryTime} t={t} />
       </div>
     );
   }
@@ -182,21 +190,23 @@ function PaymentInstructionsUI({
       <div className="flex flex-col gap-3">
         <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
           <InfoRow
-            label="Kode Perusahaan"
+            label={t("booking.payment.companyCodeLabel")}
             value={instructions.companyCode}
             mono
             copyValue={instructions.companyCode}
+            t={t}
           />
           <div className="border-t border-border">
             <InfoRow
-              label="Kode Tagihan"
+              label={t("booking.payment.billCodeLabel")}
               value={instructions.billCode}
               mono
               copyValue={instructions.billCode}
+              t={t}
             />
           </div>
         </div>
-        <ExpiryBadge expiryTime={instructions.expiryTime} />
+        <ExpiryBadge expiryTime={instructions.expiryTime} t={t} />
       </div>
     );
   }
@@ -214,9 +224,9 @@ function PaymentInstructionsUI({
           />
         </div>
         <p className="text-xs text-muted-foreground font-medium text-center">
-          Scan QR di atas menggunakan dompet digital apapun
+          {t("booking.payment.scanQris")}
         </p>
-        <ExpiryBadge expiryTime={instructions.expiryTime} />
+        <ExpiryBadge expiryTime={instructions.expiryTime} t={t} />
       </div>
     );
   }
@@ -229,16 +239,16 @@ function PaymentInstructionsUI({
           <Wallet className="w-7 h-7 text-primary-foreground" />
         </div>
         <div>
-          <p className="font-semibold text-primary-foreground mb-1">Bayar dengan Kartu</p>
+          <p className="font-semibold text-primary-foreground mb-1">{t("booking.payment.payWithCard")}</p>
           <p className="text-sm text-primary-foreground/70">
-            Klik tombol di bawah untuk membuka halaman pembayaran dan memasukkan detail kartu kredit / debit kamu.
+            {t("booking.payment.payWithCardDesc")}
           </p>
         </div>
         <a
           href={instructions.redirectUrl}
           className="w-full py-3 rounded-xl bg-primary-foreground text-primary text-sm font-semibold text-center hover:bg-primary-foreground/90 transition-colors"
         >
-          Bayar Sekarang
+          {t("booking.payment.pay")}
         </a>
       </div>
     );
@@ -254,24 +264,24 @@ function PaymentInstructionsUI({
           </div>
           <div>
             <p className="font-semibold text-primary-foreground mb-1">
-              Selesaikan di {instructions.provider}
+              {t("booking.payment.completeIn")} {instructions.provider}
             </p>
             <p className="text-sm text-primary-foreground/70">
-              Klik tombol di bawah untuk membuka aplikasi{" "}
+              {t("booking.payment.openApp")}{" "}
               <span className="font-semibold text-primary-foreground">
                 {instructions.provider}
               </span>{" "}
-              dan menyelesaikan pembayaran.
+              {t("booking.payment.andComplete")}
             </p>
           </div>
           <a
             href={instructions.deepLinkUrl}
             className="w-full py-3 rounded-xl bg-primary-foreground text-primary text-sm font-semibold text-center hover:bg-primary-foreground/90 transition-colors"
           >
-            Buka {instructions.provider}
+            {t("booking.payment.openProvider")} {instructions.provider}
           </a>
         </div>
-        <ExpiryBadge expiryTime={instructions.expiryTime} />
+        <ExpiryBadge expiryTime={instructions.expiryTime} t={t} />
       </div>
     );
   }
@@ -286,6 +296,7 @@ export default function PayPage() {
   const [token] = useQueryState("token", parseAsString);
   const router = useRouter();
   const signedToken = token ?? "";
+  const { t } = useTranslation("customer");
 
   const { booking } = useBookingStatus({
     bookingId,
@@ -338,7 +349,7 @@ export default function PayPage() {
             </p>
           )}
           <h1 className="mt-1 text-2xl font-bold leading-tight text-foreground">
-            Selesaikan Pembayaran
+            {t("booking.payment.completeTitle")}
           </h1>
         </div>
 
@@ -347,6 +358,7 @@ export default function PayPage() {
           <PaymentInstructionsUI
             instructions={booking.paymentInstructions}
             onChangeMethod={handleChangeMethod}
+            t={t}
           />
         ) : (
           <div className="bg-card rounded-2xl border border-border shadow-sm flex items-center justify-center py-16">
@@ -358,14 +370,14 @@ export default function PayPage() {
         {booking?.paymentInstructions?.type === "VA" && (
           <div className="bg-card rounded-2xl border border-border shadow-sm p-4">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-              Cara Bayar
+              {t("booking.payment.howToPay")}
             </p>
             <ol className="space-y-2">
               {[
-                "Buka aplikasi mobile banking atau ATM",
-                "Pilih Transfer → Virtual Account",
-                "Masukkan nomor VA di atas",
-                "Konfirmasi dan selesaikan pembayaran",
+                t("booking.payment.vaStep1"),
+                t("booking.payment.vaStep2"),
+                t("booking.payment.vaStep3"),
+                t("booking.payment.vaStep4"),
               ].map((step, i) => (
                 <li key={i} className="flex items-start gap-2.5">
                   <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center mt-0.5">
@@ -382,15 +394,15 @@ export default function PayPage() {
         {booking?.paymentInstructions?.type === "MANDIRI" && (
           <div className="bg-card rounded-2xl border border-border shadow-sm p-4">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-              Cara Bayar via Mandiri
+              {t("booking.payment.howToPayMandiri")}
             </p>
             <ol className="space-y-2">
               {[
-                "Buka Livin' by Mandiri atau ATM Mandiri",
-                "Pilih Bayar → Multipayment",
-                "Masukkan Kode Perusahaan di atas",
-                "Masukkan Kode Tagihan di atas",
-                "Konfirmasi pembayaran",
+                t("booking.payment.mandiriStep1"),
+                t("booking.payment.mandiriStep2"),
+                t("booking.payment.mandiriStep3"),
+                t("booking.payment.mandiriStep4"),
+                t("booking.payment.mandiriStep5"),
               ].map((step, i) => (
                 <li key={i} className="flex items-start gap-2.5">
                   <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center mt-0.5">
@@ -407,6 +419,9 @@ export default function PayPage() {
       {/* ── Sticky bottom actions ─────────────────────────────────── */}
       <div className="fixed bottom-0 left-0 right-0 z-10 bg-card/95 border-t border-border shadow-sm backdrop-blur-sm">
         <div className="max-w-md mx-auto px-4 py-4 flex flex-col gap-2">
+          <p className="text-center text-sm text-muted-foreground">
+            {t("booking.payment.alreadyPaid")}
+          </p>
           <button
             onClick={() => void checkPayment()}
             disabled={isChecking}
@@ -415,13 +430,13 @@ export default function PayPage() {
             <RefreshCw
               className={["w-4 h-4", isChecking ? "animate-spin" : ""].join(" ")}
             />
-            {isChecking ? "Memeriksa status..." : "Sudah Bayar? Cek Status"}
+            {isChecking ? t("booking.payment.checking") : t("booking.payment.updateStatus")}
           </button>
           <button
             onClick={handleChangeMethod}
             className="w-full py-2.5 rounded-xl border border-border text-muted-foreground text-sm font-medium hover:bg-muted transition-colors"
           >
-            Ganti Metode Pembayaran
+            {t("booking.payment.changeMethod")}
           </button>
         </div>
       </div>

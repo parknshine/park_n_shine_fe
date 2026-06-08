@@ -18,7 +18,7 @@ export function AdminQueueGroup({
   status,
   bookings,
   onBookingClick,
-}: AdminQueueGroupProps) {
+}: Readonly<AdminQueueGroupProps>) {
   const { t } = useTranslation("admin");
 
   function formatElapsed(seconds: number): string {
@@ -51,7 +51,7 @@ export function AdminQueueGroup({
               </p>
               <p className="text-muted-foreground">{booking.slotText}</p>
             </div>
-            <p className="text-muted-foreground">{booking.crewName ?? "Unassigned"}</p>
+            <p className="text-muted-foreground">{booking.crewName ?? t("queueGroup.unassigned")}</p>
             <p className="font-mono text-xs text-muted-foreground">
               {formatElapsed(booking.elapsedSeconds)}
             </p>

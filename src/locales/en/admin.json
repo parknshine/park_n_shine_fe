@@ -112,7 +112,8 @@
   "queueGroup": {
     "seconds": "{{n}}s",
     "minutes": "{{n}}m",
-    "hours": "{{h}}h {{m}}m"
+    "hours": "{{h}}h {{m}}m",
+    "unassigned": "Unassigned"
   },
   "reassignModal": {
     "title": "Reassign Crew",
@@ -183,5 +184,280 @@
     "subtitle": "Bookings without a site — GPS-based or unassigned",
     "loading": "Loading walk-in queue...",
     "emptyQueue": "No walk-in bookings at the moment."
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "sitesQr": "Sites & QR",
+    "reports": "Reports",
+    "auditTrail": "Audit Trail",
+    "crew": "Crew",
+    "settings": "Settings",
+    "adminUsers": "Admin Users"
+  },
+  "crewPage": {
+    "title": "Crew Members",
+    "addCrew": "Add Crew",
+    "loading": "Loading...",
+    "empty": "No crew members yet.",
+    "table": {
+      "name": "Name",
+      "whatsapp": "WhatsApp",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "add": {
+      "title": "Add Crew Member",
+      "nameLabel": "Name",
+      "namePlaceholder": "Full name",
+      "pinLabel": "PIN (4-8 digits)",
+      "whatsappLabel": "WhatsApp Number",
+      "whatsappOptional": "(optional)",
+      "whatsappHelper": "Used for job notifications via WhatsApp.",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "save": "Save"
+    },
+    "edit": {
+      "title": "Edit Crew Member",
+      "nameLabel": "Name",
+      "pinLabel": "New PIN",
+      "pinHint": "(leave blank to keep unchanged)",
+      "whatsappLabel": "WhatsApp Number",
+      "whatsappOptional": "(optional)",
+      "whatsappHelper": "Leave blank to remove number.",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "save": "Save"
+    },
+    "confirm": {
+      "deactivate": "Deactivate crew member \"{{name}}\"?"
+    },
+    "toast": {
+      "nameRequired": "Name is required and PIN must be 4-8 digits.",
+      "invalidWhatsapp": "Invalid WhatsApp number (e.g. 08123456789).",
+      "addFailed": "Failed to add crew member.",
+      "pinRequired": "PIN must be 4-8 digits.",
+      "updateFailed": "Failed to update crew member.",
+      "deactivated": "Crew member deactivated.",
+      "deactivateFailed": "Failed to deactivate crew member."
+    }
+  },
+  "sitesPage": {
+    "title": "Sites & QR Codes",
+    "subtitle": "Manage parking sites and their QR codes",
+    "genericQr": "Generic Site QR",
+    "newSite": "New Site",
+    "loading": "Loading...",
+    "empty": "No sites yet. Create one to get started.",
+    "status": {
+      "paused": "Paused",
+      "active": "Active"
+    },
+    "actions": {
+      "edit": "Edit",
+      "manageQr": "Manage QR"
+    },
+    "genericQrModal": {
+      "title": "Generic Site QR",
+      "description": "Scan to open the Park & Shine booking page.",
+      "printQr": "Print QR",
+      "close": "Close"
+    },
+    "create": {
+      "title": "New Site",
+      "nameLabel": "Name",
+      "addressLabel": "Address",
+      "timezoneLabel": "Timezone",
+      "cutoffLabel": "Cutoff Time (HH:MM, optional)",
+      "creating": "Creating...",
+      "create": "Create Site",
+      "cancel": "Cancel"
+    },
+    "editModal": {
+      "title": "Edit Site",
+      "nameLabel": "Name",
+      "addressLabel": "Address",
+      "timezoneLabel": "Timezone",
+      "cutoffLabel": "Cutoff Time (HH:MM, optional)",
+      "saving": "Saving...",
+      "save": "Save Changes",
+      "cancel": "Cancel"
+    }
+  },
+  "siteDetail": {
+    "title": "QR Codes",
+    "subtitle": "Manage QR codes for this site",
+    "shifts": "Shifts",
+    "generateQr": "Generate QR",
+    "loading": "Loading...",
+    "activeSection": "Active",
+    "emptyActive": "No active QR codes",
+    "created": "Created",
+    "print": "Print",
+    "rotate": "Rotate",
+    "rotatedSection": "Rotated",
+    "rotatedLabel": "Rotated",
+    "rotatedBadge": "Rotated",
+    "generateModal": {
+      "title": "Generate New QR Code",
+      "slotLabel": "Slot Label (e.g. \"Slot A1\")",
+      "generating": "Generating...",
+      "generate": "Generate & Print",
+      "cancel": "Cancel"
+    },
+    "rotateConfirm": {
+      "title": "Rotate QR Code?",
+      "message": "The current QR for \"{{slot}}\" will be invalidated and a new one generated. Customers scanning the old QR will see an error.",
+      "rotating": "Rotating...",
+      "confirm": "Yes, Rotate",
+      "cancel": "Cancel"
+    }
+  },
+  "shiftsPage": {
+    "title": "Shifts",
+    "subtitle": "Manage shifts for this site",
+    "createShift": "Create Shift",
+    "loading": "Loading shifts...",
+    "empty": "No shifts yet.",
+    "table": {
+      "code": "Shift Code",
+      "time": "Time",
+      "crew": "Crew",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "ongoing": "Ongoing"
+    },
+    "actions": {
+      "hideCode": "Hide code",
+      "showCode": "Show code",
+      "closeShift": "Close Shift"
+    },
+    "create": {
+      "title": "Create New Shift",
+      "description": "Select crew members for this shift:",
+      "loading": "Loading crew...",
+      "empty": "No active crew available.",
+      "selected": "{{count}} crew selected",
+      "cancel": "Cancel",
+      "creating": "Creating...",
+      "create": "Create Shift"
+    },
+    "created": {
+      "title": "Shift Created Successfully",
+      "description": "Copy this code and share it with crew:",
+      "copied": "Code copied successfully!",
+      "close": "Close"
+    },
+    "closeConfirm": {
+      "title": "Close Shift?",
+      "message": "Shift with code \"{{code}}\" will be closed. This action cannot be undone.",
+      "cancel": "Cancel",
+      "closing": "Closing...",
+      "confirm": "Yes, Close Shift"
+    },
+    "toast": {
+      "createFailed": "Failed to create shift. Please try again."
+    }
+  },
+  "usersPage": {
+    "title": "Admin Users",
+    "addAdmin": "Add Admin",
+    "loading": "Loading...",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "add": {
+      "title": "Add Admin User",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "roleLabel": "Role",
+      "creating": "Creating...",
+      "create": "Create",
+      "cancel": "Cancel"
+    },
+    "edit": {
+      "title": "Edit Admin User",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "roleLabel": "Role",
+      "saving": "Saving...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "passwordLabel": "New Password (min 8 characters)",
+      "resetting": "Resetting...",
+      "reset": "Reset",
+      "cancel": "Cancel"
+    },
+    "confirm": {
+      "deactivate": "Deactivate this admin user?"
+    }
+  },
+  "settingsWhatsapp": {
+    "supportTitle": "WhatsApp Support Number",
+    "supportDesc": "This number is used for the WhatsApp button on the customer page. Format: 628xxxxxxxxxx (without +).",
+    "supportLabel": "WhatsApp Number",
+    "saving": "Saving...",
+    "save": "Save",
+    "status": {
+      "inactive": "Inactive",
+      "disconnected": "Disconnected",
+      "connecting": "Connecting...",
+      "scanQr": "Scan QR Code",
+      "connected": "Connected"
+    },
+    "notificationTitle": "WhatsApp Notifications",
+    "notificationDesc": "Send job notifications to crew via WhatsApp. Use a number that has WhatsApp registered.",
+    "logout": "Logout WhatsApp",
+    "connecting": "Connecting...",
+    "connect": "Connect WhatsApp",
+    "viewQr": "View QR Code",
+    "qrDialog": {
+      "title": "Scan WhatsApp QR Code",
+      "instructions": "Open WhatsApp on phone → ⋮ → Linked Devices → Link a Device, then scan this QR.",
+      "autoRefresh": "QR code auto-refreshes every ~20 seconds."
+    },
+    "toast": {
+      "saveSuccess": "WhatsApp number saved successfully.",
+      "saveFailed": "Failed to save WhatsApp number.",
+      "connectFailed": "Failed to start WhatsApp connection.",
+      "logoutSuccess": "WhatsApp logged out successfully.",
+      "logoutFailed": "Failed to logout WhatsApp."
+    }
+  },
+  "locationPicker": {
+    "title": "Pick location from map",
+    "searchPlaceholder": "Search mall or address…",
+    "noResults": "No results found. Try a different search.",
+    "searchFailed": "Search failed. Please try again.",
+    "useLocation": "Use this location",
+    "cancel": "Cancel"
+  },
+  "printPage": {
+    "loading": "Preparing QR code...",
+    "notFound": "QR code not found.",
+    "preview": "Print preview",
+    "print": "Print / Save as PDF",
+    "brand": "Park & Shine",
+    "instruction": "Scan to book car wash service"
   }
 }

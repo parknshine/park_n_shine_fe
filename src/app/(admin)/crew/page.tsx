@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/i18n";
 import { useAdminCrew, useDeleteCrew } from "@/features/admin/hooks";
 import type { AdminCrewMember } from "@/features/admin/types";
 
@@ -24,6 +25,7 @@ function CreateCrewModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation("admin");
   const { create, isCreating } = useAdminCrew();
   const [name, setName] = useState("");
   const [pin, setPin] = useState("");
@@ -31,11 +33,11 @@ function CreateCrewModal({
 
   async function handleSubmit() {
     if (!name.trim() || !pin.match(/^\d{4,8}$/)) {
-      toast.error("Nama wajib diisi dan PIN harus 4-8 digit.");
+      toast.error(t("crewPage.toast.nameRequired"));
       return;
     }
     if (phone && !phone.match(/^(\+62|62|0)8\d{8,11}$/)) {
-      toast.error("Nomor WhatsApp tidak valid (contoh: 08123456789).");
+      toast.error(t("crewPage.toast.invalidWhatsapp"));
       return;
     }
     try {
@@ -45,7 +47,7 @@ function CreateCrewModal({
       setPhone("");
       onClose();
     } catch {
-      toast.error("Gagal menambah crew member.");
+      toast.error(t("crewPage.toast.addFailed"));
     }
   }
 
@@ -53,20 +55,20 @@ function CreateCrewModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Tambah Crew Member</DialogTitle>
+          <DialogTitle>{t("crewPage.add.title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-1">
-            <Label htmlFor="crew-name">Nama</Label>
-            <Input id="crew-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama lengkap" />
+            <Label htmlFor="crew-name">{t("crewPage.add.nameLabel")}</Label>
+            <Input id="crew-name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("crewPage.add.namePlaceholder")} />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="crew-pin">PIN (4-8 digit)</Label>
+            <Label htmlFor="crew-pin">{t("crewPage.add.pinLabel")}</Label>
             <Input id="crew-pin" type="password" inputMode="numeric" maxLength={8} value={pin} onChange={(e) => setPin(e.target.value)} placeholder="••••" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="crew-phone">
-              Nomor WhatsApp <span className="text-muted-foreground">(opsional)</span>
+              {t("crewPage.add.whatsappLabel")} <span className="text-muted-foreground">{t("crewPage.add.whatsappOptional")}</span>
             </Label>
             <Input
               id="crew-phone"
@@ -76,13 +78,13 @@ function CreateCrewModal({
               onChange={(e) => setPhone(e.target.value)}
               placeholder="08123456789"
             />
-            <p className="text-xs text-muted-foreground">Digunakan untuk notifikasi job via WhatsApp.</p>
+            <p className="text-xs text-muted-foreground">{t("crewPage.add.whatsappHelper")}</p>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Batal</Button>
+          <Button variant="outline" onClick={onClose}>{t("crewPage.add.cancel")}</Button>
           <Button onClick={handleSubmit} disabled={isCreating}>
-            {isCreating ? "Menyimpan..." : "Simpan"}
+            {isCreating ? t("crewPage.add.saving") : t("crewPage.add.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -97,6 +99,7 @@ function EditCrewModal({
   crew: AdminCrewMember;
   onClose: () => void;
 }) {
+  const { t } = useTranslation("admin");
   const { update, isUpdating } = useAdminCrew();
   const [name, setName] = useState(crew.name);
   const [pin, setPin] = useState("");
@@ -104,11 +107,11 @@ function EditCrewModal({
 
   async function handleSubmit() {
     if (pin && !pin.match(/^\d{4,8}$/)) {
-      toast.error("PIN harus 4-8 digit.");
+      toast.error(t("crewPage.toast.pinRequired"));
       return;
     }
     if (phone && !phone.match(/^(\+62|62|0)8\d{8,11}$/)) {
-      toast.error("Nomor WhatsApp tidak valid (contoh: 08123456789).");
+      toast.error(t("crewPage.toast.invalidWhatsapp"));
       return;
     }
     try {
@@ -122,7 +125,7 @@ function EditCrewModal({
       });
       onClose();
     } catch {
-      toast.error("Gagal mengupdate crew member.");
+      toast.error(t("crewPage.toast.updateFailed"));
     }
   }
 
@@ -130,20 +133,20 @@ function EditCrewModal({
     <Dialog open onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Crew Member</DialogTitle>
+          <DialogTitle>{t("crewPage.edit.title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-1">
-            <Label>Nama</Label>
+            <Label>{t("crewPage.edit.nameLabel")}</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label>PIN Baru <span className="text-muted-foreground">(kosongkan jika tidak diubah)</span></Label>
+            <Label>{t("crewPage.edit.pinLabel")} <span className="text-muted-foreground">{t("crewPage.edit.pinHint")}</span></Label>
             <Input type="password" inputMode="numeric" maxLength={8} value={pin} onChange={(e) => setPin(e.target.value)} placeholder="••••" />
           </div>
           <div className="space-y-1">
             <Label>
-              Nomor WhatsApp <span className="text-muted-foreground">(opsional)</span>
+              {t("crewPage.edit.whatsappLabel")} <span className="text-muted-foreground">{t("crewPage.edit.whatsappOptional")}</span>
             </Label>
             <Input
               type="tel"
@@ -152,13 +155,13 @@ function EditCrewModal({
               onChange={(e) => setPhone(e.target.value)}
               placeholder="08123456789"
             />
-            <p className="text-xs text-muted-foreground">Kosongkan untuk hapus nomor.</p>
+            <p className="text-xs text-muted-foreground">{t("crewPage.edit.whatsappHelper")}</p>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Batal</Button>
+          <Button variant="outline" onClick={onClose}>{t("crewPage.edit.cancel")}</Button>
           <Button onClick={handleSubmit} disabled={isUpdating}>
-            {isUpdating ? "Menyimpan..." : "Simpan"}
+            {isUpdating ? t("crewPage.edit.saving") : t("crewPage.edit.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -167,6 +170,7 @@ function EditCrewModal({
 }
 
 export default function CrewPage() {
+  const { t } = useTranslation("admin");
   const { crew, isLoading, update } = useAdminCrew();
   const deleteCrew = useDeleteCrew();
   const [showCreate, setShowCreate] = useState(false);
@@ -174,27 +178,27 @@ export default function CrewPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`Nonaktifkan crew member "${name}"?`)) return;
+    if (!confirm(t("crewPage.confirm.deactivate", { name }))) return;
     setDeletingId(id);
     try {
       await deleteCrew.mutateAsync(id);
-      toast.success("Crew member dinonaktifkan.");
+      toast.success(t("crewPage.toast.deactivated"));
     } catch {
-      toast.error("Gagal menonaktifkan crew member.");
+      toast.error(t("crewPage.toast.deactivateFailed"));
     } finally {
       setDeletingId(null);
     }
   }
 
-  if (isLoading) return <p className="text-muted-foreground">Loading...</p>;
+  if (isLoading) return <p className="text-muted-foreground">{t("crewPage.loading")}</p>;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Crew Members</h1>
+        <h1 className="text-xl font-semibold">{t("crewPage.title")}</h1>
         <Button size="sm" onClick={() => setShowCreate(true)}>
           <UserPlus className="mr-2 h-4 w-4" />
-          Tambah Crew
+          {t("crewPage.addCrew")}
         </Button>
       </div>
 
@@ -202,10 +206,10 @@ export default function CrewPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="px-4 py-2 text-left font-medium">Nama</th>
-              <th className="px-4 py-2 text-left font-medium">WhatsApp</th>
-              <th className="px-4 py-2 text-left font-medium">Status</th>
-              <th className="px-4 py-2 text-right font-medium">Aksi</th>
+              <th className="px-4 py-2 text-left font-medium">{t("crewPage.table.name")}</th>
+              <th className="px-4 py-2 text-left font-medium">{t("crewPage.table.whatsapp")}</th>
+              <th className="px-4 py-2 text-left font-medium">{t("crewPage.table.status")}</th>
+              <th className="px-4 py-2 text-right font-medium">{t("crewPage.table.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -229,7 +233,7 @@ export default function CrewPage() {
                 </td>
                 <td className="px-4 py-3">
                   <Badge variant={c.active ? "default" : "secondary"}>
-                    {c.active ? "Aktif" : "Nonaktif"}
+                    {c.active ? t("crewPage.status.active") : t("crewPage.status.inactive")}
                   </Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -261,7 +265,7 @@ export default function CrewPage() {
             {crew.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
-                  Belum ada crew member.
+                  {t("crewPage.empty")}
                 </td>
               </tr>
             )}

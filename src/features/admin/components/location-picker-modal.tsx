@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { Loader2, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/i18n";
 import {
   Dialog,
   DialogContent,
@@ -62,6 +63,7 @@ export function LocationPickerModal({
   initialLng,
   initialAddress,
 }: LocationPickerModalProps) {
+  const { t } = useTranslation("admin");
   const [query, setQuery] = useState(initialAddress ?? "");
   const [results, setResults] = useState<NominatimResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -180,7 +182,7 @@ export function LocationPickerModal({
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="flex flex-col gap-4 p-6">
-        <DialogTitle>Pick location from map</DialogTitle>
+        <DialogTitle>{t("locationPicker.title")}</DialogTitle>
 
         <div className="relative">
           <div className="relative">
@@ -188,7 +190,7 @@ export function LocationPickerModal({
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search mall or address…"
+              placeholder={t("locationPicker.searchPlaceholder")}
               className="pl-9 pr-9"
               autoFocus
             />
@@ -216,12 +218,12 @@ export function LocationPickerModal({
 
           {!isSearching && searchError === "no_results" && query.length >= 3 && (
             <p className="mt-1.5 text-xs text-muted-foreground">
-              No results found. Try a different search.
+              {t("locationPicker.noResults")}
             </p>
           )}
           {!isSearching && searchError === "search_failed" && (
             <p className="mt-1.5 text-xs text-destructive">
-              Search failed. Please try again.
+              {t("locationPicker.searchFailed")}
             </p>
           )}
         </div>
@@ -246,10 +248,10 @@ export function LocationPickerModal({
             onClick={handleConfirm}
             className="flex-1"
           >
-            Use this location
+            {t("locationPicker.useLocation")}
           </Button>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t("locationPicker.cancel")}
           </Button>
         </div>
       </DialogContent>

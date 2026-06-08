@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Plus, Eye, EyeOff, Copy, Check } from "lucide-react";
+import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -28,6 +29,7 @@ function ShiftCodeRevealedModal({
   shiftCode: string;
   onClose: () => void;
 }) {
+  const { t } = useTranslation("admin");
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -40,11 +42,11 @@ function ShiftCodeRevealedModal({
     <Dialog open onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Shift Berhasil Dibuat</DialogTitle>
+          <DialogTitle>{t("shiftsPage.created.title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <p className="text-sm text-muted-foreground">
-            Salin kode ini dan bagikan ke crew:
+            {t("shiftsPage.created.description")}
           </p>
           <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/50 px-4 py-3">
             <span className="flex-1 font-mono text-2xl font-bold tracking-widest text-foreground">
@@ -59,11 +61,11 @@ function ShiftCodeRevealedModal({
             </Button>
           </div>
           {copied && (
-            <p className="text-xs text-green-600">Kode berhasil disalin!</p>
+            <p className="text-xs text-green-600">{t("shiftsPage.created.copied")}</p>
           )}
         </div>
         <DialogFooter>
-          <Button onClick={onClose}>Tutup</Button>
+          <Button onClick={onClose}>{t("shiftsPage.created.close")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -85,6 +87,7 @@ function CreateShiftModal({
   siteId: string;
   onCreated: (shiftCode: string) => void;
 }) {
+  const { t } = useTranslation("admin");
   const { create, isCreating } = useAdminShifts(siteId);
   const { crew, isLoading: isLoadingCrew } = useAdminCrew();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -108,7 +111,7 @@ function CreateShiftModal({
       onClose();
       onCreated(shift.shiftCode);
     } catch {
-      toast.error("Gagal membuat shift. Silakan coba lagi.");
+      toast.error(t("shiftsPage.toast.createFailed"));
     }
   }
 
@@ -118,17 +121,17 @@ function CreateShiftModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Buat Shift Baru</DialogTitle>
+          <DialogTitle>{t("shiftsPage.create.title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <p className="text-sm text-muted-foreground">
-            Pilih crew yang bertugas pada shift ini:
+            {t("shiftsPage.create.description")}
           </p>
           {isLoadingCrew ? (
-            <p className="text-sm text-muted-foreground">Memuat crew...</p>
+            <p className="text-sm text-muted-foreground">{t("shiftsPage.create.loading")}</p>
           ) : activeCrew.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Tidak ada crew aktif yang tersedia.
+              {t("shiftsPage.create.empty")}
             </p>
           ) : (
             <div className="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-border p-2">
@@ -174,16 +177,16 @@ function CreateShiftModal({
           )}
           {selectedIds.size > 0 && (
             <p className="text-xs text-muted-foreground">
-              {selectedIds.size} crew dipilih
+              {t("shiftsPage.create.selected", { count: selectedIds.size })}
             </p>
           )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Batal
+            {t("shiftsPage.create.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={isCreating}>
-            {isCreating ? "Membuat..." : "Buat Shift"}
+            {isCreating ? t("shiftsPage.create.creating") : t("shiftsPage.create.create")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -206,22 +209,22 @@ function CloseShiftConfirmDialog({
   onConfirm: () => Promise<void>;
   isClosing: boolean;
 }) {
+  const { t } = useTranslation("admin");
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Tutup Shift?</DialogTitle>
+          <DialogTitle>{t("shiftsPage.closeConfirm.title")}</DialogTitle>
         </DialogHeader>
         <p className="py-2 text-sm text-muted-foreground">
-          Shift dengan kode <strong className="font-mono">{shift.shiftCode}</strong> akan
-          ditutup. Tindakan ini tidak dapat dibatalkan.
+          {t("shiftsPage.closeConfirm.message", { code: shift.shiftCode })}
         </p>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Batal
+            {t("shiftsPage.closeConfirm.cancel")}
           </Button>
           <Button variant="destructive" disabled={isClosing} onClick={onConfirm}>
-            {isClosing ? "Menutup..." : "Ya, Tutup Shift"}
+            {isClosing ? t("shiftsPage.closeConfirm.closing") : t("shiftsPage.closeConfirm.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -234,6 +237,7 @@ function CloseShiftConfirmDialog({
 // ---------------------------------------------------------------------------
 
 export default function ShiftsPage() {
+  const { t } = useTranslation("admin");
   const router = useRouter();
   const { siteId } = useParams<{ siteId: string }>();
   const { shifts, isLoading, close, isClosing } = useAdminShifts(siteId);
@@ -280,35 +284,34 @@ export default function ShiftsPage() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-foreground">Shifts</h1>
+          <h1 className="text-xl font-bold text-foreground">{t("shiftsPage.title")}</h1>
           <p className="text-sm text-muted-foreground">
-            Kelola shift untuk site{" "}
-            <span className="font-mono text-xs">{siteId}</span>
+            {t("shiftsPage.subtitle")}
           </p>
         </div>
         <Button size="sm" onClick={() => setShowCreate(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Buat Shift
+          {t("shiftsPage.createShift")}
         </Button>
       </div>
 
       {/* Shifts table */}
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Memuat shift...</p>
+        <p className="text-sm text-muted-foreground">{t("shiftsPage.loading")}</p>
       ) : shifts.length === 0 ? (
         <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border">
-          <p className="text-sm text-muted-foreground">Belum ada shift.</p>
+          <p className="text-sm text-muted-foreground">{t("shiftsPage.empty")}</p>
         </div>
       ) : (
         <div className="rounded-md border">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/50">
-                <th className="px-4 py-2 text-left font-medium">Kode Shift</th>
-                <th className="px-4 py-2 text-left font-medium">Waktu</th>
-                <th className="px-4 py-2 text-left font-medium">Crew</th>
-                <th className="px-4 py-2 text-left font-medium">Status</th>
-                <th className="px-4 py-2 text-right font-medium">Aksi</th>
+                <th className="px-4 py-2 text-left font-medium">{t("shiftsPage.table.code")}</th>
+                <th className="px-4 py-2 text-left font-medium">{t("shiftsPage.table.time")}</th>
+                <th className="px-4 py-2 text-left font-medium">{t("shiftsPage.table.crew")}</th>
+                <th className="px-4 py-2 text-left font-medium">{t("shiftsPage.table.status")}</th>
+                <th className="px-4 py-2 text-right font-medium">{t("shiftsPage.table.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -332,7 +335,7 @@ export default function ShiftsPage() {
                           size="sm"
                           className="h-6 w-6 p-0"
                           onClick={() => toggleReveal(shift.id)}
-                          title={isRevealed ? "Sembunyikan kode" : "Tampilkan kode"}
+                          title={isRevealed ? t("shiftsPage.actions.hideCode") : t("shiftsPage.actions.showCode")}
                         >
                           {isRevealed ? (
                             <EyeOff className="h-3.5 w-3.5" />
@@ -348,7 +351,7 @@ export default function ShiftsPage() {
                       <div className="space-y-0.5">
                         <p className="text-xs">{formatDate(shift.startedAt)}</p>
                         <p className="text-xs">
-                          {shift.endedAt ? formatDate(shift.endedAt) : "Berlangsung"}
+                          {shift.endedAt ? formatDate(shift.endedAt) : t("shiftsPage.status.ongoing")}
                         </p>
                       </div>
                     </td>
@@ -363,7 +366,7 @@ export default function ShiftsPage() {
                     {/* Status */}
                     <td className="px-4 py-3">
                       <Badge variant={shift.isActive ? "default" : "secondary"}>
-                        {shift.isActive ? "Aktif" : "Selesai"}
+                        {shift.isActive ? t("shiftsPage.status.active") : t("shiftsPage.status.completed")}
                       </Badge>
                     </td>
 
@@ -376,7 +379,7 @@ export default function ShiftsPage() {
                           onClick={() => setClosingShift(shift)}
                           disabled={isClosing}
                         >
-                          Tutup Shift
+                          {t("shiftsPage.actions.closeShift")}
                         </Button>
                       )}
                     </td>

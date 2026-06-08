@@ -13,11 +13,11 @@
     },
     "hero": {
       "heading": "Mobil Lebih Bersih\nTanpa Perlu\nPergi Jauh.",
-      "description": "Tidak perlu pergi ke tempat cuci mobil. Park & Shine membersihkan mobilmu di tempat kamu berada, jadi kamu bisa menghabiskan lebih sedikit waktu menunggu dan lebih banyak waktu bersama orang-orang tersayang.",
+      "description": "Tidak perlu pergi ke tempat cuci mobil. Park & Shine membersihkan mobilmu saat kamu berbelanja, jadi kamu bisa menghabiskan lebih sedikit waktu menunggu dan lebih banyak waktu bersama orang-orang tersayang.",
       "viewServices": "Lihat Layanan",
       "findLocations": "Temukan Lokasi",
       "imageAlt": "Keluarga berdiri di samping mobil mereka di area parkir indoor yang terang",
-      "btnBookNow": "Pesan Cuci",
+      "btnBookNow": "Pesan Sekarang",
       "btnViewPricing": "Lihat Harga"
     },
     "howItWorks": {
@@ -51,14 +51,14 @@
       "feature5": "Ramah lingkungan — kurang dari 1L air per cuci vs pencucian biasa yang menggunakan 100L"
     },
     "track": {
-      "title": "Lacak Cucian Kamu",
+      "title": "Lacak Pesananmu",
       "description": "Dari parkir hingga kilap sempurna hanya dalam 30 menit, Park & Shine membuat prosesnya lancar dan mudah diikuti. Sempurna untuk pengemudi yang memesan dari mana saja.",
       "step1": "Parkir",
       "step2": "Ambil 2 Foto",
       "step3": "Lakukan Pembayaran",
-      "step4": "Tim Mulai Mencuci",
+      "step4": "Tim sedang mencuci",
       "step5": "Mobil Siap!",
-      "bookNow": "Pesan Cuci"
+      "bookNow": "Pesan Sekarang"
     },
     "integration": {
       "title": "Integrasi Seamless",
@@ -186,7 +186,39 @@
       "totalLabel": "Total Pembayaran",
       "pay": "Bayar Sekarang",
       "processing": "Memproses...",
-      "errorPay": "Pembayaran gagal. Silakan coba lagi."
+      "errorPay": "Pembayaran gagal. Silakan coba lagi.",
+      "completeTitle": "Selesaikan Pembayaran",
+      "copied": "Tersalin",
+      "copy": "Salin",
+      "validUntil": "Berlaku hingga",
+      "expiredTitle": "Waktu Pembayaran Habis",
+      "expiredDesc": "Silakan pilih metode pembayaran baru untuk melanjutkan.",
+      "changeMethod": "Ganti Metode Pembayaran",
+      "bankLabel": "Bank",
+      "vaLabel": "Nomor Virtual Account",
+      "companyCodeLabel": "Kode Perusahaan",
+      "billCodeLabel": "Kode Tagihan",
+      "scanQris": "Scan QR di atas menggunakan dompet digital apapun",
+      "payWithCard": "Bayar dengan Kartu",
+      "payWithCardDesc": "Klik tombol di bawah untuk membuka halaman pembayaran dan memasukkan detail kartu kredit / debit kamu.",
+      "completeIn": "Selesaikan di",
+      "openApp": "Klik tombol di bawah untuk membuka aplikasi",
+      "andComplete": "dan menyelesaikan pembayaran.",
+      "openProvider": "Buka",
+      "howToPay": "Cara Bayar",
+      "howToPayMandiri": "Cara Bayar via Mandiri",
+      "vaStep1": "Buka aplikasi mobile banking atau ATM",
+      "vaStep2": "Pilih Transfer → Virtual Account",
+      "vaStep3": "Masukkan nomor VA di atas",
+      "vaStep4": "Konfirmasi dan selesaikan pembayaran",
+      "mandiriStep1": "Buka Livin' by Mandiri atau ATM Mandiri",
+      "mandiriStep2": "Pilih Bayar → Multipayment",
+      "mandiriStep3": "Masukkan Kode Perusahaan di atas",
+      "mandiriStep4": "Masukkan Kode Tagihan di atas",
+      "mandiriStep5": "Konfirmasi pembayaran",
+      "alreadyPaid": "Sudah melakukan pembayaran?",
+      "updateStatus": "Update Status Pembayaran",
+      "checking": "Memeriksa status..."
     }
   },
   "status": {

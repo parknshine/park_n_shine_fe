@@ -7,6 +7,7 @@ import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/i18n";
 import { useAdminSites } from "@/features/admin/hooks";
 import type {
   AdminSiteDetail,
@@ -16,6 +17,7 @@ import type {
 import { LocationPickerModal } from "@/features/admin/components/location-picker-modal";
 
 function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
+  const { t } = useTranslation("admin");
   const url = globalThis.window === undefined ? "" : globalThis.window.location.origin;
 
   function handlePrint() {
@@ -43,9 +45,9 @@ function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
       <div className="w-full max-w-sm rounded-lg border border-border bg-background p-6 shadow-lg space-y-5">
         <div className="space-y-1">
-          <h2 className="text-base font-semibold text-foreground">Generic Site QR</h2>
+          <h2 className="text-base font-semibold text-foreground">{t("sitesPage.genericQrModal.title")}</h2>
           <p className="text-xs text-muted-foreground">
-            Scan to open the Park &amp; Shine booking page.
+            {t("sitesPage.genericQrModal.description")}
           </p>
         </div>
 
@@ -56,9 +58,9 @@ function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
 
         <div className="flex gap-2">
           <Button onClick={handlePrint} className="flex-1 gap-2">
-            <Printer className="h-4 w-4" /> Print QR
+            <Printer className="h-4 w-4" /> {t("sitesPage.genericQrModal.printQr")}
           </Button>
-          <Button variant="outline" onClick={onClose}>Close</Button>
+          <Button variant="outline" onClick={onClose}>{t("sitesPage.genericQrModal.close")}</Button>
         </div>
       </div>
     </div>
@@ -83,6 +85,7 @@ function CreateSiteModal({
   onCreate: (payload: CreateSitePayload) => Promise<unknown>;
   isCreating: boolean;
 }) {
+  const { t } = useTranslation("admin");
   const [form, setForm] = useState<CreateFormState>({
     name: "",
     address: "",
@@ -114,10 +117,10 @@ function CreateSiteModal({
     <>
       <div className='fixed inset-0 z-40 flex items-center justify-center bg-black/40'>
         <div className='w-full max-w-md rounded-lg bg-background border border-border p-6 shadow-lg space-y-4'>
-          <h2 className='text-base font-semibold text-foreground'>New Site</h2>
+          <h2 className='text-base font-semibold text-foreground'>{t("sitesPage.create.title")}</h2>
           <form onSubmit={handleSubmit} className='space-y-3'>
             <div className='space-y-1'>
-              <Label htmlFor='site-name'>Name</Label>
+              <Label htmlFor='site-name'>{t("sitesPage.create.nameLabel")}</Label>
               <Input
                 id='site-name'
                 value={form.name}
@@ -126,7 +129,7 @@ function CreateSiteModal({
               />
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='site-address'>Address</Label>
+              <Label htmlFor='site-address'>{t("sitesPage.create.addressLabel")}</Label>
               <div className="relative">
                 <Input
                   id="site-address"
@@ -158,7 +161,7 @@ function CreateSiteModal({
               )}
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='site-timezone'>Timezone</Label>
+              <Label htmlFor='site-timezone'>{t("sitesPage.create.timezoneLabel")}</Label>
               <Input
                 id='site-timezone'
                 value={form.timezone}
@@ -168,7 +171,7 @@ function CreateSiteModal({
               />
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='site-cutoff'>Cutoff Time (HH:MM, optional)</Label>
+              <Label htmlFor='site-cutoff'>{t("sitesPage.create.cutoffLabel")}</Label>
               <Input
                 id='site-cutoff'
                 placeholder='22:00'
@@ -180,10 +183,10 @@ function CreateSiteModal({
             </div>
             <div className='flex gap-2 pt-2'>
               <Button type='submit' disabled={isCreating}>
-                {isCreating ? "Creating..." : "Create Site"}
+                {isCreating ? t("sitesPage.create.creating") : t("sitesPage.create.create")}
               </Button>
               <Button type='button' variant='outline' onClick={onClose}>
-                Cancel
+                {t("sitesPage.create.cancel")}
               </Button>
             </div>
           </form>
@@ -232,6 +235,7 @@ function EditSiteModal({
   onUpdate: (args: { siteId: string; payload: UpdateSitePayload }) => Promise<unknown>;
   isUpdating: boolean;
 }>) {
+  const { t } = useTranslation("admin");
   const [form, setForm] = useState<EditFormState>({
     name: site.name,
     address: site.address,
@@ -266,10 +270,10 @@ function EditSiteModal({
     <>
       <div className='fixed inset-0 z-40 flex items-center justify-center bg-black/40'>
         <div className='w-full max-w-md rounded-lg bg-background border border-border p-6 shadow-lg space-y-4'>
-          <h2 className='text-base font-semibold text-foreground'>Edit Site</h2>
+          <h2 className='text-base font-semibold text-foreground'>{t("sitesPage.editModal.title")}</h2>
           <form onSubmit={handleSubmit} className='space-y-3'>
             <div className='space-y-1'>
-              <Label htmlFor='edit-site-name'>Name</Label>
+              <Label htmlFor='edit-site-name'>{t("sitesPage.editModal.nameLabel")}</Label>
               <Input
                 id='edit-site-name'
                 value={form.name}
@@ -278,7 +282,7 @@ function EditSiteModal({
               />
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='edit-site-address'>Address</Label>
+              <Label htmlFor='edit-site-address'>{t("sitesPage.editModal.addressLabel")}</Label>
               <div className="relative">
                 <Input
                   id="edit-site-address"
@@ -310,7 +314,7 @@ function EditSiteModal({
               )}
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='edit-site-timezone'>Timezone</Label>
+              <Label htmlFor='edit-site-timezone'>{t("sitesPage.editModal.timezoneLabel")}</Label>
               <Input
                 id='edit-site-timezone'
                 value={form.timezone}
@@ -320,7 +324,7 @@ function EditSiteModal({
               />
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='edit-site-cutoff'>Cutoff Time (HH:MM, optional)</Label>
+              <Label htmlFor='edit-site-cutoff'>{t("sitesPage.editModal.cutoffLabel")}</Label>
               <Input
                 id='edit-site-cutoff'
                 placeholder='22:00'
@@ -332,10 +336,10 @@ function EditSiteModal({
             </div>
             <div className='flex gap-2 pt-2'>
               <Button type='submit' disabled={isUpdating}>
-                {isUpdating ? "Saving..." : "Save Changes"}
+                {isUpdating ? t("sitesPage.editModal.saving") : t("sitesPage.editModal.save")}
               </Button>
               <Button type='button' variant='outline' onClick={onClose}>
-                Cancel
+                {t("sitesPage.editModal.cancel")}
               </Button>
             </div>
           </form>
@@ -364,6 +368,7 @@ function EditSiteModal({
 }
 
 export default function SitesPage() {
+  const { t } = useTranslation("admin");
   const router = useRouter();
   const { sites, isLoading, create, isCreating, update, isUpdating } = useAdminSites();
   const [showCreate, setShowCreate] = useState(false);
@@ -374,28 +379,28 @@ export default function SitesPage() {
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-bold text-foreground'>
-            Sites & QR Codes
+            {t("sitesPage.title")}
           </h1>
           <p className='text-sm text-muted-foreground'>
-            Manage parking sites and their QR codes
+            {t("sitesPage.subtitle")}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => setShowGenericQr(true)}>
-            <QrCode className='mr-2 h-4 w-4' /> Generic Site QR
+            <QrCode className='mr-2 h-4 w-4' /> {t("sitesPage.genericQr")}
           </Button>
           <Button onClick={() => setShowCreate(true)}>
-            <Plus className='mr-2 h-4 w-4' /> New Site
+            <Plus className='mr-2 h-4 w-4' /> {t("sitesPage.newSite")}
           </Button>
         </div>
       </div>
 
       {isLoading ? (
-        <p className='text-sm text-muted-foreground'>Loading...</p>
+        <p className='text-sm text-muted-foreground'>{t("sitesPage.loading")}</p>
       ) : sites.length === 0 ? (
         <div className='flex h-40 items-center justify-center rounded-lg border border-dashed border-border'>
           <p className='text-sm text-muted-foreground'>
-            No sites yet. Create one to get started.
+            {t("sitesPage.empty")}
           </p>
         </div>
       ) : (
@@ -414,11 +419,11 @@ export default function SitesPage() {
               <div className='flex items-center gap-3'>
                 {site.intakePaused ? (
                   <span className='flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive'>
-                    <PauseCircle className='h-3 w-3' /> Paused
+                    <PauseCircle className='h-3 w-3' /> {t("sitesPage.status.paused")}
                   </span>
                 ) : (
                   <span className='flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-xs text-green-600'>
-                    <PlayCircle className='h-3 w-3' /> Active
+                    <PlayCircle className='h-3 w-3' /> {t("sitesPage.status.active")}
                   </span>
                 )}
                 <Button
@@ -426,14 +431,14 @@ export default function SitesPage() {
                   size='sm'
                   onClick={() => setEditSite(site)}
                 >
-                  Edit
+                  {t("sitesPage.actions.edit")}
                 </Button>
                 <Button
                   variant='outline'
                   size='sm'
                   onClick={() => router.push(`/sites/${site.id}`)}
                 >
-                  Manage QR <ChevronRight className='ml-1 h-3 w-3' />
+                  {t("sitesPage.actions.manageQr")} <ChevronRight className='ml-1 h-3 w-3' />
                 </Button>
               </div>
             </div>
