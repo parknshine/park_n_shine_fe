@@ -42,6 +42,7 @@ export interface ReportCrewPerformance {
   staleCount: number;
   needsHelpCount: number;
   reliabilityScore: number | null;
+  avgRating: number | null;
 }
 
 export interface AuditEntry {

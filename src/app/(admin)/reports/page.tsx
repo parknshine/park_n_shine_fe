@@ -43,9 +43,9 @@ function exportToCSV(report: AdminReport, from: string, to: string) {
     ...Object.entries(report.bookings.byStatus).map(([s, c]) => `${s},${c}`),
     "",
     "Crew Performance",
-    "Name,Jobs,Stale,Needs Help,Reliability (%),Avg Turnaround (s),Est. Revenue (IDR)",
+    "Name,Jobs,Stale,Needs Help,Reliability (%),Avg Turnaround (s),Avg Rating,Est. Revenue (IDR)",
     ...report.crew.map((c) =>
-      `${c.crewName},${c.jobsCompleted},${c.staleCount},${c.needsHelpCount},${c.reliabilityScore ?? ""},${c.avgTurnaroundSeconds ?? ""},${c.estimatedRevenue}`
+      `${c.crewName},${c.jobsCompleted},${c.staleCount},${c.needsHelpCount},${c.reliabilityScore ?? ""},${c.avgTurnaroundSeconds ?? ""},${c.avgRating ?? ""},${c.estimatedRevenue}`
     ),
   ];
 
@@ -222,6 +222,9 @@ export default function ReportsPage() {
                       {t("reports.crew.avgTurnaround")}
                     </th>
                     <th className="px-4 py-3 text-right font-medium text-muted-foreground">
+                      {t("reports.crew.avgRating")}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
                       {t("reports.crew.revenue")}
                     </th>
                   </tr>
@@ -229,7 +232,7 @@ export default function ReportsPage() {
                 <tbody className="divide-y divide-border">
                   {report.crew.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">
+                      <td colSpan={8} className="px-4 py-6 text-center text-muted-foreground">
                         {t("reports.noData")}
                       </td>
                     </tr>
@@ -283,6 +286,15 @@ export default function ReportsPage() {
                         </td>
                         <td className="px-4 py-3 text-right font-mono text-xs">
                           {formatTurnaround(member.avgTurnaroundSeconds)}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {member.avgRating == null ? (
+                            <span className="text-muted-foreground">—</span>
+                          ) : (
+                            <span className="font-mono text-xs">
+                              ★ {member.avgRating.toFixed(1)}
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-right">
                           {formatRupiah(member.estimatedRevenue)}

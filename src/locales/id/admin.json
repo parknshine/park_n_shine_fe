@@ -67,7 +67,8 @@
       "revenue": "Est. Revenue",
       "stale": "Stale",
       "needsHelp": "Butuh Bantuan",
-      "reliability": "Keandalan"
+      "reliability": "Keandalan",
+      "avgRating": "Rata-rata Rating"
     }
   },
   "settings": {

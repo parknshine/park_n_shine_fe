@@ -67,7 +67,8 @@
       "revenue": "Est. Revenue",
       "stale": "Stale",
       "needsHelp": "Needs Help",
-      "reliability": "Reliability"
+      "reliability": "Reliability",
+      "avgRating": "Avg Rating"
     }
   },
   "settings": {
