@@ -24,7 +24,7 @@ export interface RefundPayload {
 }
 
 export interface StatusOverridePayload {
-  nextStatus: Extract<BookingStatus, "PAID" | "CANCELLED" | "STALE" | "ASSIGNED" | "IN_PROGRESS">;
+  nextStatus: Extract<BookingStatus, "PAID" | "CANCELLED" | "STALE" | "ASSIGNED" | "IN_PROGRESS" | "CLOSED">;
   reasonCode: string;
 }
 

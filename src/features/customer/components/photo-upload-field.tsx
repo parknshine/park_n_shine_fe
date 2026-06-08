@@ -35,14 +35,15 @@ export function PhotoUploadField({
   labels,
 }: PhotoUploadFieldProps) {
   const { t } = useTranslation("customer");
-   const resolvedLabels = labels ?? {
-     retry: t("upload.retry"),
-     upload: t("upload.select"),
-     uploading: t("upload.uploading"),
-     retrying: t("upload.retrying"),
-     gallery: t("upload.gallery"),
-     retake: t("upload.retake"),
-   };
+  const defaults = {
+    retry: t("upload.retry"),
+    upload: t("upload.select"),
+    uploading: t("upload.uploading"),
+    retrying: t("upload.retrying"),
+    gallery: t("upload.gallery"),
+    retake: t("upload.retake"),
+  };
+  const resolvedLabels = labels ? { ...defaults, ...labels } : defaults;
   const isBusy = state.status === "uploading" || state.status === "retrying";
   const hasPhoto = !!state.status && state.status !== "idle";
 
@@ -50,7 +51,7 @@ export function PhotoUploadField({
   const prevUrlRef = useRef<string | null>(null);
 
   // Derive display URL — hide preview when status resets to idle without calling setState
-  const displayUrl = state.status !== "idle" ? previewUrl : null;
+  const displayUrl = state.status === "idle" ? null : previewUrl;
 
   // Only revoke the object URL on idle — no setState needed
   useEffect(() => {
@@ -77,12 +78,9 @@ export function PhotoUploadField({
     event.target.value = "";
   }
 
-  const uploadingLabel =
-    state.status === "uploading"
-      ? resolvedLabels.uploading
-      : state.status === "retrying"
-        ? resolvedLabels.retrying
-        : null;
+  let uploadingLabel: string | null = null;
+  if (state.status === "uploading") uploadingLabel = resolvedLabels.uploading;
+  else if (state.status === "retrying") uploadingLabel = resolvedLabels.retrying;
 
   return (
     <div className="rounded-lg border border-border p-4 space-y-3 bg-card shadow-sm">

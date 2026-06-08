@@ -38,6 +38,7 @@ const ALL_TRANSITIONS: Array<{
   { label: "STALE → CANCELLED",      fromStatus: "STALE",      nextStatus: "CANCELLED" },
   { label: "NEEDS_HELP → STALE",     fromStatus: "NEEDS_HELP", nextStatus: "STALE" },
   { label: "NEEDS_HELP → CANCELLED", fromStatus: "NEEDS_HELP", nextStatus: "CANCELLED" },
+  { label: "READY → CLOSED",         fromStatus: "READY",      nextStatus: "CLOSED" },
 ];
 
 interface StatusOverrideModalProps {
@@ -54,7 +55,7 @@ export function StatusOverrideModal({
   currentStatus,
   onClose,
   onSuccess,
-}: StatusOverrideModalProps) {
+}: Readonly<StatusOverrideModalProps>) {
   const [selectedLabel, setSelectedLabel] = useState("");
   const [reasonCode, setReasonCode] = useState("");
   const { overrideStatus, isSubmitting } = useBookingActions(bookingId);
