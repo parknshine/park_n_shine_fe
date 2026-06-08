@@ -173,15 +173,13 @@ function WhatsAppStatusBadge({ status }: { status: WaStatus }) {
 function WhatsAppCard() {
   const { state, isLoading, connect, isConnecting, logout, isLoggingOut } = useAdminWhatsapp();
   const [showQr, setShowQr] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
 
-  // Auto-open modal when QR is ready, unless user explicitly dismissed it
   const isQrReady = state.status === "qr_ready" && !!state.qr;
-  const modalOpen = showQr || (isQrReady && !dismissed);
+  // Only open when user explicitly triggered — never auto-open on page load
+  const modalOpen = showQr;
 
   async function handleConnect() {
     try {
-      setDismissed(false);
       setShowQr(true);
       await connect();
     } catch {
@@ -193,7 +191,6 @@ function WhatsAppCard() {
     try {
       await logout();
       setShowQr(false);
-      setDismissed(false);
       toast.success("WhatsApp berhasil logout.");
     } catch {
       toast.error("Gagal logout WhatsApp.");
@@ -261,7 +258,7 @@ function WhatsAppCard() {
         )}
       </div>
 
-      <Dialog open={modalOpen} onOpenChange={(open) => { if (!open) { setShowQr(false); setDismissed(true); } }}>
+      <Dialog open={modalOpen} onOpenChange={(open) => { if (!open) setShowQr(false); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">

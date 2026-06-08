@@ -22,7 +22,7 @@ export function useAdminWhatsapp() {
     // Poll every 3s while waiting for QR scan or connection
     refetchInterval: (query) => {
       const status = query.state.data?.status;
-      if (status === "connected" || status === "disabled") return false;
+      if (status === "connected" || status === "disabled" || status === "disconnected") return false;
       return 3_000;
     },
     refetchIntervalInBackground: false,
