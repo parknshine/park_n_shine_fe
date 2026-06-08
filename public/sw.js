@@ -3,8 +3,9 @@ const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
 const APP_SHELL_URLS = [
-  "/",
-  "/manifest.webmanifest",
+  "/crew",
+  "/crew/home",
+  "/crew/login",
   "/icons/icon.svg",
   "/icons/maskable-icon.svg",
 ];
@@ -89,6 +90,11 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // Only intercept crew pages — customer pages bypass the service worker
+  if (!url.pathname.startsWith("/crew")) {
     return;
   }
 

@@ -6,7 +6,7 @@ export { useAuditLog } from "./use-audit-log";
 export { useAdminSettings } from "./use-admin-settings";
 export { useAdminSites, useAdminSite } from "./use-admin-sites";
 export { useAdminQr } from "./use-admin-qr";
-export { useAdminCrew } from "./use-admin-crew";
+export { useAdminCrew, useDeleteCrew } from "./use-admin-crew";
 export { useAdminShifts } from "./use-admin-shifts";
 export { useAdminWhatsapp } from "./use-admin-whatsapp";
 export type { WaStatus, WaState } from "./use-admin-whatsapp";

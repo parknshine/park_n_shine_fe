@@ -41,6 +41,7 @@ export const mutationKeys = {
     rotateQr: (qrId: string) => ["admin", "qr", qrId, "rotate"] as const,
     createCrew: () => ["admin", "crew", "create"] as const,
     updateCrew: (crewId: string) => ["admin", "crew", crewId, "update"] as const,
+    deleteCrew: () => ["admin", "crew", "delete"] as const,
     createShift: (siteId: string) => ["admin", "sites", siteId, "shifts", "create"] as const,
     updateShiftCrew: (shiftId: string) => ["admin", "shifts", shiftId, "crew"] as const,
     closeShift: (shiftId: string) => ["admin", "shifts", shiftId, "close"] as const,

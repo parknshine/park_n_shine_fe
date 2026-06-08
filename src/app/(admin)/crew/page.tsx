@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { UserPlus, Pencil, ToggleLeft, ToggleRight, Phone } from "lucide-react";
+import { UserPlus, Pencil, ToggleLeft, ToggleRight, Phone, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAdminCrew } from "@/features/admin/hooks";
+import { useAdminCrew, useDeleteCrew } from "@/features/admin/hooks";
 import type { AdminCrewMember } from "@/features/admin/types";
 
 function CreateCrewModal({
@@ -168,8 +168,23 @@ function EditCrewModal({
 
 export default function CrewPage() {
   const { crew, isLoading, update } = useAdminCrew();
+  const deleteCrew = useDeleteCrew();
   const [showCreate, setShowCreate] = useState(false);
   const [editing, setEditing] = useState<AdminCrewMember | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function handleDelete(id: string, name: string) {
+    if (!confirm(`Nonaktifkan crew member "${name}"?`)) return;
+    setDeletingId(id);
+    try {
+      await deleteCrew.mutateAsync(id);
+      toast.success("Crew member dinonaktifkan.");
+    } catch {
+      toast.error("Gagal menonaktifkan crew member.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   if (isLoading) return <p className="text-muted-foreground">Loading...</p>;
 
@@ -229,6 +244,15 @@ export default function CrewPage() {
                       onClick={() => update({ crewId: c.id, payload: { active: !c.active } })}
                     >
                       {c.active ? <ToggleRight className="h-4 w-4 text-primary" /> : <ToggleLeft className="h-4 w-4" />}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                      onClick={() => handleDelete(c.id, c.name)}
+                      disabled={deletingId === c.id}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </td>

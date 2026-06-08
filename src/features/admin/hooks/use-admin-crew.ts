@@ -46,3 +46,16 @@ export function useAdminCrew() {
     isUpdating: updateMutation.isPending,
   };
 }
+
+export function useDeleteCrew() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["admin", "crew", "delete"],
+    mutationFn: async (crewId: string) => {
+      await api.delete(`/v1/admin/crew/${crewId}`);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.crew() });
+    },
+  });
+}
