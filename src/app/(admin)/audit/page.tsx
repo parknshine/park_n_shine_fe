@@ -9,8 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AuditLogTable } from "@/features/admin/components";
-import { BookingDetailDrawer } from "@/features/admin/components";
+import { AuditLogTable , BookingDetailDrawer } from "@/features/admin/components";
 import { useAuditLog } from "@/features/admin/hooks";
 import { useUIStore } from "@/store/ui-store";
 import type { AuditEntry } from "@/features/admin/types";

@@ -39,9 +39,10 @@ const STATUS_LABEL_KEYS: Record<BookingStatus, string> = {
   CANCELLED: "booking.status.cancelled",
   NEEDS_HELP: "booking.status.needs_help",
   STALE: "booking.status.stale",
+  LOCATED: "booking.status.located",
 };
 
-function StatusIcon({ status }: { status: BookingStatus }) {
+function StatusIcon({ status }: Readonly<{ status: BookingStatus }>) {
   const base = "h-10 w-10";
   if (status === BOOKING_STATUSES.READY || status === BOOKING_STATUSES.CLOSED) {
     return <CheckCircle2 className={cn(base, "text-primary")} />;
@@ -72,11 +73,11 @@ export function StatusHero({ status, plate, slot }: StatusHeroProps) {
   // so the customer never sees a confusing badge flash by.
   if (TRANSITIONAL_STATUSES.has(status)) {
     return (
-      <div className="space-y-4 text-center">
-        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-muted">
-          <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+      <div className='space-y-4 text-center'>
+        <div className='mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-muted'>
+          <Loader2 className='h-10 w-10 animate-spin text-muted-foreground' />
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className='text-sm text-muted-foreground'>
           {t("status.preparing", { defaultValue: "Preparing your booking…" })}
         </p>
       </div>
@@ -89,13 +90,13 @@ export function StatusHero({ status, plate, slot }: StatusHeroProps) {
   const isReady = status === BOOKING_STATUSES.READY;
 
   return (
-    <div className="space-y-4 text-center">
+    <div className='space-y-4 text-center'>
       <div
         className={cn(
           "mx-auto flex h-24 w-24 items-center justify-center rounded-full",
           isReady && "bg-primary/10",
           isActive && "animate-pulse bg-primary/10",
-          !isReady && !isActive && "bg-muted"
+          !isReady && !isActive && "bg-muted",
         )}
       >
         <StatusIcon status={status} />
@@ -106,9 +107,9 @@ export function StatusHero({ status, plate, slot }: StatusHeroProps) {
       </StatusBadge>
 
       {(plate || slot) && (
-        <div className="flex justify-center gap-4 text-sm text-muted-foreground">
+        <div className='flex justify-center gap-4 text-sm text-muted-foreground'>
           {plate && (
-            <span className="font-mono font-semibold uppercase">{plate}</span>
+            <span className='font-mono font-semibold uppercase'>{plate}</span>
           )}
           {slot && <span>Slot {slot}</span>}
         </div>
