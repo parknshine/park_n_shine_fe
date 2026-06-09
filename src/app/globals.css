@@ -69,7 +69,7 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Prevent layout shift when Radix UI locks body scroll on desktop.

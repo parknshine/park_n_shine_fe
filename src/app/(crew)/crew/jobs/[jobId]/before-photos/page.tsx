@@ -30,30 +30,38 @@ export function BeforePhotosPage() {
   const { t } = useTranslation("crew");
 
   const ANGLES: AngleConfig[] = [
-    { kind: "front" as const, label: t("job.photoKind.front"), id: "photo-front" },
-    { kind: "back"  as const, label: t("job.photoKind.back"),  id: "photo-back"  },
-    { kind: "left"  as const, label: t("job.photoKind.left"),  id: "photo-left"  },
-    { kind: "right" as const, label: t("job.photoKind.right"), id: "photo-right" },
+    {
+      kind: "front" as const,
+      label: t("job.photoKind.front"),
+      id: "photo-front",
+    },
+    { kind: "back" as const, label: t("job.photoKind.back"), id: "photo-back" },
+    { kind: "left" as const, label: t("job.photoKind.left"), id: "photo-left" },
+    {
+      kind: "right" as const,
+      label: t("job.photoKind.right"),
+      id: "photo-right",
+    },
   ];
 
   const uploadLabels = {
-    retry:     t("beforePhotos.uploadLabels.retry"),
-    upload:    t("beforePhotos.uploadLabels.upload"),
+    retry: t("beforePhotos.uploadLabels.retry"),
+    upload: t("beforePhotos.uploadLabels.upload"),
     uploading: t("beforePhotos.uploadLabels.uploading"),
-    retrying:  t("beforePhotos.uploadLabels.retrying"),
+    retrying: t("beforePhotos.uploadLabels.retrying"),
   };
 
   const uploadUrl = `/v1/crew/jobs/${jobId}/media`;
 
   const frontUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
-  const backUpload  = usePhotoUpload({ uploadUrl, apiClient: crewApi });
-  const leftUpload  = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+  const backUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+  const leftUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
   const rightUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
 
   const uploadMap: Record<string, ReturnType<typeof usePhotoUpload>> = {
     front: frontUpload,
-    back:  backUpload,
-    left:  leftUpload,
+    back: backUpload,
+    left: leftUpload,
     right: rightUpload,
   };
 
@@ -65,20 +73,39 @@ export function BeforePhotosPage() {
   return (
     <>
       {/* Scrollable body — leave room for sticky CTA (~88px) */}
-      <main className="mx-auto max-w-md px-4 pb-28 pt-4">
-
+      <main className='mx-auto max-w-md px-4 pb-28 pt-4'>
         <OfflineBanner visible={isOfflinePaused} />
 
         {/* Page header */}
-        <h1 className="text-lg font-semibold text-foreground">
+        <h1 className='text-lg font-semibold text-foreground'>
           {t("beforePhotos.title")}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className='mt-1 text-sm text-muted-foreground'>
           {t("beforePhotos.subtitle")}
         </p>
 
+        {/* Photo tips */}
+        <div className='mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800'>
+          <p className='font-semibold'>{t("beforePhotos.guidelineTitle")}</p>
+          <ul className='mt-1.5 space-y-1 pl-3'>
+            {(
+              [
+                "guidelineTip1",
+                "guidelineTip2",
+                "guidelineTip3",
+                "guidelineTip4",
+              ] as const
+            ).map((key) => (
+              <li key={key} className='flex gap-1.5'>
+                <span className='shrink-0'>•</span>
+                <span>{t(`beforePhotos.${key}`)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* Photo list */}
-        <div className="mt-5 flex flex-col gap-3">
+        <div className='mt-5 flex flex-col gap-3'>
           {ANGLES.map((angle) => {
             const upload = uploadMap[angle.kind];
             return (
@@ -90,10 +117,10 @@ export function BeforePhotosPage() {
                 state={upload}
                 labels={uploadLabels}
                 onSelect={(file, kind) => {
-                  void upload.uploadPhoto({ file, kind });
+                  upload.uploadPhoto({ file, kind });
                 }}
                 onRetry={
-                  upload.status === "failed"
+                  upload.status === "failed" || upload.status === "success"
                     ? () => upload.reset()
                     : undefined
                 }
@@ -104,18 +131,24 @@ export function BeforePhotosPage() {
       </main>
 
       {/* Sticky CTA */}
-      <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
-        <div className="mx-auto max-w-md">
+      <div className='fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3'>
+        <div className='mx-auto max-w-md'>
           <Button
-            size="lg"
-            variant="default"
-            className="h-14 w-full rounded-xl text-base font-bold"
+            size='lg'
+            variant='default'
+            className='h-14 w-full rounded-xl text-base font-bold'
             disabled={!allDone}
             onClick={() => router.replace(`/crew/jobs/${jobId}/checklist`)}
-            suffix={<ArrowRight className="h-5 w-5" />}
-            aria-label={allDone ? t("beforePhotos.continueAriaLabel") : t("beforePhotos.countAriaLabel", { done: doneCount })}
+            suffix={<ArrowRight className='h-5 w-5' />}
+            aria-label={
+              allDone
+                ? t("beforePhotos.continueAriaLabel")
+                : t("beforePhotos.countAriaLabel", { done: doneCount })
+            }
           >
-            {allDone ? t("beforePhotos.continueButton") : t("beforePhotos.photoCount", { done: doneCount })}
+            {allDone
+              ? t("beforePhotos.continueButton")
+              : t("beforePhotos.photoCount", { done: doneCount })}
           </Button>
         </div>
       </div>

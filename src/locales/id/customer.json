@@ -116,20 +116,24 @@
     },
     "stepper": {
       "pending": {
-        "label": "Menunggu Pembayaran",
+        "label": "Pesanan Diterima",
         "desc": "Selesaikan pembayaran untuk konfirmasi booking"
       },
       "paid": {
-        "label": "Pembayaran Dikonfirmasi",
-        "desc": "Booking dikonfirmasi, crew akan segera ditugaskan"
+        "label": "Crew Ditugaskan",
+        "desc": "Booking dikonfirmasi, crew menuju kendaraan Anda"
+      },
+      "crew_located": {
+        "label": "Crew Menemukan Kendaraan",
+        "desc": "Crew sudah berada di lokasi kendaraan Anda"
       },
       "in_progress": {
         "label": "Sedang Dicuci",
         "desc": "Crew kami sedang mencuci kendaraan Anda"
       },
       "ready": {
-        "label": "Kendaraan Siap!",
-        "desc": "Kendaraan Anda sudah selesai dicuci"
+        "label": "Pengecekan Kualitas",
+        "desc": "Pemeriksaan kualitas akhir sedang berlangsung"
       },
       "closed": {
         "label": "Selesai",
@@ -151,7 +155,9 @@
       "title": "Foto Kendaraan",
       "subtitle": "Ambil foto plat nomor dan slot parkir mobilmu.",
       "platePhotoLabel": "Foto Plat Nomor",
+      "platePhotoGuideline": "Posisikan plat di tengah frame • Ambil dari arah lurus, tidak miring • Pastikan cukup cahaya — hindari bayangan atau kilap",
       "slotPhotoLabel": "Foto Slot Parkir",
+      "slotPhotoGuideline": "Pastikan nomor slot di lantai atau tiang terlihat jelas • Pegang ponsel dengan stabil agar tidak blur • Sertakan sedikit area sekitar sebagai konteks",
       "plateOcrLabel": "Nomor Plat (perbaiki jika ada yang salah)",
       "platePlaceholder": "contoh: B 1234 SKJ",
       "slotOcrLabel": "Nomor Slot (perbaiki jika ada yang salah)",

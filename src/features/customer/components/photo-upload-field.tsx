@@ -33,7 +33,7 @@ export function PhotoUploadField({
   onSelect,
   onRetry,
   labels,
-}: PhotoUploadFieldProps) {
+}: Readonly<PhotoUploadFieldProps>) {
   const { t } = useTranslation("customer");
   const defaults = {
     retry: t("upload.retry"),

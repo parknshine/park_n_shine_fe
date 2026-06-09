@@ -35,7 +35,7 @@ export function WashChecklist({
     done: "crew.checklist.done",
     saving: "crew.checklist.saving",
   },
-}: WashChecklistProps) {
+}: Readonly<WashChecklistProps>) {
   const sortedItems = items.slice().sort((a, b) => a.order - b.order);
 
   return (

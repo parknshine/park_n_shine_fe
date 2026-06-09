@@ -53,6 +53,8 @@
     "photoAlt": "Foto {{kind}} kendaraan",
     "verifyButton": "Verifikasi Plat",
     "verifyAriaLabel": "Verifikasi plat kendaraan",
+    "continueToPhotos": "Lanjut ke Foto",
+    "viewChecklist": "Lihat Checklist",
     "photoKind": {
       "plate": "Plat",
       "slot": "Slot",
@@ -86,6 +88,11 @@
   "beforePhotos": {
     "title": "Foto Kondisi Kendaraan",
     "subtitle": "Ambil 4 foto sebelum mulai cuci.",
+    "guidelineTitle": "Tips Foto",
+    "guidelineTip1": "Berdiri 1–2 m dari kendaraan — seluruh sisi harus terlihat",
+    "guidelineTip2": "Hadap ke sumber cahaya — hindari memotret ke arah matahari",
+    "guidelineTip3": "Pegang ponsel dengan stabil agar tidak blur",
+    "guidelineTip4": "Pastikan hanya kendaraan yang difoto — tidak terpotong kendaraan lain",
     "photoCount": "{{done}}/4 Foto Diambil",
     "continueButton": "Lanjut",
     "continueAriaLabel": "Lanjut ke checklist",

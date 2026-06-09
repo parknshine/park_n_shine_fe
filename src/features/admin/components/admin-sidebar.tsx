@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { BarChart2, LayoutGrid, QrCode, ScrollText, Settings, Shield, Users } from "lucide-react";
+import { BarChart2, LayoutGrid, Mail, QrCode, ScrollText, Settings, Shield, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
 import { useAuthStore } from "@/store/auth-store";
@@ -23,7 +23,8 @@ export function AdminSidebar() {
     { href: "/sites", label: t("sidebar.sitesQr"), icon: QrCode },
     { href: "/reports", label: t("sidebar.reports"), icon: BarChart2 },
     { href: "/audit", label: t("sidebar.auditTrail"), icon: ScrollText },
-    { href: "/crew", label: t("sidebar.crew"), icon: Users },
+    { href: "/crew-members", label: t("sidebar.crew"), icon: Users },
+    { href: "/email", label: t("sidebar.email"), icon: Mail },
     { href: "/settings", label: t("sidebar.settings"), icon: Settings },
   ];
 

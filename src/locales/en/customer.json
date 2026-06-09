@@ -116,20 +116,24 @@
     },
     "stepper": {
       "pending": {
-        "label": "Awaiting Payment",
+        "label": "Order Received",
         "desc": "Complete payment to confirm your booking"
       },
       "paid": {
-        "label": "Payment Confirmed",
-        "desc": "Your booking is confirmed, crew will be assigned"
+        "label": "Crew Assigned",
+        "desc": "Your booking is confirmed, crew is heading to your vehicle"
+      },
+      "crew_located": {
+        "label": "Crew Located Vehicle",
+        "desc": "Crew is at your vehicle and ready to start"
       },
       "in_progress": {
-        "label": "Being Washed",
-        "desc": "Our crew is washing your car"
+        "label": "Wash In Progress",
+        "desc": "Our crew is washing your vehicle"
       },
       "ready": {
-        "label": "Car Ready!",
-        "desc": "Your car is ready for pickup"
+        "label": "Quality Check",
+        "desc": "Final quality inspection in progress"
       },
       "closed": {
         "label": "Completed",
@@ -151,7 +155,9 @@
       "title": "Vehicle Photos",
       "subtitle": "Take a photo of your license plate and parking slot.",
       "platePhotoLabel": "License Plate Photo",
+      "platePhotoGuideline": "Center the plate in the frame • Shoot straight-on, not at an angle • Ensure good lighting — no glare or shadows",
       "slotPhotoLabel": "Parking Slot Photo",
+      "slotPhotoGuideline": "Capture the slot number on the floor or pillar • Hold the phone steady to avoid blur • Include enough surroundings for context",
       "plateOcrLabel": "Plate Number (correct if needed)",
       "platePlaceholder": "e.g. B 1234 SKJ",
       "slotOcrLabel": "Slot Number (correct if needed)",

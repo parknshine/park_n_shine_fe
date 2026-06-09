@@ -44,7 +44,7 @@ export function RefundModal({
   priceAmount,
   onClose,
   onSuccess,
-}: RefundModalProps) {
+}: Readonly<RefundModalProps>) {
   const [amountType, setAmountType] = useState<"full" | "partial">("full");
   const [partialAmount, setPartialAmount] = useState("");
   const [reasonCode, setReasonCode] = useState("");

@@ -30,7 +30,7 @@ export function PayButton({
   plateText,
   slotText,
   labels = DEFAULT_LABELS,
-}: PayButtonProps) {
+}: Readonly<PayButtonProps>) {
   const { canSubmit, confirmAndRedirect, error, isSubmitting } =
     usePaymentAction(bookingId, signedToken);
 

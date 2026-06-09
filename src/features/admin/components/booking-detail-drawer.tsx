@@ -27,7 +27,7 @@ export function BookingDetailDrawer({
   bookingId,
   onClose,
   onActionSuccess,
-}: BookingDetailDrawerProps) {
+}: Readonly<BookingDetailDrawerProps>) {
   const [activeModal, setActiveModal] = useState<
     "reassign" | "override" | "refund" | null
   >(null);
@@ -110,9 +110,9 @@ export function BookingDetailDrawer({
 
                   <dt className="text-muted-foreground">{t("drawer.price")}</dt>
                   <dd className="font-medium text-foreground">
-                    {booking.priceAmount != null
-                      ? formatPrice(booking.priceAmount, booking.currency ?? "IDR")
-                      : "—"}
+                    {booking.priceAmount == null
+                      ? "—"
+                      : formatPrice(booking.priceAmount, booking.currency ?? "IDR")}
                   </dd>
 
                   <dt className="text-muted-foreground">{t("drawer.elapsed")}</dt>
@@ -226,7 +226,7 @@ export function BookingDetailDrawer({
                         className="rounded-md border border-border p-3 text-sm"
                       >
                         <p className="font-medium text-foreground capitalize">
-                          {entry.action.replace(/_/g, " ")}
+                          {entry.action.replaceAll('_', " ")}
                         </p>
                         <p className="text-muted-foreground">{formatAuditDetail(entry.action, entry.detail)}</p>
                         <p className="text-xs text-muted-foreground">

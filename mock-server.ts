@@ -21,6 +21,13 @@
  *   POST /v1/crew/jobs/:jobId/media    — upload before-photo (front/back/left/right)
  */
 
+declare const Bun: {
+  serve: (options: {
+    port: number;
+    fetch: (req: Request) => Promise<Response>;
+  }) => void;
+};
+
 const PORT = 4000;
 const BASE_URL = `http://localhost:3000`;
 
@@ -70,6 +77,13 @@ const bookings = new Map<string, MockBooking>();
 
 // ─── Crew types ───────────────────────────────────────────────────────────────
 
+interface CrewMedia {
+  id: string;
+  kind: "front" | "back" | "left" | "right";
+  url: string;
+  ocrText: null;
+}
+
 interface MockCrewJob {
   id: string;
   bookingId: string;
@@ -79,7 +93,7 @@ interface MockCrewJob {
   assignedAt: string;
   etaEndsAt: string;
   supervisorPhone: string;
-  media: MockBooking["media"];
+  media: CrewMedia[];
   checklist: Array<{
     id: string;
     labelKey: string;
@@ -140,7 +154,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "status_override",
     detail: "PENDING → PAID",
     adminEmail: "admin@park-shine.com",
-    createdAt: new Date(Date.now() - 3600_000).toISOString(),
+    createdAt: new Date(Date.now() - 3600000).toISOString(),
   },
   {
     id: "audit-2",
@@ -149,7 +163,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "refund",
     detail: "Full refund — Rp 45.000",
     adminEmail: "admin@park-shine.com",
-    createdAt: new Date(Date.now() - 7200_000).toISOString(),
+    createdAt: new Date(Date.now() - 7200000).toISOString(),
   },
   {
     id: "audit-3",
@@ -158,7 +172,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "reassign",
     detail: "Reassigned to Agus Wijaya",
     adminEmail: "admin@park-shine.com",
-    createdAt: new Date(Date.now() - 1800_000).toISOString(),
+    createdAt: new Date(Date.now() - 1800000).toISOString(),
   },
   {
     id: "audit-4",
@@ -167,7 +181,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "status_override",
     detail: "PAID → CANCELLED",
     adminEmail: "admin@park-shine.com",
-    createdAt: new Date(Date.now() - 5400_000).toISOString(),
+    createdAt: new Date(Date.now() - 5400000).toISOString(),
   },
   {
     id: "audit-5",
@@ -176,7 +190,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "reassign",
     detail: "Reassigned to Budi Santoso",
     adminEmail: "supervisor@park-shine.com",
-    createdAt: new Date(Date.now() - 900_000).toISOString(),
+    createdAt: new Date(Date.now() - 900000).toISOString(),
   },
   {
     id: "audit-6",
@@ -185,7 +199,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "status_override",
     detail: "PENDING → PAID",
     adminEmail: "admin@park-shine.com",
-    createdAt: new Date(Date.now() - 10800_000).toISOString(),
+    createdAt: new Date(Date.now() - 10800000).toISOString(),
   },
   {
     id: "audit-7",
@@ -194,7 +208,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "refund",
     detail: "Partial refund — Rp 20.000",
     adminEmail: "supervisor@park-shine.com",
-    createdAt: new Date(Date.now() - 300_000).toISOString(),
+    createdAt: new Date(Date.now() - 300000).toISOString(),
   },
   {
     id: "audit-8",
@@ -203,7 +217,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "reassign",
     detail: "Reassigned to Rudi Hartono",
     adminEmail: "admin@park-shine.com",
-    createdAt: new Date(Date.now() - 2700_000).toISOString(),
+    createdAt: new Date(Date.now() - 2700000).toISOString(),
   },
   {
     id: "audit-9",
@@ -212,7 +226,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "status_override",
     detail: "PAID → CANCELLED",
     adminEmail: "admin@park-shine.com",
-    createdAt: new Date(Date.now() - 14400_000).toISOString(),
+    createdAt: new Date(Date.now() - 14400000).toISOString(),
   },
   {
     id: "audit-10",
@@ -221,7 +235,7 @@ const adminAuditLog: MockAdminAuditEntry[] = [
     action: "reassign",
     detail: "Reassigned to Budi Santoso",
     adminEmail: "supervisor@park-shine.com",
-    createdAt: new Date(Date.now() - 600_000).toISOString(),
+    createdAt: new Date(Date.now() - 600000).toISOString(),
   },
 ];
 
@@ -279,7 +293,7 @@ function seedAdminBookings() {
       slot: "A1",
       siteId: "site-1",
       priceAmount: 45000,
-      baseOffsetMs: 1200_000,
+      baseOffsetMs: 1200000,
     },
     {
       status: "PAID",
@@ -287,7 +301,7 @@ function seedAdminBookings() {
       slot: "A2",
       siteId: "site-1",
       priceAmount: 45000,
-      baseOffsetMs: 900_000,
+      baseOffsetMs: 900000,
     },
     {
       status: "ASSIGNED",
@@ -295,7 +309,7 @@ function seedAdminBookings() {
       slot: "B1",
       siteId: "site-1",
       priceAmount: 45000,
-      baseOffsetMs: 2400_000,
+      baseOffsetMs: 2400000,
     },
     {
       status: "ASSIGNED",
@@ -303,7 +317,7 @@ function seedAdminBookings() {
       slot: "B2",
       siteId: "site-1",
       priceAmount: 60000,
-      baseOffsetMs: 1800_000,
+      baseOffsetMs: 1800000,
     },
     {
       status: "IN_PROGRESS",
@@ -311,7 +325,7 @@ function seedAdminBookings() {
       slot: "C1",
       siteId: "site-1",
       priceAmount: 45000,
-      baseOffsetMs: 3600_000,
+      baseOffsetMs: 3600000,
     },
     {
       status: "IN_PROGRESS",
@@ -319,7 +333,7 @@ function seedAdminBookings() {
       slot: "C2",
       siteId: "site-1",
       priceAmount: 45000,
-      baseOffsetMs: 2700_000,
+      baseOffsetMs: 2700000,
     },
     {
       status: "READY",
@@ -327,7 +341,7 @@ function seedAdminBookings() {
       slot: "D1",
       siteId: "site-1",
       priceAmount: 60000,
-      baseOffsetMs: 5400_000,
+      baseOffsetMs: 5400000,
     },
     {
       status: "NEEDS_HELP",
@@ -335,7 +349,7 @@ function seedAdminBookings() {
       slot: "D2",
       siteId: "site-1",
       priceAmount: 45000,
-      baseOffsetMs: 4500_000,
+      baseOffsetMs: 4500000,
     },
     {
       status: "STALE",
@@ -343,7 +357,7 @@ function seedAdminBookings() {
       slot: "E1",
       siteId: "site-2",
       priceAmount: 45000,
-      baseOffsetMs: 7200_000,
+      baseOffsetMs: 7200000,
     },
     {
       status: "PAID",
@@ -351,7 +365,7 @@ function seedAdminBookings() {
       slot: "E2",
       siteId: "site-2",
       priceAmount: 60000,
-      baseOffsetMs: 600_000,
+      baseOffsetMs: 600000,
     },
     {
       status: "IN_PROGRESS",
@@ -359,7 +373,7 @@ function seedAdminBookings() {
       slot: "F1",
       siteId: "site-2",
       priceAmount: 45000,
-      baseOffsetMs: 3000_000,
+      baseOffsetMs: 3000000,
     },
     {
       status: "NEEDS_HELP",
@@ -367,7 +381,7 @@ function seedAdminBookings() {
       slot: "F2",
       siteId: "site-2",
       priceAmount: 45000,
-      baseOffsetMs: 5000_000,
+      baseOffsetMs: 5000000,
     },
   ];
 
@@ -387,7 +401,7 @@ function seedAdminBookings() {
         locationName: null,
         priceAmount,
         currency: "IDR",
-        estimatedReadyAt: new Date(Date.now() + 1800_000).toISOString(),
+        estimatedReadyAt: new Date(Date.now() + 1800000).toISOString(),
         media: [
           {
             id: `media-${id}-plate`,
@@ -568,7 +582,7 @@ async function handleRequest(req: Request): Promise<Response> {
 
     // Accept multipart or JSON
     const contentType = req.headers.get("content-type") ?? "";
-    let kind: string = "plate";
+    let kind: string;
     if (contentType.includes("multipart")) {
       const form = await req.formData().catch(() => null);
       kind =
@@ -790,7 +804,7 @@ async function handleRequest(req: Request): Promise<Response> {
       assignedAt: now(),
       etaEndsAt,
       supervisorPhone: "628123456789",
-      media: paidBooking.media,
+      media: [],
       checklist: MOCK_SOP_STEPS.map((s) => ({ ...s, completedAt: null })),
     };
 
@@ -849,7 +863,7 @@ async function handleRequest(req: Request): Promise<Response> {
     if (!job) return notFound("Job tidak ditemukan");
 
     const contentType = req.headers.get("content-type") ?? "";
-    let kind = "front";
+    let kind: string;
     if (contentType.includes("multipart")) {
       const form = await req.formData().catch(() => null);
       kind = (form?.get("kind") as string) ?? "front";
@@ -1049,7 +1063,7 @@ async function handleRequest(req: Request): Promise<Response> {
     const siteId = path.split("/")[4];
     const from =
       url.searchParams.get("from") ??
-      new Date(Date.now() - 7 * 86400_000).toISOString().slice(0, 10);
+      new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
     const to =
       url.searchParams.get("to") ?? new Date().toISOString().slice(0, 10);
 

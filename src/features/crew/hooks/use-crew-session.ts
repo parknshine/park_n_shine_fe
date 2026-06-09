@@ -11,6 +11,7 @@ export function useCrewSession() {
 
   const sessionQuery = useQuery<CrewSession | null>({
     enabled: false,
+    meta: { persist: true },
     placeholderData: null,
     queryFn: async () => queryClient.getQueryData(queryKeys.crew.session()) ?? null,
     queryKey: queryKeys.crew.session(),

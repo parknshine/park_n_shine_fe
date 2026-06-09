@@ -53,6 +53,8 @@
     "photoAlt": "{{kind}} photo of vehicle",
     "verifyButton": "Verify Plate",
     "verifyAriaLabel": "Verify vehicle plate",
+    "continueToPhotos": "Continue to Photos",
+    "viewChecklist": "View Checklist",
     "photoKind": {
       "plate": "Plate",
       "slot": "Slot",
@@ -86,6 +88,11 @@
   "beforePhotos": {
     "title": "Vehicle Condition Photos",
     "subtitle": "Take 4 photos before starting the wash.",
+    "guidelineTitle": "Photo Tips",
+    "guidelineTip1": "Stand 1–2 m from the vehicle — full side must be visible",
+    "guidelineTip2": "Face the light source — avoid shooting into the sun",
+    "guidelineTip3": "Hold the phone steady to avoid blur",
+    "guidelineTip4": "Capture the vehicle only — no other cars overlapping the frame",
     "photoCount": "{{done}}/4 Photos Taken",
     "continueButton": "Continue",
     "continueAriaLabel": "Continue to checklist",

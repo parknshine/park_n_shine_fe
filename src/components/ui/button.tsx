@@ -41,7 +41,7 @@ export function Button({
   children,
   ref,
   ...props
-}: ButtonProps) {
+}: Readonly<ButtonProps>) {
   const baseClass = cn(
     "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-inherit",
     variantClasses[variant],

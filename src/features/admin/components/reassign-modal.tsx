@@ -33,7 +33,7 @@ export function ReassignModal({
   bookingId,
   onClose,
   onSuccess,
-}: ReassignModalProps) {
+}: Readonly<ReassignModalProps>) {
   const [crewId, setCrewId] = useState("");
   const { reassign, isSubmitting } = useBookingActions(bookingId);
   const { crew } = useAdminCrew();

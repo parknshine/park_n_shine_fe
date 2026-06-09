@@ -51,7 +51,7 @@ export function CrewShell({ children }: CrewShellProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-md items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
@@ -91,7 +91,9 @@ export function CrewShell({ children }: CrewShellProps) {
         </div>
       </header>
 
-      <AppShell surface="crew">{children}</AppShell>
+      <div className="pt-14">
+        <AppShell surface="crew">{children}</AppShell>
+      </div>
     </>
   );
 }

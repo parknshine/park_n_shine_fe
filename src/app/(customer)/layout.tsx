@@ -15,7 +15,7 @@ export default async function CustomerLayout({
   const whatsappNumber = await getWhatsAppNumber();
   return (
     <NuqsAdapter>
-      <header className='sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-sm'>
+      <header className='fixed inset-x-0 top-0 z-40 border-b border-border bg-background/90 backdrop-blur-sm'>
         <div className='mx-auto flex h-14 max-w-md items-center justify-between px-4'>
           <div className='flex items-center gap-2.5'>
             <HeaderBackButton />
@@ -34,7 +34,9 @@ export default async function CustomerLayout({
         </div>
       </header>
 
-      {children}
+      <div className='pt-14'>
+        {children}
+      </div>
 
       {whatsappNumber && (
         <WhatsAppSupportWidget

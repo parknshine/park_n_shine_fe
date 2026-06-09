@@ -16,14 +16,19 @@ interface Step {
 
 const STEPS: Step[] = [
   {
-    status: "PENDING",
+    status: "PAID",
     labelKey: "booking.stepper.pending.label",
     descKey: "booking.stepper.pending.desc",
   },
   {
-    status: "PAID",
+    status: "ASSIGNED",
     labelKey: "booking.stepper.paid.label",
     descKey: "booking.stepper.paid.desc",
+  },
+  {
+    status: "LOCATED",
+    labelKey: "booking.stepper.crew_located.label",
+    descKey: "booking.stepper.crew_located.desc",
   },
   {
     status: "IN_PROGRESS",
@@ -46,15 +51,16 @@ const STEPS: Step[] = [
 const STATUS_STEP: Record<BookingStatus, number> = {
   DRAFT: 0,
   PENDING: 1,
-  PAID: 2,
-  ASSIGNED: 3, // customer sees this as "crew on the way"
-  IN_PROGRESS: 3,
-  NEEDS_HELP: 3,
-  READY: 4,
-  CLOSED: 5,
+  PAID: 1,
+  ASSIGNED: 2,
+  LOCATED: 3,
+  IN_PROGRESS: 4,
+  NEEDS_HELP: 4,
+  READY: 5,
+  CLOSED: 6,
   EXPIRED: 1,
   CANCELLED: 1,
-  STALE: 1,
+  STALE: 2,
 };
 
 interface BookingStatusTimelineProps {
@@ -97,9 +103,17 @@ export function BookingStatusTimeline({
     }
   });
 
-  // Also map ASSIGNED timestamp to IN_PROGRESS step
-  if (!timestampMap.has("IN_PROGRESS") && timestampMap.has("ASSIGNED")) {
-    timestampMap.set("IN_PROGRESS", timestampMap.get("ASSIGNED")!);
+  // Fallback: show PAID timestamp on ASSIGNED step when ASSIGNED hasn't fired yet
+  if (!timestampMap.has("ASSIGNED") && timestampMap.has("PAID")) {
+    timestampMap.set("ASSIGNED", timestampMap.get("PAID")!);
+  }
+  // Fallback: show ASSIGNED timestamp on LOCATED step when LOCATED hasn't fired yet
+  if (!timestampMap.has("LOCATED") && timestampMap.has("ASSIGNED")) {
+    timestampMap.set("LOCATED", timestampMap.get("ASSIGNED")!);
+  }
+  // Fallback: show LOCATED timestamp on IN_PROGRESS step when IN_PROGRESS hasn't fired yet
+  if (!timestampMap.has("IN_PROGRESS") && timestampMap.has("LOCATED")) {
+    timestampMap.set("IN_PROGRESS", timestampMap.get("LOCATED")!);
   }
 
   return (
@@ -121,7 +135,7 @@ export function BookingStatusTimeline({
               <div
                 className={cn(
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                  isDone && "border-primary bg-primary text-primary-foreground",
+                  isDone && "border-green-600 bg-green-600 text-white",
                   isActive && "border-primary bg-primary/10 text-primary",
                   isFuture &&
                     "border-muted bg-background text-muted-foreground",
@@ -139,7 +153,7 @@ export function BookingStatusTimeline({
                 <div
                   className={cn(
                     "my-1 w-0.5 flex-1",
-                    isDone ? "bg-primary" : "bg-muted",
+                    isDone ? "bg-green-600" : "bg-muted",
                   )}
                   style={{ minHeight: 20 }}
                 />
@@ -151,7 +165,7 @@ export function BookingStatusTimeline({
               <p
                 className={cn(
                   "text-sm font-medium leading-tight",
-                  isDone && "text-foreground",
+                  isDone && "text-green-700",
                   isActive && "font-semibold text-primary",
                   isFuture && "text-muted-foreground/50",
                 )}

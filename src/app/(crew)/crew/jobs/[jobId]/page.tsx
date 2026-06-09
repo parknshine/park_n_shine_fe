@@ -164,7 +164,7 @@ export function CrewJobDetailPage() {
       const token = localStorage.getItem("crew-token") ?? "";
       return `${baseUrl}/v1/crew/realtime/stream?token=${token}`;
     },
-    enabled: !!crewId && !!job && job.status === "ASSIGNED",
+    enabled: !!crewId && !!job && (job.status === "ASSIGNED" || job.status === "LOCATED"),
     onEvent: (event) => {
       if (
         event.type === "booking_status_changed" &&
@@ -320,16 +320,41 @@ export function CrewJobDetailPage() {
       {/* ── Sticky CTA ──────────────────────────────────────────────────── */}
       <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
         <div className="mx-auto max-w-md">
-          <Button
-            size="lg"
-            variant="default"
-            className="h-14 w-full rounded-xl text-base font-bold"
-            onClick={() => router.push(`/crew/jobs/${jobId}/verify`)}
-            suffix={<ArrowRight className="h-5 w-5" />}
-            aria-label={t("job.verifyAriaLabel")}
-          >
-            {t("job.verifyButton")}
-          </Button>
+          {job.status === "ASSIGNED" && (
+            <Button
+              size="lg"
+              variant="default"
+              className="h-14 w-full rounded-xl text-base font-bold"
+              onClick={() => router.push(`/crew/jobs/${jobId}/verify`)}
+              suffix={<ArrowRight className="h-5 w-5" />}
+              aria-label={t("job.verifyAriaLabel")}
+            >
+              {t("job.verifyButton")}
+            </Button>
+          )}
+          {job.status === "LOCATED" && (
+            <Button
+              size="lg"
+              variant="default"
+              className="h-14 w-full rounded-xl text-base font-bold"
+              onClick={() => router.push(`/crew/jobs/${jobId}/before-photos`)}
+              suffix={<ArrowRight className="h-5 w-5" />}
+              aria-label={t("job.continueToPhotos")}
+            >
+              {t("job.continueToPhotos")}
+            </Button>
+          )}
+          {job.status === "IN_PROGRESS" && (
+            <Button
+              size="lg"
+              variant="default"
+              className="h-14 w-full rounded-xl text-base font-bold"
+              onClick={() => router.push(`/crew/jobs/${jobId}/checklist`)}
+              suffix={<ArrowRight className="h-5 w-5" />}
+            >
+              {t("job.viewChecklist")}
+            </Button>
+          )}
         </div>
       </div>
       {showStaleModal && (

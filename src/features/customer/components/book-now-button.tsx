@@ -13,7 +13,7 @@ interface BookNowButtonProps {
   qrId: string;
 }
 
-export function BookNowButton({ qrId }: BookNowButtonProps) {
+export function BookNowButton({ qrId }: Readonly<BookNowButtonProps>) {
   const router = useRouter();
 
   const mutation = useMutation({
