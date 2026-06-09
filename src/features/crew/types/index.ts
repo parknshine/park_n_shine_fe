@@ -40,7 +40,7 @@ export interface VerifyPlatePayload {
 }
 
 export interface BeforePhotoRequirement {
-  kind: "front" | "back" | "left" | "right";
+  kind: "before_front" | "before_back" | "before_left" | "before_right";
   labelKey: string;
   mediaId?: string;
   progress: number;

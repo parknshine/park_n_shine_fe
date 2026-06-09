@@ -9,11 +9,14 @@ import { PhotoUploadField } from "@/features/customer/components/photo-upload-fi
 import { usePhotoUpload } from "@/features/customer/hooks/use-photo-upload";
 import { useCompleteJob } from "@/features/crew/hooks";
 import crewApi from "@/lib/axios-crew";
+import type { MediaKind } from "@/types/media";
 import { useTranslation } from "@/i18n";
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
+interface AngleConfig {
+  kind: MediaKind;
+  label: string;
+  id: string;
+}
 
 export function FinishPage() {
   const { jobId } = useParams<{ jobId: string }>();
@@ -21,11 +24,48 @@ export function FinishPage() {
   const { t } = useTranslation("crew");
 
   const uploadUrl = `/v1/crew/jobs/${jobId}/media`;
-  const afterUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
-  const { complete, isLoading } = useCompleteJob(jobId);
 
-  const photoUploaded = afterUpload.status === "success";
-  const canFinish = photoUploaded && !isLoading;
+  const frontUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+  const backUpload  = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+  const leftUpload  = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+  const rightUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+
+  const uploads = [frontUpload, backUpload, leftUpload, rightUpload];
+  const allDone = uploads.every((u) => u.status === "success");
+  const doneCount = uploads.filter((u) => u.status === "success").length;
+  const isOfflinePaused = uploads.some((u) => u.isOfflinePaused);
+
+  const { complete, isLoading } = useCompleteJob(jobId);
+  const canFinish = allDone && !isLoading;
+
+  function buttonLabel() {
+    if (isLoading) {
+      return (
+        <>
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+          {t("finish.completing")}
+        </>
+      );
+    }
+    if (allDone) {
+      return t("finish.continueButton");
+    }
+    return t("finish.photoCount", { done: doneCount });
+  }
+
+  const AFTER_ANGLES: AngleConfig[] = [
+    { kind: "after_front", label: t("job.photoKind.after_front"), id: "photo-after-front" },
+    { kind: "after_back",  label: t("job.photoKind.after_back"),  id: "photo-after-back"  },
+    { kind: "after_left",  label: t("job.photoKind.after_left"),  id: "photo-after-left"  },
+    { kind: "after_right", label: t("job.photoKind.after_right"), id: "photo-after-right" },
+  ];
+
+  const uploadMap: Record<string, ReturnType<typeof usePhotoUpload>> = {
+    after_front: frontUpload,
+    after_back:  backUpload,
+    after_left:  leftUpload,
+    after_right: rightUpload,
+  };
 
   const uploadLabels = {
     retry:     t("finish.uploadLabels.retry"),
@@ -45,12 +85,9 @@ export function FinishPage() {
 
   return (
     <>
-      {/* Scrollable body — leave room for sticky CTA (~88px) */}
       <main className="mx-auto max-w-md px-4 pb-28 pt-4">
+        <OfflineBanner visible={isOfflinePaused} />
 
-        <OfflineBanner visible={afterUpload.isOfflinePaused} />
-
-        {/* Page header */}
         <div className="mb-6 flex items-center gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-950/40 dark:text-green-400">
             <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
@@ -65,25 +102,31 @@ export function FinishPage() {
           </div>
         </div>
 
-        {/* After photo upload */}
-        <PhotoUploadField
-          id="after-photo"
-          kind="after"
-          label={t("finish.afterPhotoLabel")}
-          state={afterUpload}
-          labels={uploadLabels}
-          onSelect={(file, kind) => {
-            void afterUpload.uploadPhoto({ file, kind });
-          }}
-          onRetry={
-            afterUpload.status === "failed"
-              ? () => afterUpload.reset()
-              : undefined
-          }
-        />
+        <div className="flex flex-col gap-3">
+          {AFTER_ANGLES.map((angle) => {
+            const upload = uploadMap[angle.kind];
+            return (
+              <PhotoUploadField
+                key={angle.kind}
+                id={angle.id}
+                label={angle.label}
+                kind={angle.kind}
+                state={upload}
+                labels={uploadLabels}
+                onSelect={(file, kind) => {
+                  upload.uploadPhoto({ file, kind });
+                }}
+                onRetry={
+                  upload.status === "failed" || upload.status === "success"
+                    ? () => upload.reset()
+                    : undefined
+                }
+              />
+            );
+          })}
+        </div>
       </main>
 
-      {/* Sticky CTA */}
       <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
         <div className="mx-auto max-w-md">
           <Button
@@ -94,14 +137,7 @@ export function FinishPage() {
             onClick={handleComplete}
             aria-label={t("finish.completeAriaLabel")}
           >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
-                {t("finish.completing")}
-              </>
-            ) : (
-              t("finish.completeButton")
-            )}
+            {buttonLabel()}
           </Button>
         </div>
       </div>

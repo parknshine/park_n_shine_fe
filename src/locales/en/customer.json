@@ -112,7 +112,8 @@
       "stale": "Inactive",
       "closed": "Completed",
       "expired": "Expired",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "located": "Crew Found Vehicle"
     },
     "stepper": {
       "pending": {
@@ -238,7 +239,10 @@
     "closed": "This booking has been completed.",
     "historyTitle": "Status History",
     "whatsAppMessage": "Hello Park & Shine, I need help with my booking (ID: {{bookingId}}).",
-    "preparing": "Preparing your booking…"
+    "preparing": "Preparing your booking…",
+    "washingProgress": "Washing In Progress",
+    "progressPercent": "{{percent}}% complete",
+    "estReadyAt": "Est. ready at {{time}}"
   },
   "rate": {
     "title": "How was your experience?",

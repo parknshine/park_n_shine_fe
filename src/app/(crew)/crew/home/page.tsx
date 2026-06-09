@@ -78,7 +78,7 @@ export function CrewHomePage() {
     if (claimed) {
       router.push(`/crew/jobs/${claimed.id}`);
     } else {
-      toast(t("home.jobTakenByOther", { defaultValue: "Job sudah diambil crew lain, coba lagi." }), {
+      toast(t("home.jobTakenByOther"), {
         icon: "⚠️",
       });
       void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });

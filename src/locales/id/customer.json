@@ -112,7 +112,8 @@
       "stale": "Tidak Aktif",
       "closed": "Selesai",
       "expired": "Kadaluarsa",
-      "cancelled": "Dibatalkan"
+      "cancelled": "Dibatalkan",
+      "located": "Crew Telah Menemukan Kendaraan"
     },
     "stepper": {
       "pending": {
@@ -238,7 +239,10 @@
     "closed": "Booking ini telah selesai.",
     "historyTitle": "Riwayat Status",
     "whatsAppMessage": "Halo Park & Shine, saya butuh bantuan dengan booking saya (ID: {{bookingId}}).",
-    "preparing": "Mempersiapkan booking…"
+    "preparing": "Mempersiapkan booking…",
+    "washingProgress": "Sedang Dicuci",
+    "progressPercent": "{{percent}}% selesai",
+    "estReadyAt": "Estimasi selesai pukul {{time}}"
   },
   "rate": {
     "title": "Bagaimana pengalamanmu?",

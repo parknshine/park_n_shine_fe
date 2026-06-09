@@ -75,6 +75,12 @@
     "title": "Settings",
     "subtitle": "Konfigurasi per site",
     "loading": "Memuat settings...",
+    "table": {
+      "setting": "Pengaturan",
+      "value": "Nilai",
+      "action": "Aksi",
+      "save": "Simpan"
+    },
     "staleTimeout": {
       "title": "Stale Job Timeout",
       "description": "Booking PAID yang belum di-claim lebih dari X menit akan muncul di Escalations Panel.",
@@ -86,6 +92,48 @@
       "save": "Save Changes",
       "success": "Settings berhasil disimpan.",
       "error": "Gagal menyimpan. Coba lagi."
+    },
+    "avgCleaning": {
+      "title": "Rata-rata Durasi Cuci",
+      "description": "Digunakan untuk menghitung persentase progress yang ditampilkan ke customer saat mobil sedang dicuci.",
+      "label": "Durasi (menit)",
+      "unit": "menit",
+      "hint": "Min: 5, Max: 120",
+      "resetLabel": "Reset ke 30 menit",
+      "saving": "Menyimpan...",
+      "save": "Save Changes",
+      "success": "Durasi berhasil disimpan.",
+      "error": "Gagal menyimpan. Coba lagi."
+    },
+    "paymentExpiry": {
+      "title": "Batas Waktu Pembayaran",
+      "description": "Booking yang belum dibayar dalam waktu X menit akan otomatis expired.",
+      "label": "Waktu kadaluarsa (menit)",
+      "unit": "menit",
+      "hint": "Min: 5, Max: 60",
+      "resetLabel": "Reset ke 15 menit",
+      "saving": "Menyimpan...",
+      "save": "Save Changes",
+      "success": "Batas waktu pembayaran berhasil disimpan.",
+      "error": "Gagal menyimpan. Coba lagi."
+    },
+    "jobEta": {
+      "title": "Batas Waktu Pengerjaan Job",
+      "description": "Waktu yang diberikan ke crew untuk menyelesaikan satu job sejak diklaim. Sesuaikan dengan rata-rata durasi cuci.",
+      "unit": "menit",
+      "hint": "Min: 5, Max: 120. Sebaiknya lebih besar dari Rata-rata Durasi Cuci.",
+      "resetLabel": "Reset ke 20 menit",
+      "success": "Batas waktu pengerjaan job berhasil disimpan.",
+      "error": "Gagal menyimpan. Coba lagi."
+    },
+    "crewTimeExtension": {
+      "title": "Durasi Tambah Waktu Crew",
+      "description": "Jumlah menit yang ditambahkan saat crew mengajukan permintaan tambah waktu pengerjaan.",
+      "unit": "menit",
+      "hint": "Min: 5, Maks: 30.",
+      "resetLabel": "Reset ke 10 menit",
+      "success": "Durasi tambah waktu crew berhasil disimpan.",
+      "error": "Gagal menyimpan durasi tambah waktu crew."
     }
   },
   "drawer": {

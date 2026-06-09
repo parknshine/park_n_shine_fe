@@ -31,16 +31,24 @@ export function BeforePhotosPage() {
 
   const ANGLES: AngleConfig[] = [
     {
-      kind: "front" as const,
-      label: t("job.photoKind.front"),
-      id: "photo-front",
+      kind: "before_front" as const,
+      label: t("job.photoKind.before_front"),
+      id: "photo-before-front",
     },
-    { kind: "back" as const, label: t("job.photoKind.back"), id: "photo-back" },
-    { kind: "left" as const, label: t("job.photoKind.left"), id: "photo-left" },
     {
-      kind: "right" as const,
-      label: t("job.photoKind.right"),
-      id: "photo-right",
+      kind: "before_back" as const,
+      label: t("job.photoKind.before_back"),
+      id: "photo-before-back",
+    },
+    {
+      kind: "before_left" as const,
+      label: t("job.photoKind.before_left"),
+      id: "photo-before-left",
+    },
+    {
+      kind: "before_right" as const,
+      label: t("job.photoKind.before_right"),
+      id: "photo-before-right",
     },
   ];
 
@@ -59,10 +67,10 @@ export function BeforePhotosPage() {
   const rightUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
 
   const uploadMap: Record<string, ReturnType<typeof usePhotoUpload>> = {
-    front: frontUpload,
-    back: backUpload,
-    left: leftUpload,
-    right: rightUpload,
+    before_front: frontUpload,
+    before_back: backUpload,
+    before_left: leftUpload,
+    before_right: rightUpload,
   };
 
   const uploads = [frontUpload, backUpload, leftUpload, rightUpload];

@@ -19,7 +19,10 @@ export function useAdminSettings() {
   const saveMutation = useMutation({
     meta: { persist: false },
     mutationKey: mutationKeys.admin.saveSettings(),
-    mutationFn: async (payload: Partial<Pick<AdminSettings, "staleJobTimeoutMinutes" | "whatsappNumber">>) => {
+    mutationFn: async (payload: Partial<Pick<AdminSettings,
+      "staleJobTimeoutMinutes" | "jobEtaMinutes" | "whatsappNumber" |
+      "avgCleaningMinutes" | "paymentExpiryMinutes" | "crewTimeExtensionMinutes"
+    >>) => {
       const response = await api.post<AdminSettings>("/v1/admin/settings", payload);
       return response.data;
     },
@@ -30,12 +33,12 @@ export function useAdminSettings() {
     },
   });
 
-  const error =
-    saveMutation.error instanceof Error
-      ? saveMutation.error.message
-      : saveMutation.error
-        ? "settings_save_failed"
-        : null;
+  let error: string | null = null;
+  if (saveMutation.error instanceof Error) {
+    error = saveMutation.error.message;
+  } else if (saveMutation.error) {
+    error = "settings_save_failed";
+  }
 
   return {
     settings: query.data ?? null,

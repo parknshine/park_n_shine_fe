@@ -34,7 +34,8 @@
     "notifGranted": "Notifications enabled",
     "notifGrantedDescription": "You'll be notified when new jobs arrive",
     "notifDenied": "Notifications blocked",
-    "notifDeniedDescription": "Enable notifications in your browser settings to receive job alerts"
+    "notifDeniedDescription": "Enable notifications in your browser settings to receive job alerts",
+    "jobTakenByOther": "No jobs available at the moment."
   },
   "job": {
     "loading": "Loading job data",
@@ -63,7 +64,15 @@
       "left": "Left",
       "right": "Right",
       "before": "Before",
-      "after": "After"
+      "after": "After",
+      "before_front": "Front (Before)",
+      "before_back": "Back (Before)",
+      "before_left": "Left (Before)",
+      "before_right": "Right (Before)",
+      "after_front": "Front (After)",
+      "after_back": "Back (After)",
+      "after_left": "Left (After)",
+      "after_right": "Right (After)"
     },
     "staleModal": {
       "title": "Job Time Expired",
@@ -125,7 +134,9 @@
   },
   "finish": {
     "title": "Finish",
-    "subtitle": "Take an after photo and confirm the wash is complete.",
+    "subtitle": "Take 4 photos of the vehicle after washing, then confirm.",
+    "photoCount": "{{done}}/4 Photos Taken",
+    "continueButton": "Done & Back to Queue",
     "afterPhotoLabel": "After Photo",
     "completeButton": "Done & Back to Queue",
     "completing": "Completing…",

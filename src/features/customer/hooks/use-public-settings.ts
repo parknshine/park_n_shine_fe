@@ -8,6 +8,7 @@ const ENV_FALLBACK = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
 
 interface PublicSettings {
   whatsappNumber: string;
+  avgCleaningMinutes: number;
 }
 
 async function fetchPublicSettings(): Promise<PublicSettings> {
@@ -26,6 +27,7 @@ export function usePublicSettings() {
 
   return {
     whatsappNumber: query.data?.whatsappNumber || ENV_FALLBACK,
+    avgCleaningMinutes: query.data?.avgCleaningMinutes ?? 30,
     isLoading: query.isLoading,
   };
 }

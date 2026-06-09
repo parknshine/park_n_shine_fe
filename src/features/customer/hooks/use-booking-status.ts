@@ -43,6 +43,8 @@ export function useBookingStatus({
         siteAddress?: string | null;
         paymentMethod?: string | null;
         paymentInstructions?: PaymentInstructions | null;
+        startedAt?: string | null;
+        completedSteps?: number;
         timeline?: { status: CustomerBooking["status"]; timestamp: string }[];
       }>(`/v1/bookings/${bookingId}`, {
         headers: { "X-Booking-Token": signedToken },
@@ -61,6 +63,8 @@ export function useBookingStatus({
         paymentMethod: d.paymentMethod ?? null,
         paymentInstructions: d.paymentInstructions ?? null,
         media: [],
+        startedAt: d.startedAt ?? null,
+        completedSteps: d.completedSteps ?? 0,
         statusHistory: (d.timeline ?? [])
           .filter((t) => CUSTOMER_VISIBLE_STATUSES.has(t.status))
           .map((t) => ({

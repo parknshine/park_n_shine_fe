@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -25,107 +24,279 @@ import type { AdminSettings } from "@/features/admin/types";
 import type { WaStatus } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
 
-interface SettingsFormProps {
+interface SettingsTableProps {
   settings: AdminSettings;
-  save: (data: Partial<Pick<AdminSettings, "staleJobTimeoutMinutes" | "whatsappNumber">>) => Promise<unknown>;
+  save: (data: Partial<Pick<AdminSettings, "staleJobTimeoutMinutes" | "jobEtaMinutes" | "whatsappNumber" | "avgCleaningMinutes" | "paymentExpiryMinutes" | "crewTimeExtensionMinutes">>) => Promise<unknown>;
   isSaving: boolean;
 }
 
-function SettingsForm({ settings, save, isSaving }: SettingsFormProps) {
-  const [timeoutMinutes, setTimeoutMinutes] = useState(settings.staleJobTimeoutMinutes);
+function SettingsTable({ settings, save, isSaving }: SettingsTableProps) {
   const { t } = useTranslation("admin");
+  const [staleTimeout, setStaleTimeout] = useState(settings.staleJobTimeoutMinutes);
+  const [jobEta, setJobEta] = useState(settings.jobEtaMinutes);
+  const [avgCleaning, setAvgCleaning] = useState(settings.avgCleaningMinutes);
+  const [paymentExpiry, setPaymentExpiry] = useState(settings.paymentExpiryMinutes);
+  const [waNumber, setWaNumber] = useState(settings.whatsappNumber);
+  const [crewTimeExtension, setCrewTimeExtension] = useState(settings.crewTimeExtensionMinutes);
 
-  async function handleSave() {
+  async function handleSave(payload: Parameters<typeof save>[0], successKey: string, errorKey: string) {
     try {
-      await save({ staleJobTimeoutMinutes: timeoutMinutes });
-      toast.success(t("settings.staleTimeout.success"));
+      await save(payload);
+      toast.success(t(successKey));
     } catch {
-      toast.error(t("settings.staleTimeout.error"));
+      toast.error(t(errorKey));
     }
   }
 
   return (
-    <div className="rounded-lg border border-border p-4 space-y-4">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">
-          {t("settings.staleTimeout.title")}
-        </h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {t("settings.staleTimeout.description")}
-        </p>
-      </div>
+    <div className="rounded-lg border border-border overflow-hidden">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-border bg-muted/40">
+            <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-2/5">
+              {t("settings.table.setting")}
+            </th>
+            <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground">
+              {t("settings.table.value")}
+            </th>
+            <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-32">
+              {t("settings.table.action")}
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {/* Stale Job Timeout */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">{t("settings.staleTimeout.title")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.staleTimeout.description")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  id="timeout-input"
+                  type="number"
+                  min={5}
+                  max={120}
+                  value={staleTimeout}
+                  onChange={(e) => setStaleTimeout(Number(e.target.value))}
+                  className="w-20 h-8 text-sm"
+                />
+                <span className="text-xs text-muted-foreground">{t("settings.staleTimeout.unit")}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t("settings.staleTimeout.hint")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex flex-col gap-1.5">
+                <Button
+                  size="sm"
+                  disabled={isSaving}
+                  onClick={() => handleSave({ staleJobTimeoutMinutes: staleTimeout }, "settings.staleTimeout.success", "settings.staleTimeout.error")}
+                >
+                  {t("settings.table.save")}
+                </Button>
+                <button
+                  onClick={() => setStaleTimeout(20)}
+                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
+                >
+                  {t("settings.staleTimeout.resetLabel")}
+                </button>
+              </div>
+            </td>
+          </tr>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="timeout-input">{t("settings.staleTimeout.label")}</Label>
-        <div className="flex items-center gap-3">
-          <Input
-            id="timeout-input"
-            type="number"
-            min={5}
-            max={120}
-            value={timeoutMinutes}
-            onChange={(e) => setTimeoutMinutes(Number(e.target.value))}
-            className="w-24"
-          />
-          <span className="text-sm text-muted-foreground">{t("settings.staleTimeout.unit")}</span>
-        </div>
-        <p className="text-xs text-muted-foreground">{t("settings.staleTimeout.hint")}</p>
-      </div>
+          {/* Job ETA */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">{t("settings.jobEta.title")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.jobEta.description")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  id="job-eta-input"
+                  type="number"
+                  min={5}
+                  max={120}
+                  value={jobEta}
+                  onChange={(e) => setJobEta(Number(e.target.value))}
+                  className="w-20 h-8 text-sm"
+                />
+                <span className="text-xs text-muted-foreground">{t("settings.jobEta.unit")}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t("settings.jobEta.hint")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex flex-col gap-1.5">
+                <Button
+                  size="sm"
+                  disabled={isSaving}
+                  onClick={() => handleSave({ jobEtaMinutes: jobEta }, "settings.jobEta.success", "settings.jobEta.error")}
+                >
+                  {t("settings.table.save")}
+                </Button>
+                <button
+                  onClick={() => setJobEta(20)}
+                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
+                >
+                  {t("settings.jobEta.resetLabel")}
+                </button>
+              </div>
+            </td>
+          </tr>
 
-      <div className="flex items-center gap-3">
-        <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? t("settings.staleTimeout.saving") : t("settings.staleTimeout.save")}
-        </Button>
-        <button
-          onClick={() => setTimeoutMinutes(20)}
-          className="text-xs text-muted-foreground underline hover:text-foreground"
-        >
-          {t("settings.staleTimeout.resetLabel")}
-        </button>
-      </div>
-    </div>
-  );
-}
+          {/* Crew Time Extension */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">{t("settings.crewTimeExtension.title")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.crewTimeExtension.description")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  id="crew-time-extension-input"
+                  type="number"
+                  min={5}
+                  max={30}
+                  value={crewTimeExtension}
+                  onChange={(e) => setCrewTimeExtension(Number(e.target.value))}
+                  className="w-20 h-8 text-sm"
+                />
+                <span className="text-xs text-muted-foreground">{t("settings.crewTimeExtension.unit")}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t("settings.crewTimeExtension.hint")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex flex-col gap-1.5">
+                <Button
+                  size="sm"
+                  disabled={isSaving}
+                  onClick={() => handleSave(
+                    { crewTimeExtensionMinutes: crewTimeExtension },
+                    "settings.crewTimeExtension.success",
+                    "settings.crewTimeExtension.error"
+                  )}
+                >
+                  {t("settings.table.save")}
+                </Button>
+                <button
+                  onClick={() => setCrewTimeExtension(10)}
+                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
+                >
+                  {t("settings.crewTimeExtension.resetLabel")}
+                </button>
+              </div>
+            </td>
+          </tr>
 
-function WhatsAppNumberCard({
-  settings,
-  save,
-  isSaving,
-}: SettingsFormProps) {
-  const { t } = useTranslation("admin");
-  const [number, setNumber] = useState(settings.whatsappNumber);
+          {/* Avg Cleaning Duration */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">{t("settings.avgCleaning.title")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.avgCleaning.description")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  id="avg-cleaning-input"
+                  type="number"
+                  min={5}
+                  max={120}
+                  value={avgCleaning}
+                  onChange={(e) => setAvgCleaning(Number(e.target.value))}
+                  className="w-20 h-8 text-sm"
+                />
+                <span className="text-xs text-muted-foreground">{t("settings.avgCleaning.unit")}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t("settings.avgCleaning.hint")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex flex-col gap-1.5">
+                <Button
+                  size="sm"
+                  disabled={isSaving}
+                  onClick={() => handleSave({ avgCleaningMinutes: avgCleaning }, "settings.avgCleaning.success", "settings.avgCleaning.error")}
+                >
+                  {t("settings.table.save")}
+                </Button>
+                <button
+                  onClick={() => setAvgCleaning(30)}
+                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
+                >
+                  {t("settings.avgCleaning.resetLabel")}
+                </button>
+              </div>
+            </td>
+          </tr>
 
-  async function handleSave() {
-    try {
-      await save({ whatsappNumber: number });
-      toast.success(t("settingsWhatsapp.toast.saveSuccess"));
-    } catch {
-      toast.error(t("settingsWhatsapp.toast.saveFailed"));
-    }
-  }
+          {/* Payment Expiry */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">{t("settings.paymentExpiry.title")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.paymentExpiry.description")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  id="payment-expiry-input"
+                  type="number"
+                  min={5}
+                  max={60}
+                  value={paymentExpiry}
+                  onChange={(e) => setPaymentExpiry(Number(e.target.value))}
+                  className="w-20 h-8 text-sm"
+                />
+                <span className="text-xs text-muted-foreground">{t("settings.paymentExpiry.unit")}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{t("settings.paymentExpiry.hint")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex flex-col gap-1.5">
+                <Button
+                  size="sm"
+                  disabled={isSaving}
+                  onClick={() => handleSave({ paymentExpiryMinutes: paymentExpiry }, "settings.paymentExpiry.success", "settings.paymentExpiry.error")}
+                >
+                  {t("settings.table.save")}
+                </Button>
+                <button
+                  onClick={() => setPaymentExpiry(15)}
+                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
+                >
+                  {t("settings.paymentExpiry.resetLabel")}
+                </button>
+              </div>
+            </td>
+          </tr>
 
-  return (
-    <div className="rounded-lg border border-border p-4 space-y-4">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">{t("settingsWhatsapp.supportTitle")}</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {t("settingsWhatsapp.supportDesc")}
-        </p>
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="wa-number-input">{t("settingsWhatsapp.supportLabel")}</Label>
-        <Input
-          id="wa-number-input"
-          type="tel"
-          placeholder="628123456789"
-          value={number}
-          onChange={(e) => setNumber(e.target.value)}
-          className="w-56"
-        />
-      </div>
-      <Button onClick={handleSave} disabled={isSaving}>
-        {isSaving ? t("settingsWhatsapp.saving") : t("settingsWhatsapp.save")}
-      </Button>
+          {/* WhatsApp Number */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">{t("settingsWhatsapp.supportTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("settingsWhatsapp.supportDesc")}</p>
+            </td>
+            <td className="px-4 py-3">
+              <Input
+                id="wa-number-input"
+                type="tel"
+                placeholder="628123456789"
+                value={waNumber}
+                onChange={(e) => setWaNumber(e.target.value)}
+                className="w-44 h-8 text-sm"
+              />
+            </td>
+            <td className="px-4 py-3">
+              <Button
+                size="sm"
+                disabled={isSaving}
+                onClick={() => handleSave({ whatsappNumber: waNumber }, "settingsWhatsapp.toast.saveSuccess", "settingsWhatsapp.toast.saveFailed")}
+              >
+                {t("settings.table.save")}
+              </Button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -290,7 +461,7 @@ export default function SettingsPage() {
   const { settings, isLoading, save, isSaving } = useAdminSettings();
 
   return (
-    <div className="max-w-md space-y-6">
+    <div className="max-w-3xl space-y-6">
       <div>
         <h1 className="text-xl font-bold text-foreground">{t("settings.title")}</h1>
         <p className="text-sm text-muted-foreground">{t("settings.subtitle")}</p>
@@ -299,20 +470,12 @@ export default function SettingsPage() {
       {isLoading || !settings ? (
         <p className="text-sm text-muted-foreground">{t("settings.loading")}</p>
       ) : (
-        <>
-          <SettingsForm
-            key={settings.staleJobTimeoutMinutes}
-            settings={settings}
-            save={save}
-            isSaving={isSaving}
-          />
-          <WhatsAppNumberCard
-            key={settings.whatsappNumber}
-            settings={settings}
-            save={save}
-            isSaving={isSaving}
-          />
-        </>
+        <SettingsTable
+          key={`${settings.staleJobTimeoutMinutes}-${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}`}
+          settings={settings}
+          save={save}
+          isSaving={isSaving}
+        />
       )}
 
       <WhatsAppCard />

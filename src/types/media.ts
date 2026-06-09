@@ -6,4 +6,12 @@ export type MediaKind =
   | "front"
   | "back"
   | "left"
-  | "right";
+  | "right"
+  | "before_front"
+  | "before_back"
+  | "before_left"
+  | "before_right"
+  | "after_front"
+  | "after_back"
+  | "after_left"
+  | "after_right";

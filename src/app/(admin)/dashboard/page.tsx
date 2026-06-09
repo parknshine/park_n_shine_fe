@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useUIStore } from "@/store/ui-store";
 import {
@@ -14,7 +14,7 @@ import { useTranslation } from "@/i18n";
 
 function DashboardContent() {
   const activeSiteId = useUIStore((s) => s.activeSiteId);
-  const [selectedBooking, setSelectedBooking] =
+  const [clickedBooking, setClickedBooking] =
     useState<AdminQueueBooking | null>(null);
   const { t } = useTranslation("admin");
   const searchParams = useSearchParams();
@@ -25,21 +25,24 @@ function DashboardContent() {
     enabled: !!activeSiteId,
   });
 
-  // Auto-open drawer when bookingId is in the URL (e.g. from notification click)
-  useEffect(() => {
-    const bookingId = searchParams.get("bookingId");
-    if (!bookingId || !queue) return;
+  const urlBookingId = searchParams.get("bookingId");
 
+  const urlBooking = useMemo(() => {
+    if (!urlBookingId || !queue) return null;
     const allBookings = [
       ...(queue.escalations ?? []),
       ...(queue.groups ?? []).flatMap((g) => g.bookings),
     ];
-    const found = allBookings.find((b) => b.id === bookingId);
-    if (found) {
-      setSelectedBooking(found);
+    return allBookings.find((b) => b.id === urlBookingId) ?? null;
+  }, [urlBookingId, queue]);
+
+  useEffect(() => {
+    if (urlBooking) {
       router.replace("/dashboard");
     }
-  }, [searchParams, queue, router]);
+  }, [urlBooking, router]);
+
+  const selectedBooking = urlBooking ?? clickedBooking;
 
   function handleActionSuccess() {
     void refresh();
@@ -78,7 +81,7 @@ function DashboardContent() {
               : "dashboard.escalationsTitlePlural",
             { count: queue.escalations.length }
           )}
-          onBookingClick={setSelectedBooking}
+          onBookingClick={setClickedBooking}
         />
       )}
 
@@ -90,7 +93,7 @@ function DashboardContent() {
               key={group.status}
               status={group.status}
               bookings={group.bookings}
-              onBookingClick={setSelectedBooking}
+              onBookingClick={setClickedBooking}
             />
           ))}
         </div>
@@ -103,7 +106,7 @@ function DashboardContent() {
       {/* Booking detail drawer */}
       <BookingDetailDrawer
         bookingId={selectedBooking?.id ?? null}
-        onClose={() => setSelectedBooking(null)}
+        onClose={() => setClickedBooking(null)}
         onActionSuccess={handleActionSuccess}
       />
     </div>

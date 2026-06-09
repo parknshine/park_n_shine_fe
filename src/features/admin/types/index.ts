@@ -72,7 +72,11 @@ export interface AdminReport {
 
 export interface AdminSettings {
   staleJobTimeoutMinutes: number;
+  jobEtaMinutes: number;
   whatsappNumber: string;
+  avgCleaningMinutes: number;
+  paymentExpiryMinutes: number;
+  crewTimeExtensionMinutes: number;
 }
 
 export interface AdminSite {

@@ -7,7 +7,7 @@ interface BookNowButtonV2Props {
   qrId: string;
 }
 
-export function BookNowButtonV2({ qrId }: BookNowButtonV2Props) {
+export function BookNowButtonV2({ qrId }: Readonly<BookNowButtonV2Props>) {
   const router = useRouter();
   return (
     <Button

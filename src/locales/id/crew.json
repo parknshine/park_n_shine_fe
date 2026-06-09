@@ -34,7 +34,8 @@
     "notifGranted": "Notifikasi aktif",
     "notifGrantedDescription": "Kamu akan diberitahu saat job baru tersedia",
     "notifDenied": "Notifikasi diblokir",
-    "notifDeniedDescription": "Aktifkan notifikasi di pengaturan browser untuk menerima pemberitahuan job"
+    "notifDeniedDescription": "Aktifkan notifikasi di pengaturan browser untuk menerima pemberitahuan job",
+    "jobTakenByOther": "Job kosong, tidak ada job tersedia saat ini."
   },
   "job": {
     "loading": "Memuat data job",
@@ -63,7 +64,15 @@
       "left": "Kiri",
       "right": "Kanan",
       "before": "Sebelum",
-      "after": "Sesudah"
+      "after": "Sesudah",
+      "before_front": "Depan (Sebelum)",
+      "before_back": "Belakang (Sebelum)",
+      "before_left": "Kiri (Sebelum)",
+      "before_right": "Kanan (Sebelum)",
+      "after_front": "Depan (Sesudah)",
+      "after_back": "Belakang (Sesudah)",
+      "after_left": "Kiri (Sesudah)",
+      "after_right": "Kanan (Sesudah)"
     },
     "staleModal": {
       "title": "Waktu Pengerjaan Habis",
@@ -125,7 +134,9 @@
   },
   "finish": {
     "title": "Selesai",
-    "subtitle": "Ambil foto kendaraan sesudah dicuci, lalu konfirmasi.",
+    "subtitle": "Ambil 4 foto kendaraan sesudah dicuci, lalu konfirmasi.",
+    "photoCount": "{{done}}/4 Foto Diambil",
+    "continueButton": "Selesai & Kembali ke Antrian",
     "afterPhotoLabel": "Foto Sesudah Cuci",
     "completeButton": "Selesai & Kembali ke Antrian",
     "completing": "Menyelesaikan…",

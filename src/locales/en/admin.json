@@ -75,6 +75,12 @@
     "title": "Settings",
     "subtitle": "Per-site configuration",
     "loading": "Loading settings...",
+    "table": {
+      "setting": "Setting",
+      "value": "Value",
+      "action": "Action",
+      "save": "Save"
+    },
     "staleTimeout": {
       "title": "Stale Job Timeout",
       "description": "PAID bookings unclaimed for more than X minutes will appear in the Escalations Panel.",
@@ -86,6 +92,48 @@
       "save": "Save Changes",
       "success": "Settings saved successfully.",
       "error": "Failed to save. Please try again."
+    },
+    "avgCleaning": {
+      "title": "Average Cleaning Duration",
+      "description": "Used to calculate the progress percentage shown to customers while their car is being washed.",
+      "label": "Duration (minutes)",
+      "unit": "minutes",
+      "hint": "Min: 5, Max: 120",
+      "resetLabel": "Reset to 30 minutes",
+      "saving": "Saving...",
+      "save": "Save Changes",
+      "success": "Duration saved successfully.",
+      "error": "Failed to save. Please try again."
+    },
+    "paymentExpiry": {
+      "title": "Payment Expiry Duration",
+      "description": "Bookings that are not paid within X minutes will be automatically expired.",
+      "label": "Expiry duration (minutes)",
+      "unit": "minutes",
+      "hint": "Min: 5, Max: 60",
+      "resetLabel": "Reset to 15 minutes",
+      "saving": "Saving...",
+      "save": "Save Changes",
+      "success": "Payment expiry duration saved successfully.",
+      "error": "Failed to save. Please try again."
+    },
+    "jobEta": {
+      "title": "Job Completion Time Limit",
+      "description": "Time given to crew to complete a job after claiming it. Should be greater than the average cleaning duration.",
+      "unit": "minutes",
+      "hint": "Min: 5, Max: 120. Should be higher than Average Cleaning Duration.",
+      "resetLabel": "Reset to 20 minutes",
+      "success": "Job completion time limit saved successfully.",
+      "error": "Failed to save. Please try again."
+    },
+    "crewTimeExtension": {
+      "title": "Crew Time Extension Duration",
+      "description": "Number of minutes added when a crew member requests a time extension.",
+      "unit": "minutes",
+      "hint": "Min: 5, Max: 30.",
+      "resetLabel": "Reset to 10 minutes",
+      "success": "Crew time extension duration saved.",
+      "error": "Failed to save crew time extension duration."
     }
   },
   "drawer": {

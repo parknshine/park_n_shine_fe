@@ -78,6 +78,8 @@ export interface CustomerBooking {
   paymentInstructions: PaymentInstructions | null;
   media: BookingMedia[];
   statusHistory: BookingStatusEvent[];
+  startedAt: string | null;
+  completedSteps: number;
 }
 
 export interface CreateBookingPayload {
