@@ -102,8 +102,13 @@ export default function BookingStatusPage() {
 
   const isPending = booking.status === BOOKING_STATUSES.PENDING;
   const isReady = booking.status === BOOKING_STATUSES.READY;
+  const isCancelled = booking.status === BOOKING_STATUSES.CANCELLED;
   const isNeedsHelp = booking.status === BOOKING_STATUSES.NEEDS_HELP;
   const isInProgress = booking.status === BOOKING_STATUSES.IN_PROGRESS;
+
+  const cancellationReason = booking.statusHistory.find(
+    (e) => e.status === "CANCELLED"
+  )?.reason ?? null;
   const startedAt = booking.startedAt ?? (isInProgress ? new Date().toISOString() : null);
 
   const waUrl = whatsappNumber
@@ -180,6 +185,25 @@ export default function BookingStatusPage() {
       {isTerminal && booking.status === BOOKING_STATUSES.CLOSED && (
         <div className='rounded-2xl bg-muted p-6 text-center'>
           <p className='text-sm text-muted-foreground'>{t("status.closed")}</p>
+        </div>
+      )}
+
+      {isCancelled && (
+        <div className='rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center space-y-3'>
+          <p className='text-sm text-muted-foreground'>
+            {t("status.cancelledMessage")}
+          </p>
+          {cancellationReason && (
+            <p className='text-xs text-muted-foreground'>
+              {t("status.cancellationReason")}: <span className='font-medium'>{cancellationReason}</span>
+            </p>
+          )}
+          <Link
+            href={`/booking/${bookingId}/rate?token=${token}`}
+            className='inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground! transition-opacity hover:opacity-90'
+          >
+            {t("status.leaveFeedback")}
+          </Link>
         </div>
       )}
 

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Download, X } from "lucide-react";
+import { Download, X, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +16,18 @@ import { cn } from "@/lib/utils";
 
 function toISODate(date: Date): string {
   return date.toISOString().slice(0, 10);
+}
+
+function reliabilityBarColor(score: number): string {
+  if (score >= 80) return "bg-green-500";
+  if (score >= 60) return "bg-amber-500";
+  return "bg-red-500";
+}
+
+function reliabilityTextColor(score: number): string {
+  if (score >= 80) return "text-green-600 dark:text-green-400";
+  if (score >= 60) return "text-amber-600 dark:text-amber-400";
+  return "text-red-600 dark:text-red-400";
 }
 
 function formatRupiah(amount: number): string {
@@ -40,12 +54,12 @@ function exportToCSV(report: AdminReport, from: string, to: string) {
     "",
     "Bookings by Status",
     "Status,Count",
-    ...Object.entries(report.bookings.byStatus).map(([s, c]) => `${s},${c}`),
+    ...Object.entries(report.bookings.byStatus).map(([s, count]) => `${s},${count.toString()}`),
     "",
     "Crew Performance",
-    "Name,Jobs,Stale,Needs Help,Reliability (%),Avg Turnaround (s),Avg Rating,Est. Revenue (IDR)",
+    "Name,Jobs,Stale,Needs Help,Rejected,Reliability (%),Avg Turnaround (s),Avg Rating,Est. Revenue (IDR)",
     ...report.crew.map((c) =>
-      `${c.crewName},${c.jobsCompleted},${c.staleCount},${c.needsHelpCount},${c.reliabilityScore ?? ""},${c.avgTurnaroundSeconds ?? ""},${c.avgRating ?? ""},${c.estimatedRevenue}`
+      `${c.crewName},${c.jobsCompleted},${c.staleCount},${c.needsHelpCount},${c.rejectedCount},${c.reliabilityScore ?? ""},${c.avgTurnaroundSeconds ?? ""},${c.avgRating ?? ""},${c.estimatedRevenue}`
     ),
   ];
 
@@ -56,6 +70,33 @@ function exportToCSV(report: AdminReport, from: string, to: string) {
   a.download = `park-n-shine-report-${from}-${to}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function ReportTabs() {
+  const pathname = usePathname();
+  const { t } = useTranslation("admin");
+  const tabs = [
+    { label: t("reports.tabs.summary"), href: "/reports" },
+    { label: t("reports.tabs.jobs"), href: "/reports/jobs" },
+  ];
+  return (
+    <div className="flex gap-1 border-b border-border">
+      {tabs.map((tab) => (
+        <Link
+          key={tab.href}
+          href={tab.href}
+          className={cn(
+            "px-4 py-2 text-sm font-medium transition-colors",
+            pathname === tab.href
+              ? "border-b-2 border-primary text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          {tab.label}
+        </Link>
+      ))}
+    </div>
+  );
 }
 
 export default function ReportsPage() {
@@ -101,6 +142,8 @@ export default function ReportsPage() {
         <h1 className="text-xl font-bold text-foreground">{t("reports.title")}</h1>
         <p className="text-sm text-muted-foreground">{t("reports.subtitle")}</p>
       </div>
+
+      <ReportTabs />
 
       {/* Date controls */}
       <div className="flex flex-wrap items-end gap-3">
@@ -199,8 +242,8 @@ export default function ReportsPage() {
             <h2 className="text-sm font-semibold text-foreground">
               {t("reports.crewPerformance")}
             </h2>
-            <div className="overflow-hidden rounded-lg border border-border">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full min-w-175 text-sm">
                 <thead className="border-b border-border bg-muted/50">
                   <tr>
                     <th className="px-4 py-3 text-left font-medium text-muted-foreground">
@@ -214,6 +257,9 @@ export default function ReportsPage() {
                     </th>
                     <th className="px-4 py-3 text-right font-medium text-muted-foreground">
                       {t("reports.crew.needsHelp")}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
+                      {t("reports.crew.rejected")}
                     </th>
                     <th className="px-4 py-3 text-right font-medium text-muted-foreground">
                       {t("reports.crew.reliability")}
@@ -253,6 +299,12 @@ export default function ReportsPage() {
                         )}>
                           {member.needsHelpCount}
                         </td>
+                        <td className={cn(
+                          "px-4 py-3 text-right font-mono text-xs",
+                          member.rejectedCount > 0 ? "text-orange-600 dark:text-orange-400" : "text-muted-foreground"
+                        )}>
+                          {member.rejectedCount}
+                        </td>
                         <td className="px-4 py-3 text-right">
                           {member.reliabilityScore == null ? (
                             <span className="text-muted-foreground">—</span>
@@ -260,25 +312,11 @@ export default function ReportsPage() {
                             <div className="flex items-center justify-end gap-2">
                               <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
                                 <div
-                                  className={cn(
-                                    "h-full rounded-full",
-                                    member.reliabilityScore >= 80
-                                      ? "bg-green-500"
-                                      : member.reliabilityScore >= 60
-                                        ? "bg-amber-500"
-                                        : "bg-red-500"
-                                  )}
+                                  className={cn("h-full rounded-full", reliabilityBarColor(member.reliabilityScore))}
                                   style={{ width: `${member.reliabilityScore}%` }}
                                 />
                               </div>
-                              <span className={cn(
-                                "font-mono text-xs",
-                                member.reliabilityScore >= 80
-                                  ? "text-green-600 dark:text-green-400"
-                                  : member.reliabilityScore >= 60
-                                    ? "text-amber-600 dark:text-amber-400"
-                                    : "text-red-600 dark:text-red-400"
-                              )}>
+                              <span className={cn("font-mono text-xs", reliabilityTextColor(member.reliabilityScore))}>
                                 {member.reliabilityScore.toFixed(1)}%
                               </span>
                             </div>
@@ -308,6 +346,17 @@ export default function ReportsPage() {
           </div>
         </div>
       )}
+
+      {/* Link to job details */}
+      <div className="flex items-center justify-end">
+        <Link
+          href="/reports/jobs"
+          className="flex items-center gap-1.5 text-sm text-primary hover:underline"
+        >
+          {t("reports.jobDetail.viewJobs")}
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
 
       {!report && !isLoading && (
         <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border">

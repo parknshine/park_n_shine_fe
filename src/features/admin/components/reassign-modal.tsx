@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import {
   Dialog,
@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/select";
 import { useBookingActions, useAdminCrew } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 
 interface ReassignModalProps {
   open: boolean;
@@ -37,16 +39,29 @@ export function ReassignModal({
   const [crewId, setCrewId] = useState("");
   const { reassign, isSubmitting } = useBookingActions(bookingId);
   const { crew } = useAdminCrew();
+  const queryClient = useQueryClient();
   const crewOptions = crew.filter((c) => c.active);
   const { t } = useTranslation("admin");
+
+  useEffect(() => {
+    if (open) {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.crew() });
+    }
+  }, [open, queryClient]);
 
   async function handleConfirm() {
     if (!crewId) return;
     try {
       await reassign({ crewId });
       onSuccess();
-    } catch {
-      toast.error(t("reassignModal.error"));
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 409) {
+        setCrewId("");
+        toast.error(t("reassignModal.crewBusy"));
+      } else {
+        toast.error(t("reassignModal.error"));
+      }
     }
   }
 
@@ -66,8 +81,8 @@ export function ReassignModal({
               </SelectTrigger>
               <SelectContent>
                 {crewOptions.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
+                  <SelectItem key={c.id} value={c.id} disabled={c.isBusy}>
+                    {c.name}{c.isBusy ? ` (${t("reassignModal.busyBadge")})` : ""}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -772,6 +772,7 @@ export const adminSuccessExamples = {
           estimatedRevenue: 1650000,
           staleCount: 1,
           needsHelpCount: 2,
+          rejectedCount: 3,
           reliabilityScore: 0.95,
         },
         {
@@ -783,6 +784,7 @@ export const adminSuccessExamples = {
           estimatedRevenue: 1275000,
           staleCount: 0,
           needsHelpCount: 1,
+          rejectedCount: 0,
           reliabilityScore: 0.98,
         },
       ],

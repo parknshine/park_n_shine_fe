@@ -56,6 +56,10 @@
     "verifyAriaLabel": "Verifikasi plat kendaraan",
     "continueToPhotos": "Lanjut ke Foto",
     "viewChecklist": "Lihat Checklist",
+    "requestTimeExtension": "Minta Tambah Waktu",
+    "requestTimeExtensionSending": "Mengirim...",
+    "requestTimeExtensionSent": "Permintaan terkirim ke admin",
+    "requestTimeExtensionError": "Gagal mengirim permintaan",
     "photoKind": {
       "plate": "Plat",
       "slot": "Slot",
@@ -82,6 +86,34 @@
       "markStale": "Tandai Stale",
       "markStaleDesc": "Tandai job sebagai stale. Job tetap tercatat dan admin dapat menugaskan ulang.",
       "submitting": "Memproses..."
+    },
+    "incomingModal": {
+      "title": "Job Tersedia",
+      "description": "Ada job baru di antrian. Apa yang ingin kamu lakukan?",
+      "plate": "Plat",
+      "slot": "Slot",
+      "noSlot": "—",
+      "accept": "Ambil Job",
+      "acceptDesc": "Klaim job ini dan mulai sekarang.",
+      "wait": "Minta Tunggu",
+      "waitDesc": "Lewati dulu. Job tetap di antrian untuk crew lain.",
+      "wait10": "Tunggu 10 menit",
+      "wait30": "Tunggu 30 menit",
+      "reject": "Tolak Job",
+      "rejectDesc": "Tolak job ini dengan alasan.",
+      "rejectConfirm": "Konfirmasi Penolakan",
+      "reasonLabel": "Pilih alasan",
+      "reasons": {
+        "VEHICLE_TOO_DIRTY": "Kendaraan terlalu kotor / berat",
+        "PARKING_TOO_TIGHT": "Parkir terlalu sempit",
+        "SPECIAL_CARE_NEEDED": "Butuh perawatan khusus",
+        "CREW_UNAVAILABLE": "Crew sedang tidak tersedia"
+      },
+      "submitting": "Memproses...",
+      "waitingTitle": "Sedang Menunggu",
+      "waitingDesc": "Penawaran job dijeda. Kamu bisa klaim kapan saja.",
+      "claimNow": "Klaim Sekarang",
+      "cancelWait": "Batalkan Tunggu"
     }
   },
   "verify": {
@@ -147,6 +179,26 @@
       "upload": "Ambil Foto",
       "uploading": "Mengunggah…",
       "retrying": "Mencoba ulang…"
+    }
+  },
+  "needsHelp": {
+    "button": "Butuh Bantuan",
+    "modalTitle": "Minta Bantuan",
+    "modalDesc": "Pilih alasan kamu membutuhkan bantuan supervisor.",
+    "noteLabel": "Catatan tambahan (opsional)",
+    "notePlaceholder": "Deskripsikan situasinya…",
+    "submitButton": "Kirim Permintaan",
+    "submitting": "Mengirim…",
+    "successToast": "Permintaan bantuan terkirim",
+    "errorToast": "Gagal mengirim permintaan",
+    "waitingBannerTitle": "Menunggu Bantuan",
+    "waitingBannerDesc": "Bantuan sudah diminta. Mohon tunggu supervisor.",
+    "reasons": {
+      "VEHICLE_INACCESSIBLE": "Kendaraan tidak bisa diakses",
+      "MECHANICAL_ISSUE": "Masalah alat/mesin",
+      "CUSTOMER_DISPUTE": "Dispute dengan pelanggan",
+      "HAZARD": "Situasi berbahaya",
+      "OTHER": "Lainnya"
     }
   }
 }

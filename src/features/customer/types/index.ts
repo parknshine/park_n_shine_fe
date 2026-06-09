@@ -53,6 +53,7 @@ export interface BookingStatusEvent {
   status: BookingStatus;
   changedAt: string;
   labelKey: string;
+  reason?: string | null;
 }
 
 export type PaymentInstructions =

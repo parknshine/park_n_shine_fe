@@ -2,6 +2,7 @@ export { useAdminAuth } from "./use-admin-auth";
 export { useAdminQueue } from "./use-admin-queue";
 export { useBookingActions } from "./use-booking-actions";
 export { useAdminReport } from "./use-admin-report";
+export { useAdminReportBookings } from "./use-admin-report-bookings";
 export { useAuditLog } from "./use-audit-log";
 export { useAdminSettings } from "./use-admin-settings";
 export { useAdminSites, useAdminSite } from "./use-admin-sites";

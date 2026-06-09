@@ -51,3 +51,18 @@ export interface CompleteChecklistPayload {
   checklistItemId: string;
   completedAt: string;
 }
+
+export interface JobPreview {
+  id: string;
+  plateText: string;
+  slotText: string;
+}
+
+export const REJECTION_REASONS = [
+  "VEHICLE_TOO_DIRTY",
+  "PARKING_TOO_TIGHT",
+  "SPECIAL_CARE_NEEDED",
+  "CREW_UNAVAILABLE",
+] as const;
+
+export type RejectionReason = typeof REJECTION_REASONS[number];

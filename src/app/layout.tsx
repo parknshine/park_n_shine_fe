@@ -49,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head />
-      <body className={`${plusJakartaSans.variable} antialiased`}>
+      <body className={`${plusJakartaSans.variable} antialiased`} suppressHydrationWarning>
         {/* DARK MODE DISABLED — script below reads localStorage/system preference and applies dark class */}
         {/* <Script
           id="theme-init"

@@ -3,6 +3,7 @@ import type { BookingStatus, CustomerBooking } from "@/features/customer/types";
 export interface AdminQueueBooking extends CustomerBooking {
   crewName?: string | null;
   elapsedSeconds: number;
+  rejectionCount?: number;
 }
 
 export interface AdminQueueStatusGroup {
@@ -41,6 +42,7 @@ export interface ReportCrewPerformance {
   estimatedRevenue: number;
   staleCount: number;
   needsHelpCount: number;
+  rejectedCount: number;
   reliabilityScore: number | null;
   avgRating: number | null;
 }
@@ -49,7 +51,7 @@ export interface AuditEntry {
   id: string;
   bookingId: string;
   plateText: string | null;
-  action: "refund" | "status_override" | "reassign";
+  action: "refund" | "status_override" | "reassign" | "crew.job_rejected";
   detail: string;
   adminEmail: string;
   createdAt: string;
@@ -68,6 +70,32 @@ export interface AdminReport {
   };
   avgTurnaroundSeconds: number | null;
   crew: ReportCrewPerformance[];
+}
+
+export interface ReportPhotoAsset {
+  type: string;
+  storageKey: string;
+  url: string | null;
+}
+
+export interface ReportBookingDuration {
+  locateSeconds: number | null;
+  washSeconds: number | null;
+  totalJobSeconds: number | null;
+}
+
+export interface ReportBookingRow {
+  id: string;
+  createdAt: string;
+  siteName: string | null;
+  slot: string | null;
+  crewName: string | null;
+  status: string;
+  price: number;
+  rating: number | null;
+  ratingNote: string | null;
+  duration: ReportBookingDuration;
+  photos: ReportPhotoAsset[];
 }
 
 export interface AdminSettings {
@@ -143,6 +171,7 @@ export interface AdminCrewMember {
   phone: string | null;
   active: boolean;
   createdAt: string;
+  isBusy: boolean;
 }
 
 export interface AdminShiftCrewMember {

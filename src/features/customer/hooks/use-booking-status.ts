@@ -45,7 +45,7 @@ export function useBookingStatus({
         paymentInstructions?: PaymentInstructions | null;
         startedAt?: string | null;
         completedSteps?: number;
-        timeline?: { status: CustomerBooking["status"]; timestamp: string }[];
+        timeline?: { status: CustomerBooking["status"]; timestamp: string; reason?: string | null }[];
       }>(`/v1/bookings/${bookingId}`, {
         headers: { "X-Booking-Token": signedToken },
       });
@@ -71,6 +71,7 @@ export function useBookingStatus({
             status: t.status,
             changedAt: t.timestamp,
             labelKey: `booking.status.${t.status.toLowerCase()}`,
+            reason: t.reason ?? null,
           })),
       };
       return booking;

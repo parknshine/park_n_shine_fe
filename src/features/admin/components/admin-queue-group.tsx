@@ -51,7 +51,14 @@ export function AdminQueueGroup({
               </p>
               <p className="text-muted-foreground">{booking.slotText}</p>
             </div>
-            <p className="text-muted-foreground">{booking.crewName ?? t("queueGroup.unassigned")}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-muted-foreground">{booking.crewName ?? t("queueGroup.unassigned")}</p>
+              {(booking.rejectionCount ?? 0) > 0 && (
+                <span className="inline-flex items-center rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive">
+                  {booking.rejectionCount}× rejected
+                </span>
+              )}
+            </div>
             <p className="font-mono text-xs text-muted-foreground">
               {formatElapsed(booking.elapsedSeconds)}
             </p>

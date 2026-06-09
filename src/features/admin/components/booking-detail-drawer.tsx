@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Timer } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { useAdminSettings } from "@/features/admin/hooks";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios-admin";
 import { queryKeys } from "@/lib/query-keys";
@@ -14,7 +16,7 @@ import { StatusOverrideModal } from "./status-override-modal";
 import { RefundModal } from "./refund-modal";
 import { useTranslation } from "@/i18n";
 import { useAuthStore } from "@/store/auth-store";
-import { formatAuditDetail } from "@/features/admin/utils/format-audit-detail";
+import { formatAuditDetail, formatAuditAction } from "@/features/admin/utils/format-audit-detail";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface BookingDetailDrawerProps {
@@ -31,8 +33,37 @@ export function BookingDetailDrawer({
   const [activeModal, setActiveModal] = useState<
     "reassign" | "override" | "refund" | null
   >(null);
+  const [showExtend, setShowExtend] = useState(false);
+  const [extendMinutes, setExtendMinutes] = useState<number | "">("");
+  const [extendStatus, setExtendStatus] = useState("");
+  const [isExtending, setIsExtending] = useState(false);
   const { t } = useTranslation("admin");
   const role = useAuthStore((s) => s.role);
+  const { settings } = useAdminSettings();
+  const defaultExtendMinutes = settings?.crewTimeExtensionMinutes ?? 10;
+
+  async function handleExtendTime() {
+    if (!bookingId) return;
+    setIsExtending(true);
+    try {
+      const minutes = typeof extendMinutes === "number" && extendMinutes > 0
+        ? extendMinutes
+        : defaultExtendMinutes;
+      await api.post(`/v1/admin/bookings/${bookingId}/extend-time`, {
+        minutes,
+        ...(extendStatus ? { newStatus: extendStatus } : {}),
+      });
+      toast.success(t("drawer.extendTimeSuccess"));
+      setShowExtend(false);
+      setExtendMinutes("");
+      setExtendStatus("");
+      onActionSuccess();
+    } catch {
+      toast.error(t("drawer.extendTimeError"));
+    } finally {
+      setIsExtending(false);
+    }
+  }
 
   const { data: booking, isLoading } = useQuery({
     enabled: !!bookingId,
@@ -200,6 +231,54 @@ export function BookingDetailDrawer({
                   >
                     {t("drawer.overrideStatus")}
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={["CLOSED", "CANCELLED", "EXPIRED", "DRAFT", "PENDING", "PAID"].includes(booking.status)}
+                    onClick={() => setShowExtend((v) => !v)}
+                    prefix={<Timer className="h-3.5 w-3.5" />}
+                  >
+                    {t("drawer.extendTime")}
+                  </Button>
+                  {showExtend && (
+                    <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
+                      <p className="text-xs font-semibold text-foreground">{t("drawer.extendTimeTitle")}</p>
+                      <div>
+                        <label className="text-xs text-muted-foreground">{t("drawer.extendTimeMinutes")}</label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={120}
+                          placeholder={String(defaultExtendMinutes)}
+                          value={extendMinutes}
+                          onChange={(e) => setExtendMinutes(e.target.value === "" ? "" : Number(e.target.value))}
+                          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground">{t("drawer.extendTimeStatus")}</label>
+                        <select
+                          value={extendStatus}
+                          onChange={(e) => setExtendStatus(e.target.value)}
+                          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        >
+                          <option value="">— {t("drawer.extendTimeStatus")} —</option>
+                          <option value="IN_PROGRESS">IN_PROGRESS</option>
+                          <option value="LOCATED">LOCATED</option>
+                          <option value="ASSIGNED">ASSIGNED</option>
+                          <option value="NEEDS_HELP">NEEDS_HELP</option>
+                        </select>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="default" onClick={handleExtendTime} disabled={isExtending} className="flex-1">
+                          {isExtending ? "..." : t("drawer.extendTimeSubmit")}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => setShowExtend(false)} disabled={isExtending}>
+                          {t("drawer.extendTimeCancel")}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                   {role === "super_admin" && (
                     <Button
                       variant="destructive"
@@ -226,7 +305,7 @@ export function BookingDetailDrawer({
                         className="rounded-md border border-border p-3 text-sm"
                       >
                         <p className="font-medium text-foreground capitalize">
-                          {entry.action.replaceAll('_', " ")}
+                          {formatAuditAction(entry.action)}
                         </p>
                         <p className="text-muted-foreground">{formatAuditDetail(entry.action, entry.detail)}</p>
                         <p className="text-xs text-muted-foreground">

@@ -1,24 +1,52 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import { useIsRestoring } from "@tanstack/react-query";
+import { useIsRestoring, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/shared/app-shell";
 import { LanguageSwitcher } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { useCrewSession } from "@/features/crew/hooks";
+import { JobStaleModal } from "@/features/crew/components";
+import { useRealtimeEvents, getCrewIdFromToken } from "@/lib/use-realtime-events";
+import { queryKeys } from "@/lib/query-keys";
+import type { CrewJob } from "@/features/crew/types";
 
 interface CrewShellProps {
   children: ReactNode;
 }
 
-export function CrewShell({ children }: CrewShellProps) {
+export function CrewShell({ children }: Readonly<CrewShellProps>) {
   const router = useRouter();
   const isRestoring = useIsRestoring();
   const { session, clearSession } = useCrewSession();
+  const [staleJobId, setStaleJobId] = useState<string | null>(null);
+  const crewId = session ? getCrewIdFromToken() : null;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+  const queryClient = useQueryClient();
+
+  useRealtimeEvents({
+    url: () => {
+      if (!crewId) return "";
+      const token = localStorage.getItem("crew-token") ?? "";
+      return `${baseUrl}/v1/crew/realtime/stream?token=${token}`;
+    },
+    enabled: !!crewId,
+    onEvent: (event) => {
+      if (event.type === "booking_status_changed" && event.status === "STALE") {
+        setStaleJobId(event.bookingId as string);
+      }
+      if (event.type === "eta_extended" && event.bookingId && event.etaEndsAt) {
+        queryClient.setQueryData<CrewJob | null>(
+          queryKeys.crew.job(event.bookingId as string),
+          (prev) => prev ? { ...prev, etaEndsAt: event.etaEndsAt as string } : prev,
+        );
+      }
+    },
+  });
 
   useEffect(() => {
     if (!isRestoring && !session) {
@@ -31,8 +59,8 @@ export function CrewShell({ children }: CrewShellProps) {
       clearSession();
       router.replace("/crew/login");
     }
-    window.addEventListener("crew-session-expired", handleSessionExpired);
-    return () => window.removeEventListener("crew-session-expired", handleSessionExpired);
+    globalThis.addEventListener("crew-session-expired", handleSessionExpired);
+    return () => globalThis.removeEventListener("crew-session-expired", handleSessionExpired);
   }, [clearSession, router]);
 
   if (isRestoring || !session) return null;
@@ -51,6 +79,16 @@ export function CrewShell({ children }: CrewShellProps) {
 
   return (
     <>
+      {staleJobId && (
+        <JobStaleModal
+          open={true}
+          jobId={staleJobId}
+          onDone={() => {
+            setStaleJobId(null);
+            router.replace("/crew/home?noResume=true");
+          }}
+        />
+      )}
       <header className="fixed inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-md items-center justify-between px-4">
           <div className="flex items-center gap-2">

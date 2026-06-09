@@ -12,6 +12,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CrewLayout({ children }: { children: ReactNode }) {
+export default function CrewLayout({ children }: Readonly<{ children: ReactNode }>) {
   return <CrewShell>{children}</CrewShell>;
 }

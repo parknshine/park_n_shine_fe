@@ -3,12 +3,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios-crew";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
-import type { CrewJob } from "@/features/crew/types";
+import type { CrewJob, JobPreview, RejectionReason } from "@/features/crew/types";
+
+export async function previewNextJob(): Promise<JobPreview | null> {
+  const response = await api.get<JobPreview | null>("/v1/crew/jobs/next-preview");
+  return response.data ?? null;
+}
 
 export function useNextJob() {
   const queryClient = useQueryClient();
 
-  // Auto-fetch on mount — recovers active job after refresh/relog
   const jobQuery = useQuery<CrewJob | null>({
     queryKey: queryKeys.crew.nextJob(),
     queryFn: async () => {
@@ -18,7 +22,16 @@ export function useNextJob() {
     staleTime: Infinity,
   });
 
-  const mutation = useMutation({
+  const waitStatusQuery = useQuery<{ waitUntil: number | null }>({
+    queryKey: queryKeys.crew.waitStatus(),
+    queryFn: async () => {
+      const response = await api.get<{ waitUntil: number | null }>("/v1/crew/jobs/wait-status");
+      return response.data;
+    },
+    staleTime: 30_000,
+  });
+
+  const claimMutation = useMutation({
     meta: { persist: false },
     mutationFn: async () => {
       const response = await api.post<CrewJob | null>("/v1/crew/jobs/next");
@@ -33,25 +46,68 @@ export function useNextJob() {
     },
   });
 
+  const rejectMutation = useMutation({
+    meta: { persist: false },
+    mutationFn: async ({ bookingId, reason }: { bookingId: string; reason: RejectionReason }) => {
+      await api.post("/v1/crew/jobs/reject", { bookingId, reason });
+    },
+  });
+
+  const requestWaitMutation = useMutation({
+    meta: { persist: false },
+    mutationFn: async ({ bookingId, minutes }: { bookingId: string; minutes: 10 | 30 }) => {
+      const response = await api.post<{ ok: boolean; waitUntil: number }>("/v1/crew/jobs/request-wait", { bookingId, minutes });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(queryKeys.crew.waitStatus(), { waitUntil: data.waitUntil });
+    },
+  });
+
+  const cancelWaitMutation = useMutation({
+    meta: { persist: false },
+    mutationFn: async () => {
+      await api.delete("/v1/crew/jobs/wait");
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(queryKeys.crew.waitStatus(), { waitUntil: null });
+    },
+  });
+
   function claimNextJob() {
-    return mutation.mutateAsync();
+    return claimMutation.mutateAsync();
+  }
+
+  function rejectJob(bookingId: string, reason: RejectionReason) {
+    return rejectMutation.mutateAsync({ bookingId, reason });
+  }
+
+  function requestWait(bookingId: string, minutes: 10 | 30) {
+    return requestWaitMutation.mutateAsync({ bookingId, minutes });
+  }
+
+  function cancelWait() {
+    return cancelWaitMutation.mutateAsync();
   }
 
   const job = jobQuery.data ?? null;
-  const error =
-    mutation.error instanceof Error
-      ? mutation.error.message
-      : mutation.error
-        ? "claim_job_failed"
-        : null;
+  const claimError = claimMutation.error;
+  let error: string | null = null;
+  if (claimError instanceof Error) error = claimError.message;
+  else if (claimError) error = "claim_job_failed";
 
   return {
     claimNextJob,
+    rejectJob,
+    requestWait,
+    cancelWait,
+    waitUntil: waitStatusQuery.data?.waitUntil ?? null,
+    isWaitStatusLoading: waitStatusQuery.isLoading,
     error,
-    hasNoJob: !jobQuery.isLoading && !job && mutation.isSuccess && !mutation.data,
-    isLoading: jobQuery.isLoading || mutation.isPending,
-    isNewlyClaimed: mutation.isSuccess && !!mutation.data,
-    isOfflinePaused: mutation.isPaused,
+    hasNoJob: !jobQuery.isLoading && !job && claimMutation.isSuccess && !claimMutation.data,
+    isLoading: jobQuery.isLoading || claimMutation.isPending,
+    isNewlyClaimed: claimMutation.isSuccess && !!claimMutation.data,
+    isOfflinePaused: claimMutation.isPaused,
     job,
   };
 }

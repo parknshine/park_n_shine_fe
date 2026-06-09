@@ -1,18 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRealtimeEvents, getCrewIdFromToken } from "@/lib/use-realtime-events";
-import { JobStaleModal } from "@/features/crew/components";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowRight, ChevronLeft, Clock, Loader2, MapPin } from "lucide-react";
+import { ArrowRight, ChevronLeft, Clock, HelpCircle, Loader2, MapPin, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCrewJob } from "@/features/crew/hooks";
+import { NeedsHelpModal } from "@/features/crew";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
 import { queryKeys } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
+import { toast } from "react-hot-toast";
+import api from "@/lib/axios-crew";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -149,32 +150,31 @@ export function CrewJobDetailPage() {
   const { job, isLoading, error } = useCrewJob(jobId);
   const { t } = useTranslation("crew");
 
+  const [timeExtState, setTimeExtState] = useState<"idle" | "sending" | "sent">("idle");
+  const [helpModalOpen, setHelpModalOpen] = useState(false);
+
   function goBackToQueue() {
     queryClient.removeQueries({ queryKey: queryKeys.crew.nextJob() });
     router.replace("/crew/home?noResume=true");
   }
 
-  const [showStaleModal, setShowStaleModal] = useState(false);
-  const crewId = getCrewIdFromToken();
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+  async function handleRequestTimeExtension() {
+    setTimeExtState("sending");
+    try {
+      await api.post(`/v1/crew/jobs/${jobId}/request-time-extension`);
+      setTimeExtState("sent");
+      toast.success(t("job.requestTimeExtensionSent"));
+    } catch {
+      setTimeExtState("idle");
+      toast.error(t("job.requestTimeExtensionError"));
+    }
+  }
 
-  useRealtimeEvents({
-    url: () => {
-      if (!crewId) return "";
-      const token = localStorage.getItem("crew-token") ?? "";
-      return `${baseUrl}/v1/crew/realtime/stream?token=${token}`;
-    },
-    enabled: !!crewId && !!job && (job.status === "ASSIGNED" || job.status === "LOCATED"),
-    onEvent: (event) => {
-      if (
-        event.type === "booking_status_changed" &&
-        event.status === "STALE" &&
-        event.bookingId === jobId
-      ) {
-        setShowStaleModal(true);
-      }
-    },
-  });
+  async function handleHelpSuccess() {
+    setHelpModalOpen(false);
+    await queryClient.invalidateQueries({ queryKey: queryKeys.crew.job(jobId) });
+  }
+
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
@@ -315,58 +315,111 @@ export function CrewJobDetailPage() {
             </div>
           </section>
         )}
+
+        {job.status === "NEEDS_HELP" && (
+          <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950/40">
+            <div className="mb-1 flex items-center gap-2">
+              <HelpCircle
+                className="h-4 w-4 text-amber-600 dark:text-amber-400"
+                aria-hidden="true"
+              />
+              <span className="font-semibold text-amber-700 dark:text-amber-300">
+                {t("needsHelp.waitingBannerTitle")}
+              </span>
+            </div>
+            <p className="text-sm text-amber-700 dark:text-amber-300">
+              {t("needsHelp.waitingBannerDesc")}
+            </p>
+          </div>
+        )}
       </main>
 
       {/* ── Sticky CTA ──────────────────────────────────────────────────── */}
+      {job.status !== "NEEDS_HELP" && (
       <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
         <div className="mx-auto max-w-md">
           {job.status === "ASSIGNED" && (
-            <Button
-              size="lg"
-              variant="default"
-              className="h-14 w-full rounded-xl text-base font-bold"
-              onClick={() => router.push(`/crew/jobs/${jobId}/verify`)}
-              suffix={<ArrowRight className="h-5 w-5" />}
-              aria-label={t("job.verifyAriaLabel")}
-            >
-              {t("job.verifyButton")}
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                size="lg"
+                variant="default"
+                className="h-14 w-full rounded-xl text-base font-bold"
+                onClick={() => router.push(`/crew/jobs/${jobId}/verify`)}
+                suffix={<ArrowRight className="h-5 w-5" />}
+                aria-label={t("job.verifyAriaLabel")}
+              >
+                {t("job.verifyButton")}
+              </Button>
+              <Button
+                size="md"
+                variant="outline"
+                className="w-full rounded-xl border-amber-400 text-amber-700 hover:bg-amber-50 dark:border-amber-600 dark:text-amber-400 dark:hover:bg-amber-950/40"
+                prefix={<HelpCircle className="h-4 w-4" />}
+                onClick={() => setHelpModalOpen(true)}
+              >
+                {t("needsHelp.button")}
+              </Button>
+            </div>
           )}
           {job.status === "LOCATED" && (
-            <Button
-              size="lg"
-              variant="default"
-              className="h-14 w-full rounded-xl text-base font-bold"
-              onClick={() => router.push(`/crew/jobs/${jobId}/before-photos`)}
-              suffix={<ArrowRight className="h-5 w-5" />}
-              aria-label={t("job.continueToPhotos")}
-            >
-              {t("job.continueToPhotos")}
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                size="lg"
+                variant="default"
+                className="h-14 w-full rounded-xl text-base font-bold"
+                onClick={() => router.push(`/crew/jobs/${jobId}/before-photos`)}
+                suffix={<ArrowRight className="h-5 w-5" />}
+                aria-label={t("job.continueToPhotos")}
+              >
+                {t("job.continueToPhotos")}
+              </Button>
+              <Button
+                size="md"
+                variant="outline"
+                className="w-full rounded-xl border-amber-400 text-amber-700 hover:bg-amber-50 dark:border-amber-600 dark:text-amber-400 dark:hover:bg-amber-950/40"
+                prefix={<HelpCircle className="h-4 w-4" />}
+                onClick={() => setHelpModalOpen(true)}
+              >
+                {t("needsHelp.button")}
+              </Button>
+            </div>
           )}
           {job.status === "IN_PROGRESS" && (
-            <Button
-              size="lg"
-              variant="default"
-              className="h-14 w-full rounded-xl text-base font-bold"
-              onClick={() => router.push(`/crew/jobs/${jobId}/checklist`)}
-              suffix={<ArrowRight className="h-5 w-5" />}
-            >
-              {t("job.viewChecklist")}
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                size="lg"
+                variant="default"
+                className="h-14 w-full rounded-xl text-base font-bold"
+                onClick={() => router.push(`/crew/jobs/${jobId}/checklist`)}
+                suffix={<ArrowRight className="h-5 w-5" />}
+              >
+                {t("job.viewChecklist")}
+              </Button>
+              <Button
+                size="md"
+                variant="outline"
+                className="w-full rounded-xl"
+                onClick={handleRequestTimeExtension}
+                disabled={timeExtState !== "idle"}
+                prefix={<Timer className="h-4 w-4" />}
+              >
+                {timeExtState === "sending"
+                  ? t("job.requestTimeExtensionSending")
+                  : timeExtState === "sent"
+                    ? t("job.requestTimeExtensionSent")
+                    : t("job.requestTimeExtension")}
+              </Button>
+            </div>
           )}
         </div>
       </div>
-      {showStaleModal && (
-        <JobStaleModal
-          open={showStaleModal}
-          jobId={jobId}
-          onDone={() => {
-            setShowStaleModal(false);
-            goBackToQueue();
-          }}
-        />
       )}
+      <NeedsHelpModal
+        open={helpModalOpen}
+        jobId={jobId}
+        onClose={() => setHelpModalOpen(false)}
+        onSuccess={handleHelpSuccess}
+      />
     </>
   );
 }

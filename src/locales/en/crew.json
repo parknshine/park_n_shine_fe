@@ -56,6 +56,10 @@
     "verifyAriaLabel": "Verify vehicle plate",
     "continueToPhotos": "Continue to Photos",
     "viewChecklist": "View Checklist",
+    "requestTimeExtension": "Request More Time",
+    "requestTimeExtensionSending": "Sending...",
+    "requestTimeExtensionSent": "Request sent to admin",
+    "requestTimeExtensionError": "Failed to send request",
     "photoKind": {
       "plate": "Plate",
       "slot": "Slot",
@@ -82,6 +86,34 @@
       "markStale": "Mark as Stale",
       "markStaleDesc": "Mark job as stale. The job remains recorded and admin can reassign it.",
       "submitting": "Processing..."
+    },
+    "incomingModal": {
+      "title": "Job Available",
+      "description": "A new job is ready in the queue. What would you like to do?",
+      "plate": "Plate",
+      "slot": "Slot",
+      "noSlot": "—",
+      "accept": "Accept Job",
+      "acceptDesc": "Claim this job and start immediately.",
+      "wait": "Request Waiting",
+      "waitDesc": "Skip for now. Job remains in queue for others.",
+      "wait10": "Wait 10 minutes",
+      "wait30": "Wait 30 minutes",
+      "reject": "Reject Job",
+      "rejectDesc": "Decline this job with a reason.",
+      "rejectConfirm": "Confirm Rejection",
+      "reasonLabel": "Select a reason",
+      "reasons": {
+        "VEHICLE_TOO_DIRTY": "Vehicle too dirty / heavy soiling",
+        "PARKING_TOO_TIGHT": "Parking too tight",
+        "SPECIAL_CARE_NEEDED": "Requires special treatment",
+        "CREW_UNAVAILABLE": "Crew temporarily unavailable"
+      },
+      "submitting": "Processing...",
+      "waitingTitle": "Waiting",
+      "waitingDesc": "Job offer paused. You can claim early anytime.",
+      "claimNow": "Claim Now",
+      "cancelWait": "Cancel Wait"
     }
   },
   "verify": {
@@ -147,6 +179,26 @@
       "upload": "Take Photo",
       "uploading": "Uploading…",
       "retrying": "Retrying…"
+    }
+  },
+  "needsHelp": {
+    "button": "Needs Help",
+    "modalTitle": "Request Help",
+    "modalDesc": "Select the reason you need supervisor assistance.",
+    "noteLabel": "Additional note (optional)",
+    "notePlaceholder": "Describe the situation…",
+    "submitButton": "Send Request",
+    "submitting": "Sending…",
+    "successToast": "Help request sent",
+    "errorToast": "Failed to send request",
+    "waitingBannerTitle": "Waiting for Help",
+    "waitingBannerDesc": "Help has been requested. Please wait for your supervisor.",
+    "reasons": {
+      "VEHICLE_INACCESSIBLE": "Vehicle inaccessible",
+      "MECHANICAL_ISSUE": "Equipment issue",
+      "CUSTOMER_DISPUTE": "Customer dispute",
+      "HAZARD": "Hazardous situation",
+      "OTHER": "Other"
     }
   }
 }

@@ -1,14 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, BellOff, BriefcaseBusiness, CheckCircle2, Inbox, Loader2 } from "lucide-react";
+import { Bell, BellOff, BriefcaseBusiness, CheckCircle2, Clock, Inbox, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useJobQueue, useNextJob } from "@/features/crew/hooks";
-import type { CrewJob } from "@/features/crew/types";
+import { IncomingJobModal } from "@/features/crew/components";
+import { previewNextJob } from "@/features/crew/hooks/use-next-job";
+import type { CrewJob, JobPreview, RejectionReason } from "@/features/crew/types";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 import { useRealtimeEvents, getCrewIdFromToken } from "@/lib/use-realtime-events";
@@ -28,14 +30,26 @@ function getResumeTarget(job: CrewJob): string {
   return base;
 }
 
+function formatCountdown(ms: number): string {
+  const totalSecs = Math.max(0, Math.ceil(ms / 1000));
+  const mins = Math.floor(totalSecs / 60);
+  const secs = totalSecs % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
 export function CrewHomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const noResume = searchParams.get("noResume") === "true";
   const queryClient = useQueryClient();
-  const { claimNextJob, job, isLoading, hasNoJob, error, isNewlyClaimed } = useNextJob();
+  const { claimNextJob, rejectJob, requestWait, cancelWait, waitUntil, job, isLoading, hasNoJob, error, isNewlyClaimed } = useNextJob();
   const { count, hasJob } = useJobQueue();
   const { t } = useTranslation("crew");
+
+  const [preview, setPreview] = useState<JobPreview | null>(null);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [countdown, setCountdown] = useState("");
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const crewId = useMemo(() => getCrewIdFromToken(), []);
   const { permission, subscribe: subscribePush } = usePushNotification({ type: "crew" });
@@ -73,21 +87,186 @@ export function CrewHomePage() {
     if (error) toast.error(error);
   }, [error]);
 
-  async function handleClaim() {
+  useEffect(() => {
+    if (!waitUntil) {
+      if (countdownRef.current) clearInterval(countdownRef.current);
+      setCountdown("");
+      return;
+    }
+    const tick = () => {
+      const remaining = waitUntil - Date.now();
+      if (remaining <= 0) {
+        setCountdown("");
+        if (countdownRef.current) clearInterval(countdownRef.current);
+      } else {
+        setCountdown(formatCountdown(remaining));
+      }
+    };
+    tick();
+    countdownRef.current = setInterval(tick, 1000);
+    return () => {
+      if (countdownRef.current) clearInterval(countdownRef.current);
+    };
+  }, [waitUntil]);
+
+  async function openPreviewModal() {
+    setIsPreviewing(true);
+    try {
+      const p = await previewNextJob();
+      if (p) {
+        setPreview(p);
+      } else {
+        toast(t("home.jobTakenByOther"), { icon: "⚠️" });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
+      }
+    } finally {
+      setIsPreviewing(false);
+    }
+  }
+
+  async function handleAccept() {
     const claimed = await claimNextJob();
+    setPreview(null);
     if (claimed) {
       router.push(`/crew/jobs/${claimed.id}`);
     } else {
-      toast(t("home.jobTakenByOther"), {
-        icon: "⚠️",
-      });
+      toast(t("home.jobTakenByOther"), { icon: "⚠️" });
       void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
     }
   }
 
+  async function handleWait(minutes: 10 | 30) {
+    if (!preview) return;
+    await requestWait(preview.id, minutes);
+    setPreview(null);
+  }
+
+  async function handleReject(reason: RejectionReason) {
+    if (!preview) return;
+    await rejectJob(preview.id, reason);
+    setPreview(null);
+    void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
+  }
+
+  const isWaiting = waitUntil !== null;
+  const claimBusy = isLoading || isPreviewing;
+
+  function renderMainContent() {
+    if (hasNoJob && !hasJob && !isWaiting) {
+      return (
+        <EmptyState
+          title={t("home.emptyTitle")}
+          description={t("home.emptyDescription")}
+          action={
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={openPreviewModal}
+              prefix={<Inbox className="h-4 w-4" />}
+            >
+              {t("action.retry", { ns: "common" })}
+            </Button>
+          }
+        />
+      );
+    }
+
+    if (isWaiting) {
+      return (
+        <div className="w-full space-y-4">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-muted/30 p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <Clock className="h-6 w-6 text-primary" />
+            </div>
+            <p className="text-sm font-semibold text-foreground">
+              {t("job.incomingModal.waitingTitle")}
+            </p>
+            <p className="font-mono text-3xl font-bold tabular-nums text-primary">
+              {countdown}
+            </p>
+            <p className="text-center text-xs text-muted-foreground">
+              {t("job.incomingModal.waitingDesc")}
+            </p>
+          </div>
+          <Button
+            size="lg"
+            className="h-14 w-full rounded-xl text-base font-bold"
+            onClick={openPreviewModal}
+            disabled={claimBusy}
+          >
+            {claimBusy && <Loader2 className="h-5 w-5 animate-spin" />}
+            {t("job.incomingModal.claimNow")}
+          </Button>
+          <button
+            className="w-full text-center text-sm text-muted-foreground underline-offset-2 hover:underline"
+            onClick={cancelWait}
+          >
+            {t("job.incomingModal.cancelWait")}
+          </button>
+        </div>
+      );
+    }
+
+    const jobCountLabel = count === 1
+      ? t("home.jobWaiting_one", { count, defaultValue: `${count} job waiting` })
+      : t("home.jobWaiting_other", { count, defaultValue: `${count} jobs waiting` });
+
+    return (
+      <div className="w-full space-y-4">
+        {hasJob && (
+          <div className="flex items-center justify-center">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+              </span>
+              {jobCountLabel}
+            </span>
+          </div>
+        )}
+
+        <div className="relative w-full">
+          {!claimBusy && hasJob && (
+            <span
+              className="absolute inset-0 -z-10 animate-pulse rounded-xl bg-primary/20"
+              aria-hidden="true"
+            />
+          )}
+          <Button
+            size="lg"
+            variant="default"
+            className={cn(
+              "h-16 w-full rounded-xl text-base font-bold tracking-wide",
+              claimBusy && "opacity-80"
+            )}
+            disabled={claimBusy}
+            onClick={openPreviewModal}
+            aria-label={t("home.claimAriaLabel")}
+          >
+            {claimBusy ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                {t("home.searching")}
+              </>
+            ) : (
+              t("home.claimButton")
+            )}
+          </Button>
+        </div>
+
+        {!claimBusy && (
+          <p className="text-center text-xs text-muted-foreground">
+            {hasJob
+              ? t("home.claimHintReady", { defaultValue: "Tap to claim the next available job" })
+              : t("home.claimHint")}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-44px)] max-w-md flex-col px-4 pb-8 pt-10">
-      {/* Push notification card */}
       {pushEnabled && permission !== "unsupported" && (
         <div className={cn(
           "mb-4 rounded-xl border p-4",
@@ -138,7 +317,6 @@ export function CrewHomePage() {
         </div>
       )}
 
-      {/* Section header */}
       <div className="mb-8 flex items-center gap-3">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <BriefcaseBusiness className="h-5 w-5" />
@@ -153,81 +331,20 @@ export function CrewHomePage() {
         </div>
       </div>
 
-      {/* Main action area */}
       <div className="flex flex-1 flex-col items-center justify-center gap-6">
-        {hasNoJob && !hasJob ? (
-          <EmptyState
-            title={t("home.emptyTitle")}
-            description={t("home.emptyDescription")}
-            action={
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={handleClaim}
-                prefix={<Inbox className="h-4 w-4" />}
-              >
-                {t("action.retry", { ns: "common" })}
-              </Button>
-            }
-          />
-        ) : (
-          <div className="w-full space-y-4">
-            {/* Live job count badge */}
-            {hasJob && (
-              <div className="flex items-center justify-center">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-                  </span>
-                  {count === 1
-                    ? t("home.jobWaiting_one", { count, defaultValue: `${count} job waiting` })
-                    : t("home.jobWaiting_other", { count, defaultValue: `${count} jobs waiting` })}
-                </span>
-              </div>
-            )}
-
-            {/* Pulse ring behind the button when idle */}
-            <div className="relative w-full">
-              {!isLoading && hasJob && (
-                <span
-                  className="absolute inset-0 -z-10 animate-pulse rounded-xl bg-primary/20"
-                  aria-hidden="true"
-                />
-              )}
-              <Button
-                size="lg"
-                variant="default"
-                className={cn(
-                  "h-16 w-full rounded-xl text-base font-bold tracking-wide",
-                  isLoading && "opacity-80"
-                )}
-                disabled={isLoading}
-                onClick={handleClaim}
-                aria-label={t("home.claimAriaLabel")}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    {t("home.searching")}
-                  </>
-                ) : (
-                  t("home.claimButton")
-                )}
-              </Button>
-            </div>
-
-            {/* Hint text */}
-            {!isLoading && (
-              <p className="text-center text-xs text-muted-foreground">
-                {hasJob
-                  ? t("home.claimHintReady", { defaultValue: "Tap to claim the next available job" })
-                  : t("home.claimHint")}
-              </p>
-            )}
-          </div>
-        )}
+        {renderMainContent()}
       </div>
+
+      {preview && (
+        <IncomingJobModal
+          open={true}
+          preview={preview}
+          onAccept={handleAccept}
+          onWait={handleWait}
+          onReject={handleReject}
+          onClose={() => setPreview(null)}
+        />
+      )}
     </main>
   );
 }

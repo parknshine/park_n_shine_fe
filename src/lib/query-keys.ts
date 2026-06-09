@@ -4,6 +4,8 @@ export const queryKeys = {
     booking: (bookingId: string) => ["admin", "booking", bookingId] as const,
     report: (siteId: string, from: string, to: string) =>
       ["admin", "report", siteId, from, to] as const,
+    reportBookings: (siteId: string, from: string, to: string, filters?: object, page?: number, pageSize?: number) =>
+      ["admin", "report-bookings", siteId, from, to, filters ?? {}, page ?? 1, pageSize ?? 25] as const,
     auditLog: (siteId: string) => ["admin", "audit-log", siteId] as const,
     settings: () => ["admin", "settings"] as const,
     sites: () => ["admin", "sites"] as const,
@@ -17,6 +19,7 @@ export const queryKeys = {
     job: (jobId: string) => ["crew", "job", jobId] as const,
     nextJob: () => ["crew", "jobs", "next"] as const,
     queue: () => ["crew", "jobs", "queue"] as const,
+    waitStatus: () => ["crew", "jobs", "wait-status"] as const,
   },
   customer: {
     booking: (bookingId: string) => ["customer", "booking", bookingId] as const,
