@@ -6,6 +6,7 @@
   },
   "landingPage": {
     "nav": {
+      "home": "Beranda",
       "services": "Proses",
       "pricing": "Harga",
       "about": "Tentang",
@@ -251,6 +252,10 @@
     "title": "Bagaimana pengalamanmu?",
     "subtitle": "Nilai layanan Park & Shine hari ini",
     "starLabel": "Pilih bintang",
+    "nameLabel": "Nama kamu",
+    "namePlaceholder": "Contoh: Budi Santoso",
+    "titleLabel": "Ringkasan singkat",
+    "titlePlaceholder": "Contoh: Praktis banget buat yang sibuk...",
     "feedbackLabel": "Ada yang bisa kami perbaiki?",
     "feedbackOptional": "(opsional)",
     "feedbackPlaceholder": "Tuliskan masukan kamu di sini...",
@@ -272,5 +277,9 @@
     "step2Alt": "Foto plat dan slot parkir",
     "step3Alt": "Tim kami mencuci mobilmu",
     "step4Alt": "Mobilmu siap dan bersih!"
+  },
+  "testimonials": {
+    "title": "Kata Pelanggan Kami",
+    "subtitle": "Ulasan nyata dari pelanggan kami"
   }
 }

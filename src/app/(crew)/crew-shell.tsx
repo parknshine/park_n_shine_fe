@@ -10,7 +10,7 @@ import { AppShell } from "@/components/shared/app-shell";
 import { LanguageSwitcher } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { useCrewSession } from "@/features/crew/hooks";
-import { JobStaleModal } from "@/features/crew/components";
+import { EtaCountdown, JobStaleModal } from "@/features/crew/components";
 import { useRealtimeEvents, getCrewIdFromToken } from "@/lib/use-realtime-events";
 import { queryKeys } from "@/lib/query-keys";
 import type { CrewJob } from "@/features/crew/types";
@@ -24,9 +24,29 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
   const isRestoring = useIsRestoring();
   const { session, clearSession } = useCrewSession();
   const [staleJobId, setStaleJobId] = useState<string | null>(null);
+  const [activeEtaEndsAt, setActiveEtaEndsAt] = useState<string | null>(null);
   const crewId = session ? getCrewIdFromToken() : null;
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
   const queryClient = useQueryClient();
+
+  // Track etaEndsAt from any loaded crew job in the query cache
+  useEffect(() => {
+    const cache = queryClient.getQueryCache();
+
+    // Read initial value from any already-cached job
+    for (const query of cache.findAll({ queryKey: ["crew", "job"] })) {
+      const data = query.state.data as CrewJob | null;
+      if (data?.etaEndsAt) { setActiveEtaEndsAt(data.etaEndsAt); break; }
+    }
+
+    return cache.subscribe((event) => {
+      const key = event.query.queryKey;
+      if (key[0] === "crew" && key[1] === "job" && key.length === 3) {
+        const data = event.query.state.data as CrewJob | null;
+        queueMicrotask(() => setActiveEtaEndsAt(data?.etaEndsAt ?? null));
+      }
+    });
+  }, [queryClient]);
 
   useRealtimeEvents({
     url: () => {
@@ -39,10 +59,18 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
       if (event.type === "booking_status_changed" && event.status === "STALE") {
         setStaleJobId(event.bookingId as string);
       }
-      if (event.type === "eta_extended" && event.bookingId && event.etaEndsAt) {
+      if (
+        (event.type === "eta_extended" || event.type === "time_extension_approved") &&
+        event.bookingId && event.etaEndsAt
+      ) {
         queryClient.setQueryData<CrewJob | null>(
           queryKeys.crew.job(event.bookingId as string),
           (prev) => prev ? { ...prev, etaEndsAt: event.etaEndsAt as string } : prev,
+        );
+      }
+      if (event.type === "time_extension_rejected" && event.bookingId) {
+        globalThis.dispatchEvent(
+          new CustomEvent("time-extension-rejected", { detail: { bookingId: event.bookingId } })
         );
       }
     },
@@ -107,6 +135,9 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
           </div>
 
           <div className="flex items-center gap-1">
+            {activeEtaEndsAt && (
+              <EtaCountdown etaEndsAt={activeEtaEndsAt} compact />
+            )}
             <LanguageSwitcher />
 
             <div

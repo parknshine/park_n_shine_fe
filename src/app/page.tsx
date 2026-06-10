@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
+import { usePublicTestimonials } from "@/features/customer/hooks";
 
 const imgParkShineLogo = "/park_n_shine_logo.jpeg.png";
 const imgScanningQrCode = "/park-shine-panel-1.jpeg";
@@ -44,6 +46,21 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { data: testimonials = [] } = usePublicTestimonials();
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
+  const carouselTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (isCarouselPaused || testimonials.length === 0) return;
+    carouselTimerRef.current = setInterval(() => {
+      setTestimonialIndex((c) => (c + 1) % testimonials.length);
+    }, 5000);
+    return () => {
+      if (carouselTimerRef.current) clearInterval(carouselTimerRef.current);
+    };
+  }, [isCarouselPaused, testimonials.length, testimonialIndex]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -120,22 +137,11 @@ export default function Home() {
               </a>
 
               {/* Language dropdown */}
-              <div style={{ position: "relative" }} ref={dropdownRef}>
+              <div className='relative' ref={dropdownRef}>
                 <button
                   type='button'
                   onClick={() => setIsDropdownOpen((prev) => !prev)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.4rem",
-                    border: "1.5px solid var(--outline)",
-                    borderRadius: "999px",
-                    padding: "0.35rem 0.85rem",
-                    background: "transparent",
-                    color: "var(--primary)",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                  }}
+                  className='flex items-center gap-[0.4rem] border-[1.5px] border-[var(--outline)] rounded-full px-[0.85rem] py-[0.35rem] bg-transparent text-[var(--primary)] font-bold cursor-pointer'
                   aria-label={
                     locale === "id" ? "Ganti bahasa" : "Change language"
                   }
@@ -146,10 +152,7 @@ export default function Home() {
                     height='6'
                     viewBox='0 0 10 6'
                     fill='none'
-                    style={{
-                      transition: "transform 0.2s",
-                      transform: isDropdownOpen ? "rotate(180deg)" : "none",
-                    }}
+                    className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
                   >
                     <path
                       d='M1 1L5 5L9 1'
@@ -162,19 +165,7 @@ export default function Home() {
                 </button>
 
                 {isDropdownOpen && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      right: 0,
-                      top: "calc(100% + 0.5rem)",
-                      minWidth: "9rem",
-                      background: "#fff",
-                      borderRadius: "1rem",
-                      boxShadow: "0 8px 24px rgba(0,98,137,0.12)",
-                      overflow: "hidden",
-                      zIndex: 60,
-                    }}
-                  >
+                  <div className='absolute right-0 top-[calc(100%+0.5rem)] min-w-[9rem] bg-white rounded-2xl shadow-[0_8px_24px_rgba(0,98,137,0.12)] overflow-hidden z-[60]'>
                     {languages.map((lang) => (
                       <button
                         key={lang.code}
@@ -183,26 +174,10 @@ export default function Home() {
                           setLocale(lang.code.toLowerCase() as "id" | "en");
                           setIsDropdownOpen(false);
                         }}
-                        style={{
-                          width: "100%",
-                          textAlign: "left",
-                          padding: "0.65rem 1rem",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          background: "transparent",
-                          border: 0,
-                          cursor: "pointer",
-                          fontWeight:
-                            locale.toUpperCase() === lang.code ? 700 : 400,
-                          color:
-                            locale.toUpperCase() === lang.code
-                              ? "var(--primary)"
-                              : "var(--text-soft)",
-                        }}
+                        className={`w-full text-left px-4 py-[0.65rem] flex justify-between items-center bg-transparent border-0 cursor-pointer ${locale.toUpperCase() === lang.code ? "font-bold text-[var(--primary)]" : "font-normal text-[var(--text-soft)]"}`}
                       >
                         <span>{lang.label}</span>
-                        <span style={{ fontSize: "0.78rem" }}>{lang.code}</span>
+                        <span className='text-[0.78rem]'>{lang.code}</span>
                       </button>
                     ))}
                   </div>
@@ -343,6 +318,110 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* ── Testimonials ──────────────────────────────────────── */}
+        {testimonials.length > 0 && (
+  <section id="testimonials" className="shell pt-16 pb-16">
+    <div
+      className="relative rounded-3xl bg-[var(--surface-low)] px-8 py-10 md:px-14 md:py-16"
+      onMouseEnter={() => setIsCarouselPaused(true)}
+      onMouseLeave={() => setIsCarouselPaused(false)}
+    >
+      {/* Counter — top right */}
+      <div className="flex justify-end mb-6 text-sm font-medium text-[var(--text-soft)] select-none">
+        <span className="text-[var(--foreground)] text-lg font-bold">
+          {String(testimonialIndex + 1).padStart(2, "0")}
+        </span>
+        <span className="mx-1.5">／</span>
+        <span>{String(testimonials.length).padStart(2, "0")}</span>
+      </div>
+
+      {/* Slide content — fade+slide animation on index change */}
+      {(() => {
+        const item = testimonials[testimonialIndex];
+        return (
+          <div key={testimonialIndex} className="testimonial-slide-in" style={{ minHeight: 280 }}>
+            {/* Stars */}
+            <div className="flex gap-1 mb-5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={`star-${i + 1}`}
+                  className={`h-[22px] w-[22px] ${i < item.rating ? "fill-[var(--primary)] text-[var(--primary)]" : "text-[var(--surface-high)]"}`}
+                />
+              ))}
+            </div>
+
+            {/* Headline — large editorial quote */}
+            {item.title && (
+              <h3
+                className="font-semibold text-[var(--foreground)] leading-[1.12] tracking-[-0.025em] mb-5 max-w-[20ch]"
+                style={{ fontSize: "clamp(28px, 4.2vw, 50px)" }}
+              >
+                &ldquo;{item.title}&rdquo;
+              </h3>
+            )}
+
+            {/* Body */}
+            <p className="text-[var(--text-soft)] leading-relaxed max-w-[56ch]" style={{ fontSize: 17 }}>
+              {item.body}
+            </p>
+          </div>
+        );
+      })()}
+
+      {/* Footer: author + nav */}
+      <div className="flex items-center justify-between gap-4 mt-12 flex-wrap">
+        {/* Author chip */}
+        <div className="flex items-center gap-3.5">
+          <div className="w-11.5 h-11.5 rounded-full bg-white border border-border flex items-center justify-center flex-shrink-0 text-[var(--primary)]">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="8.2" r="3.6" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M4.8 19.4c0-3.6 3.2-5.6 7.2-5.6s7.2 2 7.2 5.6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div className="flex flex-col leading-tight">
+            <span className="font-semibold text-[15.5px] text-foreground">
+              {testimonials[testimonialIndex].authorName}
+            </span>
+            {testimonials[testimonialIndex].location && (
+              <span className="text-[13.5px] text-(--text-soft)">
+                {testimonials[testimonialIndex].location}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Progress bar + nav arrows */}
+        {testimonials.length > 1 && (
+          <div className="flex items-center gap-3.5 flex-shrink-0">
+            <div className="hidden sm:block w-40 h-1 rounded-full bg-[var(--surface-high)] overflow-hidden">
+              <div
+                className="h-full rounded-full bg-[var(--primary)] transition-all duration-500"
+                style={{ width: `${((testimonialIndex + 1) / testimonials.length) * 100}%` }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setTestimonialIndex((c) => (c - 1 + testimonials.length) % testimonials.length)}
+              aria-label="Previous testimonial"
+              className="w-[54px] h-[54px] rounded-full border border-[var(--border)] bg-white flex items-center justify-center text-[var(--foreground)] cursor-pointer hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setTestimonialIndex((c) => (c + 1) % testimonials.length)}
+              aria-label="Next testimonial"
+              className="w-[54px] h-[54px] rounded-full border border-[var(--border)] bg-white flex items-center justify-center text-[var(--foreground)] cursor-pointer hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] transition-colors"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+)}
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────── */}
@@ -364,7 +443,7 @@ export default function Home() {
       {/* ── Mobile dock ────────────────────────────────────────── */}
       <nav className='mobile-dock'>
         <a className='dock-link active' href='#top'>
-          Home
+          {t("landingPage.nav.home")}
         </a>
         <a
           className='dock-link'

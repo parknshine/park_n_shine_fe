@@ -7,6 +7,7 @@ import { parseAsString } from "nuqs";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { mutationKeys } from "@/lib/query-keys";
+import { Sparkles } from "lucide-react";
 import { StarRating } from "@/features/customer/components/star-rating";
 import type { RatingPayload } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
@@ -19,6 +20,8 @@ export default function BookingRatePage() {
 
   const [score, setScore] = useState(0);
   const [reason, setReason] = useState("");
+  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
   const [isDone, setIsDone] = useState(false);
 
   const mutation = useMutation({
@@ -37,7 +40,9 @@ export default function BookingRatePage() {
     if (score === 0 || mutation.isPending) return;
     const payload: RatingPayload = {
       score: score as RatingPayload["score"],
-      ...(score <= 2 && reason.trim() ? { reason: reason.trim() } : {}),
+      ...(reason.trim() ? { reason: reason.trim() } : {}),
+      ...(name.trim() ? { authorName: name.trim() } : {}),
+      ...(title.trim() ? { title: title.trim() } : {}),
     };
     mutation.mutate(payload);
   }
@@ -50,7 +55,7 @@ export default function BookingRatePage() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-          <span className="text-4xl">✨</span>
+          <Sparkles className="h-10 w-10 text-primary" />
         </div>
         <h2 className="text-xl font-bold text-foreground">
           {t("rate.doneTitle")}
@@ -79,22 +84,57 @@ export default function BookingRatePage() {
         label={t("rate.starLabel")}
       />
 
-      {score > 0 && score <= 2 && (
-        <div className="space-y-2">
-          <label
-            htmlFor="reason"
-            className="block text-sm font-medium text-foreground"
-          >
-            {t("rate.feedbackLabel")} <span className="text-muted-foreground">{t("rate.feedbackOptional")}</span>
-          </label>
-          <textarea
-            id="reason"
-            rows={3}
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder={t("rate.feedbackPlaceholder")}
-            className="w-full resize-none rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          />
+      {score > 0 && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-foreground"
+            >
+              {t("rate.nameLabel")} <span className="text-muted-foreground">{t("rate.feedbackOptional")}</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t("rate.namePlaceholder")}
+              className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-foreground"
+            >
+              {t("rate.titleLabel")} <span className="text-muted-foreground">{t("rate.feedbackOptional")}</span>
+            </label>
+            <input
+              id="title"
+              type="text"
+              maxLength={120}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={t("rate.titlePlaceholder")}
+              className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="reason"
+              className="block text-sm font-medium text-foreground"
+            >
+              {t("rate.feedbackLabel")} <span className="text-muted-foreground">{t("rate.feedbackOptional")}</span>
+            </label>
+            <textarea
+              id="reason"
+              rows={3}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder={t("rate.feedbackPlaceholder")}
+              className="w-full resize-none rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
         </div>
       )}
 

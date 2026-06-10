@@ -114,6 +114,18 @@
       "waitingDesc": "Job offer paused. You can claim early anytime.",
       "claimNow": "Claim Now",
       "cancelWait": "Cancel Wait"
+    },
+    "timeExt": {
+      "request": "Request More Time",
+      "sending": "Sending...",
+      "pending": "Waiting for approval...",
+      "approved": "Time extended!",
+      "rejected": "Request rejected",
+      "requestAgain": "Request Again",
+      "confirmTitle": "Request More Time?",
+      "confirmDesc": "Your request will be sent to the admin for approval. The time extension is not guaranteed.",
+      "confirmOk": "Yes, Request",
+      "confirmCancel": "Cancel"
     }
   },
   "verify": {

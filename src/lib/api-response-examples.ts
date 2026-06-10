@@ -41,6 +41,7 @@ export const customerSuccessExamples = {
       media: [],
       startedAt: null,
       completedSteps: 0,
+      hasRated: false,
       statusHistory: [],
     },
     meta: META,
@@ -71,6 +72,7 @@ export const customerSuccessExamples = {
       ],
       startedAt: null,
       completedSteps: 0,
+      hasRated: false,
       statusHistory: [
         {
           status: "DRAFT",
@@ -120,6 +122,7 @@ export const customerSuccessExamples = {
       media: [],
       startedAt: null,
       completedSteps: 0,
+      hasRated: false,
       statusHistory: [
         {
           status: "DRAFT",
@@ -154,6 +157,7 @@ export const customerSuccessExamples = {
       media: [],
       startedAt: null,
       completedSteps: 0,
+      hasRated: false,
       statusHistory: [
         {
           status: "DRAFT",
@@ -193,6 +197,7 @@ export const customerSuccessExamples = {
       media: [],
       startedAt: null,
       completedSteps: 0,
+      hasRated: false,
       statusHistory: [
         {
           status: "READY",
@@ -577,6 +582,7 @@ export const adminSuccessExamples = {
           media: [],
           startedAt: null,
           completedSteps: 0,
+          hasRated: false,
       statusHistory: [],
           crewName: null,
           elapsedSeconds: 1380,
@@ -601,6 +607,7 @@ export const adminSuccessExamples = {
               media: [],
               startedAt: null,
               completedSteps: 0,
+              hasRated: false,
       statusHistory: [],
               crewName: null,
               elapsedSeconds: 240,
@@ -625,6 +632,7 @@ export const adminSuccessExamples = {
               media: [],
               startedAt: null,
               completedSteps: 0,
+              hasRated: false,
       statusHistory: [],
               crewName: "Budi Santoso",
               elapsedSeconds: 720,
@@ -654,6 +662,7 @@ export const adminSuccessExamples = {
       media: [],
       startedAt: null,
       completedSteps: 0,
+      hasRated: false,
       statusHistory: [],
       crewName: "Agus Widodo",
       elapsedSeconds: 300,
@@ -691,6 +700,7 @@ export const adminSuccessExamples = {
       media: [],
       startedAt: null,
       completedSteps: 0,
+      hasRated: false,
       statusHistory: [],
       crewName: null,
       elapsedSeconds: 180,
@@ -727,6 +737,7 @@ export const adminSuccessExamples = {
       media: [],
       startedAt: null,
       completedSteps: 0,
+      hasRated: false,
       statusHistory: [],
       crewName: null,
       elapsedSeconds: 120,
@@ -774,6 +785,7 @@ export const adminSuccessExamples = {
           needsHelpCount: 2,
           rejectedCount: 3,
           reliabilityScore: 0.95,
+          timeExtensionCount: 2,
         },
         {
           crewId: "crew_02",
@@ -786,6 +798,7 @@ export const adminSuccessExamples = {
           needsHelpCount: 1,
           rejectedCount: 0,
           reliabilityScore: 0.98,
+          timeExtensionCount: 0,
         },
       ],
     },

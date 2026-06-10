@@ -1,31 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowRight, ChevronLeft, Clock, HelpCircle, Loader2, MapPin, Timer } from "lucide-react";
+import { ArrowRight, ChevronLeft, HelpCircle, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCrewJob } from "@/features/crew/hooks";
-import { NeedsHelpModal } from "@/features/crew";
+import { EtaCountdown, NeedsHelpModal } from "@/features/crew";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
 import { queryKeys } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
-import { toast } from "react-hot-toast";
-import api from "@/lib/axios-crew";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function formatCountdown(ms: number): string {
-  if (ms <= 0) return "00:00";
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
 
 function formatAssignedAt(raw?: string | null): string {
   if (!raw) return "—";
@@ -46,99 +36,6 @@ function formatAssignedAt(raw?: string | null): string {
 // ETA Countdown
 // ---------------------------------------------------------------------------
 
-interface EtaCountdownProps {
-  etaEndsAt: string;
-}
-
-function EtaCountdown({ etaEndsAt }: EtaCountdownProps) {
-  const { t } = useTranslation("crew");
-  const [remaining, setRemaining] = useState<number>(() =>
-    Math.max(0, new Date(etaEndsAt).getTime() - Date.now())
-  );
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    function tick() {
-      const ms = Math.max(0, new Date(etaEndsAt).getTime() - Date.now());
-      setRemaining(ms);
-      if (ms <= 0 && intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-
-    intervalRef.current = setInterval(tick, 1000);
-    return () => {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [etaEndsAt]);
-
-  const isWarning = remaining > 0 && remaining < 5 * 60 * 1000;
-  const isDone = remaining <= 0;
-
-  return (
-    <section
-      className={cn(
-        "rounded-xl border px-5 py-4 transition-colors",
-        isDone
-          ? "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/40"
-          : isWarning
-            ? "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40"
-            : "border-border bg-muted/40"
-      )}
-      aria-live="polite"
-      aria-label={t("job.timeAriaLabel", { time: formatCountdown(remaining) })}
-    >
-      <div className="mb-1.5 flex items-center gap-1.5">
-        <Clock
-          className={cn(
-            "h-3.5 w-3.5",
-            isDone
-              ? "text-red-500"
-              : isWarning
-                ? "text-amber-500"
-                : "text-muted-foreground"
-          )}
-          aria-hidden="true"
-        />
-        <span
-          className={cn(
-            "text-[10px] font-semibold uppercase tracking-widest",
-            isDone
-              ? "text-red-500"
-              : isWarning
-                ? "text-amber-600 dark:text-amber-400"
-                : "text-muted-foreground"
-          )}
-        >
-          {t("job.timeRemaining")}
-        </span>
-      </div>
-
-      <p
-        className={cn(
-          "font-mono text-4xl font-bold tabular-nums leading-none tracking-tight",
-          isDone
-            ? "text-red-600 dark:text-red-400"
-            : isWarning
-              ? "text-amber-700 dark:text-amber-300"
-              : "text-foreground"
-        )}
-      >
-        {formatCountdown(remaining)}
-      </p>
-
-      {isDone && (
-        <p className="mt-1.5 text-xs font-medium text-red-500">
-          {t("job.timeExpired")}
-        </p>
-      )}
-    </section>
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
@@ -150,24 +47,11 @@ export function CrewJobDetailPage() {
   const { job, isLoading, error } = useCrewJob(jobId);
   const { t } = useTranslation("crew");
 
-  const [timeExtState, setTimeExtState] = useState<"idle" | "sending" | "sent">("idle");
   const [helpModalOpen, setHelpModalOpen] = useState(false);
 
   function goBackToQueue() {
     queryClient.removeQueries({ queryKey: queryKeys.crew.nextJob() });
     router.replace("/crew/home?noResume=true");
-  }
-
-  async function handleRequestTimeExtension() {
-    setTimeExtState("sending");
-    try {
-      await api.post(`/v1/crew/jobs/${jobId}/request-time-extension`);
-      setTimeExtState("sent");
-      toast.success(t("job.requestTimeExtensionSent"));
-    } catch {
-      setTimeExtState("idle");
-      toast.error(t("job.requestTimeExtensionError"));
-    }
   }
 
   async function handleHelpSuccess() {
@@ -394,20 +278,6 @@ export function CrewJobDetailPage() {
                 suffix={<ArrowRight className="h-5 w-5" />}
               >
                 {t("job.viewChecklist")}
-              </Button>
-              <Button
-                size="md"
-                variant="outline"
-                className="w-full rounded-xl"
-                onClick={handleRequestTimeExtension}
-                disabled={timeExtState !== "idle"}
-                prefix={<Timer className="h-4 w-4" />}
-              >
-                {timeExtState === "sending"
-                  ? t("job.requestTimeExtensionSending")
-                  : timeExtState === "sent"
-                    ? t("job.requestTimeExtensionSent")
-                    : t("job.requestTimeExtension")}
               </Button>
             </div>
           )}

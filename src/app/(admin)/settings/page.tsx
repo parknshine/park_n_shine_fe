@@ -30,7 +30,7 @@ interface SettingsTableProps {
   isSaving: boolean;
 }
 
-function SettingsTable({ settings, save, isSaving }: SettingsTableProps) {
+function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps>) {
   const { t } = useTranslation("admin");
   const [staleTimeout, setStaleTimeout] = useState(settings.staleJobTimeoutMinutes);
   const [jobEta, setJobEta] = useState(settings.jobEtaMinutes);
@@ -75,9 +75,8 @@ function SettingsTable({ settings, save, isSaving }: SettingsTableProps) {
               <div className="flex items-center gap-2">
                 <Input
                   id="timeout-input"
-                  type="number"
-                  min={5}
-                  max={120}
+                  type="text"
+                  inputMode="numeric"
                   value={staleTimeout}
                   onChange={(e) => setStaleTimeout(Number(e.target.value))}
                   className="w-20 h-8 text-sm"
@@ -115,9 +114,8 @@ function SettingsTable({ settings, save, isSaving }: SettingsTableProps) {
               <div className="flex items-center gap-2">
                 <Input
                   id="job-eta-input"
-                  type="number"
-                  min={5}
-                  max={120}
+                  type="text"
+                  inputMode="numeric"
                   value={jobEta}
                   onChange={(e) => setJobEta(Number(e.target.value))}
                   className="w-20 h-8 text-sm"
@@ -155,9 +153,8 @@ function SettingsTable({ settings, save, isSaving }: SettingsTableProps) {
               <div className="flex items-center gap-2">
                 <Input
                   id="crew-time-extension-input"
-                  type="number"
-                  min={5}
-                  max={30}
+                  type="text"
+                  inputMode="numeric"
                   value={crewTimeExtension}
                   onChange={(e) => setCrewTimeExtension(Number(e.target.value))}
                   className="w-20 h-8 text-sm"
@@ -199,9 +196,8 @@ function SettingsTable({ settings, save, isSaving }: SettingsTableProps) {
               <div className="flex items-center gap-2">
                 <Input
                   id="avg-cleaning-input"
-                  type="number"
-                  min={5}
-                  max={120}
+                  type="text"
+                  inputMode="numeric"
                   value={avgCleaning}
                   onChange={(e) => setAvgCleaning(Number(e.target.value))}
                   className="w-20 h-8 text-sm"
@@ -239,9 +235,8 @@ function SettingsTable({ settings, save, isSaving }: SettingsTableProps) {
               <div className="flex items-center gap-2">
                 <Input
                   id="payment-expiry-input"
-                  type="number"
-                  min={5}
-                  max={60}
+                  type="text"
+                  inputMode="numeric"
                   value={paymentExpiry}
                   onChange={(e) => setPaymentExpiry(Number(e.target.value))}
                   className="w-20 h-8 text-sm"

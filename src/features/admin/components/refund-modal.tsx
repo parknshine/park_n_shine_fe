@@ -109,9 +109,8 @@ export function RefundModal({
               <Label htmlFor="partial-amount">{t("refundModal.amountLabel")}</Label>
               <Input
                 id="partial-amount"
-                type="number"
-                min={1}
-                max={priceAmount}
+                type="text"
+                inputMode="numeric"
                 placeholder="0"
                 value={partialAmount}
                 onChange={(e) => setPartialAmount(e.target.value)}

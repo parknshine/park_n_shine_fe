@@ -7,3 +7,4 @@ export { useLocationPicker } from "./use-location-picker";
 export { usePaymentActionV2 } from "./use-payment-action-v2";
 export { useResumePayment } from "./use-resume-payment";
 export { usePaymentAutoPoll } from "./use-payment-auto-poll";
+export { usePublicTestimonials } from "./use-public-testimonials";

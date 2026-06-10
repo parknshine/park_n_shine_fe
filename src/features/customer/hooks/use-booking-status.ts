@@ -45,6 +45,7 @@ export function useBookingStatus({
         paymentInstructions?: PaymentInstructions | null;
         startedAt?: string | null;
         completedSteps?: number;
+        hasRated?: boolean;
         timeline?: { status: CustomerBooking["status"]; timestamp: string; reason?: string | null }[];
       }>(`/v1/bookings/${bookingId}`, {
         headers: { "X-Booking-Token": signedToken },
@@ -65,6 +66,7 @@ export function useBookingStatus({
         media: [],
         startedAt: d.startedAt ?? null,
         completedSteps: d.completedSteps ?? 0,
+        hasRated: d.hasRated ?? false,
         statusHistory: (d.timeline ?? [])
           .filter((t) => CUSTOMER_VISIBLE_STATUSES.has(t.status))
           .map((t) => ({

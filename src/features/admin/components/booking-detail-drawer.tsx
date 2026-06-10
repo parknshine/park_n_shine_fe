@@ -37,10 +37,29 @@ export function BookingDetailDrawer({
   const [extendMinutes, setExtendMinutes] = useState<number | "">("");
   const [extendStatus, setExtendStatus] = useState("");
   const [isExtending, setIsExtending] = useState(false);
+  const [pendingExtMinutes, setPendingExtMinutes] = useState("10");
+  const [isRespondingToExtension, setIsRespondingToExtension] = useState(false);
   const { t } = useTranslation("admin");
   const role = useAuthStore((s) => s.role);
   const { settings } = useAdminSettings();
   const defaultExtendMinutes = settings?.crewTimeExtensionMinutes ?? 10;
+
+  async function handleTimeExtensionRespond(approved: boolean, minutes: number) {
+    if (!bookingId) return;
+    setIsRespondingToExtension(true);
+    try {
+      await api.post(`/v1/admin/bookings/${bookingId}/time-extension-request/respond`, {
+        approved,
+        ...(approved ? { minutes } : {}),
+      });
+      toast.success(approved ? t("timeExtension.approveSuccess") : t("timeExtension.rejectSuccess"));
+      onActionSuccess();
+    } catch {
+      toast.error(approved ? t("timeExtension.approveError") : t("timeExtension.rejectError"));
+    } finally {
+      setIsRespondingToExtension(false);
+    }
+  }
 
   async function handleExtendTime() {
     if (!bookingId) return;
@@ -246,9 +265,8 @@ export function BookingDetailDrawer({
                       <div>
                         <label className="text-xs text-muted-foreground">{t("drawer.extendTimeMinutes")}</label>
                         <input
-                          type="number"
-                          min={1}
-                          max={120}
+                          type="text"
+                          inputMode="numeric"
                           placeholder={String(defaultExtendMinutes)}
                           value={extendMinutes}
                           onChange={(e) => setExtendMinutes(e.target.value === "" ? "" : Number(e.target.value))}
@@ -275,6 +293,46 @@ export function BookingDetailDrawer({
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => setShowExtend(false)} disabled={isExtending}>
                           {t("drawer.extendTimeCancel")}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  {booking?.pendingTimeExtension?.status === "PENDING" && (
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/40">
+                      <div className="mb-2 flex items-center gap-1.5">
+                        <Timer className="h-3.5 w-3.5 text-amber-600" />
+                        <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
+                          {t("timeExtension.toastTitle")}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={pendingExtMinutes}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, "");
+                            setPendingExtMinutes(val);
+                          }}
+                          className="w-16 rounded border border-amber-200 px-2 py-1 text-center text-xs"
+                          disabled={isRespondingToExtension}
+                        />
+                        <span className="text-xs text-muted-foreground">{t("timeExtension.minutes")}</span>
+                        <Button
+                          size="sm"
+                          variant="default"
+                          disabled={isRespondingToExtension || !pendingExtMinutes || Number(pendingExtMinutes) < 1}
+                          onClick={() => handleTimeExtensionRespond(true, Number(pendingExtMinutes))}
+                        >
+                          {t("timeExtension.approve")}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={isRespondingToExtension}
+                          onClick={() => handleTimeExtensionRespond(false, 0)}
+                        >
+                          {t("timeExtension.reject")}
                         </Button>
                       </div>
                     </div>

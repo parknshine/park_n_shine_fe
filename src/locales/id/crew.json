@@ -114,6 +114,18 @@
       "waitingDesc": "Penawaran job dijeda. Kamu bisa klaim kapan saja.",
       "claimNow": "Klaim Sekarang",
       "cancelWait": "Batalkan Tunggu"
+    },
+    "timeExt": {
+      "request": "Minta Tambah Waktu",
+      "sending": "Mengirim...",
+      "pending": "Menunggu persetujuan...",
+      "approved": "Waktu diperpanjang!",
+      "rejected": "Permintaan ditolak",
+      "requestAgain": "Minta Lagi",
+      "confirmTitle": "Tambah Waktu?",
+      "confirmDesc": "Permintaan Anda akan dikirim ke admin untuk disetujui. Penambahan waktu tidak dijamin.",
+      "confirmOk": "Ya, Kirim",
+      "confirmCancel": "Batal"
     }
   },
   "verify": {

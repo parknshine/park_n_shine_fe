@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "@/i18n";
 
 const TOTAL_STEPS = 5;
@@ -20,18 +20,16 @@ function formatLocalTime(iso: string): string {
   }).format(new Date(iso));
 }
 
-function calcProgress(startedAt: string, avgMinutes: number, completedSteps: number): number {
+function calcProgress(startedAt: string, avgMinutes: number, completedSteps: number, now: number): number {
   if (completedSteps >= TOTAL_STEPS) return 100;
 
-  const elapsed = Date.now() - new Date(startedAt).getTime();
+  const elapsed = now - new Date(startedAt).getTime();
   const total = avgMinutes * 60 * 1000;
-  const rawTimePercent = Math.max(0, (elapsed / total) * 100);
+  const rawTimePercent = Math.max(0, Math.min(99, (elapsed / total) * 100));
 
   const milestonePercent = (completedSteps / TOTAL_STEPS) * 100;
-  const nextMilestonePercent = ((completedSteps + 1) / TOTAL_STEPS) * 100;
-  const timeCapped = Math.min(rawTimePercent, nextMilestonePercent - 1);
 
-  return Math.round(Math.max(milestonePercent, timeCapped));
+  return Math.round(Math.max(milestonePercent, rawTimePercent));
 }
 
 export function CleaningProgressBar({
@@ -41,17 +39,14 @@ export function CleaningProgressBar({
   estimatedReadyAt,
 }: Readonly<CleaningProgressBarProps>) {
   const { t } = useTranslation("customer");
-  const [tick, setTick] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 30_000);
+    const id = setInterval(() => setNow(Date.now()), 10_000);
     return () => clearInterval(id);
   }, []);
 
-  const progress = useMemo(
-    () => calcProgress(startedAt, avgMinutes, completedSteps),
-    [startedAt, avgMinutes, completedSteps, tick]
-  );
+  const progress = calcProgress(startedAt, avgMinutes, completedSteps, now);
 
   return (
     <div className="rounded-2xl border border-border px-4 py-5 space-y-3">

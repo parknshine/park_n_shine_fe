@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { BarChart2, LayoutGrid, Mail, QrCode, ScrollText, Settings, Shield, Users } from "lucide-react";
+import { BarChart2, LayoutGrid, Mail, MessageSquare, QrCode, ScrollText, Settings, Shield, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
 import { useAuthStore } from "@/store/auth-store";
@@ -24,6 +24,7 @@ export function AdminSidebar() {
     { href: "/reports", label: t("sidebar.reports"), icon: BarChart2 },
     { href: "/audit", label: t("sidebar.auditTrail"), icon: ScrollText },
     { href: "/crew-members", label: t("sidebar.crew"), icon: Users },
+    { href: "/testimonials", label: t("sidebar.testimonials"), icon: MessageSquare },
     { href: "/email", label: t("sidebar.email"), icon: Mail },
     { href: "/settings", label: t("sidebar.settings"), icon: Settings },
   ];
@@ -74,7 +75,7 @@ export function AdminSidebar() {
       {/* Nav */}
       <nav className="flex-1 space-y-1 px-2 py-3">
         {navItems.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname === href;
+          const isActive = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
               key={href}

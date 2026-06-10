@@ -14,12 +14,20 @@ interface AdminSite {
   name: string;
 }
 
+interface TimeExtNotification {
+  bookingId: string;
+  crewId?: string;
+  ts: number;
+}
+
 interface UIState {
   toasts: Toast[];
   isSidebarOpen: boolean;
   activeSiteId: string | null;
   sites: AdminSite[];
   locale: "id" | "en";
+  timeExtNotifications: TimeExtNotification[];
+  drawerBookingId: string | null;
 }
 
 interface UIActions {
@@ -30,6 +38,9 @@ interface UIActions {
   setActiveSiteId: (siteId: string) => void;
   setSites: (sites: AdminSite[]) => void;
   setLocale: (locale: "id" | "en") => void;
+  addTimeExtNotification: (n: TimeExtNotification) => void;
+  removeTimeExtNotification: (bookingId: string) => void;
+  setDrawerBookingId: (bookingId: string | null) => void;
 }
 
 export const useUIStore = create<UIState & UIActions>()(
@@ -40,6 +51,8 @@ export const useUIStore = create<UIState & UIActions>()(
       activeSiteId: null,
       sites: [],
       locale: "id",
+      timeExtNotifications: [],
+      drawerBookingId: null,
 
       addToast: (toast) =>
         set((state) => {
@@ -74,6 +87,26 @@ export const useUIStore = create<UIState & UIActions>()(
       setLocale: (locale) =>
         set((state) => {
           state.locale = locale;
+        }),
+
+      addTimeExtNotification: (n) =>
+        set((state) => {
+          // deduplicate by bookingId — only one notification per booking at a time
+          if (!state.timeExtNotifications.some((x) => x.bookingId === n.bookingId)) {
+            state.timeExtNotifications.push(n);
+          }
+        }),
+
+      removeTimeExtNotification: (bookingId) =>
+        set((state) => {
+          state.timeExtNotifications = state.timeExtNotifications.filter(
+            (x) => x.bookingId !== bookingId
+          );
+        }),
+
+      setDrawerBookingId: (bookingId) =>
+        set((state) => {
+          state.drawerBookingId = bookingId;
         }),
     })),
     {

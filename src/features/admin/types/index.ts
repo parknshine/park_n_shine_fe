@@ -45,13 +45,14 @@ export interface ReportCrewPerformance {
   rejectedCount: number;
   reliabilityScore: number | null;
   avgRating: number | null;
+  timeExtensionCount: number;
 }
 
 export interface AuditEntry {
   id: string;
   bookingId: string;
   plateText: string | null;
-  action: "refund" | "status_override" | "reassign" | "crew.job_rejected";
+  action: "refund" | "status_override" | "reassign" | "crew.job_rejected" | "approve_time_extension" | "reject_time_extension";
   detail: string;
   adminEmail: string;
   createdAt: string;
@@ -112,8 +113,20 @@ export interface AdminSite {
   name: string;
 }
 
+export interface TimeExtensionRequest {
+  id: string;
+  bookingId: string;
+  crewId: string;
+  requestedAt: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  minutes: number | null;
+  respondedAt: string | null;
+  respondedBy: string | null;
+}
+
 export interface AdminBookingDetail extends AdminQueueBooking {
   auditEntries: AuditEntry[];
+  pendingTimeExtension?: TimeExtensionRequest | null;
 }
 
 export interface AdminSiteDetail {
@@ -210,4 +223,39 @@ export interface CreateShiftPayload {
 
 export interface UpdateShiftCrewPayload {
   crewMemberIds: string[];
+}
+
+export interface AdminTestimonial {
+  id: string;
+  bookingId: string | null;
+  authorName: string;
+  rating: number;
+  body: string;
+  title: string | null;
+  location: string | null;
+  featured: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTestimonialPayload {
+  bookingId?: string | null;
+  authorName: string;
+  rating: number;
+  body: string;
+  title?: string;
+  location?: string;
+  featured?: boolean;
+  order?: number;
+}
+
+export interface UpdateTestimonialPayload {
+  authorName?: string;
+  rating?: number;
+  body?: string;
+  title?: string | null;
+  location?: string | null;
+  featured?: boolean;
+  order?: number;
 }

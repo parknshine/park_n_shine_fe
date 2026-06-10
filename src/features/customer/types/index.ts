@@ -81,6 +81,7 @@ export interface CustomerBooking {
   statusHistory: BookingStatusEvent[];
   startedAt: string | null;
   completedSteps: number;
+  hasRated: boolean;
 }
 
 export interface CreateBookingPayload {
@@ -111,6 +112,8 @@ export interface ResumePaymentResponse {
 export interface RatingPayload {
   score: 1 | 2 | 3 | 4 | 5;
   reason?: string;
+  authorName?: string;
+  title?: string;
 }
 
 export interface UploadState {
@@ -118,4 +121,15 @@ export interface UploadState {
   status: "idle" | "uploading" | "retrying" | "success" | "failed";
   error: string | null;
   media: BookingMedia | null;
+}
+
+export interface PublicTestimonial {
+  id: string;
+  authorName: string;
+  rating: number;
+  body: string;
+  title?: string;
+  location?: string;
+  order: number;
+  createdAt: string;
 }

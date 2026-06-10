@@ -1,21 +1,68 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2, Timer } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { WashChecklist } from "@/features/crew/components";
 import { useCrewJob, useWashChecklist } from "@/features/crew/hooks";
 import type { CrewJob } from "@/features/crew/types";
 import { useTranslation } from "@/i18n";
+import api from "@/lib/axios-crew";
+import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
 // Inner component — has access to resolved job
 // ---------------------------------------------------------------------------
 
-function ChecklistContent({ jobId, job }: { jobId: string; job: CrewJob }) {
+function ChecklistContent({ jobId, job }: Readonly<{ jobId: string; job: CrewJob }>) {
   const router = useRouter();
   const { t } = useTranslation("crew");
+  const [timeExtState, setTimeExtState] = useState<"idle" | "sending" | "pending" | "approved" | "rejected">("idle");
+  const [showTimeExtConfirm, setShowTimeExtConfirm] = useState(false);
+
+  async function handleRequestTimeExtension() {
+    setTimeExtState("sending");
+    try {
+      await api.post(`/v1/crew/jobs/${jobId}/request-time-extension`);
+      setTimeExtState("pending");
+      toast.success(t("job.timeExt.pending"));
+    } catch {
+      setTimeExtState("idle");
+      toast.error(t("job.requestTimeExtensionError"));
+    }
+  }
+
+  const prevEtaRef = useRef<string | null | undefined>(job?.etaEndsAt);
+  useEffect(() => {
+    if (timeExtState !== "pending") return;
+    if (job?.etaEndsAt !== prevEtaRef.current) {
+      setTimeExtState("approved");
+      toast.success(t("job.timeExt.approved"));
+      prevEtaRef.current = job?.etaEndsAt;
+    }
+  }, [job?.etaEndsAt, timeExtState, t]);
+
+  useEffect(() => {
+    function handleRejected(e: Event) {
+      const detail = (e as CustomEvent<{ bookingId: string }>).detail;
+      if (detail.bookingId === jobId) {
+        setTimeExtState("rejected");
+        toast.error(t("job.timeExt.rejected"));
+      }
+    }
+    globalThis.addEventListener("time-extension-rejected", handleRejected);
+    return () => globalThis.removeEventListener("time-extension-rejected", handleRejected);
+  }, [jobId, t]);
 
   const {
     items,
@@ -102,10 +149,44 @@ function ChecklistContent({ jobId, job }: { jobId: string; job: CrewJob }) {
         )}
       </main>
 
-      {/* Sticky CTA — only visible when all steps done */}
-      {isComplete && (
-        <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
-          <div className="mx-auto max-w-md">
+      {/* Time extension confirmation modal */}
+      <Dialog open={showTimeExtConfirm} onOpenChange={setShowTimeExtConfirm}>
+        <DialogContent className="mx-auto max-w-sm rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Timer className="h-5 w-5 text-amber-500" />
+              {t("job.timeExt.confirmTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {t("job.timeExt.confirmDesc")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-row gap-2 pt-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setShowTimeExtConfirm(false)}
+            >
+              {t("job.timeExt.confirmCancel")}
+            </Button>
+            <Button
+              variant="default"
+              className="flex-1"
+              onClick={() => {
+                setShowTimeExtConfirm(false);
+                void handleRequestTimeExtension();
+              }}
+            >
+              {t("job.timeExt.confirmOk")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Sticky CTA */}
+      <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
+        <div className="mx-auto max-w-md flex flex-col gap-2">
+          {isComplete ? (
             <Button
               size="lg"
               variant="default"
@@ -116,9 +197,36 @@ function ChecklistContent({ jobId, job }: { jobId: string; job: CrewJob }) {
             >
               {t("checklist.continueButton")}
             </Button>
-          </div>
+          ) : (
+            <Button
+              size="md"
+              variant={timeExtState === "approved" ? "default" : "outline"}
+              className={cn(
+                "w-full rounded-xl",
+                timeExtState === "rejected" && "border-red-300 text-red-600",
+                timeExtState === "approved" && "border-green-300 bg-green-50 text-green-700",
+              )}
+              onClick={
+                timeExtState === "idle" || timeExtState === "rejected"
+                  ? () => setShowTimeExtConfirm(true)
+                  : undefined
+              }
+              disabled={
+                timeExtState === "sending" ||
+                timeExtState === "pending" ||
+                timeExtState === "approved"
+              }
+              prefix={<Timer className="h-4 w-4" />}
+            >
+              {timeExtState === "sending" && t("job.timeExt.sending")}
+              {timeExtState === "pending" && t("job.timeExt.pending")}
+              {timeExtState === "approved" && t("job.timeExt.approved")}
+              {timeExtState === "rejected" && t("job.timeExt.requestAgain")}
+              {timeExtState === "idle" && t("job.requestTimeExtension")}
+            </Button>
+          )}
         </div>
-      )}
+      </div>
     </>
   );
 }

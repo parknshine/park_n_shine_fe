@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, X, ArrowRight } from "lucide-react";
+import { Download, X, ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -57,9 +57,9 @@ function exportToCSV(report: AdminReport, from: string, to: string) {
     ...Object.entries(report.bookings.byStatus).map(([s, count]) => `${s},${count.toString()}`),
     "",
     "Crew Performance",
-    "Name,Jobs,Stale,Needs Help,Rejected,Reliability (%),Avg Turnaround (s),Avg Rating,Est. Revenue (IDR)",
+    "Name,Jobs,Stale,Needs Help,Rejected,Time Ext,Reliability (%),Avg Turnaround (s),Avg Rating,Est. Revenue (IDR)",
     ...report.crew.map((c) =>
-      `${c.crewName},${c.jobsCompleted},${c.staleCount},${c.needsHelpCount},${c.rejectedCount},${c.reliabilityScore ?? ""},${c.avgTurnaroundSeconds ?? ""},${c.avgRating ?? ""},${c.estimatedRevenue}`
+      `${c.crewName},${c.jobsCompleted},${c.staleCount},${c.needsHelpCount},${c.rejectedCount},${c.timeExtensionCount},${c.reliabilityScore ?? ""},${c.avgTurnaroundSeconds ?? ""},${c.avgRating ?? ""},${c.estimatedRevenue}`
     ),
   ];
 
@@ -262,6 +262,9 @@ export default function ReportsPage() {
                       {t("reports.crew.rejected")}
                     </th>
                     <th className="px-4 py-3 text-right font-medium text-muted-foreground">
+                      {t("reports.crew.timeExt")}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
                       {t("reports.crew.reliability")}
                     </th>
                     <th className="px-4 py-3 text-right font-medium text-muted-foreground">
@@ -278,7 +281,7 @@ export default function ReportsPage() {
                 <tbody className="divide-y divide-border">
                   {report.crew.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="px-4 py-6 text-center text-muted-foreground">
+                      <td colSpan={10} className="px-4 py-6 text-center text-muted-foreground">
                         {t("reports.noData")}
                       </td>
                     </tr>
@@ -305,6 +308,12 @@ export default function ReportsPage() {
                         )}>
                           {member.rejectedCount}
                         </td>
+                        <td className={cn(
+                          "px-4 py-3 text-right font-mono text-xs",
+                          member.timeExtensionCount > 0 ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground"
+                        )}>
+                          {member.timeExtensionCount}
+                        </td>
                         <td className="px-4 py-3 text-right">
                           {member.reliabilityScore == null ? (
                             <span className="text-muted-foreground">—</span>
@@ -329,8 +338,8 @@ export default function ReportsPage() {
                           {member.avgRating == null ? (
                             <span className="text-muted-foreground">—</span>
                           ) : (
-                            <span className="font-mono text-xs">
-                              ★ {member.avgRating.toFixed(1)}
+                            <span className="font-mono text-xs inline-flex items-center gap-1">
+                              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" /> {member.avgRating.toFixed(1)}
                             </span>
                           )}
                         </td>

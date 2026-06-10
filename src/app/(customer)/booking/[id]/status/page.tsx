@@ -183,8 +183,16 @@ export default function BookingStatusPage() {
       )}
 
       {isTerminal && booking.status === BOOKING_STATUSES.CLOSED && (
-        <div className='rounded-2xl bg-muted p-6 text-center'>
+        <div className='rounded-2xl bg-muted p-6 text-center space-y-4'>
           <p className='text-sm text-muted-foreground'>{t("status.closed")}</p>
+          {!booking.hasRated && (
+            <Link
+              href={`/booking/${bookingId}/rate?token=${token}`}
+              className='inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground! transition-opacity hover:opacity-90'
+            >
+              {t("status.rateButton")}
+            </Link>
+          )}
         </div>
       )}
 

@@ -69,7 +69,8 @@
       "needsHelp": "Needs Help",
       "rejected": "Rejected",
       "reliability": "Reliability",
-      "avgRating": "Avg Rating"
+      "avgRating": "Avg Rating",
+      "timeExt": "Time Ext"
     },
     "jobDetail": {
       "title": "Job Detail",
@@ -260,7 +261,13 @@
     "escalationsTitle": "{{count}} escalation needs attention",
     "escalationsTitlePlural": "{{count}} escalations need attention",
     "noEscalations": "No escalations",
-    "noEscalationsDesc": "All bookings are running smoothly."
+    "noEscalationsDesc": "All bookings are running smoothly.",
+    "timeExtAriaLabel": "Time extension requests",
+    "timeExtTitle": "{{count}} time extension request",
+    "timeExtTitlePlural": "{{count}} time extension requests",
+    "noTimeExt": "No pending requests",
+    "noTimeExtDesc": "No crew has requested more time.",
+    "timeExtOpen": "View booking"
   },
   "auditTable": {
     "empty": "No audit entries.",
@@ -275,7 +282,9 @@
     "actions": {
       "refund": "Refund",
       "status_override": "Override Status",
-      "reassign": "Reassign"
+      "reassign": "Reassign",
+      "approve_time_extension": "Approve Time Extension",
+      "reject_time_extension": "Reject Time Extension"
     }
   },
   "walkin": {
@@ -292,7 +301,8 @@
     "crew": "Crew",
     "email": "Email Marketing",
     "settings": "Settings",
-    "adminUsers": "Admin Users"
+    "adminUsers": "Admin Users",
+    "testimonials": "Testimonials"
   },
   "crewPage": {
     "title": "Crew Members",
@@ -559,5 +569,79 @@
     "print": "Print / Save as PDF",
     "brand": "Park & Shine",
     "instruction": "Scan to book car wash service"
+  },
+  "testimonialsPage": {
+    "title": "Testimonials",
+    "addManual": "Add Manually",
+    "importFromBooking": "Import from Booking",
+    "filterAll": "All",
+    "filterFeatured": "Featured Only",
+    "loading": "Loading...",
+    "empty": "No testimonials yet.",
+    "table": {
+      "author": "Author",
+      "rating": "Rating",
+      "body": "Review",
+      "source": "Source",
+      "featured": "Featured",
+      "order": "Order",
+      "actions": "Actions"
+    },
+    "source": {
+      "booking": "Booking",
+      "manual": "Manual"
+    },
+    "add": {
+      "title": "Add Testimonial",
+      "authorLabel": "Author Name",
+      "ratingLabel": "Rating",
+      "titleLabel": "Brief summary",
+      "titlePlaceholder": "e.g. Super quick and easy...",
+      "bodyLabel": "Review Text",
+      "featuredLabel": "Show on landing page",
+      "orderLabel": "Display Order",
+      "submit": "Add",
+      "submitting": "Adding..."
+    },
+    "edit": {
+      "title": "Edit Testimonial",
+      "submit": "Save",
+      "submitting": "Saving..."
+    },
+    "cancel": "Cancel",
+    "import": {
+      "title": "Import from Booking",
+      "searchPlaceholder": "Search by plate or slot...",
+      "noResults": "No importable bookings found.",
+      "authorLabel": "Author Name",
+      "bodyLabel": "Review Text",
+      "featuredLabel": "Show on landing page",
+      "submit": "Import",
+      "submitting": "Importing...",
+      "changeSelection": "Change selection",
+      "slotLabel": "Slot"
+    },
+    "toast": {
+      "addSuccess": "Testimonial added.",
+      "addFailed": "Failed to add testimonial.",
+      "updateSuccess": "Testimonial updated.",
+      "updateFailed": "Failed to update testimonial.",
+      "deleteSuccess": "Testimonial deleted.",
+      "deleteFailed": "Failed to delete testimonial."
+    },
+    "confirm": {
+      "delete": "Delete this testimonial?"
+    }
+  },
+  "timeExtension": {
+    "toastTitle": "Time Extension Request",
+    "toastBody": "Crew is requesting more time for booking {{bookingId}}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "minutes": "Minutes",
+    "approveSuccess": "Time extended successfully",
+    "rejectSuccess": "Request rejected",
+    "approveError": "Failed to approve request",
+    "rejectError": "Failed to reject request"
   }
 }

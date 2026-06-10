@@ -13,3 +13,4 @@ export { useAdminWhatsapp } from "./use-admin-whatsapp";
 export type { WaStatus, WaState } from "./use-admin-whatsapp";
 export { useAdminEmail } from "./use-admin-email";
 export type { EmailTemplateType, SendEmailPayload, BroadcastEmailPayload, BroadcastRecipient } from "./use-admin-email";
+export * from "./use-admin-testimonials";

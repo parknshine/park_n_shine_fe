@@ -3,11 +3,19 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { AdminSidebar, AdminNavbar } from "@/features/admin/components";
+import { useQueryClient } from "@tanstack/react-query";
+import { AdminSidebar, AdminNavbar, BookingDetailDrawer } from "@/features/admin/components";
 import { useAdminSites } from "@/features/admin/hooks";
+import { useAdminRealtime } from "@/hooks/use-admin-realtime";
+import { useUIStore } from "@/store/ui-store";
 
 export default function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const addTimeExtNotification = useUIStore((s) => s.addTimeExtNotification);
+  const drawerBookingId = useUIStore((s) => s.drawerBookingId);
+  const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
+  const removeTimeExtNotification = useUIStore((s) => s.removeTimeExtNotification);
 
   useEffect(() => {
     const token = localStorage.getItem("admin-token");
@@ -19,6 +27,18 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
   // Always fetch fresh sites on every admin page so sidebar stays in sync
   useAdminSites();
 
+  useAdminRealtime({
+    onEvent: (event) => {
+      if (event.type === "crew_time_extension_request" && event.bookingId) {
+        addTimeExtNotification({
+          bookingId: event.bookingId as string,
+          crewId: event.crewId as string | undefined,
+          ts: Date.now(),
+        });
+      }
+    },
+  });
+
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
       <AdminSidebar />
@@ -26,6 +46,19 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
         <AdminNavbar />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
+
+      <BookingDetailDrawer
+        bookingId={drawerBookingId}
+        onClose={() => setDrawerBookingId(null)}
+        onActionSuccess={() => {
+          if (drawerBookingId) {
+            removeTimeExtNotification(drawerBookingId);
+            void queryClient.invalidateQueries({ queryKey: ["admin", "booking", drawerBookingId] });
+            void queryClient.invalidateQueries({ queryKey: ["admin", "queue"] });
+          }
+          setDrawerBookingId(null);
+        }}
+      />
     </div>
   );
 }

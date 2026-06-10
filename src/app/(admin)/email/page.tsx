@@ -53,8 +53,8 @@ function TemplateDataFields({
       <div className="space-y-3">
         <Field label="Judul Reward *" id="rewardTitle" value={data.rewardTitle ?? ""} onChange={(v) => onChange("rewardTitle", v)} placeholder="Selamat! Kamu Dapat Reward" />
         <TextareaField label="Deskripsi Reward *" id="rewardDescription" value={data.rewardDescription ?? ""} onChange={(v) => onChange("rewardDescription", v)} placeholder="Deskripsi reward..." />
-        <Field label="Poin Didapat" id="pointsEarned" value={data.pointsEarned ?? ""} onChange={(v) => onChange("pointsEarned", v)} placeholder="50" type="number" />
-        <Field label="Total Poin" id="pointsTotal" value={data.pointsTotal ?? ""} onChange={(v) => onChange("pointsTotal", v)} placeholder="250" type="number" />
+        <Field label="Poin Didapat" id="pointsEarned" value={data.pointsEarned ?? ""} onChange={(v) => onChange("pointsEarned", v)} placeholder="50" type="text" inputMode="numeric" />
+        <Field label="Total Poin" id="pointsTotal" value={data.pointsTotal ?? ""} onChange={(v) => onChange("pointsTotal", v)} placeholder="250" type="text" inputMode="numeric" />
         <Field label="Label Tombol" id="ctaLabel" value={data.ctaLabel ?? ""} onChange={(v) => onChange("ctaLabel", v)} placeholder="Tukar Reward" />
         <Field label="URL Tombol" id="ctaUrl" value={data.ctaUrl ?? ""} onChange={(v) => onChange("ctaUrl", v)} placeholder="https://parknshine.com" />
       </div>
@@ -77,11 +77,11 @@ function TemplateDataFields({
   );
 }
 
-function Field({ label, id, value, onChange, placeholder, type = "text" }: { label: string; id: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
+function Field({ label, id, value, onChange, placeholder, type = "text", inputMode }: { label: string; id: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"] }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
+      <Input id={id} type={type} inputMode={inputMode} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
     </div>
   );
 }

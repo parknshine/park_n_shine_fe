@@ -713,6 +713,15 @@ img {
   animation: scan-line 1.5s ease-in-out infinite;
 }
 
+/* ─── Testimonial slide-in animation ────────────────────────────────────────── */
+@keyframes testimonial-slide-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.testimonial-slide-in {
+  animation: testimonial-slide-in .34s cubic-bezier(.22,.61,.36,1) both;
+}
+
 /* ─── Responsive ────────────────────────────────────────────────────────────── */
 @media (max-width: 1050px) {
   .comic-grid,

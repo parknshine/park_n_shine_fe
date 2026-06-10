@@ -69,7 +69,8 @@
       "needsHelp": "Butuh Bantuan",
       "rejected": "Ditolak",
       "reliability": "Keandalan",
-      "avgRating": "Rata-rata Rating"
+      "avgRating": "Rata-rata Rating",
+      "timeExt": "Minta Waktu"
     },
     "jobDetail": {
       "title": "Detail Per Job",
@@ -260,7 +261,13 @@
     "escalationsTitle": "{{count}} eskalasi butuh perhatian",
     "escalationsTitlePlural": "{{count}} eskalasi butuh perhatian",
     "noEscalations": "Tidak ada eskalasi",
-    "noEscalationsDesc": "Semua booking berjalan lancar."
+    "noEscalationsDesc": "Semua booking berjalan lancar.",
+    "timeExtAriaLabel": "Permintaan tambah waktu",
+    "timeExtTitle": "{{count}} permintaan tambah waktu",
+    "timeExtTitlePlural": "{{count}} permintaan tambah waktu",
+    "noTimeExt": "Tidak ada permintaan",
+    "noTimeExtDesc": "Tidak ada crew yang meminta tambah waktu.",
+    "timeExtOpen": "Lihat booking"
   },
   "auditTable": {
     "empty": "Tidak ada audit entry.",
@@ -275,7 +282,9 @@
     "actions": {
       "refund": "Refund",
       "status_override": "Override Status",
-      "reassign": "Reassign"
+      "reassign": "Reassign",
+      "approve_time_extension": "Setujui Tambah Waktu",
+      "reject_time_extension": "Tolak Tambah Waktu"
     }
   },
   "walkin": {
@@ -292,7 +301,8 @@
     "crew": "Crew",
     "email": "Email Marketing",
     "settings": "Settings",
-    "adminUsers": "Admin Users"
+    "adminUsers": "Admin Users",
+    "testimonials": "Testimoni"
   },
   "crewPage": {
     "title": "Crew Members",
@@ -559,5 +569,79 @@
     "print": "Print / Save as PDF",
     "brand": "Park & Shine",
     "instruction": "Scan to book car wash service"
+  },
+  "testimonialsPage": {
+    "title": "Testimoni",
+    "addManual": "Tambah Manual",
+    "importFromBooking": "Import dari Booking",
+    "filterAll": "Semua",
+    "filterFeatured": "Featured Saja",
+    "loading": "Memuat...",
+    "empty": "Belum ada testimoni.",
+    "table": {
+      "author": "Penulis",
+      "rating": "Rating",
+      "body": "Ulasan",
+      "source": "Sumber",
+      "featured": "Featured",
+      "order": "Urutan",
+      "actions": "Aksi"
+    },
+    "source": {
+      "booking": "Booking",
+      "manual": "Manual"
+    },
+    "add": {
+      "title": "Tambah Testimoni",
+      "authorLabel": "Nama Penulis",
+      "ratingLabel": "Rating",
+      "titleLabel": "Ringkasan singkat",
+      "titlePlaceholder": "Contoh: Praktis banget buat yang sibuk...",
+      "bodyLabel": "Teks Ulasan",
+      "featuredLabel": "Tampilkan di landing page",
+      "orderLabel": "Urutan Tampil",
+      "submit": "Tambah",
+      "submitting": "Menambahkan..."
+    },
+    "edit": {
+      "title": "Edit Testimoni",
+      "submit": "Simpan",
+      "submitting": "Menyimpan..."
+    },
+    "cancel": "Batal",
+    "import": {
+      "title": "Import dari Booking",
+      "searchPlaceholder": "Cari berdasarkan plat atau slot...",
+      "noResults": "Tidak ada booking yang bisa diimport.",
+      "authorLabel": "Nama Penulis",
+      "bodyLabel": "Teks Ulasan",
+      "featuredLabel": "Tampilkan di landing page",
+      "submit": "Import",
+      "submitting": "Mengimport...",
+      "changeSelection": "Ganti pilihan",
+      "slotLabel": "Slot"
+    },
+    "toast": {
+      "addSuccess": "Testimoni berhasil ditambahkan.",
+      "addFailed": "Gagal menambahkan testimoni.",
+      "updateSuccess": "Testimoni berhasil diperbarui.",
+      "updateFailed": "Gagal memperbarui testimoni.",
+      "deleteSuccess": "Testimoni berhasil dihapus.",
+      "deleteFailed": "Gagal menghapus testimoni."
+    },
+    "confirm": {
+      "delete": "Hapus testimoni ini?"
+    }
+  },
+  "timeExtension": {
+    "toastTitle": "Permintaan Tambah Waktu",
+    "toastBody": "Crew meminta tambah waktu untuk booking {{bookingId}}",
+    "approve": "Setujui",
+    "reject": "Tolak",
+    "minutes": "Menit",
+    "approveSuccess": "Waktu berhasil diperpanjang",
+    "rejectSuccess": "Permintaan ditolak",
+    "approveError": "Gagal menyetujui permintaan",
+    "rejectError": "Gagal menolak permintaan"
   }
 }

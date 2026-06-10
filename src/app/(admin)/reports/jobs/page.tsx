@@ -316,7 +316,7 @@ function JobDetailRow({ row, t }: { row: ReportBookingRow; t: (key: string) => s
         </td>
         <td className="px-3 py-2 text-xs text-right">
           {row.rating != null ? (
-            <span className="font-mono">★ {row.rating}</span>
+            <span className="font-mono inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" /> {row.rating}</span>
           ) : (
             <span className="text-muted-foreground">—</span>
           )}

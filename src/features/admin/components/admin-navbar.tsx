@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, LogOut } from "lucide-react";
+import { Bell, LogOut, Timer } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
 import { useAdminAuth, useAdminQueue } from "@/features/admin/hooks";
@@ -27,7 +27,12 @@ export function AdminNavbar() {
   const activeSiteId = useUIStore((s) => s.activeSiteId);
   const { t } = useTranslation("admin");
   const [showEscalations, setShowEscalations] = useState(false);
+  const [showTimeExt, setShowTimeExt] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const timeExtDropdownRef = useRef<HTMLDivElement>(null);
+
+  const timeExtNotifications = useUIStore((s) => s.timeExtNotifications);
+  const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
 
   const { queue } = useAdminQueue({
     siteId: activeSiteId ?? "",
@@ -41,6 +46,9 @@ export function AdminNavbar() {
     function handleOutsideClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setShowEscalations(false);
+      }
+      if (timeExtDropdownRef.current && !timeExtDropdownRef.current.contains(e.target as Node)) {
+        setShowTimeExt(false);
       }
     }
     document.addEventListener("mousedown", handleOutsideClick);
@@ -59,6 +67,78 @@ export function AdminNavbar() {
 
       {/* Right: escalations + language + user + logout */}
       <div className="flex items-center gap-2">
+        {/* Time extension request bell */}
+        <div ref={timeExtDropdownRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setShowTimeExt((v) => !v)}
+            className="relative rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label={t("navbar.timeExtAriaLabel")}
+          >
+            <Timer className="h-4 w-4" />
+            {timeExtNotifications.length > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+                {timeExtNotifications.length > 9 ? "9+" : timeExtNotifications.length}
+              </span>
+            )}
+          </button>
+
+          {showTimeExt && (
+            <div className="absolute right-0 top-full z-50 mt-1 w-72 rounded-lg border border-border bg-background shadow-lg">
+              <div className="border-b border-border px-4 py-2.5">
+                <p className="text-xs font-semibold text-foreground">
+                  {timeExtNotifications.length > 0
+                    ? t(
+                        timeExtNotifications.length === 1
+                          ? "navbar.timeExtTitle"
+                          : "navbar.timeExtTitlePlural",
+                        { count: timeExtNotifications.length }
+                      )
+                    : t("navbar.noTimeExt")}
+                </p>
+              </div>
+              {timeExtNotifications.length > 0 ? (
+                <ul className="max-h-64 divide-y divide-border overflow-y-auto">
+                  {timeExtNotifications.map((n) => (
+                    <li
+                      key={n.bookingId}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        setShowTimeExt(false);
+                        setDrawerBookingId(n.bookingId);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          setShowTimeExt(false);
+                          setDrawerBookingId(n.bookingId);
+                        }
+                      }}
+                      className="flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/60"
+                    >
+                      <Timer className="h-4 w-4 shrink-0 text-amber-500" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-foreground">
+                          {t("timeExtension.toastTitle")}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {t("timeExtension.toastBody", { bookingId: n.bookingId.slice(0, 8) })}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="px-4 py-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    {t("navbar.noTimeExtDesc")}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Escalation bell */}
         <div ref={dropdownRef} className="relative">
           <button

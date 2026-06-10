@@ -6,6 +6,7 @@
   },
   "landingPage": {
     "nav": {
+      "home": "Home",
       "services": "Process",
       "pricing": "Pricing",
       "about": "About",
@@ -251,6 +252,10 @@
     "title": "How was your experience?",
     "subtitle": "Rate Park & Shine today",
     "starLabel": "Select stars",
+    "nameLabel": "Your name",
+    "namePlaceholder": "e.g. Budi Santoso",
+    "titleLabel": "Brief summary",
+    "titlePlaceholder": "e.g. Super quick and easy...",
     "feedbackLabel": "Anything we can improve?",
     "feedbackOptional": "(optional)",
     "feedbackPlaceholder": "Write your feedback here...",
@@ -272,5 +277,9 @@
     "step2Alt": "Photo your plate and parking slot",
     "step3Alt": "Our team washes your car",
     "step4Alt": "Your car is ready and clean!"
+  },
+  "testimonials": {
+    "title": "What Our Customers Say",
+    "subtitle": "Real reviews from real customers"
   }
 }

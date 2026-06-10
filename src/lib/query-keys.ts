@@ -13,6 +13,7 @@ export const queryKeys = {
     qrCodes: (siteId: string) => ["admin", "sites", siteId, "qr-codes"] as const,
     crew: () => ["admin", "crew"] as const,
     shifts: (siteId: string) => ["admin", "sites", siteId, "shifts"] as const,
+    testimonials: () => ["admin", "testimonials"] as const,
   },
   crew: {
     session: () => ["crew", "session"] as const,
@@ -25,6 +26,9 @@ export const queryKeys = {
     booking: (bookingId: string) => ["customer", "booking", bookingId] as const,
     sites: () => ["customer", "sites"] as const,
     settings: () => ["customer", "settings"] as const,
+  },
+  testimonials: {
+    public: () => ["testimonials"] as const,
   },
 } as const;
 
@@ -48,6 +52,9 @@ export const mutationKeys = {
     createShift: (siteId: string) => ["admin", "sites", siteId, "shifts", "create"] as const,
     updateShiftCrew: (shiftId: string) => ["admin", "shifts", shiftId, "crew"] as const,
     closeShift: (shiftId: string) => ["admin", "shifts", shiftId, "close"] as const,
+    createTestimonial: () => ["admin", "testimonials", "create"] as const,
+    updateTestimonial: (id: string) => ["admin", "testimonials", id, "update"] as const,
+    deleteTestimonial: (id: string) => ["admin", "testimonials", id, "delete"] as const,
   },
   crew: {
     checklist: (jobId: string) => ["crew", "job", jobId, "checklist"] as const,
