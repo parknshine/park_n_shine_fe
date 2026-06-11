@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, BellOff, BriefcaseBusiness, CheckCircle2, Clock, Inbox, Loader2 } from "lucide-react";
+import { Bell, BellOff, BriefcaseBusiness, CheckCircle2, Clock, Inbox, Loader2, Star, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
-import { useJobQueue, useNextJob } from "@/features/crew/hooks";
+import { useJobQueue, useNextJob, useCrewMonthlyStats } from "@/features/crew/hooks";
 import { IncomingJobModal } from "@/features/crew/components";
 import { previewNextJob } from "@/features/crew/hooks/use-next-job";
 import type { CrewJob, JobPreview, RejectionReason } from "@/features/crew/types";
@@ -44,11 +44,12 @@ export function CrewHomePage() {
   const queryClient = useQueryClient();
   const { claimNextJob, rejectJob, requestWait, cancelWait, waitUntil, job, isLoading, hasNoJob, error, isNewlyClaimed } = useNextJob();
   const { count, hasJob } = useJobQueue();
+  const statsQuery = useCrewMonthlyStats();
   const { t } = useTranslation("crew");
 
   const [preview, setPreview] = useState<JobPreview | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [countdown, setCountdown] = useState("");
+  const [now, setNow] = useState(() => Date.now());
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const crewId = useMemo(() => getCrewIdFromToken(), []);
@@ -87,23 +88,19 @@ export function CrewHomePage() {
     if (error) toast.error(error);
   }, [error]);
 
+  const countdown = useMemo(() => {
+    if (!waitUntil) return "";
+    const remaining = waitUntil - now;
+    if (remaining <= 0) return "";
+    return formatCountdown(remaining);
+  }, [waitUntil, now]);
+
   useEffect(() => {
     if (!waitUntil) {
       if (countdownRef.current) clearInterval(countdownRef.current);
-      setCountdown("");
       return;
     }
-    const tick = () => {
-      const remaining = waitUntil - Date.now();
-      if (remaining <= 0) {
-        setCountdown("");
-        if (countdownRef.current) clearInterval(countdownRef.current);
-      } else {
-        setCountdown(formatCountdown(remaining));
-      }
-    };
-    tick();
-    countdownRef.current = setInterval(tick, 1000);
+    countdownRef.current = setInterval(() => setNow(Date.now()), 1000);
     return () => {
       if (countdownRef.current) clearInterval(countdownRef.current);
     };
@@ -267,6 +264,39 @@ export function CrewHomePage() {
 
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-44px)] max-w-md flex-col px-4 pb-8 pt-10">
+      {/* Monthly stats widget */}
+      {statsQuery.data && (
+        <div className="mb-6 rounded-xl border border-border bg-card px-4 py-4">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col items-center">
+              <span className="text-lg font-bold">
+                {statsQuery.data.avgRating === null ? "—" : statsQuery.data.avgRating.toFixed(1)}
+              </span>
+              <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                <Star className="h-3 w-3" /> Rating
+              </span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-lg font-bold">{statsQuery.data.jobsCompleted}</span>
+              <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                <CheckCircle2 className="h-3 w-3" /> Job Selesai
+              </span>
+            </div>
+            <div className="col-span-2 flex flex-col items-center">
+              <span className="text-lg font-bold">
+                Rp {statsQuery.data.tips.amount.toLocaleString("id-ID")}
+              </span>
+              <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                <Wallet className="h-3 w-3" /> Tip ({statsQuery.data.tips.count})
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {pushEnabled && permission !== "unsupported" && (
         <div className={cn(
           "mb-4 rounded-xl border p-4",

@@ -23,27 +23,30 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
   const router = useRouter();
   const isRestoring = useIsRestoring();
   const { session, clearSession } = useCrewSession();
+  const queryClient = useQueryClient();
   const [staleJobId, setStaleJobId] = useState<string | null>(null);
-  const [activeEtaEndsAt, setActiveEtaEndsAt] = useState<string | null>(null);
+  const [activeEtaEndsAt, setActiveEtaEndsAt] = useState<string | null>(() => {
+    for (const query of queryClient.getQueryCache().findAll({ queryKey: ["crew", "job"] })) {
+      const data = query.state.data as CrewJob | null;
+      if (data?.etaEndsAt) return data.etaEndsAt;
+    }
+    return null;
+  });
   const crewId = session ? getCrewIdFromToken() : null;
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
-  const queryClient = useQueryClient();
 
-  // Track etaEndsAt from any loaded crew job in the query cache
+  // Subscribe to etaEndsAt changes from crew job query cache
   useEffect(() => {
     const cache = queryClient.getQueryCache();
-
-    // Read initial value from any already-cached job
-    for (const query of cache.findAll({ queryKey: ["crew", "job"] })) {
-      const data = query.state.data as CrewJob | null;
-      if (data?.etaEndsAt) { setActiveEtaEndsAt(data.etaEndsAt); break; }
-    }
-
     return cache.subscribe((event) => {
       const key = event.query.queryKey;
       if (key[0] === "crew" && key[1] === "job" && key.length === 3) {
+        if (event.type === "removed") {
+          setActiveEtaEndsAt(null);
+          return;
+        }
         const data = event.query.state.data as CrewJob | null;
-        queueMicrotask(() => setActiveEtaEndsAt(data?.etaEndsAt ?? null));
+        setActiveEtaEndsAt(data?.etaEndsAt ?? null);
       }
     });
   }, [queryClient]);
@@ -72,6 +75,9 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
         globalThis.dispatchEvent(
           new CustomEvent("time-extension-rejected", { detail: { bookingId: event.bookingId } })
         );
+      }
+      if (event.type === "tip_paid") {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.monthlyStats() });
       }
     },
   });

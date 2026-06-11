@@ -16,6 +16,8 @@ export const queryKeys = {
     crew: () => ["admin", "crew"] as const,
     shifts: (siteId: string) => ["admin", "sites", siteId, "shifts"] as const,
     testimonials: () => ["admin", "testimonials"] as const,
+    tipCrewSummary: (period: string) => ["admin", "tips", "crew-summary", period] as const,
+    disbursements: () => ["admin", "disbursements"] as const,
   },
   crew: {
     session: () => ["crew", "session"] as const,
@@ -23,6 +25,7 @@ export const queryKeys = {
     nextJob: () => ["crew", "jobs", "next"] as const,
     queue: () => ["crew", "jobs", "queue"] as const,
     waitStatus: () => ["crew", "jobs", "wait-status"] as const,
+    monthlyStats: () => ["crew", "monthly-stats"] as const,
   },
   customer: {
     booking: (bookingId: string) => ["customer", "booking", bookingId] as const,
@@ -57,6 +60,7 @@ export const mutationKeys = {
     createTestimonial: () => ["admin", "testimonials", "create"] as const,
     updateTestimonial: (id: string) => ["admin", "testimonials", id, "update"] as const,
     deleteTestimonial: (id: string) => ["admin", "testimonials", id, "delete"] as const,
+    createDisbursement: () => ["admin", "disbursements", "create"] as const,
   },
   crew: {
     checklist: (jobId: string) => ["crew", "job", jobId, "checklist"] as const,
@@ -76,5 +80,6 @@ export const mutationKeys = {
       ["customer", "booking", bookingId, "rate"] as const,
     resumePayment: (bookingId: string) =>
       ["customer", "booking", bookingId, "resume-payment"] as const,
+    tip: (bookingId: string) => ["customer", "tip", bookingId] as const,
   },
 } as const;

@@ -319,6 +319,7 @@ function ReportTabs() {
   const tabs = [
     { label: t("reports.tabs.summary"), href: "/reports" },
     { label: t("reports.tabs.jobs"), href: "/reports/jobs" },
+    { label: "Tips", href: "/reports/tips" },
   ];
   return (
     <div className="flex gap-1 border-b border-border">

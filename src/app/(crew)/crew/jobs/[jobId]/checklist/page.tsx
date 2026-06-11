@@ -200,11 +200,19 @@ function ChecklistContent({ jobId, job }: Readonly<{ jobId: string; job: CrewJob
           ) : (
             <Button
               size="md"
-              variant={timeExtState === "approved" ? "default" : "outline"}
+              variant="ghost"
               className={cn(
-                "w-full rounded-xl",
-                timeExtState === "rejected" && "border-red-300 text-red-600",
-                timeExtState === "approved" && "border-green-300 bg-green-50 text-green-700",
+                "w-full rounded-2xl font-semibold transition-all duration-300",
+                timeExtState === "idle" &&
+                  "border border-dashed border-slate-300 bg-transparent text-slate-600 hover:border-slate-400 hover:bg-slate-50",
+                timeExtState === "sending" &&
+                  "cursor-not-allowed border border-slate-200 bg-slate-50 text-slate-400",
+                timeExtState === "pending" &&
+                  "border border-amber-300 bg-amber-50 text-amber-700 shadow-sm shadow-amber-100",
+                timeExtState === "approved" &&
+                  "border-0 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-200/60 hover:from-emerald-500 hover:to-green-600",
+                timeExtState === "rejected" &&
+                  "border border-red-200 bg-red-50 text-red-600 hover:bg-red-100",
               )}
               onClick={
                 timeExtState === "idle" || timeExtState === "rejected"
@@ -216,7 +224,15 @@ function ChecklistContent({ jobId, job }: Readonly<{ jobId: string; job: CrewJob
                 timeExtState === "pending" ||
                 timeExtState === "approved"
               }
-              prefix={<Timer className="h-4 w-4" />}
+              prefix={
+                timeExtState === "approved" ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : timeExtState === "sending" || timeExtState === "pending" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Timer className="h-4 w-4" />
+                )
+              }
             >
               {timeExtState === "sending" && t("job.timeExt.sending")}
               {timeExtState === "pending" && t("job.timeExt.pending")}

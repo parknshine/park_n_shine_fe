@@ -8,6 +8,7 @@ import { AdminSidebar, AdminNavbar, BookingDetailDrawer } from "@/features/admin
 import { useAdminSites } from "@/features/admin/hooks";
 import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 import { useUIStore } from "@/store/ui-store";
+import { queryKeys } from "@/lib/query-keys";
 
 export default function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
           crewId: event.crewId as string | undefined,
           ts: Date.now(),
         });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.admin.booking(event.bookingId as string) });
       }
     },
   });
