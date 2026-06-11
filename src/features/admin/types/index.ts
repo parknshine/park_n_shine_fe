@@ -18,6 +18,27 @@ export interface AdminQueueResponse {
   escalations: AdminQueueBooking[];
 }
 
+export interface AdminSiteQueue {
+  siteId: string;
+  siteName: string;
+  groups: AdminQueueStatusGroup[];
+  escalations: AdminQueueBooking[];
+}
+
+export interface AdminAllSitesQueueResponse {
+  fetchedAt: string;
+  sites: AdminSiteQueue[];
+}
+
+export interface AdminEscalationBooking extends AdminQueueBooking {
+  siteId: string;
+}
+
+export interface AdminEscalationsResponse {
+  fetchedAt: string;
+  escalations: AdminEscalationBooking[];
+}
+
 export interface RefundPayload {
   amountType: "full" | "partial";
   amount?: number;
@@ -59,7 +80,7 @@ export interface AuditEntry {
 }
 
 export interface AdminReport {
-  siteId: string;
+  siteId?: string;
   period: { from: string; to: string };
   bookings: {
     total: number;

@@ -2,14 +2,16 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { X, ZoomIn, ZoomOut, RotateCcw, ChevronLeft, ChevronRight, SlidersHorizontal, ArrowRight, Check, Star, Camera, Users, Calendar } from "lucide-react";
+import { X, ZoomIn, ZoomOut, RotateCcw, ChevronLeft, ChevronRight, SlidersHorizontal, ArrowRight, Check, Star, Camera, Users, Calendar, Building2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAdminReportBookings, useAdminCrew } from "@/features/admin/hooks";
-import { useUIStore } from "@/store/ui-store";
+import { DataTable } from "@/components/ui/data-table";
+import { useAdminReportBookings, useAdminCrew, useSiteSelection } from "@/features/admin/hooks";
+import { SiteSelector } from "@/features/admin/components";
 import type { ReportBookingRow, ReportPhotoAsset } from "@/features/admin/types";
 import type { ReportBookingFilters } from "@/features/admin/hooks/use-admin-report-bookings";
 import { useTranslation } from "@/i18n";
@@ -20,13 +22,14 @@ const BOOKING_STATUSES = [
   "NEEDS_HELP", "IN_PROGRESS", "LOCATED", "ASSIGNED", "PAID",
 ];
 
-
 const BEFORE_TYPES = new Set(["BEFORE_FRONT", "BEFORE_BACK", "BEFORE_LEFT", "BEFORE_RIGHT"]);
 const AFTER_TYPES = new Set(["AFTER_PHOTO", "AFTER_FRONT", "AFTER_BACK", "AFTER_LEFT", "AFTER_RIGHT"]);
 
 const ZOOM_STEP = 0.5;
 const ZOOM_MIN = 0.5;
 const ZOOM_MAX = 4;
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 function toISODate(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -284,82 +287,30 @@ function PhotoGridModal({
   );
 }
 
-function JobDetailRow({ row, t }: { row: ReportBookingRow; t: (key: string) => string }) {
+function PhotosCell({ photos, t }: { photos: ReportPhotoAsset[]; t: (key: string) => string }) {
   const [showPhotos, setShowPhotos] = useState(false);
-  const photoCount = row.photos.length;
+  const photoCount = photos.length;
+
+  if (photoCount === 0) {
+    return <span className="text-xs text-muted-foreground">—</span>;
+  }
 
   return (
     <>
-      <tr className="hover:bg-muted/30">
-        <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">
-          {formatDate(row.createdAt)}
-        </td>
-        <td className="px-3 py-2 text-xs">
-          {row.siteName ?? <span className="text-muted-foreground">{t("reports.jobDetail.noMall")}</span>}
-        </td>
-        <td className="px-3 py-2 text-xs font-mono">
-          {row.slot ?? <span className="text-muted-foreground">{t("reports.jobDetail.noSlot")}</span>}
-        </td>
-        <td className="px-3 py-2 text-xs">{row.crewName ?? "—"}</td>
-        <td className="px-3 py-2">
-          <span className="font-mono text-xs uppercase">{row.status}</span>
-        </td>
-        <td className="px-3 py-2 text-xs text-right font-mono">{formatRupiah(row.price)}</td>
-        <td className="px-3 py-2 text-xs text-right font-mono text-muted-foreground">
-          {formatTurnaround(row.duration.locateSeconds)}
-        </td>
-        <td className="px-3 py-2 text-xs text-right font-mono text-muted-foreground">
-          {formatTurnaround(row.duration.washSeconds)}
-        </td>
-        <td className="px-3 py-2 text-xs text-right font-mono">
-          {formatTurnaround(row.duration.totalJobSeconds)}
-        </td>
-        <td className="px-3 py-2 text-xs text-right">
-          {row.rating != null ? (
-            <span className="font-mono inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" /> {row.rating}</span>
-          ) : (
-            <span className="text-muted-foreground">—</span>
-          )}
-        </td>
-        <td className="px-3 py-2 text-xs max-w-[160px] truncate" title={row.ratingNote ?? ""}>
-          {row.ratingNote ? (
-            <span className="italic text-muted-foreground">&ldquo;{row.ratingNote}&rdquo;</span>
-          ) : (
-            <span className="text-muted-foreground">{t("reports.jobDetail.noReview")}</span>
-          )}
-        </td>
-        <td className="px-3 py-2 text-xs text-right">
-          {photoCount > 0 ? (
-            <button
-              onClick={() => setShowPhotos(true)}
-              className="text-primary underline underline-offset-2 hover:no-underline"
-            >
-              {t("reports.jobDetail.photosCount").replace("{{count}}", photoCount.toString())}
-            </button>
-          ) : (
-            <span className="text-muted-foreground">—</span>
-          )}
-        </td>
-      </tr>
+      <button
+        onClick={(e) => { e.stopPropagation(); setShowPhotos(true); }}
+        className="text-xs text-primary underline underline-offset-2 hover:no-underline"
+      >
+        {t("reports.jobDetail.photosCount").replace("{{count}}", photoCount.toString())}
+      </button>
       <PhotoGridModal
         open={showPhotos}
         onClose={() => setShowPhotos(false)}
-        photos={row.photos}
+        photos={photos}
         t={t}
       />
     </>
   );
-}
-
-const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
-
-type PageItem = number | "…L" | "…R";
-
-function getPageNumbers(current: number, total: number): PageItem[] {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  if (current <= 4) return [1, 2, 3, 4, 5, "…R", total];
-  if (current >= total - 3) return [1, "…L", total - 4, total - 3, total - 2, total - 1, total];
-  return [1, "…L", current - 1, current, current + 1, "…R", total];
 }
 
 function ReportTabs() {
@@ -390,7 +341,7 @@ function ReportTabs() {
 }
 
 export default function ReportJobsPage() {
-  const activeSiteId = useUIStore((s) => s.activeSiteId);
+  const { sites: allSites, siteId, setSiteId } = useSiteSelection();
   const { t } = useTranslation("admin");
 
   const [from, setFrom] = useState("");
@@ -398,19 +349,23 @@ export default function ReportJobsPage() {
   const [appliedFrom, setAppliedFrom] = useState("");
   const [appliedTo, setAppliedTo] = useState("");
 
+  const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedCrewId, setSelectedCrewId] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [hasRatingFilter, setHasRatingFilter] = useState<"" | "true" | "false">("");
   const [hasPhotosFilter, setHasPhotosFilter] = useState(false);
 
   const [appliedFilters, setAppliedFilters] = useState<ReportBookingFilters>({});
+  const [appliedSiteId, setAppliedSiteId] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+
+  const effectiveSiteId = appliedSiteId === undefined ? undefined : appliedSiteId || undefined;
 
   const { crew } = useAdminCrew();
 
   const { bookings: jobRows, total: jobTotal, isLoading } = useAdminReportBookings(
-    activeSiteId ?? "",
+    effectiveSiteId,
     appliedFrom,
     appliedTo,
     appliedFilters,
@@ -422,6 +377,7 @@ export default function ReportJobsPage() {
     setPage(1);
     setAppliedFrom(from);
     setAppliedTo(to);
+    setAppliedSiteId(selectedSiteId === "__all__" ? "" : selectedSiteId || undefined);
     setAppliedFilters({
       crewId: selectedCrewId || undefined,
       statuses: selectedStatuses.length > 0 ? selectedStatuses : undefined,
@@ -436,6 +392,8 @@ export default function ReportJobsPage() {
     setTo("");
     setAppliedFrom("");
     setAppliedTo("");
+    setSelectedSiteId("");
+    setAppliedSiteId(undefined);
     setSelectedCrewId("");
     setSelectedStatuses([]);
     setHasRatingFilter("");
@@ -450,6 +408,7 @@ export default function ReportJobsPage() {
   }
 
   const hasFilter =
+    appliedSiteId !== undefined ||
     appliedFrom !== "" ||
     appliedTo !== "" ||
     !!appliedFilters.crewId ||
@@ -457,15 +416,19 @@ export default function ReportJobsPage() {
     appliedFilters.hasRating !== undefined ||
     appliedFilters.hasPhotos;
 
-  if (!activeSiteId) {
+  if (allSites.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">{t("common.selectSite")}</p>
+      <div className="flex h-full flex-col items-center justify-center gap-2">
+        <p className="text-muted-foreground">{t("common.noSites")}</p>
+        <Link href="/sites" className="text-sm font-medium text-primary hover:underline">
+          {t("common.noSitesLink")}
+        </Link>
       </div>
     );
   }
 
   const activeFilterCount = [
+    appliedSiteId !== undefined,
     from || to,
     selectedCrewId,
     hasRatingFilter !== "",
@@ -474,22 +437,137 @@ export default function ReportJobsPage() {
   ].filter(Boolean).length;
 
   const selectedCrewName = crew.find((c) => c.id === selectedCrewId)?.name;
+  const selectedSiteName = appliedSiteId ? allSites.find((s) => s.id === appliedSiteId)?.name : null;
+
+  const columns: ColumnDef<ReportBookingRow>[] = [
+    {
+      accessorKey: "createdAt",
+      header: t("reports.jobDetail.date"),
+      cell: ({ row }) => (
+        <span className="text-xs whitespace-nowrap">{formatDate(row.original.createdAt)}</span>
+      ),
+    },
+    {
+      accessorKey: "siteName",
+      header: t("reports.jobDetail.mall"),
+      cell: ({ row }) => (
+        <span className="text-xs">
+          {row.original.siteName ?? <span className="text-muted-foreground">{t("reports.jobDetail.noMall")}</span>}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "slot",
+      header: t("reports.jobDetail.slot"),
+      cell: ({ row }) => (
+        <span className="text-xs font-mono">
+          {row.original.slot ?? <span className="text-muted-foreground">{t("reports.jobDetail.noSlot")}</span>}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "crewName",
+      header: t("reports.jobDetail.crew"),
+      cell: ({ row }) => (
+        <span className="text-xs">{row.original.crewName ?? "—"}</span>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: t("reports.jobDetail.status"),
+      cell: ({ row }) => (
+        <span className="font-mono text-xs uppercase">{row.original.status}</span>
+      ),
+    },
+    {
+      accessorKey: "price",
+      header: t("reports.jobDetail.price"),
+      meta: { align: "right" },
+      cell: ({ row }) => (
+        <span className="text-xs font-mono">{formatRupiah(row.original.price)}</span>
+      ),
+    },
+    {
+      id: "locateTime",
+      header: t("reports.jobDetail.locateTime"),
+      meta: { align: "right" },
+      cell: ({ row }) => (
+        <span className="text-xs font-mono text-muted-foreground">
+          {formatTurnaround(row.original.duration.locateSeconds)}
+        </span>
+      ),
+    },
+    {
+      id: "washTime",
+      header: t("reports.jobDetail.washTime"),
+      meta: { align: "right" },
+      cell: ({ row }) => (
+        <span className="text-xs font-mono text-muted-foreground">
+          {formatTurnaround(row.original.duration.washSeconds)}
+        </span>
+      ),
+    },
+    {
+      id: "totalTime",
+      header: t("reports.jobDetail.totalTime"),
+      meta: { align: "right" },
+      cell: ({ row }) => (
+        <span className="text-xs font-mono">
+          {formatTurnaround(row.original.duration.totalJobSeconds)}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "rating",
+      header: t("reports.jobDetail.rating"),
+      meta: { align: "right" },
+      cell: ({ row }) => (
+        <span className="text-xs">
+          {row.original.rating != null ? (
+            <span className="font-mono inline-flex items-center gap-1">
+              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" /> {row.original.rating}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "ratingNote",
+      header: t("reports.jobDetail.review"),
+      cell: ({ row }) => (
+        <span className="text-xs max-w-[160px] inline-block truncate align-middle" title={row.original.ratingNote ?? ""}>
+          {row.original.ratingNote ? (
+            <span className="italic text-muted-foreground">&ldquo;{row.original.ratingNote}&rdquo;</span>
+          ) : (
+            <span className="text-muted-foreground">{t("reports.jobDetail.noReview")}</span>
+          )}
+        </span>
+      ),
+    },
+    {
+      id: "photos",
+      header: t("reports.jobDetail.photos"),
+      meta: { align: "right" },
+      cell: ({ row }) => <PhotosCell photos={row.original.photos} t={t} />,
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-foreground">{t("reports.title")}</h1>
           <p className="text-sm text-muted-foreground">{t("reports.jobDetail.subtitle")}</p>
         </div>
+        {/* <SiteSelector sites={allSites} value={siteId} onChange={setSiteId} /> */}
       </div>
 
       <ReportTabs />
 
-      {/* ── Filter panel ───────────────────────────────────────────── */}
+      {/* Filter panel */}
       <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-        {/* Panel header */}
         <div className="flex items-center justify-between border-b border-border px-4 py-3 bg-muted/40">
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
@@ -514,9 +592,7 @@ export default function ReportJobsPage() {
         </div>
 
         <div className="divide-y divide-border">
-          {/* Row 1: Period + Crew */}
-          <div className="grid grid-cols-1 gap-0 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border">
-            {/* Date range */}
+          <div className="grid grid-cols-1 gap-0 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border">
             <div className="px-4 py-3 space-y-2">
               <div className="flex items-center gap-1.5">
                 <Calendar className="h-3 w-3 text-muted-foreground" />
@@ -550,7 +626,34 @@ export default function ReportJobsPage() {
               </div>
             </div>
 
-            {/* Crew */}
+            <div className="px-4 py-3 space-y-2">
+              <div className="flex items-center gap-1.5">
+                <Building2 className="h-3 w-3 text-muted-foreground" />
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  {t("reports.jobDetail.filterMall")}
+                </span>
+              </div>
+              <Select
+                value={selectedSiteId || "__all__"}
+                onValueChange={(v) => setSelectedSiteId(v === "__all__" ? "" : v)}
+              >
+                <SelectTrigger className={cn(
+                  "h-8 w-full text-xs",
+                  selectedSiteId ? "border-primary/40 font-medium" : ""
+                )}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">
+                    {t("reports.jobDetail.filterMallAll")}
+                  </SelectItem>
+                  {allSites.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="px-4 py-3 space-y-2">
               <div className="flex items-center gap-1.5">
                 <Users className="h-3 w-3 text-muted-foreground" />
@@ -578,7 +681,6 @@ export default function ReportJobsPage() {
             </div>
           </div>
 
-          {/* Row 2: Status chips */}
           <div className="px-4 py-3 space-y-2">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
               {t("reports.jobDetail.filterStatus")}
@@ -599,17 +701,15 @@ export default function ReportJobsPage() {
                     )}
                   >
                     <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", isActive ? "bg-primary-foreground/60" : "bg-muted-foreground/40")} />
-                    {status.replaceAll("_", "​_")}
+                    {status.replaceAll("_", "\u200B_")}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Row 3: Extras + Apply */}
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
             <div className="flex flex-wrap items-center gap-2">
-              {/* Rating toggle */}
               <div className="flex rounded-lg border border-border overflow-hidden text-xs">
                 {(["", "true", "false"] as const).map((val) => {
                   const labels: Record<string, string> = {
@@ -637,7 +737,6 @@ export default function ReportJobsPage() {
                 })}
               </div>
 
-              {/* Photos toggle */}
               <button
                 type="button"
                 onClick={() => setHasPhotosFilter((v) => !v)}
@@ -653,7 +752,6 @@ export default function ReportJobsPage() {
               </button>
             </div>
 
-            {/* Apply */}
             <Button
               onClick={handleApply}
               disabled={isLoading}
@@ -684,6 +782,12 @@ export default function ReportJobsPage() {
       {hasFilter && (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted-foreground font-medium">Applied:</span>
+          {appliedSiteId && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary">
+              <Building2 className="h-2.5 w-2.5" />
+              {selectedSiteName ?? appliedSiteId}
+            </span>
+          )}
           {(appliedFrom || appliedTo) && (
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary">
               <Calendar className="h-2.5 w-2.5" />
@@ -721,187 +825,28 @@ export default function ReportJobsPage() {
         </div>
       )}
 
-      {/* Results summary bar */}
-      {!isLoading && (() => {
-        const totalPages = Math.max(1, Math.ceil(jobTotal / pageSize));
-        const startIndex = (page - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, jobTotal);
-        const pageNums = getPageNumbers(page, totalPages);
-
-        return (
+      {/* Data table */}
+      <DataTable
+        columns={columns}
+        data={jobRows}
+        isLoading={isLoading}
+        emptyMessage={t("reports.jobDetail.noData")}
+        totalCount={jobTotal}
+        page={page}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        pageSizeOptions={PAGE_SIZE_OPTIONS}
+        onPageSizeChange={(v) => { setPageSize(v); setPage(1); }}
+        resultsLabel={(start, end, total) => (
           <>
-            {/* Meta bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs text-muted-foreground">
-                {jobTotal === 0 ? (
-                  "0 results"
-                ) : (
-                  <>
-                    Showing{" "}
-                    <span className="font-semibold text-foreground">{startIndex + 1}–{endIndex}</span>
-                    {" "}of{" "}
-                    <span className="font-semibold text-foreground">{jobTotal}</span>
-                    {" "}results
-                  </>
-                )}
-              </p>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span>Rows per page</span>
-                <Select
-                  value={String(pageSize)}
-                  onValueChange={(v) => { setPageSize(Number(v)); setPage(1); }}
-                >
-                  <SelectTrigger className="h-7 w-16 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PAGE_SIZE_OPTIONS.map((n) => (
-                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Job table */}
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full text-sm">
-                <thead className="border-b border-border bg-muted/50">
-                  <tr>
-                    <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.date")}</th>
-                    <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.mall")}</th>
-                    <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.slot")}</th>
-                    <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.crew")}</th>
-                    <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.status")}</th>
-                    <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.price")}</th>
-                    <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.locateTime")}</th>
-                    <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.washTime")}</th>
-                    <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.totalTime")}</th>
-                    <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.rating")}</th>
-                    <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.review")}</th>
-                    <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.photos")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {jobRows.length === 0 ? (
-                    <tr>
-                      <td colSpan={12} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                        {t("reports.jobDetail.noData")}
-                      </td>
-                    </tr>
-                  ) : (
-                    jobRows.map((row) => (
-                      <JobDetailRow key={row.id} row={row} t={t} />
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination controls */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-xs text-muted-foreground">
-                  Page <span className="font-semibold text-foreground">{page}</span> of{" "}
-                  <span className="font-semibold text-foreground">{totalPages}</span>
-                </p>
-
-                <div className="flex items-center gap-1">
-                  {/* First */}
-                  <button
-                    onClick={() => setPage(1)}
-                    disabled={page === 1}
-                    className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary disabled:pointer-events-none disabled:opacity-40"
-                    aria-label="First page"
-                  >
-                    «
-                  </button>
-                  {/* Prev */}
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background transition-colors hover:border-primary/40 hover:text-primary disabled:pointer-events-none disabled:opacity-40"
-                    aria-label="Previous page"
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                  </button>
-
-                  {/* Page numbers */}
-                  {pageNums.map((n) =>
-                    typeof n === "string" ? (
-                      <span key={n} className="flex h-7 w-7 items-center justify-center text-xs text-muted-foreground select-none">
-                        …
-                      </span>
-                    ) : (
-                      <button
-                        key={n}
-                        onClick={() => setPage(n)}
-                        className={cn(
-                          "flex h-7 w-7 items-center justify-center rounded-md border text-xs font-medium transition-colors",
-                          n === page
-                            ? "border-primary bg-primary text-white"
-                            : "border-border bg-background text-foreground hover:border-primary/40 hover:text-primary"
-                        )}
-                      >
-                        {n}
-                      </button>
-                    )
-                  )}
-
-                  {/* Next */}
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                    className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background transition-colors hover:border-primary/40 hover:text-primary disabled:pointer-events-none disabled:opacity-40"
-                    aria-label="Next page"
-                  >
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
-                  {/* Last */}
-                  <button
-                    onClick={() => setPage(totalPages)}
-                    disabled={page === totalPages}
-                    className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary disabled:pointer-events-none disabled:opacity-40"
-                    aria-label="Last page"
-                  >
-                    »
-                  </button>
-                </div>
-              </div>
-            )}
+            Showing{" "}
+            <span className="font-semibold text-foreground">{start}–{end}</span>
+            {" "}of{" "}
+            <span className="font-semibold text-foreground">{total}</span>
+            {" "}results
           </>
-        );
-      })()}
-
-      {isLoading && (
-        <div className="overflow-x-auto rounded-lg border border-border">
-          <table className="w-full text-sm">
-            <thead className="border-b border-border bg-muted/50">
-              <tr>
-                <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.date")}</th>
-                <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.mall")}</th>
-                <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.slot")}</th>
-                <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.crew")}</th>
-                <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.status")}</th>
-                <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.price")}</th>
-                <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.locateTime")}</th>
-                <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.washTime")}</th>
-                <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.totalTime")}</th>
-                <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.rating")}</th>
-                <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.review")}</th>
-                <th className="px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap">{t("reports.jobDetail.photos")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colSpan={12} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                  {t("reports.loading")}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )}
+        )}
+      />
     </div>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useQueryState, parseAsString } from "nuqs";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Lock, CreditCard, AlertCircle } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
 import { useChargeCard } from "@/features/customer/hooks/use-charge-card";
@@ -92,7 +91,8 @@ export default function CardPayPage() {
 
 function CardPayContent() {
   const { id: bookingId } = useParams<{ id: string }>();
-  const [token] = useQueryState("token", parseAsString);
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
   const router = useRouter();
   const signedToken = token ?? "";
 

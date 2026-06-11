@@ -1,8 +1,10 @@
 "use client";
 
+import type { ColumnDef } from "@tanstack/react-table";
 import type { AuditEntry } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 import { formatAuditDetail } from "@/features/admin/utils/format-audit-detail";
+import { DataTable } from "@/components/ui/data-table";
 
 interface AuditLogTableProps {
   entries: AuditEntry[];
@@ -12,59 +14,61 @@ interface AuditLogTableProps {
 export function AuditLogTable({ entries, onRowClick }: Readonly<AuditLogTableProps>) {
   const { t } = useTranslation("admin");
 
-  const columns = [
-    t("auditTable.columns.timestamp"),
-    t("auditTable.columns.bookingId"),
-    t("auditTable.columns.plate"),
-    t("auditTable.columns.action"),
-    t("auditTable.columns.detail"),
-    t("auditTable.columns.admin"),
+  const columns: ColumnDef<AuditEntry>[] = [
+    {
+      accessorKey: "createdAt",
+      header: t("auditTable.columns.timestamp"),
+      cell: ({ row }) => (
+        <span className="font-mono text-xs text-muted-foreground">
+          {new Date(row.original.createdAt).toLocaleString("id-ID")}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "bookingId",
+      header: t("auditTable.columns.bookingId"),
+      cell: ({ row }) => (
+        <span className="font-mono text-xs">{row.original.bookingId}</span>
+      ),
+    },
+    {
+      accessorKey: "plateText",
+      header: t("auditTable.columns.plate"),
+      cell: ({ row }) => (
+        <span className="font-semibold">{row.original.plateText ?? "—"}</span>
+      ),
+    },
+    {
+      accessorKey: "action",
+      header: t("auditTable.columns.action"),
+      cell: ({ row }) => (
+        <span>{t(`auditTable.actions.${row.original.action}`)}</span>
+      ),
+    },
+    {
+      id: "detail",
+      header: t("auditTable.columns.detail"),
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">
+          {formatAuditDetail(row.original.action, row.original.detail)}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "adminEmail",
+      header: t("auditTable.columns.admin"),
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.adminEmail}</span>
+      ),
+    },
   ];
 
-  if (entries.length === 0) {
-    return (
-      <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border">
-        <p className="text-sm text-muted-foreground">{t("auditTable.empty")}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
-      <table className="w-full text-sm">
-        <thead className="border-b border-border bg-muted/50">
-          <tr>
-            {columns.map((col) => (
-              <th
-                key={col}
-                className="px-4 py-3 text-left font-medium text-muted-foreground"
-              >
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {entries.map((entry) => (
-            <tr
-              key={entry.id}
-              onClick={() => onRowClick?.(entry)}
-              className={`hover:bg-muted/30 ${onRowClick ? "cursor-pointer" : ""}`}
-            >
-              <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                {new Date(entry.createdAt).toLocaleString("id-ID")}
-              </td>
-              <td className="px-4 py-3 font-mono text-xs">{entry.bookingId}</td>
-              <td className="px-4 py-3 font-semibold">
-                {entry.plateText ?? "—"}
-              </td>
-              <td className="px-4 py-3">{t(`auditTable.actions.${entry.action}`)}</td>
-              <td className="px-4 py-3 text-muted-foreground">{formatAuditDetail(entry.action, entry.detail)}</td>
-              <td className="px-4 py-3 text-muted-foreground">{entry.adminEmail}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={entries}
+      emptyMessage={t("auditTable.empty")}
+      onRowClick={onRowClick}
+    />
   );
 }

@@ -23,7 +23,6 @@ interface TimeExtNotification {
 interface UIState {
   toasts: Toast[];
   isSidebarOpen: boolean;
-  activeSiteId: string | null;
   sites: AdminSite[];
   locale: "id" | "en";
   timeExtNotifications: TimeExtNotification[];
@@ -35,7 +34,6 @@ interface UIActions {
   removeToast: (id: string) => void;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
-  setActiveSiteId: (siteId: string) => void;
   setSites: (sites: AdminSite[]) => void;
   setLocale: (locale: "id" | "en") => void;
   addTimeExtNotification: (n: TimeExtNotification) => void;
@@ -48,7 +46,6 @@ export const useUIStore = create<UIState & UIActions>()(
     immer((set) => ({
       toasts: [],
       isSidebarOpen: true,
-      activeSiteId: null,
       sites: [],
       locale: "id",
       timeExtNotifications: [],
@@ -72,11 +69,6 @@ export const useUIStore = create<UIState & UIActions>()(
       setSidebarOpen: (open) =>
         set((state) => {
           state.isSidebarOpen = open;
-        }),
-
-      setActiveSiteId: (siteId) =>
-        set((state) => {
-          state.activeSiteId = siteId;
         }),
 
       setSites: (sites) =>
@@ -112,7 +104,6 @@ export const useUIStore = create<UIState & UIActions>()(
     {
       name: "ui",
       partialize: (state) => ({
-        activeSiteId: state.activeSiteId,
         sites: state.sites,
         locale: state.locale,
       }),

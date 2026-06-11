@@ -1,8 +1,7 @@
 "use client";
 
 import { Suspense, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { parseAsString, useQueryStates } from "nuqs";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/shared";
 import { BookingSummaryCard } from "@/features/customer/components/booking-summary-card";
 import { PayButton } from "@/features/customer/components/pay-button";
@@ -19,12 +18,11 @@ export default function ConfirmPage() {
 function ConfirmContent() {
   const router = useRouter();
   const { qrId } = useParams<{ qrId: string }>();
-  const [{ bookingId, token, plate, slot }] = useQueryStates({
-    bookingId: parseAsString,
-    token: parseAsString,
-    plate: parseAsString,
-    slot: parseAsString,
-  });
+  const searchParams = useSearchParams();
+  const bookingId = searchParams.get("bookingId");
+  const token = searchParams.get("token");
+  const plate = searchParams.get("plate");
+  const slot = searchParams.get("slot");
 
   useEffect(() => {
     if (!bookingId || !token || !plate || !slot) {

@@ -1,8 +1,7 @@
 "use client";
 
 import { startTransition, Suspense, useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { parseAsString, useQueryStates } from "nuqs";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { AppShell, OfflineBanner } from "@/components/shared";
@@ -25,10 +24,9 @@ function CaptureContent() {
   const { qrId } = useParams<{ qrId: string }>();
   const { t } = useTranslation("customer");
 
-  const [{ bookingId, token }] = useQueryStates({
-    bookingId: parseAsString,
-    token: parseAsString,
-  });
+  const searchParams = useSearchParams();
+  const bookingId = searchParams.get("bookingId");
+  const token = searchParams.get("token");
 
   const [plateText, setPlateText] = useState("");
   const [slotText, setSlotText] = useState("");

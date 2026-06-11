@@ -2,8 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { useParams, useRouter } from "next/navigation";
-import { parseAsString, useQueryStates } from "nuqs";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Zap } from "lucide-react";
 import api from "@/lib/axios";
@@ -36,13 +35,12 @@ function BookConfirmContent() {
   const { qrId } = useParams<{ qrId: string }>();
   const queryClient = useQueryClient();
 
-  const [{ bookingId, token, phone, plate, slot }] = useQueryStates({
-    bookingId: parseAsString,
-    token: parseAsString,
-    phone: parseAsString,
-    plate: parseAsString,
-    slot: parseAsString,
-  });
+  const searchParams = useSearchParams();
+  const bookingId = searchParams.get("bookingId");
+  const token = searchParams.get("token");
+  const phone = searchParams.get("phone");
+  const plate = searchParams.get("plate");
+  const slot = searchParams.get("slot");
 
   useEffect(() => {
     if (!bookingId || !token || !plate || !slot) {

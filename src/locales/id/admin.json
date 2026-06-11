@@ -1,9 +1,10 @@
 {
   "common": {
-    "selectSite": "Pilih site dari sidebar.",
     "adminConsole": "Admin Console",
     "siteActive": "Site aktif",
-    "logout": "Logout"
+    "logout": "Logout",
+    "noSites": "Belum ada site — buat dulu.",
+    "noSitesLink": "Ke halaman Sites"
   },
   "login": {
     "title": "Park & Shine",
@@ -98,6 +99,9 @@
       "otherPhotos": "Foto Lainnya",
       "filterCrew": "Filter Crew",
       "filterCrewAll": "Semua Crew",
+      "filterMall": "Filter Mall",
+      "filterMallAll": "Semua Mall",
+      "filterMallDefault": "Mall Saat Ini",
       "filterStatus": "Filter Status",
       "filterStatusAll": "Semua Status",
       "filterHasRating": "Ada Rating",
@@ -284,7 +288,10 @@
       "status_override": "Override Status",
       "reassign": "Reassign",
       "approve_time_extension": "Setujui Tambah Waktu",
-      "reject_time_extension": "Tolak Tambah Waktu"
+      "reject_time_extension": "Tolak Tambah Waktu",
+      "crew": {
+        "job_rejected": "Job Ditolak Crew"
+      }
     }
   },
   "walkin": {
@@ -309,6 +316,7 @@
     "addCrew": "Tambah Crew",
     "loading": "Loading...",
     "empty": "Belum ada crew member.",
+    "search": "Cari kru...",
     "table": {
       "name": "Nama",
       "whatsapp": "WhatsApp",
@@ -344,7 +352,7 @@
       "save": "Simpan"
     },
     "confirm": {
-      "deactivate": "Nonaktifkan crew member \"{{name}}\"?"
+      "delete": "Hapus crew member \"{{name}}\"?"
     },
     "toast": {
       "nameRequired": "Nama wajib diisi dan PIN harus 4-8 digit.",
@@ -352,8 +360,8 @@
       "addFailed": "Gagal menambah crew member.",
       "pinRequired": "PIN harus 4-8 digit.",
       "updateFailed": "Gagal mengupdate crew member.",
-      "deactivated": "Crew member dinonaktifkan.",
-      "deactivateFailed": "Gagal menonaktifkan crew member."
+      "deleted": "Crew member dihapus.",
+      "deleteFailed": "Gagal menghapus crew member."
     }
   },
   "sitesPage": {
@@ -481,6 +489,8 @@
     "title": "Admin Users",
     "addAdmin": "Add Admin",
     "loading": "Loading...",
+    "empty": "Belum ada pengguna.",
+    "search": "Cari pengguna...",
     "table": {
       "name": "Name",
       "email": "Email",
@@ -491,6 +501,10 @@
     "status": {
       "active": "Active",
       "inactive": "Inactive"
+    },
+    "roles": {
+      "admin": "Admin",
+      "superAdmin": "Super Admin"
     },
     "add": {
       "title": "Add Admin User",
@@ -578,6 +592,7 @@
     "filterFeatured": "Featured Saja",
     "loading": "Memuat...",
     "empty": "Belum ada testimoni.",
+    "search": "Cari testimoni...",
     "table": {
       "author": "Penulis",
       "rating": "Rating",

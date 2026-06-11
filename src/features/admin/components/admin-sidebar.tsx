@@ -5,16 +5,11 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { BarChart2, LayoutGrid, Mail, MessageSquare, QrCode, ScrollText, Settings, Shield, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useUIStore } from "@/store/ui-store";
 import { useAuthStore } from "@/store/auth-store";
 import { useTranslation } from "@/i18n";
-import { Combobox } from "@/components/ui/combobox";
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const sites = useUIStore((s) => s.sites);
-  const activeSiteId = useUIStore((s) => s.activeSiteId);
-  const setActiveSiteId = useUIStore((s) => s.setActiveSiteId);
   const role = useAuthStore((s) => s.role);
   const { t } = useTranslation("admin");
 
@@ -47,7 +42,8 @@ export function AdminSidebar() {
           alt="Park & Shine logo"
           width={28}
           height={28}
-          className="shrink-0 rounded-md"
+          className="shrink-0 rounded-md w-7 h-7"
+          style={{ width: "auto", height: "auto" }}
         />
         <div>
           <p className="text-sm font-bold tracking-tight text-foreground leading-none">
@@ -56,21 +52,6 @@ export function AdminSidebar() {
           <p className="text-[11px] text-muted-foreground mt-0.5">{t("common.adminConsole")}</p>
         </div>
       </div>
-
-      {/* Site selector */}
-      {sites.length > 0 && (
-        <div className="border-b border-border px-4 py-3">
-          <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-            {t("common.siteActive")}
-          </p>
-          <Combobox
-            options={sites.map((s) => ({ value: s.id, label: s.name }))}
-            value={activeSiteId ?? ""}
-            onChange={setActiveSiteId}
-            placeholder={t("common.siteActive")}
-          />
-        </div>
-      )}
 
       {/* Nav */}
       <nav className="flex-1 space-y-1 px-2 py-3">

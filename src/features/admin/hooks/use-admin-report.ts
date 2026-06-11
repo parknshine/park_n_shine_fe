@@ -5,12 +5,13 @@ import api from "@/lib/axios-admin";
 import { queryKeys } from "@/lib/query-keys";
 import type { AdminReport } from "@/features/admin/types";
 
-export function useAdminReport(siteId: string, from: string, to: string) {
+export function useAdminReport(siteId: string | undefined, from: string, to: string) {
   const query = useQuery({
-    enabled: !!siteId,
-    queryKey: queryKeys.admin.report(siteId, from, to),
+    enabled: true,
+    queryKey: queryKeys.admin.report(siteId ?? "", from, to),
     queryFn: async () => {
-      const params = new URLSearchParams({ siteId });
+      const params = new URLSearchParams();
+      if (siteId) params.set("siteId", siteId);
       if (from) params.set("from", from);
       if (to) params.set("to", to);
       const response = await api.get<AdminReport>(`/v1/admin/reports/summary?${params}`);

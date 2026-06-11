@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Plus, Pencil, Trash2, Star, Check, Minus } from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DataTable } from "@/components/ui/data-table";
 import {
   Dialog,
   DialogContent,
@@ -207,6 +209,35 @@ function EditModal({
   );
 }
 
+function TestimonialRowActions({
+  item,
+  onEdit,
+  onDelete,
+}: Readonly<{
+  item: AdminTestimonial;
+  onEdit: (item: AdminTestimonial) => void;
+  onDelete: (id: string) => void;
+}>) {
+  return (
+    <div className="flex justify-end gap-1">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => onEdit(item)}
+      >
+        <Pencil className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => onDelete(item.id)}
+      >
+        <Trash2 className="h-4 w-4 text-destructive" />
+      </Button>
+    </div>
+  );
+}
+
 export default function TestimonialsPage() {
   const { t } = useTranslation("admin");
   const {
@@ -247,6 +278,75 @@ export default function TestimonialsPage() {
     }
   };
 
+  const handleToggleFeatured = (item: AdminTestimonial) => {
+    update({ id: item.id, payload: { featured: !item.featured } });
+  };
+
+  const columns: ColumnDef<AdminTestimonial>[] = [
+    {
+      accessorKey: "authorName",
+      header: t("testimonialsPage.table.author"),
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.authorName}</span>
+      ),
+    },
+    {
+      accessorKey: "rating",
+      header: t("testimonialsPage.table.rating"),
+      cell: ({ row }) => <StarDisplay rating={row.original.rating} />,
+    },
+    {
+      accessorKey: "body",
+      header: t("testimonialsPage.table.body"),
+      cell: ({ row }) => (
+        <p className="line-clamp-2 max-w-xs text-muted-foreground">{row.original.body}</p>
+      ),
+    },
+    {
+      id: "source",
+      header: t("testimonialsPage.table.source"),
+      cell: ({ row }) => (
+        <Badge variant={row.original.bookingId ? "default" : "secondary"}>
+          {row.original.bookingId
+            ? t("testimonialsPage.source.booking")
+            : t("testimonialsPage.source.manual")}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "featured",
+      header: t("testimonialsPage.table.featured"),
+      cell: ({ row }) => (
+        <Button
+          variant={row.original.featured ? "default" : "outline"}
+          size="sm"
+          onClick={() => handleToggleFeatured(row.original)}
+          disabled={isUpdating}
+        >
+          {row.original.featured ? <Check className="h-3.5 w-3.5" /> : <Minus className="h-3.5 w-3.5" />}
+        </Button>
+      ),
+    },
+    {
+      accessorKey: "order",
+      header: t("testimonialsPage.table.order"),
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.order}</span>
+      ),
+    },
+    {
+      id: "actions",
+      header: t("testimonialsPage.table.actions"),
+      cell: ({ row }) => (
+        <TestimonialRowActions
+          item={row.original}
+          onEdit={setEditTarget}
+          onDelete={handleDelete}
+        />
+      ),
+    },
+  ];
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -274,78 +374,13 @@ export default function TestimonialsPage() {
         </Button>
       </div>
 
-      {(() => {
-        if (isLoading) {
-          return <p className="text-sm text-muted-foreground">{t("testimonialsPage.loading")}</p>;
-        }
-        if (displayed.length === 0) {
-          return <p className="text-sm text-muted-foreground">{t("testimonialsPage.empty")}</p>;
-        }
-        return (
-          <div className="rounded-md border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50">
-                  <th className="px-4 py-2 text-left font-medium">{t("testimonialsPage.table.author")}</th>
-                  <th className="px-4 py-2 text-left font-medium">{t("testimonialsPage.table.rating")}</th>
-                  <th className="px-4 py-2 text-left font-medium">{t("testimonialsPage.table.body")}</th>
-                  <th className="px-4 py-2 text-left font-medium">{t("testimonialsPage.table.source")}</th>
-                  <th className="px-4 py-2 text-left font-medium">{t("testimonialsPage.table.featured")}</th>
-                  <th className="px-4 py-2 text-left font-medium">{t("testimonialsPage.table.order")}</th>
-                  <th className="px-4 py-2 text-right font-medium">{t("testimonialsPage.table.actions")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayed.map((item) => (
-                  <tr key={item.id} className="border-b last:border-0">
-                    <td className="px-4 py-3 font-medium">{item.authorName}</td>
-                    <td className="px-4 py-3"><StarDisplay rating={item.rating} /></td>
-                    <td className="px-4 py-3 max-w-xs">
-                      <p className="line-clamp-2 text-muted-foreground">{item.body}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge variant={item.bookingId ? "default" : "secondary"}>
-                        {item.bookingId
-                          ? t("testimonialsPage.source.booking")
-                          : t("testimonialsPage.source.manual")}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Button
-                        variant={item.featured ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => update({ id: item.id, payload: { featured: !item.featured } })}
-                        disabled={isUpdating}
-                      >
-                        {item.featured ? <Check className="h-3.5 w-3.5" /> : <Minus className="h-3.5 w-3.5" />}
-                      </Button>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">{item.order}</td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setEditTarget(item)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      })()}
+      <DataTable
+        columns={columns}
+        data={displayed}
+        isLoading={isLoading}
+        emptyMessage={t("testimonialsPage.empty")}
+        searchPlaceholder={t("testimonialsPage.search")}
+      />
 
       <AddManualModal
         open={showAddModal}

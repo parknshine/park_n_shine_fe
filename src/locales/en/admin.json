@@ -1,9 +1,10 @@
 {
   "common": {
-    "selectSite": "Select a site from the sidebar.",
     "adminConsole": "Admin Console",
     "siteActive": "Active site",
-    "logout": "Logout"
+    "logout": "Logout",
+    "noSites": "No sites yet — create one first.",
+    "noSitesLink": "Go to Sites"
   },
   "login": {
     "title": "Park & Shine",
@@ -98,6 +99,9 @@
       "otherPhotos": "Other Photos",
       "filterCrew": "Filter Crew",
       "filterCrewAll": "All Crew",
+      "filterMall": "Filter Mall",
+      "filterMallAll": "All Malls",
+      "filterMallDefault": "Current Mall",
       "filterStatus": "Filter Status",
       "filterStatusAll": "All Statuses",
       "filterHasRating": "Has Rating",
@@ -284,7 +288,10 @@
       "status_override": "Override Status",
       "reassign": "Reassign",
       "approve_time_extension": "Approve Time Extension",
-      "reject_time_extension": "Reject Time Extension"
+      "reject_time_extension": "Reject Time Extension",
+      "crew": {
+        "job_rejected": "Job Rejected by Crew"
+      }
     }
   },
   "walkin": {
@@ -309,6 +316,7 @@
     "addCrew": "Add Crew",
     "loading": "Loading...",
     "empty": "No crew members yet.",
+    "search": "Search crew...",
     "table": {
       "name": "Name",
       "whatsapp": "WhatsApp",
@@ -344,7 +352,7 @@
       "save": "Save"
     },
     "confirm": {
-      "deactivate": "Deactivate crew member \"{{name}}\"?"
+      "delete": "Delete crew member \"{{name}}\"?"
     },
     "toast": {
       "nameRequired": "Name is required and PIN must be 4-8 digits.",
@@ -352,8 +360,8 @@
       "addFailed": "Failed to add crew member.",
       "pinRequired": "PIN must be 4-8 digits.",
       "updateFailed": "Failed to update crew member.",
-      "deactivated": "Crew member deactivated.",
-      "deactivateFailed": "Failed to deactivate crew member."
+      "deleted": "Crew member deleted.",
+      "deleteFailed": "Failed to delete crew member."
     }
   },
   "sitesPage": {
@@ -481,6 +489,8 @@
     "title": "Admin Users",
     "addAdmin": "Add Admin",
     "loading": "Loading...",
+    "empty": "No users found.",
+    "search": "Search users...",
     "table": {
       "name": "Name",
       "email": "Email",
@@ -491,6 +501,10 @@
     "status": {
       "active": "Active",
       "inactive": "Inactive"
+    },
+    "roles": {
+      "admin": "Admin",
+      "superAdmin": "Super Admin"
     },
     "add": {
       "title": "Add Admin User",
@@ -578,6 +592,7 @@
     "filterFeatured": "Featured Only",
     "loading": "Loading...",
     "empty": "No testimonials yet.",
+    "search": "Search testimonials...",
     "table": {
       "author": "Author",
       "rating": "Rating",

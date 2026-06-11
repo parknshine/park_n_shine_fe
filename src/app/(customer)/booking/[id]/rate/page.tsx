@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useQueryState } from "nuqs";
-import { parseAsString } from "nuqs";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { mutationKeys } from "@/lib/query-keys";
@@ -14,7 +12,8 @@ import { useTranslation } from "@/i18n";
 
 export default function BookingRatePage() {
   const { id: bookingId } = useParams<{ id: string }>();
-  const [token] = useQueryState("token", parseAsString);
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
   const router = useRouter();
   const { t } = useTranslation("customer");
 

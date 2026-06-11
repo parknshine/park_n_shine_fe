@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -9,39 +10,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AuditLogTable , BookingDetailDrawer } from "@/features/admin/components";
-import { useAuditLog } from "@/features/admin/hooks";
-import { useUIStore } from "@/store/ui-store";
+import { AuditLogTable, BookingDetailDrawer, SiteSelector } from "@/features/admin/components";
+import { useAuditLog, useSiteSelection } from "@/features/admin/hooks";
 import type { AuditEntry } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 
 const ACTION_VALUES = ["all", "status_override", "refund", "reassign"] as const;
 
 export default function AuditPage() {
-  const activeSiteId = useUIStore((s) => s.activeSiteId);
+  const { sites, siteId, setSiteId } = useSiteSelection();
   const [action, setAction] = useState("all");
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const { t } = useTranslation("admin");
 
-  const { entries, isLoading, isFetching } = useAuditLog(activeSiteId ?? "", { action });
+  const { entries, isLoading, isFetching } = useAuditLog(siteId ?? "", { action });
 
   function handleRowClick(entry: AuditEntry) {
     setSelectedBookingId(entry.bookingId);
   }
 
-  if (!activeSiteId) {
+  if (sites.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">{t("common.selectSite")}</p>
+      <div className="flex h-full flex-col items-center justify-center gap-2">
+        <p className="text-muted-foreground">{t("common.noSites")}</p>
+        <Link href="/sites" className="text-sm font-medium text-primary hover:underline">
+          {t("common.noSitesLink")}
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold text-foreground">{t("audit.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("audit.subtitle")}</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">{t("audit.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("audit.subtitle")}</p>
+        </div>
+        <SiteSelector sites={sites} value={siteId} onChange={setSiteId} />
       </div>
 
       {/* Filters */}

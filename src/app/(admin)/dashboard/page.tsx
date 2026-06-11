@@ -2,39 +2,37 @@
 
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useUIStore } from "@/store/ui-store";
+import Link from "next/link";
 import {
   AdminQueueGroup,
   EscalationsPanel,
   BookingDetailDrawer,
 } from "@/features/admin/components";
-import { useAdminQueue } from "@/features/admin/hooks";
+import { useAdminAllSitesQueue } from "@/features/admin/hooks";
 import type { AdminQueueBooking } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
+import { useUIStore } from "@/store/ui-store";
 
 function DashboardContent() {
-  const activeSiteId = useUIStore((s) => s.activeSiteId);
+  const sites = useUIStore((s) => s.sites);
   const [clickedBooking, setClickedBooking] =
     useState<AdminQueueBooking | null>(null);
   const { t } = useTranslation("admin");
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const { queue, isLoading, refresh } = useAdminQueue({
-    siteId: activeSiteId ?? "",
-    enabled: !!activeSiteId,
-  });
+  const { sites: queueSites, isLoading, refresh } = useAdminAllSitesQueue();
 
   const urlBookingId = searchParams.get("bookingId");
 
   const urlBooking = useMemo(() => {
-    if (!urlBookingId || !queue) return null;
-    const allBookings = [
-      ...(queue.escalations ?? []),
-      ...(queue.groups ?? []).flatMap((g) => g.bookings),
-    ];
+    if (!urlBookingId || !queueSites.length) return null;
+    const allBookings = queueSites.flatMap((s) => [
+      ...s.escalations,
+      ...s.groups.flatMap((g) => g.bookings),
+    ]);
     return allBookings.find((b) => b.id === urlBookingId) ?? null;
-  }, [urlBookingId, queue]);
+  }, [urlBookingId, queueSites]);
 
   useEffect(() => {
     if (urlBooking) {
@@ -48,10 +46,13 @@ function DashboardContent() {
     void refresh();
   }
 
-  if (!activeSiteId) {
+  if (sites.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">{t("common.selectSite")}</p>
+      <div className="flex h-full flex-col items-center justify-center gap-2">
+        <p className="text-muted-foreground">{t("common.noSites")}</p>
+        <Link href="/sites" className="text-sm font-medium text-primary hover:underline">
+          {t("common.noSitesLink")}
+        </Link>
       </div>
     );
   }
@@ -71,39 +72,42 @@ function DashboardContent() {
         <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
       </div>
 
-      {/* Escalations */}
-      {queue && queue.escalations?.length > 0 && (
-        <EscalationsPanel
-          bookings={queue.escalations}
-          title={t(
-            queue.escalations.length === 1
-              ? "dashboard.escalationsTitle"
-              : "dashboard.escalationsTitlePlural",
-            { count: queue.escalations.length }
-          )}
-          onBookingClick={setClickedBooking}
-        />
-      )}
+      {queueSites.map((site) => (
+        <div key={site.siteId} className="space-y-4">
+          <h2 className="text-base font-semibold text-foreground border-b border-border pb-2">
+            {site.siteName}
+          </h2>
 
-      {/* Queue groups */}
-      {queue && queue.groups?.length > 0 ? (
-        <div className="space-y-4">
-          {queue.groups.map((group) => (
-            <AdminQueueGroup
-              key={group.status}
-              status={group.status}
-              bookings={group.bookings}
+          {site.escalations.length > 0 && (
+            <EscalationsPanel
+              bookings={site.escalations}
+              title={t(
+                site.escalations.length === 1
+                  ? "dashboard.escalationsTitle"
+                  : "dashboard.escalationsTitlePlural",
+                { count: site.escalations.length }
+              )}
               onBookingClick={setClickedBooking}
             />
-          ))}
-        </div>
-      ) : (
-        <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-border">
-          <p className="text-sm text-muted-foreground">{t("dashboard.emptyQueue")}</p>
-        </div>
-      )}
+          )}
 
-      {/* Booking detail drawer */}
+          {site.groups.length > 0 ? (
+            site.groups.map((group) => (
+              <AdminQueueGroup
+                key={group.status}
+                status={group.status}
+                bookings={group.bookings}
+                onBookingClick={setClickedBooking}
+              />
+            ))
+          ) : (
+            <div className="flex h-28 items-center justify-center rounded-lg border border-dashed border-border">
+              <p className="text-sm text-muted-foreground">{t("dashboard.emptyQueue")}</p>
+            </div>
+          )}
+        </div>
+      ))}
+
       <BookingDetailDrawer
         bookingId={selectedBooking?.id ?? null}
         onClose={() => setClickedBooking(null)}

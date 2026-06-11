@@ -27,7 +27,6 @@ export function useAdminAuth() {
   const setUser = useAuthStore((s) => s.setUser);
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const setSites = useUIStore((s) => s.setSites);
-  const setActiveSiteId = useUIStore((s) => s.setActiveSiteId);
 
   const loginMutation = useMutation({
     meta: { persist: false },
@@ -46,9 +45,6 @@ export function useAdminAuth() {
         data.role,
       );
       setSites(data.sites);
-      if (data.sites.length > 0) {
-        setActiveSiteId(data.sites[0].id);
-      }
       router.replace("/dashboard");
     },
   });

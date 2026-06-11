@@ -97,6 +97,7 @@ export default function Home() {
               alt='Park and Shine Car Wash logo'
               width={48}
               height={48}
+              style={{ width: "auto", height: "auto" }}
             />
             <span>Park &amp; Shine</span>
           </a>

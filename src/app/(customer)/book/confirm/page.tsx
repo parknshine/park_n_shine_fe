@@ -2,8 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { parseAsString, useQueryStates } from "nuqs";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Zap } from "lucide-react";
 import api from "@/lib/axios";
 import { AppShell } from "@/components/shared";
@@ -29,19 +28,17 @@ function WalkInConfirmContent() {
   const router = useRouter();
   const { t } = useTranslation("customer");
 
-  const [{ bookingId, token, lat, lng, loc, addr, siteId, phone, plate, slot }] =
-    useQueryStates({
-      bookingId: parseAsString,
-      token: parseAsString,
-      lat: parseAsString,
-      lng: parseAsString,
-      loc: parseAsString,
-      addr: parseAsString,
-      siteId: parseAsString,
-      phone: parseAsString,
-      plate: parseAsString,
-      slot: parseAsString,
-    });
+  const searchParams = useSearchParams();
+  const bookingId = searchParams.get("bookingId");
+  const token = searchParams.get("token");
+  const lat = searchParams.get("lat");
+  const lng = searchParams.get("lng");
+  const loc = searchParams.get("loc");
+  const addr = searchParams.get("addr");
+  const siteId = searchParams.get("siteId");
+  const phone = searchParams.get("phone");
+  const plate = searchParams.get("plate");
+  const slot = searchParams.get("slot");
 
   useEffect(() => {
     if (!bookingId || !token || !plate || !slot) {

@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { Shield, Plus, Pencil, RotateCcw, UserX } from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { DataTable } from "@/components/ui/data-table";
 import {
   Select,
   SelectContent,
@@ -28,6 +30,41 @@ type ModalState =
   | { type: "edit"; user: AdminUser }
   | { type: "reset"; user: AdminUser }
   | null;
+
+function UserRowActions({
+  user,
+  onEdit,
+  onReset,
+  onDeactivate,
+  isPending,
+}: {
+  user: AdminUser;
+  onEdit: (user: AdminUser) => void;
+  onReset: (user: AdminUser) => void;
+  onDeactivate: (id: string) => void;
+  isPending: boolean;
+}) {
+  return (
+    <div className="flex justify-end gap-2">
+      <Button variant="ghost" size="sm" onClick={() => onEdit(user)}>
+        <Pencil className="h-4 w-4" />
+      </Button>
+      <Button variant="ghost" size="sm" onClick={() => onReset(user)}>
+        <RotateCcw className="h-4 w-4" />
+      </Button>
+      {user.active && (
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={isPending}
+          onClick={() => onDeactivate(user.id)}
+        >
+          <UserX className="h-4 w-4 text-destructive" />
+        </Button>
+      )}
+    </div>
+  );
+}
 
 export default function AdminUsersPage() {
   const { t } = useTranslation("admin");
@@ -93,6 +130,54 @@ export default function AdminUsersPage() {
     await deactivateUser.mutateAsync(id);
   }
 
+  const columns: ColumnDef<AdminUser>[] = [
+    {
+      accessorKey: "name",
+      header: t("usersPage.table.name"),
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.name}</span>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: t("usersPage.table.email"),
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.email}</span>
+      ),
+    },
+    {
+      accessorKey: "role",
+      header: t("usersPage.table.role"),
+      cell: ({ row }) => (
+        <Badge variant={row.original.role === "super_admin" ? "default" : "secondary"}>
+          {row.original.role}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "active",
+      header: t("usersPage.table.status"),
+      cell: ({ row }) => (
+        <Badge variant={row.original.active ? "default" : "destructive"}>
+          {row.original.active ? t("usersPage.status.active") : t("usersPage.status.inactive")}
+        </Badge>
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => (
+        <UserRowActions
+          user={row.original}
+          onEdit={openEdit}
+          onReset={openReset}
+          onDeactivate={handleDeactivate}
+          isPending={deactivateUser.isPending}
+        />
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -106,56 +191,13 @@ export default function AdminUsersPage() {
         </Button>
       </div>
 
-      {isLoading ? (
-        <p className="text-sm text-muted-foreground">{t("usersPage.loading")}</p>
-      ) : (
-        <div className="rounded-md border border-border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-muted/50">
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("usersPage.table.name")}</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("usersPage.table.email")}</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("usersPage.table.role")}</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("usersPage.table.status")}</th>
-                <th className="px-4 py-3 text-right font-medium text-muted-foreground">{t("usersPage.table.actions")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users?.map((user) => (
-                <tr key={user.id} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 font-medium">{user.name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={user.role === "super_admin" ? "default" : "secondary"}>
-                      {user.role}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge variant={user.active ? "default" : "destructive"}>
-                      {user.active ? t("usersPage.status.active") : t("usersPage.status.inactive")}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(user)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => openReset(user)}>
-                        <RotateCcw className="h-4 w-4" />
-                      </Button>
-                      {user.active && (
-                        <Button variant="ghost" size="sm" onClick={() => handleDeactivate(user.id)}>
-                          <UserX className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={users ?? []}
+        isLoading={isLoading}
+        emptyMessage={t("usersPage.empty")}
+        searchPlaceholder={t("usersPage.search")}
+      />
 
       {/* Create Modal */}
       {modal?.type === "create" && (
@@ -197,8 +239,8 @@ export default function AdminUsersPage() {
                 <Select value={form.role} onValueChange={(v) => setForm((f) => ({ ...f, role: v as "super_admin" | "admin" }))}>
                   <SelectTrigger id="create-role"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">admin</SelectItem>
-                    <SelectItem value="super_admin">super_admin</SelectItem>
+                    <SelectItem value="admin">{t("usersPage.roles.admin")}</SelectItem>
+                    <SelectItem value="super_admin">{t("usersPage.roles.superAdmin")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -245,8 +287,8 @@ export default function AdminUsersPage() {
                 <Select value={form.role} onValueChange={(v) => setForm((f) => ({ ...f, role: v as "super_admin" | "admin" }))}>
                   <SelectTrigger id="edit-role"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">admin</SelectItem>
-                    <SelectItem value="super_admin">super_admin</SelectItem>
+                    <SelectItem value="admin">{t("usersPage.roles.admin")}</SelectItem>
+                    <SelectItem value="super_admin">{t("usersPage.roles.superAdmin")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -14,8 +14,6 @@ import type {
 export function useAdminSites() {
   const queryClient = useQueryClient();
   const setSites = useUIStore((s) => s.setSites);
-  const setActiveSiteId = useUIStore((s) => s.setActiveSiteId);
-  const activeSiteId = useUIStore((s) => s.activeSiteId);
 
   const query = useQuery({
     queryKey: queryKeys.admin.sites(),
@@ -29,13 +27,8 @@ export function useAdminSites() {
 
   useEffect(() => {
     if (!query.data) return;
-    const mapped = query.data.map((s) => ({ id: s.id, name: s.name }));
-    setSites(mapped);
-    const isValid = mapped.some((s) => s.id === activeSiteId);
-    if (!isValid && mapped.length > 0) {
-      setActiveSiteId(mapped[0].id);
-    }
-  }, [query.data, setSites, setActiveSiteId, activeSiteId]);
+    setSites(query.data.map((s) => ({ id: s.id, name: s.name })));
+  }, [query.data, setSites]);
 
   const createMutation = useMutation({
     mutationKey: mutationKeys.admin.createSite(),

@@ -7,9 +7,8 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { KpiSummary } from "@/features/admin/components";
-import { useAdminReport } from "@/features/admin/hooks";
-import { useUIStore } from "@/store/ui-store";
+import { KpiSummary, SiteSelector } from "@/features/admin/components";
+import { useAdminReport, useSiteSelection } from "@/features/admin/hooks";
 import type { AdminReport } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -100,16 +99,17 @@ function ReportTabs() {
 }
 
 export default function ReportsPage() {
-  const activeSiteId = useUIStore((s) => s.activeSiteId);
+  const { sites } = useSiteSelection();
   const { t } = useTranslation("admin");
 
+  const [siteId, setSiteId] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [appliedFrom, setAppliedFrom] = useState("");
   const [appliedTo, setAppliedTo] = useState("");
 
   const { report, isLoading } = useAdminReport(
-    activeSiteId ?? "",
+    siteId || undefined,
     appliedFrom,
     appliedTo
   );
@@ -128,19 +128,25 @@ export default function ReportsPage() {
     setAppliedTo("");
   }
 
-  if (!activeSiteId) {
+  if (sites.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">{t("common.selectSite")}</p>
+      <div className="flex h-full flex-col items-center justify-center gap-2">
+        <p className="text-muted-foreground">{t("common.noSites")}</p>
+        <Link href="/sites" className="text-sm font-medium text-primary hover:underline">
+          {t("common.noSitesLink")}
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold text-foreground">{t("reports.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("reports.subtitle")}</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">{t("reports.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("reports.subtitle")}</p>
+        </div>
+        <SiteSelector sites={sites} value={siteId} onChange={setSiteId} allowAll />
       </div>
 
       <ReportTabs />

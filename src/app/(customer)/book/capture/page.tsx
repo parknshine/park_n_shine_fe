@@ -2,8 +2,7 @@
 
 import { startTransition, Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { parseAsString, useQueryStates } from "nuqs";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Loader2 } from "lucide-react";
 import api from "@/lib/axios";
@@ -38,11 +37,10 @@ function WalkInCaptureContent() {
   const { t } = useTranslation("customer");
   const locale = useUIStore((s) => s.locale);
 
-  const [{ lat, lng, loc }] = useQueryStates({
-    lat: parseAsString,
-    lng: parseAsString,
-    loc: parseAsString,
-  });
+  const searchParams = useSearchParams();
+  const lat = searchParams.get("lat");
+  const lng = searchParams.get("lng");
+  const loc = searchParams.get("loc");
 
   const { sites, isLoading: isSitesLoading } = usePublicSites();
 

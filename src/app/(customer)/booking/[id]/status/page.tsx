@@ -1,7 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useQueryState, parseAsString } from "nuqs";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Bell } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
@@ -19,7 +18,8 @@ import { CleaningProgressBar } from "@/features/customer/components/cleaning-pro
 
 export default function BookingStatusPage() {
   const { id: bookingId } = useParams<{ id: string }>();
-  const [token] = useQueryState("token", parseAsString);
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
   const { t } = useTranslation("customer");
   const { whatsappNumber, avgCleaningMinutes } = usePublicSettings();
 

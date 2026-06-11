@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { useQueryState, parseAsString } from "nuqs";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Copy, CheckCircle, RefreshCw, AlertCircle, Wallet } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
@@ -293,7 +292,8 @@ function PaymentInstructionsUI({
 
 export default function PayPage() {
   const { id: bookingId } = useParams<{ id: string }>();
-  const [token] = useQueryState("token", parseAsString);
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
   const router = useRouter();
   const signedToken = token ?? "";
   const { t } = useTranslation("customer");

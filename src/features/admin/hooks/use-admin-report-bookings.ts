@@ -20,7 +20,7 @@ export interface ReportBookingsResponse {
 }
 
 export function useAdminReportBookings(
-  siteId: string,
+  siteId: string | undefined,
   from: string,
   to: string,
   filters?: ReportBookingFilters,
@@ -28,11 +28,12 @@ export function useAdminReportBookings(
   pageSize = 25,
 ) {
   const query = useQuery({
-    enabled: !!siteId,
+    enabled: true,
     placeholderData: keepPreviousData,
-    queryKey: queryKeys.admin.reportBookings(siteId, from, to, filters, page, pageSize),
+    queryKey: queryKeys.admin.reportBookings(siteId ?? "", from, to, filters, page, pageSize),
     queryFn: async () => {
-      const params = new URLSearchParams({ siteId });
+      const params = new URLSearchParams();
+      if (siteId) params.set("siteId", siteId);
       if (from) params.set("from", from);
       if (to) params.set("to", to);
       if (filters?.crewId) params.set("crewId", filters.crewId);

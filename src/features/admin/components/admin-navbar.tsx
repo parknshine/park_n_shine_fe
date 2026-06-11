@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Bell, LogOut, Timer } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
-import { useAdminAuth, useAdminQueue } from "@/features/admin/hooks";
+import { useAdminAuth, useAdminEscalations } from "@/features/admin/hooks";
 import { LanguageSwitcher } from "@/components/shared";
 import { StatusBadge } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,6 @@ export function AdminNavbar() {
   const router = useRouter();
   const { logout } = useAdminAuth();
   const user = useAuthStore((s) => s.user);
-  const activeSiteId = useUIStore((s) => s.activeSiteId);
   const { t } = useTranslation("admin");
   const [showEscalations, setShowEscalations] = useState(false);
   const [showTimeExt, setShowTimeExt] = useState(false);
@@ -34,12 +33,7 @@ export function AdminNavbar() {
   const timeExtNotifications = useUIStore((s) => s.timeExtNotifications);
   const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
 
-  const { queue } = useAdminQueue({
-    siteId: activeSiteId ?? "",
-    enabled: !!activeSiteId,
-  });
-
-  const escalations = queue?.escalations ?? [];
+  const { escalations } = useAdminEscalations();
   const escalationCount = escalations.length;
 
   useEffect(() => {
@@ -189,7 +183,8 @@ export function AdminNavbar() {
                           {booking.plateText ?? booking.id}
                         </p>
                         <p className="truncate text-xs text-muted-foreground">
-                          {booking.slotText}
+                          {booking.siteName}
+                          {booking.slotText ? ` · ${booking.slotText}` : ""}
                         </p>
                       </div>
                       <StatusBadge tone={BOOKING_STATUS_TONES[booking.status] ?? "neutral"}>
