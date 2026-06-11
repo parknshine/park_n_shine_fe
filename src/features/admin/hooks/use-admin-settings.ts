@@ -21,7 +21,9 @@ export function useAdminSettings() {
     mutationKey: mutationKeys.admin.saveSettings(),
     mutationFn: async (payload: Partial<Pick<AdminSettings,
       "staleJobTimeoutMinutes" | "jobEtaMinutes" | "whatsappNumber" |
-      "avgCleaningMinutes" | "paymentExpiryMinutes" | "crewTimeExtensionMinutes"
+      "avgCleaningMinutes" | "paymentExpiryMinutes" | "crewTimeExtensionMinutes" |
+      "loyaltyEnabled" | "loyaltyOtpChannel" | "signupDiscountPercent" |
+      "loyaltyWashThreshold" | "loyaltyRewardDiscountPercent"
     >>) => {
       const response = await api.post<AdminSettings>("/v1/admin/settings", payload);
       return response.data;

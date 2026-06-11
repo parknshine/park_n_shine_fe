@@ -1,5 +1,6 @@
 export { useBookingStatus } from "./use-booking-status";
 export { usePublicSites } from "./use-public-sites";
+export { usePublicSettings } from "./use-public-settings";
 export type { PublicSite } from "./use-public-sites";
 export { usePaymentAction } from "./use-payment-action";
 export { usePhotoUpload } from "./use-photo-upload";

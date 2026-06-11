@@ -11,8 +11,10 @@ import {
   QrCode,
   WifiOff,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -26,7 +28,7 @@ import { useTranslation } from "@/i18n";
 
 interface SettingsTableProps {
   settings: AdminSettings;
-  save: (data: Partial<Pick<AdminSettings, "staleJobTimeoutMinutes" | "jobEtaMinutes" | "whatsappNumber" | "avgCleaningMinutes" | "paymentExpiryMinutes" | "crewTimeExtensionMinutes">>) => Promise<unknown>;
+  save: (data: Partial<Pick<AdminSettings, "staleJobTimeoutMinutes" | "jobEtaMinutes" | "whatsappNumber" | "avgCleaningMinutes" | "paymentExpiryMinutes" | "crewTimeExtensionMinutes" | "loyaltyEnabled" | "loyaltyOtpChannel" | "signupDiscountPercent" | "loyaltyWashThreshold" | "loyaltyRewardDiscountPercent">>) => Promise<unknown>;
   isSaving: boolean;
 }
 
@@ -38,6 +40,10 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
   const [paymentExpiry, setPaymentExpiry] = useState(settings.paymentExpiryMinutes);
   const [waNumber, setWaNumber] = useState(settings.whatsappNumber);
   const [crewTimeExtension, setCrewTimeExtension] = useState(settings.crewTimeExtensionMinutes);
+  const [loyaltyEnabled, setLoyaltyEnabled] = useState(settings.loyaltyEnabled);
+  const [signupDiscountPercent, setSignupDiscountPercent] = useState(settings.signupDiscountPercent);
+  const [loyaltyWashThreshold, setLoyaltyWashThreshold] = useState(settings.loyaltyWashThreshold);
+  const [loyaltyRewardDiscountPercent, setLoyaltyRewardDiscountPercent] = useState(settings.loyaltyRewardDiscountPercent);
 
   async function handleSave(payload: Parameters<typeof save>[0], successKey: string, errorKey: string) {
     try {
@@ -264,6 +270,137 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
             </td>
           </tr>
 
+          {/* Loyalty Program */}
+          <tr className="align-top">
+            <td className="px-4 py-3" colSpan={3}>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                Program Loyalti
+              </p>
+            </td>
+          </tr>
+
+          {/* Loyalty Enabled */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">Tampilkan program loyalti ke customer</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="loyalty-enabled-input"
+                  checked={loyaltyEnabled}
+                  onCheckedChange={setLoyaltyEnabled}
+                  className="h-6 w-11 data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground/30"
+                />
+                <label
+                  htmlFor="loyalty-enabled-input"
+                  className={cn(
+                    "text-sm font-medium cursor-pointer select-none",
+                    loyaltyEnabled ? "text-primary" : "text-muted-foreground",
+                  )}
+                >
+                  {loyaltyEnabled ? "Aktif" : "Nonaktif"}
+                </label>
+              </div>
+            </td>
+            <td className="px-4 py-3">
+              <Button
+                size="sm"
+                disabled={isSaving}
+                onClick={() => handleSave({ loyaltyEnabled }, "settings.loyaltyEnabled.success", "settings.loyaltyEnabled.error")}
+              >
+                {t("settings.table.save")}
+              </Button>
+            </td>
+          </tr>
+
+          {/* Signup Discount */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">Diskon signup (%)</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  id="signup-discount-input"
+                  type="text"
+                  inputMode="numeric"
+                  value={signupDiscountPercent}
+                  onChange={(e) => setSignupDiscountPercent(Number(e.target.value))}
+                  className="w-20 h-8 text-sm"
+                />
+                <span className="text-xs text-muted-foreground">%</span>
+              </div>
+            </td>
+            <td className="px-4 py-3">
+              <Button
+                size="sm"
+                disabled={isSaving}
+                onClick={() => handleSave({ signupDiscountPercent }, "settings.signupDiscount.success", "settings.signupDiscount.error")}
+              >
+                {t("settings.table.save")}
+              </Button>
+            </td>
+          </tr>
+
+          {/* Loyalty Wash Threshold */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">Jumlah stempel</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  id="loyalty-wash-threshold-input"
+                  type="text"
+                  inputMode="numeric"
+                  value={loyaltyWashThreshold}
+                  onChange={(e) => setLoyaltyWashThreshold(Number(e.target.value))}
+                  className="w-20 h-8 text-sm"
+                />
+                <span className="text-xs text-muted-foreground">cuci</span>
+              </div>
+            </td>
+            <td className="px-4 py-3">
+              <Button
+                size="sm"
+                disabled={isSaving}
+                onClick={() => handleSave({ loyaltyWashThreshold }, "settings.loyaltyThreshold.success", "settings.loyaltyThreshold.error")}
+              >
+                {t("settings.table.save")}
+              </Button>
+            </td>
+          </tr>
+
+          {/* Loyalty Reward Discount */}
+          <tr className="align-top">
+            <td className="px-4 py-3">
+              <p className="font-medium text-foreground">Diskon reward (%)</p>
+            </td>
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  id="loyalty-reward-discount-input"
+                  type="text"
+                  inputMode="numeric"
+                  value={loyaltyRewardDiscountPercent}
+                  onChange={(e) => setLoyaltyRewardDiscountPercent(Number(e.target.value))}
+                  className="w-20 h-8 text-sm"
+                />
+                <span className="text-xs text-muted-foreground">%</span>
+              </div>
+            </td>
+            <td className="px-4 py-3">
+              <Button
+                size="sm"
+                disabled={isSaving}
+                onClick={() => handleSave({ loyaltyRewardDiscountPercent }, "settings.loyaltyReward.success", "settings.loyaltyReward.error")}
+              >
+                {t("settings.table.save")}
+              </Button>
+            </td>
+          </tr>
+
           {/* WhatsApp Number */}
           <tr className="align-top">
             <td className="px-4 py-3">
@@ -466,7 +603,7 @@ export default function SettingsPage() {
         <p className="text-sm text-muted-foreground">{t("settings.loading")}</p>
       ) : (
         <SettingsTable
-          key={`${settings.staleJobTimeoutMinutes}-${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}`}
+          key={`${settings.staleJobTimeoutMinutes}-${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}-${String(settings.loyaltyEnabled)}-${settings.signupDiscountPercent}-${settings.loyaltyWashThreshold}-${settings.loyaltyRewardDiscountPercent}`}
           settings={settings}
           save={save}
           isSaving={isSaving}

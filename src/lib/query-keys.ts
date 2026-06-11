@@ -18,6 +18,7 @@ export const queryKeys = {
     testimonials: () => ["admin", "testimonials"] as const,
     tipCrewSummary: (period: string) => ["admin", "tips", "crew-summary", period] as const,
     disbursements: () => ["admin", "disbursements"] as const,
+    loyaltyCustomers: () => ["admin", "loyalty", "customers"] as const,
   },
   crew: {
     session: () => ["crew", "session"] as const,

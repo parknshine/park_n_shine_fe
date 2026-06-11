@@ -180,6 +180,22 @@
       "resetLabel": "Reset to 10 minutes",
       "success": "Crew time extension duration saved.",
       "error": "Failed to save crew time extension duration."
+    },
+    "loyaltyEnabled": {
+      "success": "Loyalty program setting saved successfully.",
+      "error": "Failed to save loyalty program setting."
+    },
+    "signupDiscount": {
+      "success": "Signup discount saved successfully.",
+      "error": "Failed to save signup discount."
+    },
+    "loyaltyThreshold": {
+      "success": "Stamp threshold saved successfully.",
+      "error": "Failed to save stamp threshold."
+    },
+    "loyaltyReward": {
+      "success": "Reward discount saved successfully.",
+      "error": "Failed to save reward discount."
     }
   },
   "drawer": {

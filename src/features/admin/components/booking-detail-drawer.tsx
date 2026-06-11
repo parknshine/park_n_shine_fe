@@ -297,7 +297,8 @@ export function BookingDetailDrawer({
                       </div>
                     </div>
                   )}
-                  {booking?.pendingTimeExtension?.status === "PENDING" && (
+                  {booking?.pendingTimeExtension?.status === "PENDING" &&
+                    !["CLOSED", "CANCELLED", "EXPIRED"].includes(booking.status) && (
                     <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/40">
                       <div className="mb-2 flex items-center gap-1.5">
                         <Timer className="h-3.5 w-3.5 text-amber-600" />

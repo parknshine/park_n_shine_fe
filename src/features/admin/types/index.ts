@@ -73,7 +73,7 @@ export interface AuditEntry {
   id: string;
   bookingId: string;
   plateText: string | null;
-  action: "refund" | "status_override" | "reassign" | "crew.job_rejected" | "approve_time_extension" | "reject_time_extension";
+  action: "refund" | "status_override" | "reassign" | "extend_time" | "crew.job_rejected" | "approve_time_extension" | "reject_time_extension";
   detail: string;
   adminEmail: string;
   createdAt: string;
@@ -127,6 +127,11 @@ export interface AdminSettings {
   avgCleaningMinutes: number;
   paymentExpiryMinutes: number;
   crewTimeExtensionMinutes: number;
+  loyaltyEnabled: boolean;
+  loyaltyOtpChannel: string;
+  signupDiscountPercent: number;
+  loyaltyWashThreshold: number;
+  loyaltyRewardDiscountPercent: number;
 }
 
 export interface AdminSite {

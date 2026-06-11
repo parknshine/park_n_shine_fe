@@ -180,6 +180,22 @@
       "resetLabel": "Reset ke 10 menit",
       "success": "Durasi tambah waktu crew berhasil disimpan.",
       "error": "Gagal menyimpan durasi tambah waktu crew."
+    },
+    "loyaltyEnabled": {
+      "success": "Pengaturan program loyalti berhasil disimpan.",
+      "error": "Gagal menyimpan pengaturan program loyalti."
+    },
+    "signupDiscount": {
+      "success": "Diskon signup berhasil disimpan.",
+      "error": "Gagal menyimpan diskon signup."
+    },
+    "loyaltyThreshold": {
+      "success": "Jumlah stempel berhasil disimpan.",
+      "error": "Gagal menyimpan jumlah stempel."
+    },
+    "loyaltyReward": {
+      "success": "Diskon reward berhasil disimpan.",
+      "error": "Gagal menyimpan diskon reward."
     }
   },
   "drawer": {

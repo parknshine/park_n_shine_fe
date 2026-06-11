@@ -10,7 +10,7 @@ import { AppShell, OfflineBanner } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { OcrEditField } from "@/features/customer/components/ocr-edit-field";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
-import { usePhotoUpload, usePublicSites } from "@/features/customer/hooks";
+import { usePhotoUpload, usePublicSettings, usePublicSites } from "@/features/customer/hooks";
 import { isValidPhone } from "@/features/customer/utils/phone";
 import type { CustomerBooking } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
@@ -43,6 +43,7 @@ function WalkInCaptureContent() {
   const loc = searchParams.get("loc");
 
   const { sites, isLoading: isSitesLoading } = usePublicSites();
+  const { loyaltyEnabled } = usePublicSettings();
 
   const [plateText, setPlateText] = useState("");
   const [slotText, setSlotText] = useState("");
@@ -284,6 +285,11 @@ function WalkInCaptureContent() {
               placeholder={t("booking.capture.phonePlaceholder")}
               className='w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
             />
+            {loyaltyEnabled && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Nomor HP akan digunakan untuk program loyalti Park N Shine
+              </p>
+            )}
             <p className='text-xs text-muted-foreground'>
               {t("booking.capture.phoneHelper")}
             </p>

@@ -31,11 +31,11 @@ function TemplateDataFields({
   templateType,
   data,
   onChange,
-}: {
+}: Readonly<{
   templateType: EmailTemplateType;
   data: Record<string, string>;
   onChange: (key: string, value: string) => void;
-}) {
+}>) {
   if (templateType === "promotional") {
     return (
       <div className="space-y-3">
@@ -77,7 +77,7 @@ function TemplateDataFields({
   );
 }
 
-function Field({ label, id, value, onChange, placeholder, type = "text", inputMode }: { label: string; id: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"] }) {
+function Field({ label, id, value, onChange, placeholder, type = "text", inputMode }: Readonly<{ label: string; id: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"] }>) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
@@ -86,7 +86,7 @@ function Field({ label, id, value, onChange, placeholder, type = "text", inputMo
   );
 }
 
-function TextareaField({ label, id, value, onChange, placeholder, rows = 3 }: { label: string; id: string; value: string; onChange: (v: string) => void; placeholder?: string; rows?: number }) {
+function TextareaField({ label, id, value, onChange, placeholder, rows = 3 }: Readonly<{ label: string; id: string; value: string; onChange: (v: string) => void; placeholder?: string; rows?: number }>) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>

@@ -23,6 +23,15 @@ function formatApproveTimeExtension(p: Record<string, unknown>): string {
   return `+${minutes} min${etaSuffix}`;
 }
 
+function formatExtendTime(p: Record<string, unknown>): string {
+  const minutes = p.minutes as number | undefined;
+  const status = p.newStatus ? ` → ${p.newStatus as string}` : "";
+  const eta = p.newEtaEndsAt
+    ? ` · ETA ${new Date(p.newEtaEndsAt as string).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}`
+    : "";
+  return minutes != null ? `+${minutes} min${status}${eta}` : "Extended";
+}
+
 function parseDetail(action: string, p: Record<string, unknown>, raw: string): string {
   if (action === "crew.job_rejected") {
     const reason = (p.reason as string) ?? "—";
@@ -51,6 +60,7 @@ function parseDetail(action: string, p: Record<string, unknown>, raw: string): s
     const reason = p.reasonCode ? ` • ${p.reasonCode as string}` : "";
     return `${type}${reason}`;
   }
+  if (action === "extend_time") return formatExtendTime(p);
   if (action === "approve_time_extension") return formatApproveTimeExtension(p);
   if (action === "reject_time_extension") return "Request rejected";
   return raw;
@@ -59,6 +69,7 @@ function parseDetail(action: string, p: Record<string, unknown>, raw: string): s
 export function formatAuditAction(action: string): string {
   if (action === "crew.job_rejected") return "Crew Rejected Job";
   if (action === "crew.requested_help") return "Crew Requested Help";
+  if (action === "extend_time") return "Extend Time";
   if (action === "approve_time_extension") return "Approve Time Extension";
   if (action === "reject_time_extension") return "Reject Time Extension";
   return action.replaceAll("_", " ");

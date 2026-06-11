@@ -23,10 +23,10 @@ import type { AdminCrewMember } from "@/features/admin/types";
 function CreateCrewModal({
   open,
   onClose,
-}: {
+}: Readonly<{
   open: boolean;
   onClose: () => void;
-}) {
+}>) {
   const { t } = useTranslation("admin");
   const { create, isCreating } = useAdminCrew();
   const [name, setName] = useState("");
@@ -34,11 +34,11 @@ function CreateCrewModal({
   const [phone, setPhone] = useState("");
 
   async function handleSubmit() {
-    if (!name.trim() || !pin.match(/^\d{4,8}$/)) {
+    if (!name.trim() || !new RegExp(/^\d{4,8}$/).exec(pin)) {
       toast.error(t("crewPage.toast.nameRequired"));
       return;
     }
-    if (phone && !phone.match(/^(\+62|62|0)8\d{8,11}$/)) {
+    if (phone && !new RegExp(/^(\+62|62|0)8\d{8,11}$/).exec(phone)) {
       toast.error(t("crewPage.toast.invalidWhatsapp"));
       return;
     }
@@ -97,10 +97,10 @@ function CreateCrewModal({
 function EditCrewModal({
   crew,
   onClose,
-}: {
+}: Readonly<{
   crew: AdminCrewMember;
   onClose: () => void;
-}) {
+}>) {
   const { t } = useTranslation("admin");
   const { update, isUpdating } = useAdminCrew();
   const [name, setName] = useState(crew.name);
@@ -108,11 +108,11 @@ function EditCrewModal({
   const [phone, setPhone] = useState(crew.phone ?? "");
 
   async function handleSubmit() {
-    if (pin && !pin.match(/^\d{4,8}$/)) {
+    if (pin && !new RegExp(/^\d{4,8}$/).exec(pin)) {
       toast.error(t("crewPage.toast.pinRequired"));
       return;
     }
-    if (phone && !phone.match(/^(\+62|62|0)8\d{8,11}$/)) {
+    if (phone && !new RegExp(/^(\+62|62|0)8\d{8,11}$/).exec(phone)) {
       toast.error(t("crewPage.toast.invalidWhatsapp"));
       return;
     }
@@ -177,13 +177,13 @@ function CrewRowActions({
   onToggle,
   onDelete,
   isDeleting,
-}: {
+}: Readonly<{
   crew: AdminCrewMember;
   onEdit: (crew: AdminCrewMember) => void;
   onToggle: (crew: AdminCrewMember) => void;
   onDelete: (id: string, name: string) => void;
   isDeleting: boolean;
-}) {
+}>) {
   return (
     <div className="flex justify-end gap-2">
       <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => onEdit(crew)}>
