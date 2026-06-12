@@ -4,6 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/shared";
 import { BookingSummaryCard } from "@/features/customer/components/booking-summary-card";
+import { BookingLocationCard } from "@/features/customer/components/booking-location-card";
 import { PayButton } from "@/features/customer/components/pay-button";
 import { useBookingStatus } from "@/features/customer/hooks";
 
@@ -23,6 +24,7 @@ function ConfirmContent() {
   const token = searchParams.get("token");
   const plate = searchParams.get("plate");
   const slot = searchParams.get("slot");
+  const phone = searchParams.get("phone");
 
   useEffect(() => {
     if (!bookingId || !token || !plate || !slot) {
@@ -66,11 +68,20 @@ function ConfirmContent() {
           estimatedReadyAt={booking?.estimatedReadyAt}
         />
 
+        {booking?.siteName && (
+          <BookingLocationCard
+            locationName={booking.siteName}
+            locationAddress={booking.siteAddress ?? undefined}
+            phone={phone ?? undefined}
+          />
+        )}
+
         <PayButton
           bookingId={bookingId}
           signedToken={token}
           plateText={plate}
           slotText={slot}
+          phone={phone ?? undefined}
         />
       </div>
     </AppShell>

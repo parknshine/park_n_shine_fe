@@ -4,7 +4,7 @@ export const TIP_PRESETS = [5_000, 10_000] as const;
 
 export interface TipQrisInstructions {
   type: "QRIS";
-  qrUrl: string;
+  qrString: string;
   expiryTime: string;
 }
 

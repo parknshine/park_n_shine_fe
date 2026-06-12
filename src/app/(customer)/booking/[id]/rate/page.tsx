@@ -9,6 +9,7 @@ import { Sparkles } from "lucide-react";
 import { StarRating } from "@/features/customer/components/star-rating";
 import type { RatingPayload } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
+import QRCode from "react-qr-code";
 import { useTipPayment } from "@/features/customer/hooks/use-tip-payment";
 import { useCheckTip } from "@/features/customer/hooks/use-check-tip";
 import { usePaymentAutoPoll } from "@/features/customer/hooks/use-payment-auto-poll";
@@ -34,12 +35,18 @@ function TipPayStep({
       <h2 className="text-xl font-bold text-foreground">Selesaikan Pembayaran Tip</h2>
       {instructions.type === "QRIS" ? (
         <div className="space-y-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={instructions.qrUrl}
-            alt="QR Code Tip"
-            className="mx-auto h-56 w-56 rounded-xl border border-border object-contain"
-          />
+          {instructions.qrString.startsWith("http") ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={instructions.qrString}
+              alt="QR Code Tip"
+              className="mx-auto h-56 w-56 rounded-xl border border-border object-contain"
+            />
+          ) : (
+            <div className="mx-auto w-fit rounded-xl border border-border p-3">
+              <QRCode value={instructions.qrString} size={192} />
+            </div>
+          )}
           <p className="text-sm text-muted-foreground">
             Berlaku hingga: {new Date(instructions.expiryTime).toLocaleTimeString("id-ID")}
           </p>

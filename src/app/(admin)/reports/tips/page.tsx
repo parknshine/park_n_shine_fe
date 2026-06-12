@@ -3,12 +3,12 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, X, Calendar } from "lucide-react";
+import { Search, X, Calendar, Wallet, Users, TrendingUp } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useAdminTipList } from "@/features/admin/hooks/use-admin-tips";
+import { useAdminTipList, useAdminTipCrewSummary } from "@/features/admin/hooks/use-admin-tips";
 import { useSiteSelection } from "@/features/admin/hooks";
 import type { AdminTipRow } from "@/features/admin/types/tip";
 import {
@@ -92,6 +92,8 @@ export default function TipsReportPage() {
     appliedSearch,
     appliedSiteId,
   );
+
+  const { crewSummary, isLoading: isCrewSummaryLoading } = useAdminTipCrewSummary(period);
 
   const STATUS_STYLES: Record<AdminTipRow["status"], string> = {
     PAID: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
@@ -281,6 +283,66 @@ export default function TipsReportPage() {
       </div>
 
       <ReportTabs />
+
+      {/* Summary KPI cards */}
+      <dl className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-950/20">
+          <dt className="flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+            <Wallet className="h-3.5 w-3.5" />
+            Total Tip Diterima
+          </dt>
+          <dd className="mt-2 text-2xl font-semibold text-amber-800 dark:text-amber-300">
+            {isCrewSummaryLoading ? "—" : formatRupiah(crewSummary?.summary.totalPaid ?? 0)}
+          </dd>
+          <p className="mt-1 text-xs text-amber-600/70 dark:text-amber-500/60">Terpisah dari revenue car wash</p>
+        </div>
+        <div className="rounded-lg border border-border p-4">
+          <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <TrendingUp className="h-3.5 w-3.5" />
+            Total Sudah Dicairkan
+          </dt>
+          <dd className="mt-2 text-2xl font-semibold text-foreground">
+            {isCrewSummaryLoading ? "—" : formatRupiah(crewSummary?.summary.totalDisbursed ?? 0)}
+          </dd>
+        </div>
+        <div className="rounded-lg border border-border p-4">
+          <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Users className="h-3.5 w-3.5" />
+            Crew Menerima Tip
+          </dt>
+          <dd className="mt-2 text-2xl font-semibold text-foreground">
+            {isCrewSummaryLoading ? "—" : (crewSummary?.summary.crewCount ?? 0)}
+            <span className="ml-1 text-sm font-normal text-muted-foreground">orang</span>
+          </dd>
+        </div>
+      </dl>
+
+      {/* Per-crew tip breakdown */}
+      {crewSummary && crewSummary.crews.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold text-foreground">Rincian Tip per Staff</h2>
+          <div className="rounded-lg border border-border divide-y divide-border">
+            {crewSummary.crews.map((crew) => (
+              <div key={crew.crewId} className="flex items-center justify-between px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{crew.crewName}</p>
+                  <p className="text-xs text-muted-foreground">{crew.tipCount} transaksi tip</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                    + {formatRupiah(crew.totalPaid)}
+                  </p>
+                  {crew.pendingDisbursement > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Belum dicairkan: {formatRupiah(crew.pendingDisbursement)}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className='space-y-3'>
         <div className='flex flex-wrap items-center justify-between gap-3'>

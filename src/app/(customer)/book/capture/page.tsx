@@ -193,14 +193,11 @@ function WalkInCaptureContent() {
         </div>
 
         <div className='space-y-3'>
-          <div className='rounded-lg border border-sky-100 bg-sky-50 px-3 py-2.5 text-xs text-sky-700'>
-            <p className='font-semibold'>{t("booking.capture.platePhotoLabel")}</p>
-            <p className='mt-0.5 leading-relaxed'>{t("booking.capture.platePhotoGuideline")}</p>
-          </div>
           <PhotoUploadField
             id='plate-photo'
             kind='plate'
             label={t("booking.capture.platePhotoLabel")}
+            hint={t("booking.capture.platePhotoGuideline")}
             state={plateUpload}
             onSelect={(file, kind) => plateUpload.uploadPhoto({ file, kind })}
             onRetry={plateUpload.reset}
@@ -215,14 +212,11 @@ function WalkInCaptureContent() {
             />
           )}
 
-          <div className='rounded-lg border border-sky-100 bg-sky-50 px-3 py-2.5 text-xs text-sky-700'>
-            <p className='font-semibold'>{t("booking.capture.slotPhotoLabel")}</p>
-            <p className='mt-0.5 leading-relaxed'>{t("booking.capture.slotPhotoGuideline")}</p>
-          </div>
           <PhotoUploadField
             id='slot-photo'
             kind='slot'
             label={t("booking.capture.slotPhotoLabel")}
+            hint={t("booking.capture.slotPhotoGuideline")}
             state={slotUpload}
             onSelect={(file, kind) => slotUpload.uploadPhoto({ file, kind })}
             onRetry={slotUpload.reset}

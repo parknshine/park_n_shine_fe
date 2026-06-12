@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { Download, X, ArrowRight, Star } from "lucide-react";
+import { useMemo, useState } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Download, X, ArrowRight, Star, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { KpiSummary, SiteSelector } from "@/features/admin/components";
 import { useAdminReport, useSiteSelection } from "@/features/admin/hooks";
-import type { AdminReport } from "@/features/admin/types";
+import { useAdminTipCrewSummary } from "@/features/admin/hooks/use-admin-tips";
+import type { AdminReport, ReportCrewPerformance } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
 
@@ -17,16 +20,21 @@ function toISODate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function reliabilityBarColor(score: number): string {
-  if (score >= 80) return "bg-green-500";
-  if (score >= 60) return "bg-amber-500";
-  return "bg-red-500";
+function currentMonth(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function reliabilityTextColor(score: number): string {
-  if (score >= 80) return "text-green-600 dark:text-green-400";
-  if (score >= 60) return "text-amber-600 dark:text-amber-400";
-  return "text-red-600 dark:text-red-400";
+function deriveTipPeriod(appliedFrom: string): string {
+  return appliedFrom ? appliedFrom.slice(0, 7) : currentMonth();
+}
+
+function formatPeriodLabel(period: string): string {
+  const [year, month] = period.split("-");
+  return new Date(Number(year), Number(month) - 1).toLocaleDateString("id-ID", {
+    month: "long",
+    year: "numeric",
+  });
 }
 
 function formatRupiah(amount: number): string {
@@ -39,6 +47,18 @@ function formatTurnaround(seconds: number | null): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return s > 0 ? `${m}m ${s}s` : `${m}m`;
+}
+
+function reliabilityColor(score: number): string {
+  if (score >= 80) return "bg-green-500";
+  if (score >= 60) return "bg-amber-500";
+  return "bg-red-500";
+}
+
+function reliabilityTextColor(score: number): string {
+  if (score >= 80) return "text-green-600 dark:text-green-400";
+  if (score >= 60) return "text-amber-600 dark:text-amber-400";
+  return "text-red-600 dark:text-red-400";
 }
 
 function exportToCSV(report: AdminReport, from: string, to: string) {
@@ -77,18 +97,18 @@ function ReportTabs() {
   const tabs = [
     { label: t("reports.tabs.summary"), href: "/reports" },
     { label: t("reports.tabs.jobs"), href: "/reports/jobs" },
-    { label: "Tips", href: "/reports/tips" },
-    { label: "Disbursements", href: "/reports/disbursements" },
-    { label: "Customers", href: "/reports/customers" },
+    { label: t("reports.tabs.tips"), href: "/reports/tips" },
+    { label: t("reports.tabs.disbursements"), href: "/reports/disbursements" },
+    { label: t("reports.tabs.customers"), href: "/reports/customers" },
   ];
   return (
-    <div className="flex gap-1 border-b border-border">
+    <div className="flex gap-1 overflow-x-auto border-b border-border">
       {tabs.map((tab) => (
         <Link
           key={tab.href}
           href={tab.href}
           className={cn(
-            "px-4 py-2 text-sm font-medium transition-colors",
+            "whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors",
             pathname === tab.href
               ? "border-b-2 border-primary text-foreground"
               : "text-muted-foreground hover:text-foreground"
@@ -111,13 +131,172 @@ export default function ReportsPage() {
   const [appliedFrom, setAppliedFrom] = useState("");
   const [appliedTo, setAppliedTo] = useState("");
 
-  const { report, isLoading } = useAdminReport(
-    siteId || undefined,
-    appliedFrom,
-    appliedTo
-  );
+  const tipPeriod = deriveTipPeriod(appliedFrom);
+
+  const { report, isLoading } = useAdminReport(siteId || undefined, appliedFrom, appliedTo);
+  const { crewSummary } = useAdminTipCrewSummary(tipPeriod);
 
   const hasFilter = appliedFrom !== "" || appliedTo !== "";
+
+  const statusEntries = useMemo(() => Object.entries(report?.bookings.byStatus ?? {}), [report?.bookings.byStatus]);
+
+  const statusColumns = useMemo<ColumnDef<[string, number]>[]>(
+    () => [
+      {
+        accessorFn: ([status]) => status,
+        id: "status",
+        header: t("reports.columns.status"),
+        cell: ({ row }) => (
+          <span className="font-mono text-xs uppercase">{row.original[0]}</span>
+        ),
+      },
+      {
+        accessorFn: ([, count]) => count,
+        id: "count",
+        header: t("reports.columns.count"),
+        meta: { align: "right" },
+        cell: ({ row }) => row.original[1],
+      },
+    ],
+    [t]
+  );
+
+  const crewColumns = useMemo<ColumnDef<ReportCrewPerformance>[]>(
+    () => [
+      {
+        accessorKey: "crewName",
+        header: t("reports.crew.name"),
+        cell: ({ row }) => <span className="font-medium">{row.original.crewName}</span>,
+      },
+      {
+        accessorKey: "jobsCompleted",
+        header: t("reports.crew.jobs"),
+        meta: { align: "right" },
+      },
+      {
+        accessorKey: "staleCount",
+        header: t("reports.crew.stale"),
+        meta: { align: "right" },
+        cell: ({ row }) => (
+          <span
+            className={cn(
+              "font-mono text-xs",
+              row.original.staleCount > 0
+                ? "text-red-600 dark:text-red-400"
+                : "text-muted-foreground"
+            )}
+          >
+            {row.original.staleCount}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "needsHelpCount",
+        header: t("reports.crew.needsHelp"),
+        meta: { align: "right" },
+        cell: ({ row }) => (
+          <span
+            className={cn(
+              "font-mono text-xs",
+              row.original.needsHelpCount > 0
+                ? "text-amber-600 dark:text-amber-400"
+                : "text-muted-foreground"
+            )}
+          >
+            {row.original.needsHelpCount}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "rejectedCount",
+        header: t("reports.crew.rejected"),
+        meta: { align: "right" },
+        cell: ({ row }) => (
+          <span
+            className={cn(
+              "font-mono text-xs",
+              row.original.rejectedCount > 0
+                ? "text-orange-600 dark:text-orange-400"
+                : "text-muted-foreground"
+            )}
+          >
+            {row.original.rejectedCount}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "timeExtensionCount",
+        header: t("reports.crew.timeExt"),
+        meta: { align: "right" },
+        cell: ({ row }) => (
+          <span
+            className={cn(
+              "font-mono text-xs",
+              row.original.timeExtensionCount > 0
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-muted-foreground"
+            )}
+          >
+            {row.original.timeExtensionCount}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "reliabilityScore",
+        header: t("reports.crew.reliability"),
+        meta: { align: "right" },
+        cell: ({ row }) => {
+          const score = row.original.reliabilityScore;
+          if (score == null) return <span className="text-muted-foreground">—</span>;
+          return (
+            <div className="flex items-center justify-end gap-2">
+              <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
+                <div
+                  className={cn("h-full rounded-full", reliabilityColor(score))}
+                  style={{ width: `${score}%` }}
+                />
+              </div>
+              <span className={cn("font-mono text-xs", reliabilityTextColor(score))}>
+                {score.toFixed(1)}%
+              </span>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "avgTurnaroundSeconds",
+        header: t("reports.crew.avgTurnaround"),
+        meta: { align: "right" },
+        cell: ({ row }) => (
+          <span className="font-mono text-xs">
+            {formatTurnaround(row.original.avgTurnaroundSeconds)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "avgRating",
+        header: t("reports.crew.avgRating"),
+        meta: { align: "right" },
+        cell: ({ row }) => {
+          const rating = row.original.avgRating;
+          if (rating == null) return <span className="text-muted-foreground">—</span>;
+          return (
+            <span className="inline-flex items-center gap-1 font-mono text-xs">
+              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+              {rating.toFixed(1)}
+            </span>
+          );
+        },
+      },
+      {
+        accessorKey: "estimatedRevenue",
+        header: t("reports.crew.revenue"),
+        meta: { align: "right" },
+        cell: ({ row }) => formatRupiah(row.original.estimatedRevenue),
+      },
+    ],
+    [t]
+  );
 
   function handleApply() {
     setAppliedFrom(from);
@@ -144,6 +323,7 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-foreground">{t("reports.title")}</h1>
@@ -198,52 +378,71 @@ export default function ReportsPage() {
         </Button>
       </div>
 
-      {/* KPI cards */}
+      {/* Car wash KPI cards */}
       {report && <KpiSummary report={report} />}
 
+      {/* Total Tip card — separate from car wash revenue */}
+      {crewSummary && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20">
+          <div className="flex flex-wrap items-center gap-4 p-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40">
+              <Wallet className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                {t("reports.tipCard.title")}
+                <span className="ml-1.5 font-normal text-amber-600/70 dark:text-amber-500/60">
+                  ({formatPeriodLabel(tipPeriod)})
+                </span>
+              </p>
+              <p className="mt-0.5 text-2xl font-bold text-amber-800 dark:text-amber-300">
+                {formatRupiah(crewSummary.summary.totalPaid)}
+              </p>
+            </div>
+            <div className="flex gap-6 text-right">
+              <div>
+                <p className="text-xs text-amber-600/70 dark:text-amber-500/60">{t("reports.tipCard.disbursed")}</p>
+                <p className="mt-0.5 text-sm font-semibold text-amber-800 dark:text-amber-300">
+                  {formatRupiah(crewSummary.summary.totalDisbursed)}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-amber-600/70 dark:text-amber-500/60">{t("reports.tipCard.crewCount")}</p>
+                <p className="mt-0.5 text-sm font-semibold text-amber-800 dark:text-amber-300">
+                  {crewSummary.summary.crewCount} {t("reports.tipCard.crewCountUnit")}
+                </p>
+              </div>
+            </div>
+            <div className="hidden sm:block h-8 w-px bg-amber-200 dark:bg-amber-800/50" />
+            <p className="hidden sm:block text-xs text-amber-600/60 dark:text-amber-500/50 italic">
+              {t("reports.tipCard.notIncluded")}
+            </p>
+            <Link
+              href="/reports/tips"
+              className="flex items-center gap-1 text-xs font-medium text-amber-700 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-200"
+            >
+              {t("reports.tipCard.detail")} <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      )}
+
       {report && (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-6">
           {/* Bookings by status */}
           <div className="space-y-2">
-            <h2 className="text-sm font-semibold text-foreground">
-              {t("reports.statusBreakdown")}
-            </h2>
-            <div className="overflow-hidden rounded-lg border border-border">
-              <table className="w-full text-sm">
-                <thead className="border-b border-border bg-muted/50">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      {t("reports.columns.status")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.columns.count")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {Object.entries(report.bookings.byStatus).length === 0 ? (
-                    <tr>
-                      <td colSpan={2} className="px-4 py-6 text-center text-muted-foreground">
-                        {t("reports.noData")}
-                      </td>
-                    </tr>
-                  ) : (
-                    Object.entries(report.bookings.byStatus).map(([status, count]) => (
-                      <tr key={status} className="hover:bg-muted/30">
-                        <td className="px-4 py-3 font-mono text-xs uppercase">{status}</td>
-                        <td className="px-4 py-3 text-right">{count}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-                <tfoot className="border-t border-border bg-muted/50 font-semibold">
-                  <tr>
-                    <td className="px-4 py-3">{t("reports.totalRow")}</td>
-                    <td className="px-4 py-3 text-right">{report.bookings.total}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+            <h2 className="text-sm font-semibold text-foreground">{t("reports.statusBreakdown")}</h2>
+            <DataTable
+              columns={statusColumns}
+              data={statusEntries}
+              emptyMessage={t("reports.noData")}
+            />
+            {statusEntries.length > 0 && (
+              <div className="flex items-center justify-between rounded-lg border border-border bg-muted/50 px-4 py-3 text-sm font-semibold">
+                <span>{t("reports.totalRow")}</span>
+                <span>{report.bookings.total}</span>
+              </div>
+            )}
           </div>
 
           {/* Crew performance */}
@@ -251,116 +450,11 @@ export default function ReportsPage() {
             <h2 className="text-sm font-semibold text-foreground">
               {t("reports.crewPerformance")}
             </h2>
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full min-w-175 text-sm">
-                <thead className="border-b border-border bg-muted/50">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      {t("reports.crew.name")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.crew.jobs")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.crew.stale")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.crew.needsHelp")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.crew.rejected")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.crew.timeExt")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.crew.reliability")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.crew.avgTurnaround")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.crew.avgRating")}
-                    </th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                      {t("reports.crew.revenue")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {report.crew.length === 0 ? (
-                    <tr>
-                      <td colSpan={10} className="px-4 py-6 text-center text-muted-foreground">
-                        {t("reports.noData")}
-                      </td>
-                    </tr>
-                  ) : (
-                    report.crew.map((member) => (
-                      <tr key={member.crewId} className="hover:bg-muted/30">
-                        <td className="px-4 py-3 font-medium">{member.crewName}</td>
-                        <td className="px-4 py-3 text-right">{member.jobsCompleted}</td>
-                        <td className={cn(
-                          "px-4 py-3 text-right font-mono text-xs",
-                          member.staleCount > 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground"
-                        )}>
-                          {member.staleCount}
-                        </td>
-                        <td className={cn(
-                          "px-4 py-3 text-right font-mono text-xs",
-                          member.needsHelpCount > 0 ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"
-                        )}>
-                          {member.needsHelpCount}
-                        </td>
-                        <td className={cn(
-                          "px-4 py-3 text-right font-mono text-xs",
-                          member.rejectedCount > 0 ? "text-orange-600 dark:text-orange-400" : "text-muted-foreground"
-                        )}>
-                          {member.rejectedCount}
-                        </td>
-                        <td className={cn(
-                          "px-4 py-3 text-right font-mono text-xs",
-                          member.timeExtensionCount > 0 ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground"
-                        )}>
-                          {member.timeExtensionCount}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          {member.reliabilityScore == null ? (
-                            <span className="text-muted-foreground">—</span>
-                          ) : (
-                            <div className="flex items-center justify-end gap-2">
-                              <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
-                                <div
-                                  className={cn("h-full rounded-full", reliabilityBarColor(member.reliabilityScore))}
-                                  style={{ width: `${member.reliabilityScore}%` }}
-                                />
-                              </div>
-                              <span className={cn("font-mono text-xs", reliabilityTextColor(member.reliabilityScore))}>
-                                {member.reliabilityScore.toFixed(1)}%
-                              </span>
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-right font-mono text-xs">
-                          {formatTurnaround(member.avgTurnaroundSeconds)}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          {member.avgRating == null ? (
-                            <span className="text-muted-foreground">—</span>
-                          ) : (
-                            <span className="font-mono text-xs inline-flex items-center gap-1">
-                              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" /> {member.avgRating.toFixed(1)}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          {formatRupiah(member.estimatedRevenue)}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <DataTable
+              columns={crewColumns}
+              data={report.crew}
+              emptyMessage={t("reports.noData")}
+            />
           </div>
         </div>
       )}
@@ -377,7 +471,7 @@ export default function ReportsPage() {
       </div>
 
       {!report && !isLoading && (
-        <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border">
+        <div className="flex h-32 items-center justify-center rounded-xl border border-dashed border-border">
           <p className="text-sm text-muted-foreground">{t("reports.noData")}</p>
         </div>
       )}

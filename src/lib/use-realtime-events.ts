@@ -18,7 +18,7 @@ interface UseRealtimeEventsOptions {
   enabled?: boolean;
 }
 
-const EVENT_TYPES = ["booking_status_changed", "job_assigned", "new_job", "crew_time_extension_request", "eta_extended", "time_extension_approved", "time_extension_rejected", "tip_paid"];
+const EVENT_TYPES = ["booking_status_changed", "job_assigned", "new_job", "crew_time_extension_request", "eta_extended", "time_extension_approved", "time_extension_rejected", "tip_paid", "payment_confirmed", "payment_failed"];
 const INITIAL_RECONNECT_DELAY_MS = 1_000;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 

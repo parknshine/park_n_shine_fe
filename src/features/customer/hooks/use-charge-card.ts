@@ -57,10 +57,14 @@ function friendlyChargeError(err: unknown): string | null {
 export function useChargeCard(bookingId: string, signedToken: string) {
   const mutation = useMutation({
     retry: 0, // never auto-retry — card tokens are one-time use
-    mutationFn: async ({ tokenId, callbackUrl }: { tokenId: string; callbackUrl?: string }) => {
+    mutationFn: async ({ tokenId, callbackUrl, authenticationId }: { tokenId: string; callbackUrl?: string; authenticationId?: string }) => {
       const response = await api.post<ChargeCardResult>(
         `/v1/bookings/${bookingId}/charge-card`,
-        { tokenId, ...(callbackUrl ? { callbackUrl } : {}) },
+        {
+          tokenId,
+          ...(callbackUrl ? { callbackUrl } : {}),
+          ...(authenticationId ? { authenticationId } : {}),
+        },
         { headers: { "X-Booking-Token": signedToken } },
       );
       return response.data;

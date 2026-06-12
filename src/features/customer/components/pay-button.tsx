@@ -11,6 +11,7 @@ interface PayButtonProps {
   signedToken: string;
   plateText: string;
   slotText: string;
+  phone?: string;
   labels?: {
     pay: string;
     processing: string;
@@ -29,6 +30,7 @@ export function PayButton({
   signedToken,
   plateText,
   slotText,
+  phone,
   labels = DEFAULT_LABELS,
 }: Readonly<PayButtonProps>) {
   const { canSubmit, confirmAndRedirect, error, isSubmitting } =
@@ -45,7 +47,7 @@ export function PayButton({
         size="lg"
         className="w-full rounded-full"
         disabled={!canSubmit || isSubmitting}
-        onClick={() => confirmAndRedirect({ plateText, slotText })}
+        onClick={() => confirmAndRedirect({ plateText, slotText, ...(phone ? { phone } : {}) })}
       >
         {isSubmitting ? (
           <>

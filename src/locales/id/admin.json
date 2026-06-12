@@ -71,7 +71,10 @@
       "rejected": "Ditolak",
       "reliability": "Keandalan",
       "avgRating": "Rata-rata Rating",
-      "timeExt": "Minta Waktu"
+      "timeExt": "Minta Waktu",
+      "jobsDone": "jobs selesai",
+      "issues": "Masalah",
+      "noIssues": "Tidak ada masalah"
     },
     "jobDetail": {
       "title": "Detail Per Job",
@@ -116,7 +119,8 @@
       "summary": "Ringkasan",
       "jobs": "Detail Job",
       "tips": "Tips",
-      "disbursements": "Disbursements"
+      "disbursements": "Disbursements",
+      "customers": "Pelanggan"
     },
     "tips": {
       "title": "Laporan Tips",
@@ -172,6 +176,14 @@
         "confirm": "Konfirmasi",
         "processing": "Memproses..."
       }
+    },
+    "tipCard": {
+      "title": "Total Tip Staff",
+      "disbursed": "Sudah dicairkan",
+      "crewCount": "Crew menerima tip",
+      "crewCountUnit": "orang",
+      "notIncluded": "Tidak termasuk dalam\nrevenue car wash",
+      "detail": "Detail"
     }
   },
   "settings": {

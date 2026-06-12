@@ -183,6 +183,7 @@ export default function BookCapturePage() {
             id='plate-photo'
             kind='plate'
             label={t("booking.capture.platePhotoLabel")}
+            hint={t("booking.capture.platePhotoGuideline")}
             state={plateUpload}
             onSelect={(file, kind) => plateUpload.uploadPhoto({ file, kind })}
             onRetry={plateUpload.reset}
@@ -201,6 +202,7 @@ export default function BookCapturePage() {
             id='slot-photo'
             kind='slot'
             label={t("booking.capture.slotPhotoLabel")}
+            hint={t("booking.capture.slotPhotoGuideline")}
             state={slotUpload}
             onSelect={(file, kind) => slotUpload.uploadPhoto({ file, kind })}
             onRetry={slotUpload.reset}

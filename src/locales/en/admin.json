@@ -71,7 +71,10 @@
       "rejected": "Rejected",
       "reliability": "Reliability",
       "avgRating": "Avg Rating",
-      "timeExt": "Time Ext"
+      "timeExt": "Time Ext",
+      "jobsDone": "jobs completed",
+      "issues": "Issues",
+      "noIssues": "No issues"
     },
     "jobDetail": {
       "title": "Job Detail",
@@ -116,7 +119,8 @@
       "summary": "Summary",
       "jobs": "Job Details",
       "tips": "Tips",
-      "disbursements": "Disbursements"
+      "disbursements": "Disbursements",
+      "customers": "Customers"
     },
     "tips": {
       "title": "Tips Report",
@@ -172,6 +176,14 @@
         "confirm": "Confirm",
         "processing": "Processing..."
       }
+    },
+    "tipCard": {
+      "title": "Total Staff Tips",
+      "disbursed": "Disbursed",
+      "crewCount": "Crew received tips",
+      "crewCountUnit": "people",
+      "notIncluded": "Not included in\ncar wash revenue",
+      "detail": "Detail"
     }
   },
   "settings": {

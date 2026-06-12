@@ -1,5 +1,6 @@
 "use client";
 
+import QRCode from "react-qr-code";
 import { useEffect, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Copy, CheckCircle, RefreshCw, AlertCircle, Wallet } from "lucide-react";
@@ -212,15 +213,22 @@ function PaymentInstructionsUI({
 
   // ── QRIS ──
   if (instructions.type === "QRIS") {
+    const isImageUrl = instructions.qrString.startsWith("http");
     return (
       <div className="flex flex-col items-center gap-3">
         <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={instructions.qrUrl}
-            alt="QRIS QR Code"
-            className="w-56 h-56 object-contain"
-          />
+          {isImageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={instructions.qrString}
+              alt="QRIS QR Code"
+              className="w-56 h-56 object-contain"
+            />
+          ) : (
+            <div className="bg-white p-4 rounded-lg">
+              <QRCode value={instructions.qrString} size={192} />
+            </div>
+          )}
         </div>
         <p className="text-xs text-muted-foreground font-medium text-center">
           {t("booking.payment.scanQris")}

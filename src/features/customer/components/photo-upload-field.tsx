@@ -11,6 +11,7 @@ import type { MediaKind } from "@/types/media";
 interface PhotoUploadFieldProps {
   id: string;
   label: string;
+  hint?: string;
   kind: MediaKind;
   state: UploadState;
   onSelect: (file: File, kind: MediaKind) => void;
@@ -28,6 +29,7 @@ interface PhotoUploadFieldProps {
 export function PhotoUploadField({
   id,
   label,
+  hint,
   kind,
   state,
   onSelect,
@@ -85,6 +87,9 @@ export function PhotoUploadField({
   return (
     <div className="rounded-lg border border-border p-4 space-y-3 bg-card shadow-sm">
       <label className="text-sm font-semibold text-foreground">{label}</label>
+      {hint && (
+        <p className="text-xs text-muted-foreground leading-relaxed">{hint}</p>
+      )}
 
       {/* Hidden inputs */}
       <input
