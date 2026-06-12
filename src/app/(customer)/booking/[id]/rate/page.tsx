@@ -108,7 +108,7 @@ function TipSelectStep({
 
       <div className="space-y-2">
         <p className="text-sm font-medium text-foreground">Pilih nominal tip</p>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {TIP_PRESETS.map((preset) => (
             <button
               key={preset}
@@ -126,15 +126,15 @@ function TipSelectStep({
         </div>
         <input
           type="number"
-          min={1000}
+          min={5000}
           max={500000}
           value={customTip}
           onChange={(e) => {
             setCustomTip(e.target.value);
             const val = Number.parseInt(e.target.value, 10);
-            setTipAmount(!Number.isNaN(val) && val >= 1000 ? val : null);
+            setTipAmount(!Number.isNaN(val) && val >= 5000 ? val : null);
           }}
-          placeholder="Nominal lain (min Rp 1.000)"
+          placeholder="Nominal lain (min Rp 5.000)"
           className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>

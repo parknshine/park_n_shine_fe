@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Download } from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,6 +21,7 @@ import {
   useAdminDisbursements,
   useCreateDisbursement,
 } from "@/features/admin/hooks/use-admin-tips";
+import type { DisbursementEvent } from "@/features/admin/types/tip";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
@@ -186,6 +189,66 @@ export default function DisbursementsPage() {
     );
   }
 
+  const disbursementColumns: ColumnDef<DisbursementEvent>[] = [
+    {
+      accessorKey: "period",
+      header: t("reports.disbursements.columns.period"),
+      cell: ({ row }) => (
+        <span className="font-mono text-xs">{row.original.period}</span>
+      ),
+    },
+    {
+      accessorKey: "totalAmount",
+      header: t("reports.disbursements.columns.total"),
+      meta: { align: "right" },
+      cell: ({ row }) => (
+        <span className="font-mono text-xs">
+          {formatRupiah(row.original.totalAmount)}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "notes",
+      header: t("reports.disbursements.columns.notes"),
+      cell: ({ row }) => (
+        <span className="text-xs text-muted-foreground">
+          {row.original.notes ?? <span className="text-muted-foreground/50">—</span>}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "createdAt",
+      header: t("reports.disbursements.columns.createdAt"),
+      cell: ({ row }) => (
+        <span className="whitespace-nowrap text-xs text-muted-foreground">
+          {formatDate(row.original.createdAt)}
+        </span>
+      ),
+    },
+    {
+      id: "export",
+      header: t("reports.disbursements.columns.export"),
+      meta: { align: "center" },
+      cell: ({ row }) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleExportCSV(row.original.id, row.original.period);
+          }}
+          disabled={exportingId === row.original.id}
+          className="inline-flex items-center gap-1 text-xs text-primary hover:underline disabled:opacity-50"
+        >
+          {exportingId === row.original.id ? (
+            <span className="h-3.5 w-3.5 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+          ) : (
+            <Download className="h-3.5 w-3.5" />
+          )}
+          {t("reports.exportCsv")}
+        </button>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -236,70 +299,12 @@ export default function DisbursementsPage() {
         <h2 className="text-sm font-semibold text-foreground">
           {t("reports.disbursements.history")}
         </h2>
-        <div className="overflow-hidden rounded-lg border border-border">
-          {isDisbLoading ? (
-            <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
-              <span className="h-4 w-4 rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground animate-spin" />
-              {t("reports.loading")}
-            </div>
-          ) : disbursements.length === 0 ? (
-            <div className="py-8 text-center text-sm text-muted-foreground">
-              {t("reports.disbursements.noHistory")}
-            </div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead className="border-b border-border bg-muted/50">
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    {t("reports.disbursements.columns.period")}
-                  </th>
-                  <th className="px-4 py-3 text-right font-medium text-muted-foreground">
-                    {t("reports.disbursements.columns.total")}
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    {t("reports.disbursements.columns.notes")}
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    {t("reports.disbursements.columns.createdAt")}
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium text-muted-foreground">
-                    {t("reports.disbursements.columns.export")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {disbursements.map((d) => (
-                  <tr key={d.id} className="hover:bg-muted/30">
-                    <td className="px-4 py-3 font-mono text-xs">{d.period}</td>
-                    <td className="px-4 py-3 text-right font-mono text-xs">
-                      {formatRupiah(d.totalAmount)}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">
-                      {d.notes ?? <span className="text-muted-foreground/50">—</span>}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDate(d.createdAt)}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => handleExportCSV(d.id, d.period)}
-                        disabled={exportingId === d.id}
-                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline disabled:opacity-50"
-                      >
-                        {exportingId === d.id ? (
-                          <span className="h-3.5 w-3.5 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
-                        ) : (
-                          <Download className="h-3.5 w-3.5" />
-                        )}
-                        {t("reports.exportCsv")}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+        <DataTable
+          columns={disbursementColumns}
+          data={disbursements}
+          isLoading={isDisbLoading}
+          emptyMessage={t("reports.disbursements.noHistory")}
+        />
       </div>
 
       <ConfirmDisbursementModal

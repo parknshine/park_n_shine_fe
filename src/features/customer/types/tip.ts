@@ -1,6 +1,6 @@
 export type TipPaymentMethod = "qris" | "gopay" | "shopeepay";
 
-export const TIP_PRESETS = [1_000, 2_000, 5_000, 10_000] as const;
+export const TIP_PRESETS = [5_000, 10_000] as const;
 
 export interface TipQrisInstructions {
   type: "QRIS";
