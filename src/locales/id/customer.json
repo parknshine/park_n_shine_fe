@@ -281,5 +281,35 @@
   "testimonials": {
     "title": "Kata Pelanggan Kami",
     "subtitle": "Ulasan nyata dari pelanggan kami"
+  },
+  "auth": {
+    "loginTitle": "Selamat datang kembali",
+    "loginSubtitle": "Masuk untuk melihat riwayat cuci dan booking-mu.",
+    "registerTitle": "Buat akun",
+    "registerSubtitle": "Daftar untuk menyimpan booking dan cuci loyalitasmu.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "kamu@contoh.com",
+    "passwordLabel": "Kata Sandi",
+    "signIn": "Masuk",
+    "signUp": "Daftar",
+    "signingIn": "Sedang masuk...",
+    "creatingAccount": "Membuat akun...",
+    "continueWithGoogle": "Lanjut dengan Google",
+    "or": "atau",
+    "noAccount": "Belum punya akun?",
+    "haveAccount": "Sudah punya akun?",
+    "toRegister": "Daftar",
+    "toLogin": "Masuk",
+    "loginSuccess": "Berhasil masuk",
+    "registerSuccess": "Akun berhasil dibuat",
+    "errors": {
+      "invalidCredentials": "Email atau kata sandi salah.",
+      "emailInUse": "Akun dengan email ini sudah terdaftar.",
+      "weakPassword": "Kata sandi minimal 6 karakter.",
+      "invalidEmail": "Masukkan alamat email yang valid.",
+      "popupClosed": "Proses masuk dibatalkan.",
+      "tooManyRequests": "Terlalu banyak percobaan. Coba lagi nanti.",
+      "generic": "Terjadi kesalahan. Silakan coba lagi."
+    }
   }
 }
