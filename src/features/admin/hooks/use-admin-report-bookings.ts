@@ -10,6 +10,7 @@ export interface ReportBookingFilters {
   statuses?: string[];
   hasRating?: boolean;
   hasPhotos?: boolean;
+  search?: string;
 }
 
 export interface ReportBookingsResponse {
@@ -30,7 +31,7 @@ export function useAdminReportBookings(
   const query = useQuery({
     enabled: true,
     placeholderData: keepPreviousData,
-    queryKey: queryKeys.admin.reportBookings(siteId ?? "", from, to, filters, page, pageSize),
+    queryKey: queryKeys.admin.reportBookings(siteId ?? "", from, to, filters, page, pageSize, filters?.search),
     queryFn: async () => {
       const params = new URLSearchParams();
       if (siteId) params.set("siteId", siteId);
@@ -40,6 +41,7 @@ export function useAdminReportBookings(
       if (filters?.statuses?.length) params.set("statuses", filters.statuses.join(","));
       if (filters?.hasRating !== undefined) params.set("hasRating", String(filters.hasRating));
       if (filters?.hasPhotos !== undefined) params.set("hasPhotos", String(filters.hasPhotos));
+      if (filters?.search) params.set("search", filters.search);
       params.set("page", String(page));
       params.set("limit", String(pageSize));
       const response = await api.get<ReportBookingsResponse>(`/v1/admin/reports/bookings?${params}`);

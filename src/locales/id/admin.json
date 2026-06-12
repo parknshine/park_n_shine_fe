@@ -114,7 +114,64 @@
     },
     "tabs": {
       "summary": "Ringkasan",
-      "jobs": "Detail Job"
+      "jobs": "Detail Job",
+      "tips": "Tips",
+      "disbursements": "Disbursements"
+    },
+    "tips": {
+      "title": "Laporan Tips",
+      "subtitle": "Riwayat transaksi tip per booking",
+      "transactions": "Transaksi Tip",
+      "createDisbursement": "Buat Disbursement",
+      "filter": {
+        "allMalls": "Semua Mall",
+        "searchPlaceholder": "Booking ID atau nama crew...",
+        "search": "Cari"
+      },
+      "columns": {
+        "bookingId": "Booking ID",
+        "mall": "Mall",
+        "crew": "Crew",
+        "method": "Metode",
+        "amount": "Nominal",
+        "status": "Status",
+        "paidAt": "Dibayar"
+      },
+      "status": {
+        "paid": "Belum Disburse",
+        "disbursed": "Sudah Disburse"
+      },
+      "noData": "Tidak ada tip untuk periode ini.",
+      "noDataSearch": "Tidak ada tip yang cocok dengan \"{{search}}\"."
+    },
+    "disbursements": {
+      "title": "Disbursements",
+      "subtitle": "Buat dan kelola disbursement tip untuk crew",
+      "period": "Periode",
+      "totalPending": "Total belum disburse:",
+      "loading": "...",
+      "createButton": "Buat Disbursement",
+      "history": "Riwayat Disbursement",
+      "noHistory": "Belum ada disbursement.",
+      "columns": {
+        "period": "Periode",
+        "total": "Total",
+        "notes": "Catatan",
+        "createdAt": "Dibuat",
+        "export": "Export"
+      },
+      "confirmModal": {
+        "title": "Konfirmasi Disbursement",
+        "period": "Periode",
+        "crewCount": "Jumlah Crew",
+        "crewCountUnit": "orang",
+        "total": "Total Disburse",
+        "notes": "Catatan (opsional)",
+        "notesPlaceholder": "Mis: Disbursement bulan Juni...",
+        "cancel": "Batal",
+        "confirm": "Konfirmasi",
+        "processing": "Memproses..."
+      }
     }
   },
   "settings": {

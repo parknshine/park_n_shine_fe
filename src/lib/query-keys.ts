@@ -6,8 +6,8 @@ export const queryKeys = {
     booking: (bookingId: string) => ["admin", "booking", bookingId] as const,
     report: (siteId: string, from: string, to: string) =>
       ["admin", "report", siteId, from, to] as const,
-    reportBookings: (siteId: string, from: string, to: string, filters?: object, page?: number, pageSize?: number) =>
-      ["admin", "report-bookings", siteId, from, to, filters ?? {}, page ?? 1, pageSize ?? 25] as const,
+    reportBookings: (siteId: string, from: string, to: string, filters?: object, page?: number, pageSize?: number, search?: string) =>
+      ["admin", "report-bookings", siteId, from, to, filters ?? {}, page ?? 1, pageSize ?? 25, search ?? ""] as const,
     auditLog: (siteId: string) => ["admin", "audit-log", siteId] as const,
     settings: () => ["admin", "settings"] as const,
     sites: () => ["admin", "sites"] as const,
@@ -17,6 +17,8 @@ export const queryKeys = {
     shifts: (siteId: string) => ["admin", "sites", siteId, "shifts"] as const,
     testimonials: () => ["admin", "testimonials"] as const,
     tipCrewSummary: (period: string) => ["admin", "tips", "crew-summary", period] as const,
+    tipList: (period: string, page: number, pageSize: number, search: string, siteId: string) =>
+      ["admin", "tips", "list", period, page, pageSize, search, siteId] as const,
     disbursements: () => ["admin", "disbursements"] as const,
     loyaltyCustomers: () => ["admin", "loyalty", "customers"] as const,
   },

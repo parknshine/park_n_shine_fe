@@ -26,3 +26,22 @@ export interface DisbursementEvent {
   exportedAt: string | null;
   createdAt: string;
 }
+
+export interface AdminTipRow {
+  id: string;
+  bookingId: string;
+  crewName: string | null;
+  siteName: string | null;
+  amount: number;
+  paymentMethod: string | null;
+  status: "PAID" | "DISBURSED";
+  paidAt: string | null;
+}
+
+export interface TipListResponse {
+  period: string;
+  tips: AdminTipRow[];
+  total: number;
+  page: number;
+  limit: number;
+}

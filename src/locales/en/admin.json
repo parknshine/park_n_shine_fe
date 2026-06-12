@@ -114,7 +114,64 @@
     },
     "tabs": {
       "summary": "Summary",
-      "jobs": "Job Details"
+      "jobs": "Job Details",
+      "tips": "Tips",
+      "disbursements": "Disbursements"
+    },
+    "tips": {
+      "title": "Tips Report",
+      "subtitle": "Tip transactions per booking",
+      "transactions": "Tip Transactions",
+      "createDisbursement": "Create Disbursement",
+      "filter": {
+        "allMalls": "All Malls",
+        "searchPlaceholder": "Booking ID or crew name...",
+        "search": "Search"
+      },
+      "columns": {
+        "bookingId": "Booking ID",
+        "mall": "Mall",
+        "crew": "Crew",
+        "method": "Method",
+        "amount": "Amount",
+        "status": "Status",
+        "paidAt": "Paid At"
+      },
+      "status": {
+        "paid": "Pending Disburse",
+        "disbursed": "Disbursed"
+      },
+      "noData": "No tips for this period.",
+      "noDataSearch": "No tips matching \"{{search}}\"."
+    },
+    "disbursements": {
+      "title": "Disbursements",
+      "subtitle": "Create and manage tip disbursements for crew",
+      "period": "Period",
+      "totalPending": "Total pending disburse:",
+      "loading": "...",
+      "createButton": "Create Disbursement",
+      "history": "Disbursement History",
+      "noHistory": "No disbursements yet.",
+      "columns": {
+        "period": "Period",
+        "total": "Total",
+        "notes": "Notes",
+        "createdAt": "Created",
+        "export": "Export"
+      },
+      "confirmModal": {
+        "title": "Confirm Disbursement",
+        "period": "Period",
+        "crewCount": "Number of Crew",
+        "crewCountUnit": "people",
+        "total": "Total Disburse",
+        "notes": "Notes (optional)",
+        "notesPlaceholder": "E.g.: June disbursement...",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "processing": "Processing..."
+      }
     }
   },
   "settings": {

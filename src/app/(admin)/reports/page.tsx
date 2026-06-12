@@ -78,6 +78,7 @@ function ReportTabs() {
     { label: t("reports.tabs.summary"), href: "/reports" },
     { label: t("reports.tabs.jobs"), href: "/reports/jobs" },
     { label: "Tips", href: "/reports/tips" },
+    { label: "Disbursements", href: "/reports/disbursements" },
     { label: "Customers", href: "/reports/customers" },
   ];
   return (

@@ -5,12 +5,13 @@ import { createPortal } from "react-dom";
 import {
   X, ZoomIn, ZoomOut, RotateCcw, ChevronLeft, ChevronRight,
   SlidersHorizontal, ArrowRight, Check, Star, Camera, Users,
-  Calendar, Building2, Clock, Eye,
+  Calendar, Building2, Clock, Eye, Hash, Search,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DataTable } from "@/components/ui/data-table";
@@ -251,6 +252,13 @@ function JobDetailModal({
           <div className="space-y-6 overflow-y-auto max-h-[65vh] pr-1 pt-1">
             {/* Job Info */}
             <div className="rounded-lg border border-border bg-muted/30 divide-y divide-border">
+              <div className="flex items-center justify-between gap-4 px-4 py-3">
+                <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Hash className="h-3.5 w-3.5 shrink-0" />
+                  Booking ID
+                </span>
+                <span className="break-all text-right font-mono text-xs font-medium">{row.id}</span>
+              </div>
               <div className="flex items-center justify-between px-4 py-3">
                 <span className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Building2 className="h-3.5 w-3.5 shrink-0" />
@@ -356,10 +364,11 @@ function ReportTabs() {
   const pathname = usePathname();
   const { t } = useTranslation("admin");
   const tabs = [
-    { label: t("reports.tabs.summary"), href: "/reports" },
-    { label: t("reports.tabs.jobs"),    href: "/reports/jobs" },
-    { label: "Tips",                    href: "/reports/tips" },
-    { label: "Customers",               href: "/reports/customers" },
+    { label: t("reports.tabs.summary"),  href: "/reports" },
+    { label: t("reports.tabs.jobs"),     href: "/reports/jobs" },
+    { label: "Tips",                     href: "/reports/tips" },
+    { label: "Disbursements",             href: "/reports/disbursements" },
+    { label: "Customers",                href: "/reports/customers" },
   ];
   return (
     <div className="flex gap-1 border-b border-border">
@@ -394,6 +403,7 @@ export default function ReportJobsPage() {
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [hasRatingFilter, setHasRatingFilter] = useState<"" | "true" | "false">("");
   const [hasPhotosFilter, setHasPhotosFilter] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
 
   const [appliedFilters, setAppliedFilters] = useState<ReportBookingFilters>({});
   const [appliedSiteId, setAppliedSiteId] = useState<string | undefined>(undefined);
@@ -419,6 +429,7 @@ export default function ReportJobsPage() {
       statuses:  selectedStatuses.length > 0 ? selectedStatuses : undefined,
       hasRating: hasRatingFilter === "true" ? true : hasRatingFilter === "false" ? false : undefined,
       hasPhotos: hasPhotosFilter || undefined,
+      search:    searchInput.trim() || undefined,
     });
   }
 
@@ -428,6 +439,7 @@ export default function ReportJobsPage() {
     setSelectedSiteId(""); setAppliedSiteId(undefined);
     setSelectedCrewId(""); setSelectedStatuses([]);
     setHasRatingFilter(""); setHasPhotosFilter(false);
+    setSearchInput("");
     setAppliedFilters({});
   }
 
@@ -440,7 +452,8 @@ export default function ReportJobsPage() {
   const hasFilter =
     appliedSiteId !== undefined || appliedFrom !== "" || appliedTo !== "" ||
     !!appliedFilters.crewId || (appliedFilters.statuses?.length ?? 0) > 0 ||
-    appliedFilters.hasRating !== undefined || appliedFilters.hasPhotos;
+    appliedFilters.hasRating !== undefined || appliedFilters.hasPhotos ||
+    !!appliedFilters.search;
 
   if (allSites.length === 0) {
     return (
@@ -456,12 +469,20 @@ export default function ReportJobsPage() {
   const activeFilterCount = [
     appliedSiteId !== undefined, from || to, selectedCrewId,
     hasRatingFilter !== "", hasPhotosFilter, selectedStatuses.length > 0,
+    searchInput.trim() !== "",
   ].filter(Boolean).length;
 
   const selectedCrewName = crew.find((c) => c.id === selectedCrewId)?.name;
   const selectedSiteName = appliedSiteId ? allSites.find((s) => s.id === appliedSiteId)?.name : null;
 
   const columns: ColumnDef<ReportBookingRow>[] = [
+    {
+      accessorKey: "id",
+      header: "Booking ID",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs text-muted-foreground">{row.original.id}</span>
+      ),
+    },
     {
       accessorKey: "createdAt",
       header: t("reports.jobDetail.date"),
@@ -654,6 +675,34 @@ export default function ReportJobsPage() {
             </div>
           </div>
 
+          <div className="px-4 py-3">
+            <div className="flex items-center gap-1.5">
+              <Search className="h-3 w-3 text-muted-foreground" />
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Booking ID
+              </span>
+            </div>
+            <div className="mt-2 relative">
+              <Input
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleApply(); }}
+                placeholder="Cari Booking ID..."
+                prefix={<Search />}
+                className={cn("w-full sm:w-72", appliedFilters.search ? "border-primary/50" : "")}
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => setSearchInput("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex overflow-hidden rounded-lg border border-border text-xs">
@@ -750,6 +799,11 @@ export default function ReportJobsPage() {
           {appliedFilters.hasPhotos && (
             <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
               <Camera className="h-2.5 w-2.5" />{t("reports.jobDetail.filterHasPhotos")}
+            </span>
+          )}
+          {appliedFilters.search && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+              <Search className="h-2.5 w-2.5" />&ldquo;{appliedFilters.search}&rdquo;
             </span>
           )}
         </div>

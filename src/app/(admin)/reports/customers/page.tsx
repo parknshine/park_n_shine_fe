@@ -14,7 +14,8 @@ function formatDate(iso: string): string {
   });
 }
 
-function maskPhone(phone: string): string {
+function maskPhone(phone: string | null | undefined): string {
+  if (!phone) return "—";
   if (phone.length <= 6) return phone;
   return phone.slice(0, 4) + "****" + phone.slice(-3);
 }
@@ -26,6 +27,7 @@ function ReportTabs() {
     { label: t("reports.tabs.summary"), href: "/reports" },
     { label: t("reports.tabs.jobs"), href: "/reports/jobs" },
     { label: "Tips", href: "/reports/tips" },
+    { label: "Disbursements", href: "/reports/disbursements" },
     { label: "Customers", href: "/reports/customers" },
   ];
   return (
