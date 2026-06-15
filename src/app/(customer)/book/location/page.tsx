@@ -16,14 +16,14 @@ import { useTranslation } from "@/i18n";
 const LocationMap = dynamicImport(
   () =>
     import("@/features/customer/components/location-map").then(
-      (m) => m.LocationMap
+      (m) => m.LocationMap,
     ),
   {
     ssr: false,
     loading: () => (
-      <div className="h-[300px] w-full animate-pulse rounded-xl bg-muted" />
+      <div className='h-75 w-full animate-pulse rounded-xl bg-muted' />
     ),
-  }
+  },
 );
 
 // Default center: Sudirman, Jakarta — shown before geolocation resolves
@@ -50,12 +50,14 @@ export default function WalkInLocationPage() {
 
   useEffect(() => {
     if (!error) return;
-    const msg =
-      error === "geolocation_not_supported"
-        ? t("booking.location.errorNotSupported")
-        : error === "geolocation_denied"
-          ? t("booking.location.errorDenied")
-          : error;
+    let msg: string;
+    if (error === "geolocation_not_supported") {
+      msg = t("booking.location.errorNotSupported");
+    } else if (error === "geolocation_denied") {
+      msg = t("booking.location.errorDenied");
+    } else {
+      msg = error;
+    }
     toast.error(msg);
   }, [error, t]);
 
@@ -63,7 +65,7 @@ export default function WalkInLocationPage() {
   useEffect(() => {
     if (!hasRequestedRef.current) {
       hasRequestedRef.current = true;
-      void requestCurrentLocation();
+      requestCurrentLocation();
     }
   }, [requestCurrentLocation]);
 
@@ -81,16 +83,16 @@ export default function WalkInLocationPage() {
   const displayLng = lng ?? DEFAULT_LNG;
 
   return (
-    <AppShell surface="customer">
-      <div className="space-y-6">
+    <AppShell surface='customer'>
+      <div className='space-y-6'>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
             {t("booking.step", { current: 1, total: 3 })}
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-foreground">
+          <h1 className='mt-1 text-2xl font-bold text-foreground'>
             {t("booking.location.title")}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className='mt-1 text-sm text-muted-foreground'>
             {t("booking.location.subtitle")}
           </p>
         </div>
@@ -102,41 +104,41 @@ export default function WalkInLocationPage() {
         />
 
         <Button
-          variant="outline"
-          className="w-full"
+          variant='outline'
+          className='w-full'
           disabled={isLocating}
-          onClick={() => void requestCurrentLocation()}
+          onClick={() => requestCurrentLocation()}
         >
           {isLocating ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
               {t("booking.location.searchingLocation")}
             </>
           ) : (
             <>
-              <Navigation className="mr-2 h-4 w-4" />
+              <Navigation className='mr-2 h-4 w-4' />
               {t("booking.location.useCurrentLocation")}
             </>
           )}
         </Button>
 
         {isGeocoding && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
+          <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+            <Loader2 className='h-4 w-4 animate-spin' />
             <span>{t("booking.location.searchingAddress")}</span>
           </div>
         )}
 
         {hasLocation && !isGeocoding && locationName && (
-          <div className="flex items-start gap-2 rounded-lg border bg-muted/50 p-3">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <p className="text-sm text-foreground">{locationName}</p>
+          <div className='flex items-start gap-2 rounded-lg border bg-muted/50 p-3'>
+            <MapPin className='mt-0.5 h-4 w-4 shrink-0 text-primary' />
+            <p className='text-sm text-foreground'>{locationName}</p>
           </div>
         )}
 
         <Button
-          size="lg"
-          className="w-full rounded-full"
+          size='lg'
+          className='w-full rounded-full'
           disabled={!hasLocation}
           onClick={handleNext}
         >

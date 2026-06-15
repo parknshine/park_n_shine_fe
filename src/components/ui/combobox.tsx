@@ -66,7 +66,7 @@ function OptionList({
   onSingleSelect,
   onMultiToggle,
   onClearAll,
-}: {
+}: Readonly<{
   listboxId?: string;
   filtered: ComboboxOption[];
   emptyMessage: string;
@@ -76,7 +76,7 @@ function OptionList({
   onSingleSelect: (v: string) => void;
   onMultiToggle: (v: string) => void;
   onClearAll: () => void;
-}) {
+}>) {
   return (
     <>
       <ul id={listboxId} role="listbox" aria-multiselectable={multiple} className="max-h-60 overflow-y-auto p-1">
