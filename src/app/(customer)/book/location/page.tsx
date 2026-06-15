@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 import { Loader2, MapPin, Navigation } from "lucide-react";
 import { AppShell } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useLocationPicker } from "@/features/customer/hooks/use-location-picker
 import { useTranslation } from "@/i18n";
 
 // Leaflet requires browser APIs — must be imported without SSR
-const LocationMap = dynamic(
+const LocationMap = dynamicImport(
   () =>
     import("@/features/customer/components/location-map").then(
       (m) => m.LocationMap
