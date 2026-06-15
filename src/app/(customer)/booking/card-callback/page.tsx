@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+export const dynamic = "force-dynamic";
+
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 
 // Midtrans redirects here after 3DS authentication.
 // The signed token was stored in sessionStorage before redirecting to the 3DS page.
@@ -38,10 +39,10 @@ function CardCallbackContent() {
   }, [router, searchParams]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
-        <p className="text-sm text-muted-foreground">Memproses pembayaran...</p>
+    <div className='flex min-h-screen items-center justify-center bg-background'>
+      <div className='flex flex-col items-center gap-3'>
+        <div className='h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary' />
+        <p className='text-sm text-muted-foreground'>Memproses pembayaran...</p>
       </div>
     </div>
   );
