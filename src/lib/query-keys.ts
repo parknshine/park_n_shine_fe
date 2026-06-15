@@ -74,6 +74,9 @@ export const mutationKeys = {
     verifyPlate: (jobId: string) => ["crew", "job", jobId, "verify"] as const,
   },
   customer: {
+    session: () => ["customer", "auth", "session"] as const,
+    logout: () => ["customer", "auth", "logout"] as const,
+    updateProfile: () => ["customer", "me", "update"] as const,
     confirmPayment: (bookingId: string) =>
       ["customer", "booking", bookingId, "confirm"] as const,
     createBooking: () => ["customer", "booking", "create"] as const,

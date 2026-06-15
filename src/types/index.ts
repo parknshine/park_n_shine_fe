@@ -27,6 +27,19 @@ export interface User {
   avatarUrl?: string;
 }
 
+// Authenticated customer account (Firebase-backed). `phone` starts null for
+// email/Google signups until linked via PATCH /v1/me.
+export interface Customer {
+  id: string;
+  email: string;
+  name: string | null;
+  phone: string | null;
+  photoUrl: string | null;
+  washCount: number;
+  verified: boolean;
+  createdAt?: string;
+}
+
 // ─── UI ───────────────────────────────────────────────────────────────────────
 
 export type ButtonVariant = "default" | "outline" | "ghost" | "destructive";
