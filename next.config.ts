@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://js.xendit.co`,
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https://res.cloudinary.com https://midtrans-website.al-mp-id-p.cdn.gtflabs.io blob:",
+              "img-src 'self' data: https://res.cloudinary.com https://midtrans-website.al-mp-id-p.cdn.gtflabs.io https://storage.googleapis.com blob:",
               "connect-src 'self' " + (process.env.NEXT_PUBLIC_API_URL ?? ""),
               "frame-src https://js.xendit.co",
               "object-src 'none'",

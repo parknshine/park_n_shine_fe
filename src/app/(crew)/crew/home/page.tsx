@@ -1,19 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Bell, BellOff, BriefcaseBusiness, CheckCircle2, Clock, Inbox, Loader2, Star, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
-import { useJobQueue, useNextJob, useCrewMonthlyStats, useCrewSession } from "@/features/crew/hooks";
+import { useJobQueue, useNextJob, useCrewMonthlyStats } from "@/features/crew/hooks";
 import { IncomingJobModal } from "@/features/crew/components";
 import { previewNextJob } from "@/features/crew/hooks/use-next-job";
 import type { CrewJob, JobPreview, RejectionReason } from "@/features/crew/types";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
-import { useRealtimeEvents } from "@/lib/use-realtime-events";
 import { usePushNotification } from "@/lib/use-push-notification";
 import { queryKeys } from "@/lib/query-keys";
 
@@ -46,35 +45,14 @@ export function CrewHomePage() {
   const { count, hasJob } = useJobQueue();
   const statsQuery = useCrewMonthlyStats();
   const { t } = useTranslation("crew");
-  const { session } = useCrewSession();
 
   const [preview, setPreview] = useState<JobPreview | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const crewId = session?.crewId ?? null;
   const { permission, subscribe: subscribePush } = usePushNotification({ type: "crew" });
   const pushEnabled = process.env.NEXT_PUBLIC_PUSH_ENABLED === "true";
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
-  const getSseUrl = useCallback(() => {
-    const token = localStorage.getItem("crew-token") ?? "";
-    return crewId ? `${baseUrl}/v1/crew/realtime/stream?token=${token}` : "";
-  }, [baseUrl, crewId]);
-
-  useRealtimeEvents({
-    url: getSseUrl,
-    enabled: !!crewId,
-    onEvent: (event) => {
-      if (event.type === "job_assigned" || event.type === "new_job") {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
-        const msg = event.type === "new_job"
-          ? t("home.newJobQueued", { defaultValue: "New job available in queue!" })
-          : t("home.newJobNotification", { defaultValue: "New job assigned to you!" });
-        toast.success(msg);
-      }
-    },
-  });
 
   useEffect(() => {
     if (!job || noResume) return;

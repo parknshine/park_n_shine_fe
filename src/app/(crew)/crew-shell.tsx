@@ -5,16 +5,19 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import { useIsRestoring, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/shared/app-shell";
 import { LanguageSwitcher } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { useCrewSession } from "@/features/crew/hooks";
+import { useCrewAuthStore } from "@/store/crew-auth-store";
 import { EtaCountdown, JobStaleModal } from "@/features/crew/components";
 import { useRealtimeEvents } from "@/lib/use-realtime-events";
 import crewApi from "@/lib/axios-crew";
 import { queryKeys } from "@/lib/query-keys";
 import type { CrewJob } from "@/features/crew/types";
+import { toast } from "react-hot-toast";
+import { useTranslation } from "@/i18n";
 
 interface CrewShellProps {
   children: ReactNode;
@@ -22,9 +25,10 @@ interface CrewShellProps {
 
 export function CrewShell({ children }: Readonly<CrewShellProps>) {
   const router = useRouter();
-  const isRestoring = useIsRestoring();
   const { session, clearSession } = useCrewSession();
+  const hasHydrated = useCrewAuthStore((s) => s._hasHydrated);
   const queryClient = useQueryClient();
+  const { t } = useTranslation("crew");
   const [staleJobId, setStaleJobId] = useState<string | null>(null);
   const [activeEtaEndsAt, setActiveEtaEndsAt] = useState<string | null>(() => {
     for (const query of queryClient.getQueryCache().findAll({ queryKey: ["crew", "job"] })) {
@@ -80,6 +84,13 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
       if (event.type === "booking_status_changed" && event.status === "STALE") {
         setStaleJobId(event.bookingId as string);
       }
+      if (event.type === "job_assigned" || event.type === "new_job") {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
+        const msg = event.type === "new_job"
+          ? t("home.newJobQueued", { defaultValue: "New job available in queue!" })
+          : t("home.newJobNotification", { defaultValue: "New job assigned to you!" });
+        toast.success(msg);
+      }
       if (
         (event.type === "eta_extended" || event.type === "time_extension_approved") &&
         event.bookingId && event.etaEndsAt
@@ -101,10 +112,11 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
   });
 
   useEffect(() => {
-    if (!isRestoring && !session) {
+    if (!hasHydrated) return;
+    if (!session) {
       router.replace("/crew/login");
     }
-  }, [session, router, isRestoring]);
+  }, [hasHydrated, session, router]);
 
   useEffect(() => {
     function handleSessionExpired() {
@@ -115,7 +127,7 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
     return () => globalThis.removeEventListener("crew-session-expired", handleSessionExpired);
   }, [clearSession, router]);
 
-  if (isRestoring || !session) return null;
+  if (!hasHydrated || !session) return null;
 
   function handleLogout() {
     clearSession();
