@@ -11,7 +11,6 @@ export function useCrewSession() {
 
   const sessionQuery = useQuery<CrewSession | null>({
     enabled: false,
-    meta: { persist: true },
     placeholderData: null,
     queryFn: async () => queryClient.getQueryData(queryKeys.crew.session()) ?? null,
     queryKey: queryKeys.crew.session(),
@@ -38,6 +37,7 @@ export function useCrewSession() {
   function clearSession() {
     localStorage.removeItem("crew-token");
     queryClient.removeQueries({ queryKey: ["crew"] });
+    api.delete("/v1/crew/sessions/current").catch(() => {});
   }
 
   function getErrorKey(err: unknown): string | null {

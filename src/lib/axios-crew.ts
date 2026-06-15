@@ -7,47 +7,38 @@ const crewApi = axios.create({
   baseURL,
   headers: { "Content-Type": "application/json" },
   timeout: 10_000,
+  withCredentials: true,
 });
 
 // ── Token refresh state ──────────────────────────────────────────────────────
 
 interface QueueEntry {
-  resolve: (token: string) => void;
+  resolve: () => void;
   reject: (err: unknown) => void;
 }
 
 let isRefreshing = false;
 let failedQueue: QueueEntry[] = [];
 
-function processQueue(error: unknown, token: string | null) {
-  failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token!)));
+function processQueue(error: unknown) {
+  failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve()));
   failedQueue = [];
 }
 
-async function refreshCrewToken(): Promise<string> {
-  const currentToken = localStorage.getItem("crew-token");
-  if (!currentToken) throw new Error("No crew token");
-
-  const response = await axios.post<{ success: boolean; data: { token: string } }>(
+async function refreshCrewToken(): Promise<void> {
+  // Cookie crew-token is sent automatically via withCredentials.
+  // Backend re-issues a new crew-token cookie on success.
+  await axios.post(
     `${baseURL}/v1/crew/sessions/refresh`,
     {},
-    { headers: { Authorization: `Bearer ${currentToken}` } }
+    { headers: { "Content-Type": "application/json" }, withCredentials: true }
   );
-  const { token } = response.data.data;
-  localStorage.setItem("crew-token", token);
-  return token;
 }
 
-// ── Request interceptor — attach crew token ──────────────────────────────────
+// ── Request interceptor — cookie sent automatically ──────────────────────────
 
 crewApi.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("crew-token");
-      if (token) config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
+  (config) => config,
   (error) => Promise.reject(error)
 );
 
@@ -75,13 +66,10 @@ crewApi.interceptors.response.use(
 
     if (isUnauthorized && typeof window !== "undefined" && !originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return crewApi(originalRequest);
-          })
+          .then(() => crewApi(originalRequest))
           .catch(() => Promise.reject(normalizedError));
       }
 
@@ -89,13 +77,11 @@ crewApi.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const newToken = await refreshCrewToken();
-        processQueue(null, newToken);
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        await refreshCrewToken();
+        processQueue(null);
         return crewApi(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError, null);
-        localStorage.removeItem("crew-token");
+        processQueue(refreshError);
         window.dispatchEvent(new CustomEvent("crew-session-expired"));
         return Promise.reject(normalizedError);
       } finally {

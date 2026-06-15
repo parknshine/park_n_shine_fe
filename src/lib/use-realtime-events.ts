@@ -84,16 +84,3 @@ export function useRealtimeEvents({
     };
   }, [resolvedUrl, enabled]); // eslint-disable-line react-hooks/exhaustive-deps
 }
-
-/** Decode crewId from the JWT stored in localStorage without a library */
-export function getCrewIdFromToken(): string | null {
-  if (typeof window === "undefined") return null;
-  const token = localStorage.getItem("crew-token");
-  if (!token) return null;
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]!)) as { crewId?: string };
-    return payload.crewId ?? null;
-  } catch {
-    return null;
-  }
-}

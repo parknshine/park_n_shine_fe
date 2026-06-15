@@ -36,8 +36,6 @@ export function useAdminAuth() {
       return response.data;
     },
     onSuccess: (data) => {
-      localStorage.setItem("admin-token", data.token);
-      localStorage.setItem("admin-refresh-token", data.refreshToken);
       localStorage.setItem("admin-sites", JSON.stringify(data.sites));
       setUser(
         { id: data.id, email: data.email, name: data.name, role: data.role },
@@ -50,11 +48,12 @@ export function useAdminAuth() {
   });
 
   function logout() {
-    localStorage.removeItem("admin-token");
-    localStorage.removeItem("admin-refresh-token");
     localStorage.removeItem("admin-sites");
     clearAuth();
-    router.replace("/admin/login");
+    // Clear httpOnly cookies server-side then redirect
+    api.delete("/v1/admin/sessions/current").catch(() => {}).finally(() => {
+      router.replace("/admin/login");
+    });
   }
 
   const error =

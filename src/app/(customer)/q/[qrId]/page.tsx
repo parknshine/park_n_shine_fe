@@ -19,9 +19,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function getQrResolution(
   qrId: string
 ): Promise<SiteQrResolution | null> {
+  if (!UUID_RE.test(qrId)) return null;
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "/api";
   try {
     const res = await fetch(`${baseUrl}/v1/qr/${qrId}`, {

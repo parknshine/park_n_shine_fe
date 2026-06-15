@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
@@ -11,7 +11,8 @@ import { LanguageSwitcher } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { useCrewSession } from "@/features/crew/hooks";
 import { EtaCountdown, JobStaleModal } from "@/features/crew/components";
-import { useRealtimeEvents, getCrewIdFromToken } from "@/lib/use-realtime-events";
+import { useRealtimeEvents } from "@/lib/use-realtime-events";
+import crewApi from "@/lib/axios-crew";
 import { queryKeys } from "@/lib/query-keys";
 import type { CrewJob } from "@/features/crew/types";
 
@@ -32,8 +33,10 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
     }
     return null;
   });
-  const crewId = session ? getCrewIdFromToken() : null;
+  const crewId = session?.crewId ?? null;
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+  const [crewSseToken, setCrewSseToken] = useState<string | null>(null);
+  const fetchingCrewSseRef = useRef(false);
 
   // Subscribe to etaEndsAt changes from crew job query cache
   useEffect(() => {
@@ -51,13 +54,28 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
     });
   }, [queryClient]);
 
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_REALTIME_ENABLED !== "true") return;
+    if (!crewId) return;
+    if (fetchingCrewSseRef.current) return;
+    fetchingCrewSseRef.current = true;
+
+    crewApi
+      .post<{ sseToken: string }>("/v1/crew/realtime/sse-token")
+      .then((res) => {
+        setCrewSseToken(res.data.sseToken);
+      })
+      .catch(() => {
+        // SSE unavailable — silent fail
+      })
+      .finally(() => {
+        fetchingCrewSseRef.current = false;
+      });
+  }, [crewId]);
+
   useRealtimeEvents({
-    url: () => {
-      if (!crewId) return "";
-      const token = localStorage.getItem("crew-token") ?? "";
-      return `${baseUrl}/v1/crew/realtime/stream?token=${token}`;
-    },
-    enabled: !!crewId,
+    url: crewSseToken ? `${baseUrl}/v1/crew/realtime/stream?token=${crewSseToken}` : "",
+    enabled: !!crewSseToken,
     onEvent: (event) => {
       if (event.type === "booking_status_changed" && event.status === "STALE") {
         setStaleJobId(event.bookingId as string);

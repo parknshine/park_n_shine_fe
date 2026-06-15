@@ -87,6 +87,7 @@ function tokenizeCardXendit(
     // Fallback to Xendit.js's own VERIFIED callback: the 3DS page posts a JSON
     // message {id, status} to its parent frame when authentication completes.
     function onAuthMessage(event: MessageEvent) {
+      if (!event.origin.startsWith("https://")) return;
       if (typeof event.data !== "string" || !savedToken?.authenticationId) return;
       try {
         const data = JSON.parse(event.data) as { id?: string; status?: string };
@@ -229,6 +230,8 @@ function CardPayContent() {
     if (!XENDIT_PUBLIC_KEY) return;
     const script = document.createElement("script");
     script.src = "https://js.xendit.co/v1/xendit.min.js";
+    script.integrity = "sha384-KkI03psyBlU2p1WG+r+Q+xMqtuiT12InNNEEkdsjWxt/1ePB2j4Yhd+HR0V4BipY";
+    script.crossOrigin = "anonymous";
     script.async = true;
     script.onload = () => {
       (globalThis as { Xendit?: { setPublishableKey: (k: string) => void } }).Xendit?.setPublishableKey(XENDIT_PUBLIC_KEY);
