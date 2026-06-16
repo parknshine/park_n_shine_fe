@@ -72,6 +72,11 @@ export function CrewHomePage() {
           : t("home.newJobNotification", { defaultValue: "New job assigned to you!" });
         toast.success(msg);
       }
+      if (event.type === "job_assigned") {
+        // Re-fetch active job immediately so the auto-navigate effect fires
+        // without waiting for the 15-second queue poll.
+        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.nextJob() });
+      }
     },
   });
 

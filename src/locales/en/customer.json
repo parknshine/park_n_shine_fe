@@ -172,6 +172,7 @@
       "phoneLabel": "Phone Number",
       "phonePlaceholder": "08xxxxxxxxxx",
       "phoneHelper": "To receive WhatsApp notifications on your car wash progress, please enter your phone number.",
+      "ocrHint": "Correct if needed.",
       "errorCreate": "Failed to create booking. Please try again."
     },
     "confirm": {
@@ -291,7 +292,26 @@
     "submitting": "Submitting...",
     "skip": "Skip",
     "doneTitle": "Thank you!",
-    "doneSubtitle": "Your feedback helps us improve."
+    "doneSubtitle": "Your feedback helps us improve.",
+    "tip": {
+      "pay": {
+        "title": "Complete Tip Payment",
+        "validUntil": "Valid until:",
+        "openHint": "Tap the button below to open",
+        "openBtn": "Open",
+        "doneBtn": "Already Paid / Back to Home"
+      },
+      "select": {
+        "heading": "Rating sent! Appreciate your crew? Leave a tip!",
+        "amountLabel": "Select tip amount",
+        "customPlaceholder": "Other amount (min Rp 5,000)",
+        "methodLabel": "Payment method",
+        "error": "Failed to process tip. Please try again.",
+        "processing": "Processing...",
+        "payBtn": "Pay Tip",
+        "skipBtn": "Skip, back to home"
+      }
+    }
   },
   "qr": {
     "cannotProceedTitle": "Cannot Proceed",
@@ -330,6 +350,9 @@
     "toLogin": "Sign in",
     "loginSuccess": "Signed in successfully",
     "registerSuccess": "Account created",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "081234567890",
+    "phoneRequired": "Phone number is required",
     "errors": {
       "invalidCredentials": "Incorrect email or password.",
       "emailInUse": "An account with this email already exists.",
@@ -339,5 +362,101 @@
       "tooManyRequests": "Too many attempts. Please try again later.",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "bookNowModal": {
+    "title": "Car Wash Now",
+    "promoText": "Login and get a free wash promo",
+    "eyebrow": "NEW MEMBER PROMO",
+    "loginBtn": "Continue with Login",
+    "continueBtn": "Continue",
+    "guestBtn": "Wash Without Login",
+    "terms": "Free wash promo is only valid for registered members."
+  },
+  "bottomNav": {
+    "home": "Home",
+    "wash": "Wash",
+    "history": "History",
+    "account": "Account",
+    "authPromptTitle": "Create an account!",
+    "authPromptDesc": "Your wash history is saved automatically when you have an account.",
+    "authPromptCta": "Login / Register",
+    "authPromptDismiss": "Later"
+  },
+  "navGuard": {
+    "confirmLeave": "Yes, Leave",
+    "cancelLeave": "No, Stay Here",
+    "formWillReset": "If you leave this page, you'll need to fill in the form and submit again",
+    "bookingWillBeLostGuest": "If you leave this page, your booking will be lost and you'll need to start over",
+    "bookingStillActiveAuth": "You have an incomplete payment. Your booking is still active and can be resumed from home",
+    "statusWillBeLostGuest": "If you leave this page, you will lose track of your car wash status"
+  },
+  "home": {
+    "greetingLine1": "Welcome 👋",
+    "greetingLine2": "Hello",
+    "guestHeading": "Start Your Car Wash",
+    "washCountLabel": "Total Washes",
+    "washCountUnit": "times",
+    "completePhoneTitle": "Complete your phone number",
+    "completePhoneDesc": "So we can contact you when your wash is ready.",
+    "completePhoneFill": "Fill",
+    "completePhoneCta": "Complete Now",
+    "quickActionsTitle": "Quick Actions",
+    "actionBooking": "Booking",
+    "actionPaket": "Packages",
+    "actionBantuan": "Help",
+    "nearbyTitle": "Nearby Locations",
+    "nearbyViewAll": "View all",
+    "quickActionCta": "Start Wash Now",
+    "guestLoginCta": "Login to start",
+    "guestWashCta": "Wash Now",
+    "activeBookingTitle": "Active Booking",
+    "activeBookingCta": "View Status",
+    "activeBookingStatusPaid": "Waiting for crew",
+    "activeBookingStatusAssigned": "Crew on the way",
+    "activeBookingStatusLocated": "Crew on the way",
+    "activeBookingStatusInProgress": "Being washed",
+    "activeBookingStatusNeedsHelp": "Needs attention"
+  },
+  "history": {
+    "title": "Wash History",
+    "empty": "No wash history yet",
+    "authPrompt": "Create an account to save your wash history automatically",
+    "loginCta": "Login / Register",
+    "bookingId": "Booking ID",
+    "date": "Date",
+    "paymentMethod": "Payment Method",
+    "noPayment": "Unpaid"
+  },
+  "account": {
+    "title": "Account",
+    "memberBadge": "Member",
+    "personalInfoTitle": "Personal Info",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "emailNote": "Email cannot be changed",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "081234567890",
+    "saveBtn": "Save",
+    "saveChangesBtn": "Save Changes",
+    "saving": "Saving...",
+    "saveSuccess": "Profile saved",
+    "saveError": "Failed to save profile",
+    "logoutBtn": "Logout",
+    "authPrompt": "Login to manage your account",
+    "loginCta": "Login / Register",
+    "washHistory": "Wash History",
+    "paymentMethod": "Payment Method",
+    "helpFaq": "Help & FAQ",
+    "support": "Support",
+    "changePhoto": "Change profile photo",
+    "photoSuccess": "Profile photo updated",
+    "photoError": "Failed to update photo",
+    "comingSoon": "Coming soon"
+  },
+  "postFlow": {
+    "guestPromptTitle": "Save your wash history",
+    "guestPromptDesc": "Create an account and get exclusive promos for loyal customers.",
+    "registerCta": "Register Now",
+    "skipCta": "Maybe Later"
   }
 }

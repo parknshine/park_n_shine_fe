@@ -10,12 +10,14 @@ export const CUSTOMER_REFRESH_KEY = "pns_refresh";
 interface CustomerAuthState {
   customer: Customer | null;
   isAuthenticated: boolean;
+  _hasHydrated: boolean;
 }
 
 interface CustomerAuthActions {
   setCustomer: (customer: Customer) => void;
   updateCustomer: (partial: Partial<Customer>) => void;
   clearCustomer: () => void;
+  setHasHydrated: (value: boolean) => void;
 }
 
 export const useCustomerAuthStore = create<
@@ -25,6 +27,7 @@ export const useCustomerAuthStore = create<
     immer((set) => ({
       customer: null,
       isAuthenticated: false,
+      _hasHydrated: false,
 
       setCustomer: (customer) =>
         set((state) => {
@@ -44,7 +47,21 @@ export const useCustomerAuthStore = create<
           state.customer = null;
           state.isAuthenticated = false;
         }),
+
+      setHasHydrated: (value) =>
+        set((state) => {
+          state._hasHydrated = value;
+        }),
     })),
-    { name: "customer-auth" }
+    {
+      name: "customer-auth",
+      partialize: (state) => ({
+        customer: state.customer,
+        isAuthenticated: state.isAuthenticated,
+      }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
+    }
   )
 );

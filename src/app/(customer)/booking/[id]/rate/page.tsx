@@ -16,6 +16,7 @@ import { usePaymentAutoPoll } from "@/features/customer/hooks/use-payment-auto-p
 import { useRealtimeEvents } from "@/lib/use-realtime-events";
 import { TIP_PRESETS } from "@/features/customer/types/tip";
 import type { TipInstructions, TipPaymentMethod } from "@/features/customer/types/tip";
+import { useCustomerAuthStore } from "@/store/customer-auth-store";
 
 const TIP_METHOD_LABELS: Record<TipPaymentMethod, string> = {
   qris: "QRIS",
@@ -30,9 +31,15 @@ function TipPayStep({
   instructions: TipInstructions;
   onDone: () => void;
 }>) {
+  const { t } = useTranslation("customer");
+  let providerName = "";
+  if (instructions.type === "EWALLET") {
+    providerName = instructions.provider === "gopay" ? "GoPay" : "ShopeePay";
+  }
+
   return (
     <div className="mx-auto max-w-md space-y-6 px-4 py-8 text-center">
-      <h2 className="text-xl font-bold text-foreground">Selesaikan Pembayaran Tip</h2>
+      <h2 className="text-xl font-bold text-foreground">{t("rate.tip.pay.title")}</h2>
       {instructions.type === "QRIS" ? (
         <div className="space-y-3">
           {instructions.qrString.startsWith("http") ? (
@@ -48,23 +55,22 @@ function TipPayStep({
             </div>
           )}
           <p className="text-sm text-muted-foreground">
-            Berlaku hingga: {new Date(instructions.expiryTime).toLocaleTimeString("id-ID")}
+            {t("rate.tip.pay.validUntil")} {new Date(instructions.expiryTime).toLocaleTimeString("id-ID")}
           </p>
         </div>
       ) : (
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            Tap tombol di bawah untuk membuka{" "}
-            {instructions.provider === "gopay" ? "GoPay" : "ShopeePay"}
+            {t("rate.tip.pay.openHint")} {providerName}
           </p>
           <a
             href={instructions.deepLinkUrl}
-            className="inline-block w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            className="inline-block w-full rounded-full bg-primary py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
-            Buka {instructions.provider === "gopay" ? "GoPay" : "ShopeePay"}
+            {t("rate.tip.pay.openBtn")} {providerName}
           </a>
           <p className="text-sm text-muted-foreground">
-            Berlaku hingga: {new Date(instructions.expiryTime).toLocaleTimeString("id-ID")}
+            {t("rate.tip.pay.validUntil")} {new Date(instructions.expiryTime).toLocaleTimeString("id-ID")}
           </p>
         </div>
       )}
@@ -73,7 +79,7 @@ function TipPayStep({
         onClick={onDone}
         className="w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
       >
-        Sudah Bayar / Kembali ke Home
+        {t("rate.tip.pay.doneBtn")}
       </button>
     </div>
   );
@@ -102,6 +108,8 @@ function TipSelectStep({
   onPay: () => void;
   onSkip: () => void;
 }>) {
+  const { t } = useTranslation("customer");
+
   return (
     <div className="mx-auto max-w-md space-y-6 px-4 py-8">
       <div className="flex flex-col items-center gap-3 text-center">
@@ -109,12 +117,12 @@ function TipSelectStep({
           <Sparkles className="h-10 w-10 text-primary" />
         </div>
         <h2 className="text-xl font-bold text-foreground">
-          Rating berhasil dikirim! Appreciate your crew? Leave a tip!
+          {t("rate.tip.select.heading")}
         </h2>
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">Pilih nominal tip</p>
+        <p className="text-sm font-medium text-foreground">{t("rate.tip.select.amountLabel")}</p>
         <div className="grid grid-cols-2 gap-2">
           {TIP_PRESETS.map((preset) => (
             <button
@@ -141,13 +149,13 @@ function TipSelectStep({
             const val = Number.parseInt(e.target.value, 10);
             setTipAmount(!Number.isNaN(val) && val >= 5000 ? val : null);
           }}
-          placeholder="Nominal lain (min Rp 5.000)"
+          placeholder={t("rate.tip.select.customPlaceholder")}
           className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">Metode pembayaran</p>
+        <p className="text-sm font-medium text-foreground">{t("rate.tip.select.methodLabel")}</p>
         <div className="grid grid-cols-3 gap-2">
           {(["qris", "gopay", "shopeepay"] as TipPaymentMethod[]).map((method) => (
             <button
@@ -167,7 +175,7 @@ function TipSelectStep({
       </div>
 
       {isError && (
-        <p className="text-sm text-destructive">Gagal memproses tip. Silakan coba lagi.</p>
+        <p className="text-sm text-destructive">{t("rate.tip.select.error")}</p>
       )}
 
       <button
@@ -176,7 +184,7 @@ function TipSelectStep({
         onClick={onPay}
         className="w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {isPending ? "Memproses..." : "Bayar Tip"}
+        {isPending ? t("rate.tip.select.processing") : t("rate.tip.select.payBtn")}
       </button>
 
       <button
@@ -184,7 +192,7 @@ function TipSelectStep({
         onClick={onSkip}
         className="w-full py-2 text-sm text-muted-foreground hover:text-foreground"
       >
-        Skip, kembali ke home
+        {t("rate.tip.select.skipBtn")}
       </button>
     </div>
   );
@@ -195,6 +203,7 @@ export default function BookingRatePage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const router = useRouter();
+  const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
   const { t } = useTranslation("customer");
 
   const [score, setScore] = useState(0);
@@ -276,7 +285,7 @@ export default function BookingRatePage() {
         isPending={tipMutation.isPending}
         isError={tipMutation.isError}
         onPay={handleTipPay}
-        onSkip={() => router.push("/")}
+        onSkip={() => router.push(isAuthenticated ? "/home" : "/")}
       />
     );
   }

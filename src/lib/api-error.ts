@@ -58,7 +58,6 @@ export const API_ERROR_CODES = {
   SHIFT_CODE_INVALID: "SHIFT_CODE_INVALID",
   SLOT_PHOTO_REQUIRED: "SLOT_PHOTO_REQUIRED",
   SSO_REQUIRED: "SSO_REQUIRED",
-  STALE_JOB_TIMEOUT: "STALE_JOB_TIMEOUT",
   STATUS_OVERRIDE_INVALID: "STATUS_OVERRIDE_INVALID",
   STATUS_OVERRIDE_REASON_REQUIRED: "STATUS_OVERRIDE_REASON_REQUIRED",
   STATUS_POLL_FAILED: "STATUS_POLL_FAILED",
@@ -499,14 +498,6 @@ export const API_ERROR_DEFINITIONS: Record<ApiErrorCode, ApiErrorDefinition> = {
     messageKey: "errors.admin.ssoRequired",
     requirement: "FR-09",
     severity: "error",
-    surface: "admin",
-  },
-  STALE_JOB_TIMEOUT: {
-    defaultHttpStatus: 409,
-    isRetryable: false,
-    messageKey: "errors.admin.staleJobTimeout",
-    requirement: "FR-21",
-    severity: "warning",
     surface: "admin",
   },
   STATUS_OVERRIDE_INVALID: {

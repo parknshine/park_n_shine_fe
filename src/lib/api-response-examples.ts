@@ -868,17 +868,6 @@ export const adminErrorExamples = {
     meta: META,
   }),
 
-  /** FR-21: Booking PAID belum di-claim melewati threshold (default 20 menit) */
-  staleJobTimeout: createApiErrorMessageResponse({
-    code: API_ERROR_CODES.STALE_JOB_TIMEOUT,
-    details: {
-      bookingId: "book_stale_01",
-      elapsedMinutes: 23,
-      thresholdMinutes: 20,
-    },
-    meta: META,
-  }),
-
   /** FR-09: Akses admin tanpa SSO Google Workspace */
   adminAuthRequired: createApiErrorMessageResponse({
     code: API_ERROR_CODES.ADMIN_AUTH_REQUIRED,

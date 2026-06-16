@@ -4,7 +4,10 @@ import { queryKeys } from "@/lib/query-keys";
 
 export interface LoyaltyCustomer {
   id: string;
-  phone: string;
+  type: "registered" | "guest";
+  name: string | null;
+  email: string | null;
+  phone: string | null;
   washCount: number;
   bookingCount: number;
   createdAt: string;

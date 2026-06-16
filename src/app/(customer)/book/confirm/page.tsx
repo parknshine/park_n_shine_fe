@@ -11,12 +11,14 @@ import { AppShell } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { BookingSummaryCard } from "@/features/customer/components/booking-summary-card";
 import { BookingLocationCard } from "@/features/customer/components/booking-location-card";
+import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { useBookingStatus } from "@/features/customer/hooks";
 import {
   usePaymentActionV2,
   type ConfirmBookingPayloadV2,
 } from "@/features/customer/hooks/use-payment-action-v2";
 import { useTranslation } from "@/i18n";
+import { useBookingCaptureStore } from "@/store/booking-capture-store";
 
 export default function WalkInConfirmPage() {
   return (
@@ -29,6 +31,7 @@ export default function WalkInConfirmPage() {
 function WalkInConfirmContent() {
   const router = useRouter();
   const { t } = useTranslation("customer");
+  const clearCapture = useBookingCaptureStore((s) => s.clear);
 
   const searchParams = useSearchParams();
   const bookingId = searchParams.get("bookingId");
@@ -97,6 +100,7 @@ function WalkInConfirmContent() {
   }
 
   function handlePay() {
+    clearCapture();
     const payload: ConfirmBookingPayloadV2 = {
       plateText: plate!,
       slotText: slot!,
@@ -109,29 +113,17 @@ function WalkInConfirmContent() {
   }
 
   return (
-    <AppShell surface='customer'>
-      <div className='space-y-6'>
-        <div className='flex items-start gap-3'>
-          {/* <button
-            type="button"
-            className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition hover:bg-muted hover:text-foreground"
-            onClick={() => router.back()}
-            aria-label={t("booking.confirm.back")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button> */}
+    <AppShell surface='customer' className="pt-0! px-0!">
+      <StepProgressBar current={2} total={2} label={t("booking.step", { current: 2, total: 2 })} />
 
-          <div className='min-w-0 flex-1'>
-            <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
-              {t("booking.step", { current: 2, total: 2 })}
-            </p>
-            <h1 className='mt-1 text-2xl font-bold leading-tight text-foreground'>
-              {t("booking.confirm.title")}
-            </h1>
-            <p className='mt-1 text-sm text-muted-foreground'>
-              {t("booking.confirm.subtitle")}
-            </p>
-          </div>
+      <div className='space-y-4 px-4 pb-6'>
+        <div>
+          <h1 className='text-2xl font-bold leading-tight text-foreground'>
+            {t("booking.confirm.title")}
+          </h1>
+          <p className='mt-1 text-sm text-muted-foreground'>
+            {t("booking.confirm.subtitle")}
+          </p>
         </div>
 
         <div className='space-y-3'>

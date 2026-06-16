@@ -11,6 +11,7 @@ import { AppShell } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { BookingSummaryCard } from "@/features/customer/components/booking-summary-card";
 import { BookingLocationCard } from "@/features/customer/components/booking-location-card";
+import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { useBookingStatus } from "@/features/customer/hooks";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { PaymentIntentResponse } from "@/features/customer/types";
@@ -130,13 +131,12 @@ function BookConfirmContent() {
   const canSubmit = !mutation.isPending && !hasSubmitted;
 
   return (
-    <AppShell surface='customer'>
-      <div className='space-y-6'>
+    <AppShell surface='customer' className="pt-0! px-0!">
+      <StepProgressBar current={2} total={2} label={t("booking.step", { current: 2, total: 2 })} />
+
+      <div className='space-y-4 px-4 pb-6'>
         <div>
-          <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
-            {t("booking.step", { current: 2, total: 2 })}
-          </p>
-          <h1 className='mt-1 text-2xl font-bold text-foreground'>
+          <h1 className='text-2xl font-bold text-foreground'>
             {t("booking.confirm.title")}
           </h1>
           <p className='mt-1 text-sm text-muted-foreground'>
@@ -144,54 +144,58 @@ function BookConfirmContent() {
           </p>
         </div>
 
-        <BookingSummaryCard
-          plate={plate}
-          slot={slot}
-          priceAmount={booking?.priceAmount}
-          currency={booking?.currency}
-          estimatedReadyAt={booking?.estimatedReadyAt}
-        />
-
-        {booking?.siteName && (
-          <BookingLocationCard
-            locationName={booking.siteName}
-            locationAddress={booking.siteAddress ?? undefined}
-            phone={phone ?? undefined}
+        <div className='space-y-3'>
+          <BookingSummaryCard
+            plate={plate}
+            slot={slot}
+            priceAmount={booking?.priceAmount}
+            currency={booking?.currency}
+            estimatedReadyAt={booking?.estimatedReadyAt}
           />
-        )}
 
-        <Button
-          size='lg'
-          className='w-full rounded-full'
-          disabled={!canSubmit}
-          onClick={handlePay}
-        >
-          {mutation.isPending ? (
-            <>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              {t("booking.confirm.processing")}
-            </>
-          ) : (
-            t("booking.confirm.pay")
+          {booking?.siteName && (
+            <BookingLocationCard
+              locationName={booking.siteName}
+              locationAddress={booking.siteAddress ?? undefined}
+              phone={phone ?? undefined}
+            />
           )}
-        </Button>
+        </div>
 
-        {/* ── Dev-only: skip payment gateway ─────────────────────────────── */}
-        {process.env.NODE_ENV !== "production" && (
-          <button
-            type='button'
-            disabled={isSimulating}
-            onClick={handleSimulatePay}
-            className='flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400'
+        <div className='space-y-3 pt-1'>
+          <Button
+            size='lg'
+            className='w-full rounded-full'
+            disabled={!canSubmit}
+            onClick={handlePay}
           >
-            {isSimulating ? (
-              <Loader2 className='h-4 w-4 animate-spin' />
+            {mutation.isPending ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                {t("booking.confirm.processing")}
+              </>
             ) : (
-              <Zap className='h-4 w-4' />
+              t("booking.confirm.pay")
             )}
-            {isSimulating ? "Memproses..." : "⚡ Simulasi Bayar (Dev Only)"}
-          </button>
-        )}
+          </Button>
+
+          {/* ── Dev-only: skip payment gateway ─────────────────────────────── */}
+          {process.env.NODE_ENV !== "production" && (
+            <button
+              type='button'
+              disabled={isSimulating}
+              onClick={handleSimulatePay}
+              className='flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400'
+            >
+              {isSimulating ? (
+                <Loader2 className='h-4 w-4 animate-spin' />
+              ) : (
+                <Zap className='h-4 w-4' />
+              )}
+              {isSimulating ? "Memproses..." : "⚡ Simulasi Bayar (Dev Only)"}
+            </button>
+          )}
+        </div>
       </div>
     </AppShell>
   );

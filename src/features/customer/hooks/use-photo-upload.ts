@@ -22,6 +22,8 @@ interface UsePhotoUploadOptions {
   uploadUrl?: string;
   /** Override the axios instance (e.g. crewApi for crew uploads). Defaults to customer api. */
   apiClient?: AxiosInstance;
+  /** Seed the upload state (e.g. when restoring from a saved session after back-navigation). */
+  initialState?: UploadState;
 }
 
 interface UploadPhotoOptions {
@@ -97,15 +99,13 @@ export function usePhotoUpload({
   retryDelaysMs = DEFAULT_RETRY_DELAYS,
   uploadUrl,
   apiClient,
+  initialState,
 }: UsePhotoUploadOptions) {
   const httpClient = apiClient ?? api;
   const queryClient = useQueryClient();
-  const [state, setState] = useState<UploadState>({
-    progress: 0,
-    status: "idle",
-    error: null,
-    media: null,
-  });
+  const [state, setState] = useState<UploadState>(
+    initialState ?? { progress: 0, status: "idle", error: null, media: null }
+  );
 
   const endpoint = uploadUrl ?? `/v1/bookings/${bookingId}/media`;
   const mutKey = bookingId

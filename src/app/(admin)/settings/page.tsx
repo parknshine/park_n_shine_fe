@@ -28,24 +28,54 @@ import { useTranslation } from "@/i18n";
 
 interface SettingsTableProps {
   settings: AdminSettings;
-  save: (data: Partial<Pick<AdminSettings, "staleJobTimeoutMinutes" | "jobEtaMinutes" | "whatsappNumber" | "avgCleaningMinutes" | "paymentExpiryMinutes" | "crewTimeExtensionMinutes" | "loyaltyEnabled" | "loyaltyOtpChannel" | "signupDiscountPercent" | "loyaltyWashThreshold" | "loyaltyRewardDiscountPercent">>) => Promise<unknown>;
+  save: (
+    data: Partial<
+      Pick<
+        AdminSettings,
+        | "whatsappNumber"
+        | "avgCleaningMinutes"
+        | "paymentExpiryMinutes"
+        | "crewTimeExtensionMinutes"
+        | "loyaltyEnabled"
+        | "loyaltyOtpChannel"
+        | "signupDiscountPercent"
+        | "loyaltyWashThreshold"
+        | "loyaltyRewardDiscountPercent"
+      >
+    >,
+  ) => Promise<unknown>;
   isSaving: boolean;
 }
 
-function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps>) {
+function SettingsTable({
+  settings,
+  save,
+  isSaving,
+}: Readonly<SettingsTableProps>) {
   const { t } = useTranslation("admin");
-  const [staleTimeout, setStaleTimeout] = useState(settings.staleJobTimeoutMinutes);
-  const [jobEta, setJobEta] = useState(settings.jobEtaMinutes);
   const [avgCleaning, setAvgCleaning] = useState(settings.avgCleaningMinutes);
-  const [paymentExpiry, setPaymentExpiry] = useState(settings.paymentExpiryMinutes);
+  const [paymentExpiry, setPaymentExpiry] = useState(
+    settings.paymentExpiryMinutes,
+  );
   const [waNumber, setWaNumber] = useState(settings.whatsappNumber);
-  const [crewTimeExtension, setCrewTimeExtension] = useState(settings.crewTimeExtensionMinutes);
+  const [crewTimeExtension, setCrewTimeExtension] = useState(
+    settings.crewTimeExtensionMinutes,
+  );
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(settings.loyaltyEnabled);
-  const [signupDiscountPercent, setSignupDiscountPercent] = useState(settings.signupDiscountPercent);
-  const [loyaltyWashThreshold, setLoyaltyWashThreshold] = useState(settings.loyaltyWashThreshold);
-  const [loyaltyRewardDiscountPercent, setLoyaltyRewardDiscountPercent] = useState(settings.loyaltyRewardDiscountPercent);
+  const [signupDiscountPercent, setSignupDiscountPercent] = useState(
+    settings.signupDiscountPercent,
+  );
+  const [loyaltyWashThreshold, setLoyaltyWashThreshold] = useState(
+    settings.loyaltyWashThreshold,
+  );
+  const [loyaltyRewardDiscountPercent, setLoyaltyRewardDiscountPercent] =
+    useState(settings.loyaltyRewardDiscountPercent);
 
-  async function handleSave(payload: Parameters<typeof save>[0], successKey: string, errorKey: string) {
+  async function handleSave(
+    payload: Parameters<typeof save>[0],
+    successKey: string,
+    errorKey: string,
+  ) {
     try {
       await save(payload);
       toast.success(t(successKey));
@@ -55,136 +85,68 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
   }
 
   return (
-    <div className="rounded-lg border border-border overflow-hidden">
-      <table className="w-full text-sm">
+    <div className='rounded-lg border border-border overflow-hidden'>
+      <table className='w-full text-sm'>
         <thead>
-          <tr className="border-b border-border bg-muted/40">
-            <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-2/5">
+          <tr className='border-b border-border bg-muted/40'>
+            <th className='px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-2/5'>
               {t("settings.table.setting")}
             </th>
-            <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground">
+            <th className='px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground'>
               {t("settings.table.value")}
             </th>
-            <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-32">
+            <th className='px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-32'>
               {t("settings.table.action")}
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
-          {/* Stale Job Timeout */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">{t("settings.staleTimeout.title")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.staleTimeout.description")}</p>
-            </td>
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-2">
-                <Input
-                  id="timeout-input"
-                  type="text"
-                  inputMode="numeric"
-                  value={staleTimeout}
-                  onChange={(e) => setStaleTimeout(Number(e.target.value))}
-                  className="w-20 h-8 text-sm"
-                />
-                <span className="text-xs text-muted-foreground">{t("settings.staleTimeout.unit")}</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">{t("settings.staleTimeout.hint")}</p>
-            </td>
-            <td className="px-4 py-3">
-              <div className="flex flex-col gap-1.5">
-                <Button
-                  size="sm"
-                  disabled={isSaving}
-                  onClick={() => handleSave({ staleJobTimeoutMinutes: staleTimeout }, "settings.staleTimeout.success", "settings.staleTimeout.error")}
-                >
-                  {t("settings.table.save")}
-                </Button>
-                <button
-                  onClick={() => setStaleTimeout(20)}
-                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
-                >
-                  {t("settings.staleTimeout.resetLabel")}
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          {/* Job ETA */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">{t("settings.jobEta.title")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.jobEta.description")}</p>
-            </td>
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-2">
-                <Input
-                  id="job-eta-input"
-                  type="text"
-                  inputMode="numeric"
-                  value={jobEta}
-                  onChange={(e) => setJobEta(Number(e.target.value))}
-                  className="w-20 h-8 text-sm"
-                />
-                <span className="text-xs text-muted-foreground">{t("settings.jobEta.unit")}</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">{t("settings.jobEta.hint")}</p>
-            </td>
-            <td className="px-4 py-3">
-              <div className="flex flex-col gap-1.5">
-                <Button
-                  size="sm"
-                  disabled={isSaving}
-                  onClick={() => handleSave({ jobEtaMinutes: jobEta }, "settings.jobEta.success", "settings.jobEta.error")}
-                >
-                  {t("settings.table.save")}
-                </Button>
-                <button
-                  onClick={() => setJobEta(20)}
-                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
-                >
-                  {t("settings.jobEta.resetLabel")}
-                </button>
-              </div>
-            </td>
-          </tr>
-
+        <tbody className='divide-y divide-border'>
           {/* Crew Time Extension */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">{t("settings.crewTimeExtension.title")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.crewTimeExtension.description")}</p>
+          <tr className='align-top'>
+            <td className='px-4 py-3'>
+              <p className='font-medium text-foreground'>
+                {t("settings.crewTimeExtension.title")}
+              </p>
+              <p className='text-xs text-muted-foreground mt-0.5'>
+                {t("settings.crewTimeExtension.description")}
+              </p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-2">
+            <td className='px-4 py-3'>
+              <div className='flex items-center gap-2'>
                 <Input
-                  id="crew-time-extension-input"
-                  type="text"
-                  inputMode="numeric"
+                  id='crew-time-extension-input'
+                  type='text'
+                  inputMode='numeric'
                   value={crewTimeExtension}
                   onChange={(e) => setCrewTimeExtension(Number(e.target.value))}
-                  className="w-20 h-8 text-sm"
+                  className='w-20 h-8 text-sm'
                 />
-                <span className="text-xs text-muted-foreground">{t("settings.crewTimeExtension.unit")}</span>
+                <span className='text-xs text-muted-foreground'>
+                  {t("settings.crewTimeExtension.unit")}
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">{t("settings.crewTimeExtension.hint")}</p>
+              <p className='text-xs text-muted-foreground mt-1'>
+                {t("settings.crewTimeExtension.hint")}
+              </p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex flex-col gap-1.5">
+            <td className='px-4 py-3'>
+              <div className='flex flex-col gap-1.5'>
                 <Button
-                  size="sm"
+                  size='sm'
                   disabled={isSaving}
-                  onClick={() => handleSave(
-                    { crewTimeExtensionMinutes: crewTimeExtension },
-                    "settings.crewTimeExtension.success",
-                    "settings.crewTimeExtension.error"
-                  )}
+                  onClick={() =>
+                    handleSave(
+                      { crewTimeExtensionMinutes: crewTimeExtension },
+                      "settings.crewTimeExtension.success",
+                      "settings.crewTimeExtension.error",
+                    )
+                  }
                 >
                   {t("settings.table.save")}
                 </Button>
                 <button
                   onClick={() => setCrewTimeExtension(10)}
-                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
+                  className='text-xs text-muted-foreground underline hover:text-foreground text-left'
                 >
                   {t("settings.crewTimeExtension.resetLabel")}
                 </button>
@@ -193,37 +155,51 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
           </tr>
 
           {/* Avg Cleaning Duration */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">{t("settings.avgCleaning.title")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.avgCleaning.description")}</p>
+          <tr className='align-top'>
+            <td className='px-4 py-3'>
+              <p className='font-medium text-foreground'>
+                {t("settings.avgCleaning.title")}
+              </p>
+              <p className='text-xs text-muted-foreground mt-0.5'>
+                {t("settings.avgCleaning.description")}
+              </p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-2">
+            <td className='px-4 py-3'>
+              <div className='flex items-center gap-2'>
                 <Input
-                  id="avg-cleaning-input"
-                  type="text"
-                  inputMode="numeric"
+                  id='avg-cleaning-input'
+                  type='text'
+                  inputMode='numeric'
                   value={avgCleaning}
                   onChange={(e) => setAvgCleaning(Number(e.target.value))}
-                  className="w-20 h-8 text-sm"
+                  className='w-20 h-8 text-sm'
                 />
-                <span className="text-xs text-muted-foreground">{t("settings.avgCleaning.unit")}</span>
+                <span className='text-xs text-muted-foreground'>
+                  {t("settings.avgCleaning.unit")}
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">{t("settings.avgCleaning.hint")}</p>
+              <p className='text-xs text-muted-foreground mt-1'>
+                {t("settings.avgCleaning.hint")}
+              </p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex flex-col gap-1.5">
+            <td className='px-4 py-3'>
+              <div className='flex flex-col gap-1.5'>
                 <Button
-                  size="sm"
+                  size='sm'
                   disabled={isSaving}
-                  onClick={() => handleSave({ avgCleaningMinutes: avgCleaning }, "settings.avgCleaning.success", "settings.avgCleaning.error")}
+                  onClick={() =>
+                    handleSave(
+                      { avgCleaningMinutes: avgCleaning },
+                      "settings.avgCleaning.success",
+                      "settings.avgCleaning.error",
+                    )
+                  }
                 >
                   {t("settings.table.save")}
                 </Button>
                 <button
                   onClick={() => setAvgCleaning(30)}
-                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
+                  className='text-xs text-muted-foreground underline hover:text-foreground text-left'
                 >
                   {t("settings.avgCleaning.resetLabel")}
                 </button>
@@ -232,37 +208,51 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
           </tr>
 
           {/* Payment Expiry */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">{t("settings.paymentExpiry.title")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("settings.paymentExpiry.description")}</p>
+          <tr className='align-top'>
+            <td className='px-4 py-3'>
+              <p className='font-medium text-foreground'>
+                {t("settings.paymentExpiry.title")}
+              </p>
+              <p className='text-xs text-muted-foreground mt-0.5'>
+                {t("settings.paymentExpiry.description")}
+              </p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-2">
+            <td className='px-4 py-3'>
+              <div className='flex items-center gap-2'>
                 <Input
-                  id="payment-expiry-input"
-                  type="text"
-                  inputMode="numeric"
+                  id='payment-expiry-input'
+                  type='text'
+                  inputMode='numeric'
                   value={paymentExpiry}
                   onChange={(e) => setPaymentExpiry(Number(e.target.value))}
-                  className="w-20 h-8 text-sm"
+                  className='w-20 h-8 text-sm'
                 />
-                <span className="text-xs text-muted-foreground">{t("settings.paymentExpiry.unit")}</span>
+                <span className='text-xs text-muted-foreground'>
+                  {t("settings.paymentExpiry.unit")}
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">{t("settings.paymentExpiry.hint")}</p>
+              <p className='text-xs text-muted-foreground mt-1'>
+                {t("settings.paymentExpiry.hint")}
+              </p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex flex-col gap-1.5">
+            <td className='px-4 py-3'>
+              <div className='flex flex-col gap-1.5'>
                 <Button
-                  size="sm"
+                  size='sm'
                   disabled={isSaving}
-                  onClick={() => handleSave({ paymentExpiryMinutes: paymentExpiry }, "settings.paymentExpiry.success", "settings.paymentExpiry.error")}
+                  onClick={() =>
+                    handleSave(
+                      { paymentExpiryMinutes: paymentExpiry },
+                      "settings.paymentExpiry.success",
+                      "settings.paymentExpiry.error",
+                    )
+                  }
                 >
                   {t("settings.table.save")}
                 </Button>
                 <button
                   onClick={() => setPaymentExpiry(15)}
-                  className="text-xs text-muted-foreground underline hover:text-foreground text-left"
+                  className='text-xs text-muted-foreground underline hover:text-foreground text-left'
                 >
                   {t("settings.paymentExpiry.resetLabel")}
                 </button>
@@ -271,29 +261,31 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
           </tr>
 
           {/* Loyalty Program */}
-          <tr className="align-top">
-            <td className="px-4 py-3" colSpan={3}>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                Program Loyalti
+          <tr className='align-top'>
+            <td className='px-4 py-3' colSpan={3}>
+              <p className='text-xs font-semibold text-muted-foreground uppercase tracking-wide'>
+                Program Loyalti (IN PROGRESS)
               </p>
             </td>
           </tr>
 
           {/* Loyalty Enabled */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">Tampilkan program loyalti ke customer</p>
+          <tr className='align-top'>
+            <td className='px-4 py-3'>
+              <p className='font-medium text-foreground'>
+                Tampilkan program loyalti ke customer
+              </p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-3">
+            <td className='px-4 py-3'>
+              <div className='flex items-center gap-3'>
                 <Switch
-                  id="loyalty-enabled-input"
+                  id='loyalty-enabled-input'
                   checked={loyaltyEnabled}
                   onCheckedChange={setLoyaltyEnabled}
-                  className="h-6 w-11 data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground/30"
+                  className='h-6 w-11 data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground/30'
                 />
                 <label
-                  htmlFor="loyalty-enabled-input"
+                  htmlFor='loyalty-enabled-input'
                   className={cn(
                     "text-sm font-medium cursor-pointer select-none",
                     loyaltyEnabled ? "text-primary" : "text-muted-foreground",
@@ -303,11 +295,17 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
                 </label>
               </div>
             </td>
-            <td className="px-4 py-3">
+            <td className='px-4 py-3'>
               <Button
-                size="sm"
+                size='sm'
                 disabled={isSaving}
-                onClick={() => handleSave({ loyaltyEnabled }, "settings.loyaltyEnabled.success", "settings.loyaltyEnabled.error")}
+                onClick={() =>
+                  handleSave(
+                    { loyaltyEnabled },
+                    "settings.loyaltyEnabled.success",
+                    "settings.loyaltyEnabled.error",
+                  )
+                }
               >
                 {t("settings.table.save")}
               </Button>
@@ -315,28 +313,36 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
           </tr>
 
           {/* Signup Discount */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">Diskon signup (%)</p>
+          <tr className='align-top'>
+            <td className='px-4 py-3'>
+              <p className='font-medium text-foreground'>Diskon signup (%)</p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-2">
+            <td className='px-4 py-3'>
+              <div className='flex items-center gap-2'>
                 <Input
-                  id="signup-discount-input"
-                  type="text"
-                  inputMode="numeric"
+                  id='signup-discount-input'
+                  type='text'
+                  inputMode='numeric'
                   value={signupDiscountPercent}
-                  onChange={(e) => setSignupDiscountPercent(Number(e.target.value))}
-                  className="w-20 h-8 text-sm"
+                  onChange={(e) =>
+                    setSignupDiscountPercent(Number(e.target.value))
+                  }
+                  className='w-20 h-8 text-sm'
                 />
-                <span className="text-xs text-muted-foreground">%</span>
+                <span className='text-xs text-muted-foreground'>%</span>
               </div>
             </td>
-            <td className="px-4 py-3">
+            <td className='px-4 py-3'>
               <Button
-                size="sm"
+                size='sm'
                 disabled={isSaving}
-                onClick={() => handleSave({ signupDiscountPercent }, "settings.signupDiscount.success", "settings.signupDiscount.error")}
+                onClick={() =>
+                  handleSave(
+                    { signupDiscountPercent },
+                    "settings.signupDiscount.success",
+                    "settings.signupDiscount.error",
+                  )
+                }
               >
                 {t("settings.table.save")}
               </Button>
@@ -344,28 +350,36 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
           </tr>
 
           {/* Loyalty Wash Threshold */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">Jumlah stempel</p>
+          <tr className='align-top'>
+            <td className='px-4 py-3'>
+              <p className='font-medium text-foreground'>Jumlah stempel</p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-2">
+            <td className='px-4 py-3'>
+              <div className='flex items-center gap-2'>
                 <Input
-                  id="loyalty-wash-threshold-input"
-                  type="text"
-                  inputMode="numeric"
+                  id='loyalty-wash-threshold-input'
+                  type='text'
+                  inputMode='numeric'
                   value={loyaltyWashThreshold}
-                  onChange={(e) => setLoyaltyWashThreshold(Number(e.target.value))}
-                  className="w-20 h-8 text-sm"
+                  onChange={(e) =>
+                    setLoyaltyWashThreshold(Number(e.target.value))
+                  }
+                  className='w-20 h-8 text-sm'
                 />
-                <span className="text-xs text-muted-foreground">cuci</span>
+                <span className='text-xs text-muted-foreground'>cuci</span>
               </div>
             </td>
-            <td className="px-4 py-3">
+            <td className='px-4 py-3'>
               <Button
-                size="sm"
+                size='sm'
                 disabled={isSaving}
-                onClick={() => handleSave({ loyaltyWashThreshold }, "settings.loyaltyThreshold.success", "settings.loyaltyThreshold.error")}
+                onClick={() =>
+                  handleSave(
+                    { loyaltyWashThreshold },
+                    "settings.loyaltyThreshold.success",
+                    "settings.loyaltyThreshold.error",
+                  )
+                }
               >
                 {t("settings.table.save")}
               </Button>
@@ -373,28 +387,36 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
           </tr>
 
           {/* Loyalty Reward Discount */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">Diskon reward (%)</p>
+          <tr className='align-top'>
+            <td className='px-4 py-3'>
+              <p className='font-medium text-foreground'>Diskon reward (%)</p>
             </td>
-            <td className="px-4 py-3">
-              <div className="flex items-center gap-2">
+            <td className='px-4 py-3'>
+              <div className='flex items-center gap-2'>
                 <Input
-                  id="loyalty-reward-discount-input"
-                  type="text"
-                  inputMode="numeric"
+                  id='loyalty-reward-discount-input'
+                  type='text'
+                  inputMode='numeric'
                   value={loyaltyRewardDiscountPercent}
-                  onChange={(e) => setLoyaltyRewardDiscountPercent(Number(e.target.value))}
-                  className="w-20 h-8 text-sm"
+                  onChange={(e) =>
+                    setLoyaltyRewardDiscountPercent(Number(e.target.value))
+                  }
+                  className='w-20 h-8 text-sm'
                 />
-                <span className="text-xs text-muted-foreground">%</span>
+                <span className='text-xs text-muted-foreground'>%</span>
               </div>
             </td>
-            <td className="px-4 py-3">
+            <td className='px-4 py-3'>
               <Button
-                size="sm"
+                size='sm'
                 disabled={isSaving}
-                onClick={() => handleSave({ loyaltyRewardDiscountPercent }, "settings.loyaltyReward.success", "settings.loyaltyReward.error")}
+                onClick={() =>
+                  handleSave(
+                    { loyaltyRewardDiscountPercent },
+                    "settings.loyaltyReward.success",
+                    "settings.loyaltyReward.error",
+                  )
+                }
               >
                 {t("settings.table.save")}
               </Button>
@@ -402,26 +424,36 @@ function SettingsTable({ settings, save, isSaving }: Readonly<SettingsTableProps
           </tr>
 
           {/* WhatsApp Number */}
-          <tr className="align-top">
-            <td className="px-4 py-3">
-              <p className="font-medium text-foreground">{t("settingsWhatsapp.supportTitle")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("settingsWhatsapp.supportDesc")}</p>
+          <tr className='align-top'>
+            <td className='px-4 py-3'>
+              <p className='font-medium text-foreground'>
+                {t("settingsWhatsapp.supportTitle")}
+              </p>
+              <p className='text-xs text-muted-foreground mt-0.5'>
+                {t("settingsWhatsapp.supportDesc")}
+              </p>
             </td>
-            <td className="px-4 py-3">
+            <td className='px-4 py-3'>
               <Input
-                id="wa-number-input"
-                type="tel"
-                placeholder="628123456789"
+                id='wa-number-input'
+                type='tel'
+                placeholder='628123456789'
                 value={waNumber}
                 onChange={(e) => setWaNumber(e.target.value)}
-                className="w-44 h-8 text-sm"
+                className='w-44 h-8 text-sm'
               />
             </td>
-            <td className="px-4 py-3">
+            <td className='px-4 py-3'>
               <Button
-                size="sm"
+                size='sm'
                 disabled={isSaving}
-                onClick={() => handleSave({ whatsappNumber: waNumber }, "settingsWhatsapp.toast.saveSuccess", "settingsWhatsapp.toast.saveFailed")}
+                onClick={() =>
+                  handleSave(
+                    { whatsappNumber: waNumber },
+                    "settingsWhatsapp.toast.saveSuccess",
+                    "settingsWhatsapp.toast.saveFailed",
+                  )
+                }
               >
                 {t("settings.table.save")}
               </Button>
@@ -438,39 +470,42 @@ function WhatsAppStatusBadge({ status }: { status: WaStatus }) {
 
   if (status === "connected") {
     return (
-      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600">
-        <CheckCircle2 className="h-4 w-4" />
+      <span className='inline-flex items-center gap-1.5 text-sm font-medium text-green-600'>
+        <CheckCircle2 className='h-4 w-4' />
         {t("settingsWhatsapp.status.connected")}
       </span>
     );
   }
   if (status === "connecting") {
     return (
-      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600">
-        <Loader2 className="h-4 w-4 animate-spin" />
+      <span className='inline-flex items-center gap-1.5 text-sm font-medium text-amber-600'>
+        <Loader2 className='h-4 w-4 animate-spin' />
         {t("settingsWhatsapp.status.connecting")}
       </span>
     );
   }
   if (status === "qr_ready") {
     return (
-      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600">
-        <QrCode className="h-4 w-4" />
+      <span className='inline-flex items-center gap-1.5 text-sm font-medium text-amber-600'>
+        <QrCode className='h-4 w-4' />
         {t("settingsWhatsapp.status.scanQr")}
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-      <WifiOff className="h-4 w-4" />
-      {status === "disabled" ? t("settingsWhatsapp.status.inactive") : t("settingsWhatsapp.status.disconnected")}
+    <span className='inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground'>
+      <WifiOff className='h-4 w-4' />
+      {status === "disabled"
+        ? t("settingsWhatsapp.status.inactive")
+        : t("settingsWhatsapp.status.disconnected")}
     </span>
   );
 }
 
 function WhatsAppCard() {
   const { t } = useTranslation("admin");
-  const { state, isLoading, connect, isConnecting, logout, isLoggingOut } = useAdminWhatsapp();
+  const { state, isLoading, connect, isConnecting, logout, isLoggingOut } =
+    useAdminWhatsapp();
   const [showQr, setShowQr] = useState(false);
 
   const isQrReady = state.status === "qr_ready" && !!state.qr;
@@ -498,14 +533,14 @@ function WhatsAppCard() {
 
   return (
     <>
-      <div className="rounded-lg border border-border p-4 space-y-4">
-        <div className="flex items-start justify-between gap-3">
+      <div className='rounded-lg border border-border p-4 space-y-4'>
+        <div className='flex items-start justify-between gap-3'>
           <div>
-            <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <MessageCircle className="h-4 w-4 text-green-600" />
+            <h2 className='flex items-center gap-2 text-sm font-semibold text-foreground'>
+              <MessageCircle className='h-4 w-4 text-green-600' />
               {t("settingsWhatsapp.notificationTitle")}
             </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className='text-xs text-muted-foreground mt-0.5'>
               {t("settingsWhatsapp.notificationDesc")}
             </p>
           </div>
@@ -513,18 +548,18 @@ function WhatsAppCard() {
         </div>
 
         {state.status === "connected" && (
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             <Button
-              size="sm"
-              variant="outline"
-              className="text-destructive hover:text-destructive"
+              size='sm'
+              variant='outline'
+              className='text-destructive hover:text-destructive'
               onClick={handleLogout}
               disabled={isLoggingOut}
             >
               {isLoggingOut ? (
-                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                <Loader2 className='mr-2 h-3.5 w-3.5 animate-spin' />
               ) : (
-                <LogOut className="mr-2 h-3.5 w-3.5" />
+                <LogOut className='mr-2 h-3.5 w-3.5' />
               )}
               {t("settingsWhatsapp.logout")}
             </Button>
@@ -532,15 +567,15 @@ function WhatsAppCard() {
         )}
 
         {state.status !== "connected" && (
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             <Button
-              size="sm"
+              size='sm'
               onClick={handleConnect}
               disabled={isConnecting || state.status === "connecting"}
             >
               {isConnecting || state.status === "connecting" ? (
                 <>
-                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  <Loader2 className='mr-2 h-3.5 w-3.5 animate-spin' />
                   {t("settingsWhatsapp.connecting")}
                 </>
               ) : (
@@ -549,7 +584,11 @@ function WhatsAppCard() {
             </Button>
 
             {isQrReady && (
-              <Button size="sm" variant="outline" onClick={() => setShowQr(true)}>
+              <Button
+                size='sm'
+                variant='outline'
+                onClick={() => setShowQr(true)}
+              >
                 {t("settingsWhatsapp.viewQr")}
               </Button>
             )}
@@ -557,28 +596,33 @@ function WhatsAppCard() {
         )}
       </div>
 
-      <Dialog open={modalOpen} onOpenChange={(open) => { if (!open) setShowQr(false); }}>
-        <DialogContent className="max-w-sm">
+      <Dialog
+        open={modalOpen}
+        onOpenChange={(open) => {
+          if (!open) setShowQr(false);
+        }}
+      >
+        <DialogContent className='max-w-sm'>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-green-600" />
+            <DialogTitle className='flex items-center gap-2'>
+              <MessageCircle className='h-5 w-5 text-green-600' />
               {t("settingsWhatsapp.qrDialog.title")}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <p className="text-sm text-muted-foreground">
+          <div className='space-y-4 py-2'>
+            <p className='text-sm text-muted-foreground'>
               {t("settingsWhatsapp.qrDialog.instructions")}
             </p>
-            <div className="flex justify-center rounded-lg bg-white p-4">
+            <div className='flex justify-center rounded-lg bg-white p-4'>
               {state.qr ? (
                 <QRCode value={state.qr} size={220} />
               ) : (
-                <div className="flex h-55 w-55 items-center justify-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <div className='flex h-55 w-55 items-center justify-center'>
+                  <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
                 </div>
               )}
             </div>
-            <p className="text-center text-xs text-muted-foreground">
+            <p className='text-center text-xs text-muted-foreground'>
               {t("settingsWhatsapp.qrDialog.autoRefresh")}
             </p>
           </div>
@@ -593,17 +637,21 @@ export default function SettingsPage() {
   const { settings, isLoading, save, isSaving } = useAdminSettings();
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className='max-w-3xl space-y-6'>
       <div>
-        <h1 className="text-xl font-bold text-foreground">{t("settings.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("settings.subtitle")}</p>
+        <h1 className='text-xl font-bold text-foreground'>
+          {t("settings.title")}
+        </h1>
+        <p className='text-sm text-muted-foreground'>
+          {t("settings.subtitle")}
+        </p>
       </div>
 
       {isLoading || !settings ? (
-        <p className="text-sm text-muted-foreground">{t("settings.loading")}</p>
+        <p className='text-sm text-muted-foreground'>{t("settings.loading")}</p>
       ) : (
         <SettingsTable
-          key={`${settings.staleJobTimeoutMinutes}-${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}-${String(settings.loyaltyEnabled)}-${settings.signupDiscountPercent}-${settings.loyaltyWashThreshold}-${settings.loyaltyRewardDiscountPercent}`}
+          key={`${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}-${String(settings.loyaltyEnabled)}-${settings.signupDiscountPercent}-${settings.loyaltyWashThreshold}-${settings.loyaltyRewardDiscountPercent}`}
           settings={settings}
           save={save}
           isSaving={isSaving}

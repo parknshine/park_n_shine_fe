@@ -6,6 +6,7 @@ import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 import { usePublicTestimonials } from "@/features/customer/hooks";
+import { BookNowModal } from "@/features/customer/components/book-now-modal";
 
 const imgParkShineLogo = "/park_n_shine_logo.jpeg.png";
 const imgScanningQrCode = "/park-shine-panel-1.jpeg";
@@ -50,6 +51,8 @@ export default function Home() {
   const { data: testimonials = [] } = usePublicTestimonials();
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
+  const [bookNowOpen, setBookNowOpen] = useState(false);
+  const captureHref = "/book/capture";
   const carouselTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -86,7 +89,7 @@ export default function Home() {
   }
 
   return (
-    <>
+    <div className="landing-bg">
       {/* ── Topbar ─────────────────────────────────────────────── */}
       <header className='topbar'>
         <nav className='nav shell'>
@@ -133,9 +136,13 @@ export default function Home() {
             ))}
 
             <div className='nav-actions'>
-              <a className='button button-small' href='/book/capture'>
+              <button
+                type="button"
+                className='button button-small'
+                onClick={() => setBookNowOpen(true)}
+              >
                 {t("landingPage.nav.bookNow")}
-              </a>
+              </button>
 
               {/* Language dropdown */}
               <div className='relative' ref={dropdownRef}>
@@ -205,9 +212,13 @@ export default function Home() {
             </h1>
             <p>{t("landingPage.hero.description")}</p>
             <div className='hero-actions'>
-              <a className='button' href='/book/capture'>
+              <button
+                type="button"
+                className='button'
+                onClick={() => setBookNowOpen(true)}
+              >
                 {t("landingPage.hero.btnBookNow")}
-              </a>
+              </button>
               <a className='button button-muted' href='#pricing'>
                 {t("landingPage.hero.btnViewPricing")}
               </a>
@@ -313,9 +324,13 @@ export default function Home() {
             </div>
 
             <div className='tracker-action'>
-              <a className='button' href='/book/capture'>
+              <button
+                type="button"
+                className='button'
+                onClick={() => setBookNowOpen(true)}
+              >
                 {t("landingPage.track.bookNow")}
-              </a>
+              </button>
             </div>
           </div>
         </section>
@@ -456,10 +471,19 @@ export default function Home() {
         >
           {t("landingPage.nav.services")}
         </a>
-        <a className='dock-link dock-link-cta' href='/book/capture'>
+        <button
+          type="button"
+          className='dock-link dock-link-cta'
+          onClick={() => setBookNowOpen(true)}
+        >
           {t("landingPage.nav.bookNow")}
-        </a>
+        </button>
       </nav>
-    </>
+      <BookNowModal
+        captureHref={captureHref}
+        open={bookNowOpen}
+        onOpenChange={setBookNowOpen}
+      />
+    </div>
   );
 }

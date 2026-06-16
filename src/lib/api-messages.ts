@@ -322,10 +322,6 @@ export const API_ERROR_MESSAGES = {
     "id-ID": "Masuk dengan akun Google Workspace untuk melanjutkan.",
     "en-US": "Sign in with Google Workspace to continue.",
   },
-  [API_ERROR_CODES.STALE_JOB_TIMEOUT]: {
-    "id-ID": "Job sudah terlalu lama belum ditangani.",
-    "en-US": "This job has been waiting too long.",
-  },
   [API_ERROR_CODES.STATUS_OVERRIDE_INVALID]: {
     "id-ID": "Perubahan status tidak valid.",
     "en-US": "Invalid status override.",

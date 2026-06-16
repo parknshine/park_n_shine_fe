@@ -172,6 +172,7 @@
       "phoneLabel": "Nomor HP",
       "phonePlaceholder": "08xxxxxxxxxx",
       "phoneHelper": "Untuk menerima notifikasi progress cuci mobil via WhatsApp, masukkan nomor HP Anda.",
+      "ocrHint": "Perbaiki jika ada yang salah.",
       "errorCreate": "Gagal membuat booking. Silakan coba lagi."
     },
     "confirm": {
@@ -291,7 +292,26 @@
     "submitting": "Mengirim...",
     "skip": "Lewati",
     "doneTitle": "Terima kasih!",
-    "doneSubtitle": "Penilaianmu membantu kami terus berkembang."
+    "doneSubtitle": "Penilaianmu membantu kami terus berkembang.",
+    "tip": {
+      "pay": {
+        "title": "Selesaikan Pembayaran Tip",
+        "validUntil": "Berlaku hingga:",
+        "openHint": "Tap tombol di bawah untuk membuka",
+        "openBtn": "Buka",
+        "doneBtn": "Sudah Bayar / Kembali ke Home"
+      },
+      "select": {
+        "heading": "Rating terkirim! Apresiasi crew-mu? Berikan tip!",
+        "amountLabel": "Pilih nominal tip",
+        "customPlaceholder": "Nominal lain (min Rp 5.000)",
+        "methodLabel": "Metode pembayaran",
+        "error": "Gagal memproses tip. Silakan coba lagi.",
+        "processing": "Memproses...",
+        "payBtn": "Bayar Tip",
+        "skipBtn": "Skip, kembali ke home"
+      }
+    }
   },
   "qr": {
     "cannotProceedTitle": "Tidak Dapat Melanjutkan",
@@ -330,6 +350,9 @@
     "toLogin": "Masuk",
     "loginSuccess": "Berhasil masuk",
     "registerSuccess": "Akun berhasil dibuat",
+    "phoneLabel": "Nomor Telepon",
+    "phonePlaceholder": "081234567890",
+    "phoneRequired": "Nomor telepon wajib diisi",
     "errors": {
       "invalidCredentials": "Email atau kata sandi salah.",
       "emailInUse": "Akun dengan email ini sudah terdaftar.",
@@ -339,5 +362,101 @@
       "tooManyRequests": "Terlalu banyak percobaan. Coba lagi nanti.",
       "generic": "Terjadi kesalahan. Silakan coba lagi."
     }
+  },
+  "bookNowModal": {
+    "title": "Cuci Mobil Sekarang",
+    "promoText": "Login dan dapatkan promo gratis cucinya",
+    "eyebrow": "PROMO MEMBER BARU",
+    "loginBtn": "Lanjut dengan Login",
+    "continueBtn": "Lanjutkan",
+    "guestBtn": "Langsung Cuci tanpa Login",
+    "terms": "Promo gratis cuci hanya berlaku untuk member terdaftar."
+  },
+  "bottomNav": {
+    "home": "Home",
+    "wash": "Cuci",
+    "history": "Riwayat",
+    "account": "Akun",
+    "authPromptTitle": "Yuk buat akun!",
+    "authPromptDesc": "Riwayat cucimu tersimpan otomatis kalau kamu punya akun.",
+    "authPromptCta": "Login / Daftar",
+    "authPromptDismiss": "Nanti"
+  },
+  "navGuard": {
+    "confirmLeave": "Ya, Keluar",
+    "cancelLeave": "Tidak, Tetap di Sini",
+    "formWillReset": "Jika Anda meninggalkan menu ini, Anda harus mengisi ulang form dan submit lagi",
+    "bookingWillBeLostGuest": "Jika Anda meninggalkan halaman ini, booking Anda akan hilang dan harus mengulang dari awal",
+    "bookingStillActiveAuth": "Anda memiliki pembayaran yang belum selesai. Booking Anda masih aktif dan dapat dilanjutkan dari beranda",
+    "statusWillBeLostGuest": "Jika Anda meninggalkan halaman ini, maka Anda akan kehilangan status history cuci Anda"
+  },
+  "home": {
+    "greetingLine1": "Selamat datang 👋",
+    "greetingLine2": "Halo",
+    "guestHeading": "Mulai Cuci Mobilmu",
+    "washCountLabel": "Total Cuci",
+    "washCountUnit": "kali",
+    "completePhoneTitle": "Lengkapi nomor telepon",
+    "completePhoneDesc": "Agar kami bisa menghubungimu saat cuci siap.",
+    "completePhoneFill": "Isi",
+    "completePhoneCta": "Lengkapi Sekarang",
+    "quickActionsTitle": "Aksi Cepat",
+    "actionBooking": "Booking",
+    "actionPaket": "Paket",
+    "actionBantuan": "Bantuan",
+    "nearbyTitle": "Lokasi Terdekat",
+    "nearbyViewAll": "Lihat semua",
+    "quickActionCta": "Mulai Cuci Sekarang",
+    "guestLoginCta": "Login untuk mulai",
+    "guestWashCta": "Langsung Cuci",
+    "activeBookingTitle": "Booking Aktif",
+    "activeBookingCta": "Lihat Status",
+    "activeBookingStatusPaid": "Menunggu crew",
+    "activeBookingStatusAssigned": "Crew menuju mobilmu",
+    "activeBookingStatusLocated": "Crew menuju mobilmu",
+    "activeBookingStatusInProgress": "Sedang dicuci",
+    "activeBookingStatusNeedsHelp": "Butuh bantuan"
+  },
+  "history": {
+    "title": "Riwayat Cuci",
+    "empty": "Belum ada riwayat cuci",
+    "authPrompt": "Buat akun untuk menyimpan riwayat cucian kamu secara otomatis",
+    "loginCta": "Login / Daftar",
+    "bookingId": "ID Booking",
+    "date": "Tanggal",
+    "paymentMethod": "Metode Pembayaran",
+    "noPayment": "Belum dibayar"
+  },
+  "account": {
+    "title": "Akun",
+    "memberBadge": "Member",
+    "personalInfoTitle": "Informasi Pribadi",
+    "nameLabel": "Nama",
+    "emailLabel": "Email",
+    "emailNote": "Email tidak dapat diubah",
+    "phoneLabel": "Nomor Telepon",
+    "phonePlaceholder": "081234567890",
+    "saveBtn": "Simpan",
+    "saveChangesBtn": "Simpan Perubahan",
+    "saving": "Menyimpan...",
+    "saveSuccess": "Profil berhasil disimpan",
+    "saveError": "Gagal menyimpan profil",
+    "logoutBtn": "Keluar",
+    "authPrompt": "Login untuk kelola akun kamu",
+    "loginCta": "Login / Daftar",
+    "washHistory": "Riwayat Cuci",
+    "paymentMethod": "Metode Pembayaran",
+    "helpFaq": "Bantuan & FAQ",
+    "support": "Dukungan",
+    "changePhoto": "Ubah foto profil",
+    "photoSuccess": "Foto profil diperbarui",
+    "photoError": "Gagal memperbarui foto",
+    "comingSoon": "Segera hadir"
+  },
+  "postFlow": {
+    "guestPromptTitle": "Simpan riwayat cucianmu",
+    "guestPromptDesc": "Buat akun dan dapatkan promo eksklusif untuk pelanggan setia.",
+    "registerCta": "Daftar Sekarang",
+    "skipCta": "Nanti Saja"
   }
 }

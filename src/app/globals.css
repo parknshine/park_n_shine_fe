@@ -87,6 +87,9 @@ body {
   font-family: var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif;
   color: var(--text);
   background: var(--background);
+}
+
+.landing-bg {
   background-image:
     radial-gradient(circle at top left, rgba(255, 211, 77, 0.22), transparent 20rem),
     radial-gradient(circle at 80% 10%, rgba(29, 177, 241, 0.14), transparent 18rem);

@@ -34,6 +34,8 @@ export const queryKeys = {
     booking: (bookingId: string) => ["customer", "booking", bookingId] as const,
     sites: () => ["customer", "sites"] as const,
     settings: () => ["customer", "settings"] as const,
+    bookings: () => ["customer", "me", "bookings"] as const,
+    profile: () => ["customer", "me", "profile"] as const,
   },
   testimonials: {
     public: () => ["testimonials"] as const,

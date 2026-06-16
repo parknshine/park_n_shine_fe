@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Camera, CheckCircle, ImageIcon, RotateCcw, Trash2 } from "lucide-react";
+import {
+  Camera,
+  CheckCircle,
+  Grid3X3,
+  ImageIcon,
+  Pencil,
+  RotateCcw,
+  RotateCw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/shared";
 import { useTranslation } from "@/i18n";
@@ -17,13 +25,20 @@ interface PhotoUploadFieldProps {
   onSelect: (file: File, kind: MediaKind) => void;
   onRetry?: () => void;
   labels?: {
-    retry: string;
-    upload: string;
-    uploading: string;
-    retrying: string;
+    retry?: string;
+    upload?: string;
+    uploading?: string;
+    retrying?: string;
     gallery?: string;
     retake?: string;
+    detected?: string;
   };
+  /** OCR result value — when provided, an editable field is shown below the photo on success */
+  ocrValue?: string;
+  onOcrChange?: (value: string) => void;
+  ocrLabel?: string;
+  ocrHint?: string;
+  ocrPlaceholder?: string;
 }
 
 export function PhotoUploadField({
@@ -35,6 +50,11 @@ export function PhotoUploadField({
   onSelect,
   onRetry,
   labels,
+  ocrValue,
+  onOcrChange,
+  ocrLabel,
+  ocrHint,
+  ocrPlaceholder,
 }: Readonly<PhotoUploadFieldProps>) {
   const { t } = useTranslation("customer");
   const defaults = {
@@ -44,18 +64,17 @@ export function PhotoUploadField({
     retrying: t("upload.retrying"),
     gallery: t("upload.gallery"),
     retake: t("upload.retake"),
+    detected: "Terbaca",
   };
-  const resolvedLabels = labels ? { ...defaults, ...labels } : defaults;
+  const L = labels ? { ...defaults, ...labels } : defaults;
+
   const isBusy = state.status === "uploading" || state.status === "retrying";
   const hasPhoto = !!state.status && state.status !== "idle";
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const prevUrlRef = useRef<string | null>(null);
+  const displayUrl = state.status === "idle" ? null : (previewUrl ?? state.media?.url ?? null);
 
-  // Derive display URL — hide preview when status resets to idle without calling setState
-  const displayUrl = state.status === "idle" ? null : previewUrl;
-
-  // Only revoke the object URL on idle — no setState needed
   useEffect(() => {
     if (state.status === "idle" && prevUrlRef.current) {
       URL.revokeObjectURL(prevUrlRef.current);
@@ -81,17 +100,31 @@ export function PhotoUploadField({
   }
 
   let uploadingLabel: string | null = null;
-  if (state.status === "uploading") uploadingLabel = resolvedLabels.uploading;
-  else if (state.status === "retrying") uploadingLabel = resolvedLabels.retrying;
+  if (state.status === "uploading") uploadingLabel = L.uploading ?? null;
+  else if (state.status === "retrying") uploadingLabel = L.retrying ?? null;
+
+  const showOcr =
+    state.status === "success" && ocrValue !== undefined && onOcrChange;
 
   return (
-    <div className="rounded-lg border border-border p-4 space-y-3 bg-card shadow-sm">
-      <label className="text-sm font-semibold text-foreground">{label}</label>
+    <div className='rounded-2xl border border-border bg-white p-4 shadow-sm space-y-3'>
+      {/* ── Card header ────────────────────────────── */}
+      <div className='flex items-center gap-2.5'>
+        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary'>
+          {kind === "plate" ? (
+            <Camera className='h-4 w-4 text-white' />
+          ) : (
+            <Grid3X3 className='h-4 w-4 text-white' />
+          )}
+        </div>
+        <span className='text-sm font-bold text-foreground'>{label}</span>
+      </div>
+
       {hint && (
-        <p className="text-xs text-muted-foreground leading-relaxed">{hint}</p>
+        <p className='text-xs leading-relaxed text-muted-foreground'>{hint}</p>
       )}
 
-      {/* Hidden inputs */}
+      {/* ── Hidden file inputs ──────────────────── */}
       <input
         id={`${id}-camera`}
         type='file'
@@ -103,78 +136,98 @@ export function PhotoUploadField({
       />
       <input
         id={`${id}-gallery`}
-        type="file"
-        accept="image/*"
-        className="sr-only"
+        type='file'
+        accept='image/*'
+        className='sr-only'
         disabled={isBusy}
         onChange={handleFileChange}
       />
 
-      {/* Empty state — show two pick options */}
+      {/* ── Empty state ─────────────────────────── */}
       {!hasPhoto && (
-        <div className="flex gap-2">
-          <Button asChild size="sm" variant="outline" className="flex-1">
-            <label htmlFor={`${id}-camera`} className="cursor-pointer gap-1.5">
-              <Camera className="h-4 w-4 shrink-0" />
-              {resolvedLabels.upload}
+        <div className='flex gap-2'>
+          <Button
+            asChild
+            size='sm'
+            variant='outline'
+            className='flex-1 rounded-full'
+          >
+            <label htmlFor={`${id}-camera`} className='cursor-pointer gap-1.5'>
+              <Camera className='h-4 w-4 shrink-0' />
+              {L.upload}
             </label>
           </Button>
-          <Button asChild size="sm" variant="outline" className="flex-1">
-            <label htmlFor={`${id}-gallery`} className="cursor-pointer gap-1.5">
-              <ImageIcon className="h-4 w-4 shrink-0" />
-              {resolvedLabels.gallery}
+          <Button
+            asChild
+            size='sm'
+            variant='outline'
+            className='flex-1 rounded-full'
+          >
+            <label htmlFor={`${id}-gallery`} className='cursor-pointer gap-1.5'>
+              <ImageIcon className='h-4 w-4 shrink-0' />
+              {L.gallery}
             </label>
           </Button>
         </div>
       )}
 
-      {/* Preview */}
+      {/* ── Photo preview ───────────────────────── */}
       {displayUrl && (
-        <div className="relative overflow-hidden rounded-md">
-          <img src={displayUrl} alt={label} className="h-44 w-full object-cover" />
+        <div className='relative overflow-hidden rounded-xl bg-[#111]'>
+          <img
+            src={displayUrl}
+            alt={label}
+            className='h-48 w-full object-cover'
+          />
+
+          {/* Corner bracket decorations */}
+          <div className='pointer-events-none absolute inset-0'>
+            <span className='absolute left-2.5 top-2.5 h-5 w-5 rounded-tl border-l-2 border-t-2 border-white/60' />
+            <span className='absolute right-2.5 top-2.5 h-5 w-5 rounded-tr border-r-2 border-t-2 border-white/60' />
+            <span className='absolute bottom-2.5 left-2.5 h-5 w-5 rounded-bl border-b-2 border-l-2 border-white/60' />
+            <span className='absolute bottom-2.5 right-2.5 h-5 w-5 rounded-br border-b-2 border-r-2 border-white/60' />
+          </div>
 
           {/* Uploading overlay */}
           {isBusy && (
             <>
-              <div className="absolute inset-0 bg-black/20" />
-              <div className="scan-line absolute left-0 right-0 h-0.5 bg-primary shadow-[0_0_8px_3px_var(--primary)]" />
+              <div className='absolute inset-0 bg-black/20' />
+              <div className='scan-line absolute left-0 right-0 h-0.5 bg-primary shadow-[0_0_8px_3px_var(--primary)]' />
               {uploadingLabel && (
-                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white">
+                <span className='absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white'>
                   {uploadingLabel}
                 </span>
               )}
             </>
           )}
 
-          {/* Success badge */}
-          {state.status === "success" && (
-            <div className='absolute right-2 bottom-2 rounded-full bg-green-500 p-1 shadow-sm'>
-              <CheckCircle className='h-4 w-4 text-white' />
-            </div>
+          {/* Retake button */}
+          {!isBusy && onRetry && (
+            <button
+              type='button'
+              onClick={onRetry}
+              className='absolute right-2.5 top-2.5 flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-black/75'
+            >
+              <RotateCw className='h-3 w-3' />
+              {L.retake}
+            </button>
           )}
 
-          {/* Delete / redo button — visible when not busy */}
-          {!isBusy && onRetry && (
-             <button
-               type="button"
-               onClick={onRetry}
-               className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1.5 text-xs font-semibold text-white transition-opacity hover:bg-black/80"
-             >
-               <Trash2 className="h-3.5 w-3.5" />
-               {resolvedLabels.retake}
-             </button>
+          {/* Success badge */}
+          {state.status === "success" && (
+            <div className='absolute bottom-2.5 right-2.5 flex items-center gap-1 rounded-full bg-green-500 px-2.5 py-1.5 text-xs font-bold text-white shadow-sm'>
+              <CheckCircle className='h-3 w-3' />
+            </div>
           )}
         </div>
       )}
 
       {/* Progress bar */}
-      {isBusy && (
-        <ProgressBar value={state.progress} label={state.status} />
-      )}
+      {isBusy && <ProgressBar value={state.progress} label={state.status} />}
 
       {/* Error */}
       {state.error && (
-        <div className="flex items-center justify-between gap-3 text-sm text-destructive">
+        <div className='flex items-center justify-between gap-3 text-sm text-destructive'>
           <span>{state.error}</span>
           {onRetry && (
             <Button
@@ -183,9 +236,28 @@ export function PhotoUploadField({
               prefix={<RotateCcw className='h-4 w-4' />}
               onClick={onRetry}
             >
-              {resolvedLabels.retry}
+              {L.retry}
             </Button>
           )}
+        </div>
+      )}
+
+      {/* ── Integrated OCR edit field ────────────── */}
+      {showOcr && (
+        <div className='space-y-1 border-t border-border pt-3'>
+          <p className='text-sm font-semibold text-foreground'>{ocrLabel}</p>
+          {ocrHint && (
+            <p className='text-xs text-muted-foreground'>{ocrHint}</p>
+          )}
+          <div className='relative mt-1'>
+            <input
+              value={ocrValue}
+              onChange={(e) => onOcrChange(e.target.value)}
+              placeholder={ocrPlaceholder}
+              className='h-10 w-full rounded-lg border border-border bg-[#eff8fe] px-4 pr-10 font-mono text-sm font-bold uppercase tracking-widest text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20'
+            />
+            <Pencil className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+          </div>
         </div>
       )}
     </div>

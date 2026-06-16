@@ -20,7 +20,7 @@ export function LanguageSwitcher() {
     <button
       type="button"
       onClick={toggle}
-      className="rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground ring-1 ring-border transition-colors hover:bg-muted hover:text-foreground"
+      className="rounded-full bg-background/80 px-3.5 py-2 text-xs font-bold uppercase tracking-wide text-foreground shadow-[0_4px_16px_rgba(0,0,0,0.10)] backdrop-blur-sm transition-colors hover:bg-background"
       aria-label={mounted && locale === "id" ? "Switch to English" : "Ganti ke Bahasa Indonesia"}
     >
       {mounted && locale === "id" ? "EN" : "ID"}

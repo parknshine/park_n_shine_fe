@@ -8,17 +8,18 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import api from "@/lib/axios";
 import { AppShell, OfflineBanner } from "@/components/shared";
 import { Button } from "@/components/ui/button";
-import { OcrEditField } from "@/features/customer/components/ocr-edit-field";
+import { Input } from "@/components/ui/input";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
+import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { usePhotoUpload, usePublicSettings } from "@/features/customer/hooks";
 import { isValidPhone } from "@/features/customer/utils/phone";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
+import { useBookingCaptureStore } from "@/store/booking-capture-store";
 import type {
   CreateBookingPayload,
   CustomerBooking,
 } from "@/features/customer/types";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -27,6 +28,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+const QR_BOOK_FLOW = "qr-book-capture";
+
 export default function BookCapturePage() {
   const { t } = useTranslation("customer");
   const router = useRouter();
@@ -34,10 +37,18 @@ export default function BookCapturePage() {
   const locale = useUIStore((s) => s.locale);
 
   const { loyaltyEnabled } = usePublicSettings();
+  const { save: saveCapture, clear: clearCapture } = useBookingCaptureStore();
+  const setCaptureHasProgress = useBookingCaptureStore((s) => s.setCaptureHasProgress);
 
-  const [plateText, setPlateText] = useState("");
-  const [slotText, setSlotText] = useState("");
-  const [phone, setPhone] = useState("");
+  const [savedSession] = useState(() => {
+    const s = useBookingCaptureStore.getState();
+    return s.flowKey === QR_BOOK_FLOW && s.bookingId ? s : null;
+  });
+  const hasSession = !!savedSession;
+
+  const [plateText, setPlateText] = useState(savedSession?.plateText ?? "");
+  const [slotText, setSlotText] = useState(savedSession?.slotText ?? "");
+  const [phone, setPhone] = useState(savedSession?.phone ?? "");
 
   const hasCreatedRef = useRef(false);
 
@@ -54,43 +65,51 @@ export default function BookCapturePage() {
     mutationKey: ["customer", "booking", "create", "v2"] as const,
   });
 
-  const bookingId = createMutation.data?.id ?? null;
-  const signedToken = createMutation.data?.signedToken ?? null;
+  const bookingId = savedSession?.bookingId ?? createMutation.data?.id ?? null;
+  const signedToken = savedSession?.signedToken ?? createMutation.data?.signedToken ?? null;
   const siteName = createMutation.data?.siteName ?? null;
 
   useEffect(() => {
+    if (hasSession) return;
     if (!hasCreatedRef.current) {
       hasCreatedRef.current = true;
       createMutation.mutate();
     }
     return () => {
-      // Reset on unmount so React Strict Mode remount re-fires the mutation
       hasCreatedRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (createMutation.data?.id) clearCapture();
+  }, [createMutation.data?.id, clearCapture]);
+
   const plateUpload = usePhotoUpload({
     bookingId: bookingId ?? "",
     signedToken: signedToken ?? undefined,
+    initialState: savedSession?.plateState ?? undefined,
   });
   const slotUpload = usePhotoUpload({
     bookingId: bookingId ?? "",
     signedToken: signedToken ?? undefined,
+    initialState: savedSession?.slotState ?? undefined,
   });
 
   useEffect(() => {
-    if (plateUpload.media?.ocrText) {
-      const text = plateUpload.media.ocrText;
-      startTransition(() => setPlateText(text));
+    if (plateUpload.status !== "idle" || slotUpload.status !== "idle") {
+      setCaptureHasProgress(true);
     }
+  }, [plateUpload.status, slotUpload.status, setCaptureHasProgress]);
+
+  useEffect(() => {
+    const text = plateUpload.media?.ocrText;
+    if (text) startTransition(() => setPlateText(text));
   }, [plateUpload.media?.ocrText]);
 
   useEffect(() => {
-    if (slotUpload.media?.ocrText) {
-      const text = slotUpload.media.ocrText;
-      startTransition(() => setSlotText(text));
-    }
+    const text = slotUpload.media?.ocrText;
+    if (text) startTransition(() => setSlotText(text));
   }, [slotUpload.media?.ocrText]);
 
   const canContinue =
@@ -103,12 +122,25 @@ export default function BookCapturePage() {
 
   function handleContinue() {
     if (!bookingId || !signedToken) return;
+    const plate = plateText.trim().toUpperCase();
+    const slot = slotText.trim().toUpperCase();
+    saveCapture({
+      flowKey: QR_BOOK_FLOW,
+      bookingId,
+      signedToken,
+      plateText: plate,
+      slotText: slot,
+      location: "",
+      phone: phone.trim(),
+      plateState: { progress: plateUpload.progress, status: plateUpload.status, error: plateUpload.error, media: plateUpload.media },
+      slotState: { progress: slotUpload.progress, status: slotUpload.status, error: slotUpload.error, media: slotUpload.media },
+    });
     const params = new URLSearchParams({
       bookingId,
       token: signedToken,
       phone: phone.trim(),
-      plate: plateText.trim().toUpperCase(),
-      slot: slotText.trim().toUpperCase(),
+      plate,
+      slot,
     });
     router.push(`/q/${qrId}/book/confirm?${params.toString()}`);
   }
@@ -119,10 +151,10 @@ export default function BookCapturePage() {
 
   if (createMutation.isPending || (!bookingId && !createMutation.isError)) {
     return (
-      <AppShell surface='customer'>
-        <div className='flex min-h-[60vh] flex-col items-center justify-center gap-3'>
-          <Loader2 className='h-8 w-8 animate-spin text-primary' />
-          <p className='text-sm text-muted-foreground'>
+      <AppShell surface="customer">
+        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">
             {t("state.preparing", { ns: "common" })}
           </p>
         </div>
@@ -132,8 +164,8 @@ export default function BookCapturePage() {
 
   if (createMutation.isError) {
     return (
-      <AppShell surface='customer'>
-        <div className='space-y-4 pt-10 text-center'>
+      <AppShell surface="customer">
+        <div className="space-y-4 pt-10 text-center">
           <Button
             onClick={() => {
               hasCreatedRef.current = false;
@@ -151,129 +183,108 @@ export default function BookCapturePage() {
     plateUpload.isOfflinePaused || slotUpload.isOfflinePaused;
 
   return (
-    <AppShell surface='customer'>
-      <div className='space-y-5'>
+    <AppShell surface="customer" className="pt-0! px-0!">
+      <StepProgressBar current={1} total={2} label={t("booking.step", { current: 1, total: 2 })} />
+
+      <div className="space-y-4 px-4 pb-6">
         <OfflineBanner visible={isOfflinePaused} />
 
-        <div className='flex items-start gap-3'>
-          {/* <button
-            type='button'
-            className='mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition hover:bg-muted hover:text-foreground'
-            onClick={() => router.back()}
-            aria-label={t("action.back", { ns: "common" })}
-          >
-            <ArrowLeft className='h-4 w-4' />
-          </button> */}
-
-          <div className='min-w-0 flex-1'>
-            <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
-              {t("booking.step", { current: 1, total: 2 })}
-            </p>
-            <h1 className='mt-1 text-2xl font-bold leading-tight text-foreground'>
-              {t("booking.capture.title")}
-            </h1>
-            <p className='mt-1 text-sm text-muted-foreground'>
-              {t("booking.capture.subtitle")}
-            </p>
-          </div>
+        {/* Page heading */}
+        <div>
+          <h1 className="text-2xl font-bold leading-tight text-foreground">
+            {t("booking.capture.title")}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("booking.capture.subtitle")}
+          </p>
         </div>
 
-        <div className='space-y-3'>
-          <PhotoUploadField
-            id='plate-photo'
-            kind='plate'
-            label={t("booking.capture.platePhotoLabel")}
-            hint={t("booking.capture.platePhotoGuideline")}
-            state={plateUpload}
-            onSelect={(file, kind) => plateUpload.uploadPhoto({ file, kind })}
-            onRetry={plateUpload.reset}
+        {/* Plate photo + OCR */}
+        <PhotoUploadField
+          id="plate-photo"
+          kind="plate"
+          label={t("booking.capture.platePhotoLabel")}
+          hint={t("booking.capture.platePhotoGuideline")}
+          state={plateUpload}
+          onSelect={(file, kind) => plateUpload.uploadPhoto({ file, kind })}
+          onRetry={plateUpload.reset}
+          ocrValue={plateText}
+          onOcrChange={setPlateText}
+          ocrLabel={t("booking.capture.plateOcrLabel")}
+          ocrHint={t("booking.capture.ocrHint")}
+          ocrPlaceholder={t("booking.capture.platePlaceholder")}
+        />
+
+        {/* Slot photo + OCR */}
+        <PhotoUploadField
+          id="slot-photo"
+          kind="slot"
+          label={t("booking.capture.slotPhotoLabel")}
+          hint={t("booking.capture.slotPhotoGuideline")}
+          state={slotUpload}
+          onSelect={(file, kind) => slotUpload.uploadPhoto({ file, kind })}
+          onRetry={slotUpload.reset}
+          ocrValue={slotText}
+          onOcrChange={setSlotText}
+          ocrLabel={t("booking.capture.slotOcrLabel")}
+          ocrHint={t("booking.capture.ocrHint")}
+          ocrPlaceholder={t("booking.capture.slotPlaceholder")}
+        />
+
+        {/* Location */}
+        <div className="rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2">
+          <label className="text-sm font-bold text-foreground">
+            {t("booking.capture.locationLabel")}
+          </label>
+          <Select disabled value={siteName ?? undefined}>
+            <SelectTrigger className="h-10 w-full rounded-lg border-border bg-[#eff8fe]">
+              <SelectValue
+                placeholder={t("booking.capture.locationDisabledPlaceholder")}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {siteName && (
+                <SelectItem value={siteName}>{siteName}</SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Phone */}
+        <div className="rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2">
+          <label htmlFor="phone" className="text-sm font-bold text-foreground">
+            {t("booking.capture.phoneLabel")}
+          </label>
+          <Input
+            id="phone"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+            placeholder={t("booking.capture.phonePlaceholder")}
+            className="h-10 rounded-lg border-border bg-[#eff8fe]"
           />
-          {plateUpload.status === "success" && (
-            <OcrEditField
-              id='plate-text'
-              label={t("booking.capture.plateOcrLabel")}
-              value={plateText}
-              onChange={setPlateText}
-              placeholder={t("booking.capture.platePlaceholder")}
-            />
-          )}
-
-          <PhotoUploadField
-            id='slot-photo'
-            kind='slot'
-            label={t("booking.capture.slotPhotoLabel")}
-            hint={t("booking.capture.slotPhotoGuideline")}
-            state={slotUpload}
-            onSelect={(file, kind) => slotUpload.uploadPhoto({ file, kind })}
-            onRetry={slotUpload.reset}
-          />
-          {slotUpload.status === "success" && (
-            <OcrEditField
-              id='slot-text'
-              label={t("booking.capture.slotOcrLabel")}
-              value={slotText}
-              onChange={setSlotText}
-              placeholder={t("booking.capture.slotPlaceholder")}
-            />
-          )}
-
-          <div className='space-y-1.5 rounded-lg border border-border bg-card p-4 shadow-sm'>
-            <label className='text-sm font-medium text-foreground'>
-              {t("booking.capture.locationLabel")}
-            </label>
-            <Select disabled value={siteName ?? undefined}>
-              <SelectTrigger className='w-full'>
-                <SelectValue
-                  placeholder={t("booking.capture.locationDisabledPlaceholder")}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {siteName && (
-                  <SelectItem value={siteName}>{siteName}</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className='space-y-1.5 rounded-lg border border-border bg-card p-4 shadow-sm'>
-            <label
-              htmlFor='phone'
-              className='text-sm font-medium text-foreground'
-            >
-              {t("booking.capture.phoneLabel")}
-            </label>
-            <Input
-              id='phone'
-              type='text'
-              inputMode='numeric'
-              pattern='[0-9]*'
-              value={phone}
-              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-              placeholder={t("booking.capture.phonePlaceholder")}
-              className='w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-            />
-            {loyaltyEnabled && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Nomor HP akan digunakan untuk program loyalti Park N Shine
-              </p>
-            )}
-            <p className='text-xs text-muted-foreground'>
-              {t("booking.capture.phoneHelper")}
+          {loyaltyEnabled && (
+            <p className="text-xs text-muted-foreground">
+              Nomor HP akan digunakan untuk program loyalti Park N Shine
             </p>
-          </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            {t("booking.capture.phoneHelper")}
+          </p>
         </div>
 
-        <div className='pt-1'>
-          <Button
-            size='lg'
-            className='w-full rounded-full'
-            disabled={!canContinue}
-            suffix={<ArrowRight className='h-4 w-4' />}
-            onClick={handleContinue}
-          >
-            {t("action.next", { ns: "common" })}
-          </Button>
-        </div>
+        {/* Continue */}
+        <Button
+          size="lg"
+          className="w-full"
+          disabled={!canContinue}
+          suffix={<ArrowRight className="h-4 w-4" />}
+          onClick={handleContinue}
+        >
+          {t("action.next", { ns: "common" })}
+        </Button>
       </div>
     </AppShell>
   );
