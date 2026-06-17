@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { ChevronRight, CreditCard } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
@@ -37,6 +37,13 @@ function PaymentMethodContent() {
   const { booking } = useBookingStatus({ bookingId, signedToken: token });
   const { charge, isCharging, error } = useChargePayment(bookingId, token);
   const [loadingMethod, setLoadingMethod] = useState<string | null>(null);
+
+  // If booking is already charged (user navigated back from pay page), go directly
+  useEffect(() => {
+    if (booking?.paymentInstructions) {
+      router.replace(`/booking/${bookingId}/pay?token=${token}`);
+    }
+  }, [booking?.paymentInstructions, bookingId, token, router]);
 
   function handleSelect(code: string) {
     if (isCharging) return;

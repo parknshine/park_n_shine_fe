@@ -8,7 +8,7 @@ interface ActiveBookingCardProps {
   siteName: string;
   statusLabel: string;
   ctaLabel: string;
-  sectionTitle: string;
+  sectionTitle?: string;
 }
 
 export function ActiveBookingCard({
@@ -22,9 +22,11 @@ export function ActiveBookingCard({
 }: Readonly<ActiveBookingCardProps>) {
   return (
     <div>
-      <div className="text-[13px] font-extrabold tracking-wide text-[#273034] mb-3">
-        {sectionTitle}
-      </div>
+      {sectionTitle && (
+        <div className="text-[13px] font-extrabold tracking-wide text-[#273034] mb-3">
+          {sectionTitle}
+        </div>
+      )}
       <Link
         href={`/booking/${bookingId}/status?token=${signedToken}`}
         className="w-full text-left flex items-center gap-3 px-4 py-[14px] rounded-2xl bg-white border border-[#006289]/10"

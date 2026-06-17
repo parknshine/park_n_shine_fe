@@ -124,7 +124,10 @@ export default function HistoryPage() {
   const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
   const hasHydrated = useCustomerAuthStore((s) => s._hasHydrated);
   const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useCustomerBookings(isAuthenticated);
-  const bookings = data?.pages.flatMap((p) => p.items) ?? [];
+  const HIDDEN_STATUSES = new Set(["PENDING", "DRAFT"]);
+  const bookings = (data?.pages.flatMap((p) => p.items) ?? []).filter(
+    (b) => !HIDDEN_STATUSES.has(b.status),
+  );
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const canFetchRef = useRef(false);

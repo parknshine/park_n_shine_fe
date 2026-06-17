@@ -12,6 +12,7 @@ import {
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import { usePublicSites } from "@/features/customer/hooks/use-public-sites";
 import { useCustomerBookings } from "@/features/customer/hooks/use-customer-bookings";
+import { useCustomerHome } from "@/features/customer/hooks/use-customer-home";
 import { ActiveBookingCard } from "@/features/customer/components/active-booking-card";
 import type { BookingStatus } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
@@ -41,14 +42,11 @@ export default function HomePage() {
   const { sites } = usePublicSites();
 
   const { data: bookingsData } = useCustomerBookings(isAuthenticated);
+  const { data: homeData } = useCustomerHome(isAuthenticated);
 
-  const activeBooking = bookingsData?.pages
-    .flatMap((p) => p.items)
-    .find((b) => ACTIVE_STATUSES.includes(b.status as BookingStatus));
-
-  const activeStatusLabel = activeBooking
-    ? t(ACTIVE_STATUS_LABEL_KEYS[activeBooking.status] ?? "")
-    : null;
+  const activeBookings = (bookingsData?.pages.flatMap((p) => p.items) ?? []).filter(
+    (b) => ACTIVE_STATUSES.includes(b.status as BookingStatus),
+  );
 
   const initials = customer?.name
     ? customer.name
@@ -185,7 +183,7 @@ export default function HomePage() {
               </div>
               <div className='flex items-baseline gap-2'>
                 <span className='text-[46px] font-extrabold leading-none tracking-tight'>
-                  {customer?.washCount ?? 0}
+                  {homeData?.washCount ?? customer?.washCount ?? 0}
                 </span>
                 <span className='text-[15px] font-semibold opacity-90'>
                   {t("home.washCountUnit")}
@@ -202,16 +200,25 @@ export default function HomePage() {
         </div>
 
         {/* Active booking shortcut */}
-        {activeBooking && activeStatusLabel && (
-          <ActiveBookingCard
-            bookingId={activeBooking.id}
-            signedToken={activeBooking.bookingToken}
-            plate={activeBooking.plate ?? "—"}
-            siteName={activeBooking.site?.name ?? "—"}
-            statusLabel={activeStatusLabel}
-            ctaLabel={t("home.activeBookingCta")}
-            sectionTitle={t("home.activeBookingTitle")}
-          />
+        {activeBookings.length > 0 && (
+          <div>
+            <div className='text-[13px] font-extrabold tracking-wide text-[#273034] mb-3'>
+              {t("home.activeBookingTitle")} ({activeBookings.length})
+            </div>
+            <div className='flex flex-col gap-2.5'>
+              {activeBookings.map((b) => (
+                <ActiveBookingCard
+                  key={b.id}
+                  bookingId={b.id}
+                  signedToken={b.bookingToken}
+                  plate={b.plate ?? "—"}
+                  siteName={b.site?.name ?? "—"}
+                  statusLabel={t(ACTIVE_STATUS_LABEL_KEYS[b.status] ?? "")}
+                  ctaLabel={t("home.activeBookingCta")}
+                />
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Phone completion alert */}

@@ -36,7 +36,6 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.574.0",
     "next": "^16.2.6",
-    "nuqs": "^2.8.9",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "19.2.3",

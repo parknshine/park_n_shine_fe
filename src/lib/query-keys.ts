@@ -36,6 +36,7 @@ export const queryKeys = {
     settings: () => ["customer", "settings"] as const,
     bookings: () => ["customer", "me", "bookings"] as const,
     profile: () => ["customer", "me", "profile"] as const,
+    home: () => ["customer", "me", "home"] as const,
   },
   testimonials: {
     public: () => ["testimonials"] as const,
