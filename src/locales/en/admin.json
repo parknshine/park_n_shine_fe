@@ -184,6 +184,21 @@
       "crewCountUnit": "people",
       "notIncluded": "Not included in\ncar wash revenue",
       "detail": "Detail"
+    },
+    "customerFilter": {
+      "searchPlaceholder": "Search by name, email, or phone...",
+      "typeLabel": "Customer Type",
+      "typeAll": "All Types",
+      "typeRegistered": "Registered",
+      "typeGuest": "Guest",
+      "fromLabel": "Joined From",
+      "toLabel": "Until",
+      "minWashLabel": "Min. Washes",
+      "minWashPlaceholder": "e.g. 3",
+      "resetFilter": "Reset Filter",
+      "resultCount": "{{count}} customers",
+      "emptyMessage": "No customers match the current filters.",
+      "loadingMessage": "Loading customers..."
     }
   },
   "settings": {

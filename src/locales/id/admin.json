@@ -184,6 +184,21 @@
       "crewCountUnit": "orang",
       "notIncluded": "Tidak termasuk dalam\nrevenue car wash",
       "detail": "Detail"
+    },
+    "customerFilter": {
+      "searchPlaceholder": "Cari nama, email, atau no. HP...",
+      "typeLabel": "Tipe Pelanggan",
+      "typeAll": "Semua Tipe",
+      "typeRegistered": "Registered",
+      "typeGuest": "Guest",
+      "fromLabel": "Bergabung Dari",
+      "toLabel": "Sampai",
+      "minWashLabel": "Min. Cuci",
+      "minWashPlaceholder": "Contoh: 3",
+      "resetFilter": "Reset Filter",
+      "resultCount": "{{count}} pelanggan",
+      "emptyMessage": "Tidak ada pelanggan yang cocok dengan filter.",
+      "loadingMessage": "Memuat data pelanggan..."
     }
   },
   "settings": {

@@ -261,16 +261,16 @@ function SettingsTable({
           </tr>
 
           {/* Loyalty Program */}
-          <tr className='align-top'>
+          {/* <tr className='align-top'>
             <td className='px-4 py-3' colSpan={3}>
               <p className='text-xs font-semibold text-muted-foreground uppercase tracking-wide'>
                 Program Loyalti (IN PROGRESS)
               </p>
             </td>
-          </tr>
+          </tr> */}
 
           {/* Loyalty Enabled */}
-          <tr className='align-top'>
+          {/* <tr className='align-top'>
             <td className='px-4 py-3'>
               <p className='font-medium text-foreground'>
                 Tampilkan program loyalti ke customer
@@ -310,10 +310,10 @@ function SettingsTable({
                 {t("settings.table.save")}
               </Button>
             </td>
-          </tr>
+          </tr> */}
 
           {/* Signup Discount */}
-          <tr className='align-top'>
+          {/* <tr className='align-top'>
             <td className='px-4 py-3'>
               <p className='font-medium text-foreground'>Diskon signup (%)</p>
             </td>
@@ -347,10 +347,10 @@ function SettingsTable({
                 {t("settings.table.save")}
               </Button>
             </td>
-          </tr>
+          </tr> */}
 
           {/* Loyalty Wash Threshold */}
-          <tr className='align-top'>
+          {/* <tr className='align-top'>
             <td className='px-4 py-3'>
               <p className='font-medium text-foreground'>Jumlah stempel</p>
             </td>
@@ -384,10 +384,10 @@ function SettingsTable({
                 {t("settings.table.save")}
               </Button>
             </td>
-          </tr>
+          </tr> */}
 
           {/* Loyalty Reward Discount */}
-          <tr className='align-top'>
+          {/* <tr className='align-top'>
             <td className='px-4 py-3'>
               <p className='font-medium text-foreground'>Diskon reward (%)</p>
             </td>
@@ -421,7 +421,7 @@ function SettingsTable({
                 {t("settings.table.save")}
               </Button>
             </td>
-          </tr>
+          </tr> */}
 
           {/* WhatsApp Number */}
           <tr className='align-top'>

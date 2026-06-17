@@ -386,6 +386,12 @@ export default function SitesPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [showGenericQr, setShowGenericQr] = useState(false);
   const [editSite, setEditSite] = useState<AdminSiteDetail | null>(null);
+  const [confirmPauseId, setConfirmPauseId] = useState<string | null>(null);
+
+  async function handleToggleIntake(siteId: string, currentPaused: boolean) {
+    await update({ siteId, payload: { intakePaused: !currentPaused } });
+  }
+
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
@@ -437,6 +443,46 @@ export default function SitesPage() {
                   <span className='flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-xs text-green-600'>
                     <PlayCircle className='h-3 w-3' /> {t("sitesPage.status.active")}
                   </span>
+                )}
+                {confirmPauseId === site.id ? (
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={isUpdating}
+                      onClick={async () => {
+                        await handleToggleIntake(site.id, site.intakePaused);
+                        setConfirmPauseId(null);
+                      }}
+                    >
+                      Yakin
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setConfirmPauseId(null)}
+                    >
+                      Batal
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant={site.intakePaused ? "outline" : "ghost"}
+                    size="sm"
+                    className={site.intakePaused
+                      ? "text-green-600 border-green-600 hover:bg-green-50"
+                      : "text-destructive hover:bg-destructive/10"
+                    }
+                    onClick={() => {
+                      if (site.intakePaused) {
+                        void handleToggleIntake(site.id, site.intakePaused);
+                      } else {
+                        setConfirmPauseId(site.id);
+                      }
+                    }}
+                  >
+                    {site.intakePaused ? "Aktifkan" : "Nonaktifkan"}
+                  </Button>
                 )}
                 <Button
                   variant='ghost'

@@ -64,7 +64,10 @@ adminApi.interceptors.response.use(
 
     const path = window.location.pathname;
 
-    if (!originalRequest._retry) {
+    const isLoginEndpoint = originalRequest.url?.includes("/v1/admin/sessions") &&
+      !originalRequest.url?.includes("/refresh");
+
+    if (!originalRequest._retry && !isLoginEndpoint) {
       if (isRefreshing) {
         return new Promise<void>((resolve, reject) => {
           failedQueue.push({ resolve, reject });

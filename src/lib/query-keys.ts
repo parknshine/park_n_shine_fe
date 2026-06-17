@@ -20,7 +20,7 @@ export const queryKeys = {
     tipList: (period: string, page: number, pageSize: number, search: string, siteId: string) =>
       ["admin", "tips", "list", period, page, pageSize, search, siteId] as const,
     disbursements: () => ["admin", "disbursements"] as const,
-    loyaltyCustomers: () => ["admin", "loyalty", "customers"] as const,
+    loyaltyCustomers: (params?: object) => ["admin", "loyalty", "customers", params ?? {}] as const,
   },
   crew: {
     session: () => ["crew", "session"] as const,
