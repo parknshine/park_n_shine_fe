@@ -449,9 +449,13 @@
     "helpFaq": "Bantuan & FAQ",
     "support": "Dukungan",
     "changePhoto": "Ubah foto profil",
+    "uploadFromGallery": "Upload dari Galeri",
+    "cancel": "Batal",
+    "close": "Tutup",
     "photoSuccess": "Foto profil diperbarui",
     "photoError": "Gagal memperbarui foto",
-    "comingSoon": "Segera hadir"
+    "comingSoon": "Segera hadir",
+    "appVersion": "Park & Shine · Versi 1.0.0"
   },
   "postFlow": {
     "guestPromptTitle": "Simpan riwayat cucianmu",

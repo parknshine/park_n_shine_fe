@@ -3,6 +3,7 @@ import { Sparkles, ChevronRight } from "lucide-react";
 
 interface ActiveBookingCardProps {
   bookingId: string;
+  signedToken: string;
   plate: string;
   siteName: string;
   statusLabel: string;
@@ -12,6 +13,7 @@ interface ActiveBookingCardProps {
 
 export function ActiveBookingCard({
   bookingId,
+  signedToken,
   plate,
   siteName,
   statusLabel,
@@ -24,7 +26,7 @@ export function ActiveBookingCard({
         {sectionTitle}
       </div>
       <Link
-        href={`/booking/${bookingId}/status`}
+        href={`/booking/${bookingId}/status?token=${signedToken}`}
         className="w-full text-left flex items-center gap-3 px-4 py-[14px] rounded-2xl bg-white border border-[#006289]/10"
         style={{ boxShadow: "0 10px 26px rgba(0,98,137,0.08)" }}
       >

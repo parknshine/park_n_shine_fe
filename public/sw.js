@@ -11,11 +11,7 @@ const APP_SHELL_URLS = [
 ];
 
 self.addEventListener("push", (event) => {
-  console.log("[SW] push received, data:", event.data?.text());
-  if (!event.data) {
-    console.log("[SW] no data, skipping");
-    return;
-  }
+  if (!event.data) return;
 
   let payload;
   try {
@@ -24,7 +20,6 @@ self.addEventListener("push", (event) => {
     payload = { title: "Park & Shine", body: event.data.text() };
   }
 
-  console.log("[SW] showing notification:", payload);
   const title = payload.title ?? "Park & Shine";
   const options = {
     body: payload.body ?? "",
@@ -36,9 +31,7 @@ self.addEventListener("push", (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification(title, options)
-      .then(() => console.log("[SW] notification shown"))
-      .catch((err) => console.error("[SW] showNotification error:", err))
+    self.registration.showNotification(title, options).catch(() => {})
   );
 });
 

@@ -60,7 +60,84 @@ export function isPathAllowed(
   });
 }
 
-export function proxy(req: NextRequest): NextResponse {
+/**
+ * Verify an HS256 JWT token using Web Crypto (Node.js Runtime compatible).
+ * Validates signature and expiration. Returns false if token is invalid or expired.
+ */
+async function verifyHs256(token: string, secret: string): Promise<boolean> {
+  try {
+    const [headerB64, payloadB64, signatureB64] = token.split(".");
+    if (!headerB64 || !payloadB64 || !signatureB64) return false;
+
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"]
+    );
+
+    const data = encoder.encode(`${headerB64}.${payloadB64}`);
+    const sig = Uint8Array.from(
+      atob(signatureB64.replace(/-/g, "+").replace(/_/g, "/")),
+      (c) => c.charCodeAt(0)
+    );
+
+    const valid = await crypto.subtle.verify("HMAC", key, sig, data);
+    if (!valid) return false;
+
+    const payload = JSON.parse(
+      atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/"))
+    ) as { exp?: number };
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return false;
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const ADMIN_PROTECTED = /^\/admin(?:\/.*)?$/;
+const CREW_PROTECTED = /^\/crew(?:\/.*)?$/;
+const PUBLIC_PATHS = new Set(["/admin/login", "/admin", "/crew/login", "/crew"]);
+
+/**
+ * Cookie-based JWT verification for admin and crew routes.
+ * Only active when NEXT_PUBLIC_COOKIE_AUTH=true (Phase 6 feature flag).
+ */
+async function verifyCookieAuth(req: NextRequest): Promise<NextResponse | null> {
+  // Feature flag — only active when NEXT_PUBLIC_COOKIE_AUTH=true
+  if (process.env.NEXT_PUBLIC_COOKIE_AUTH !== "true") return null;
+
+  const { pathname } = req.nextUrl;
+
+  if (PUBLIC_PATHS.has(pathname)) return null;
+
+  if (ADMIN_PROTECTED.test(pathname)) {
+    const token = req.cookies.get("admin-token")?.value;
+    const secret = process.env.ADMIN_JWT_SECRET;
+    if (!secret || !token || !(await verifyHs256(token, secret))) {
+      return NextResponse.redirect(new URL("/admin/login", req.url));
+    }
+  }
+
+  if (CREW_PROTECTED.test(pathname)) {
+    const token = req.cookies.get("crew-token")?.value;
+    const secret = process.env.CREW_JWT_SECRET;
+    if (!secret || !token || !(await verifyHs256(token, secret))) {
+      return NextResponse.redirect(new URL("/crew/login", req.url));
+    }
+  }
+
+  return null;
+}
+
+export async function proxy(req: NextRequest): Promise<NextResponse> {
+  // Check cookie-based JWT auth first (Phase 6 feature flag)
+  const cookieAuthResponse = await verifyCookieAuth(req);
+  if (cookieAuthResponse) return cookieAuthResponse;
+
   const host = req.headers.get("host") ?? "";
   const { pathname } = req.nextUrl;
 

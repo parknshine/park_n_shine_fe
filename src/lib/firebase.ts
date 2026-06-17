@@ -21,6 +21,8 @@ const firebaseConfig: FirebaseOptions = {
   appId:
     process.env.NEXT_PUBLIC_FIREBASE_APP_ID ??
     "1:1072064447888:web:36640bd3ecb027f3529f15",
+  measurementId:
+    process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ?? "G-N386MLY91X",
 };
 
 // Avoid re-initialising during Next.js fast-refresh / multiple imports.

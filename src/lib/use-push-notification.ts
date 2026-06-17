@@ -39,7 +39,6 @@ export function usePushNotification({ type, bookingId, bookingToken }: Subscribe
   const subscribedRef = useRef(false);
 
   useEffect(() => {
-    console.log("[Push] effect, permission:", permission, "type:", type, "PUSH_ENABLED:", process.env.NEXT_PUBLIC_PUSH_ENABLED);
     if (process.env.NEXT_PUBLIC_PUSH_ENABLED !== "true") return;
     if (permission === "unsupported") return;
     if (permission === "granted") {
@@ -52,20 +51,16 @@ export function usePushNotification({ type, bookingId, bookingToken }: Subscribe
   }, [type, bookingId, bookingToken]);
 
   async function subscribe() {
-    console.log("[Push] subscribe() called, VAPID:", !!VAPID_PUBLIC_KEY, "subscribed:", subscribedRef.current);
     if (!VAPID_PUBLIC_KEY) return;
     if (subscribedRef.current) return;
 
     try {
       const perm = await Notification.requestPermission();
-      console.log("[Push] permission:", perm);
       setPermission(perm as PermissionState);
       if (perm !== "granted") return;
 
       const registration = await navigator.serviceWorker.ready;
-      console.log("[Push] SW ready:", registration.scope);
       const existing = await registration.pushManager.getSubscription();
-      console.log("[Push] existing subscription:", !!existing);
       const sub = existing ?? await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
@@ -95,9 +90,7 @@ export function usePushNotification({ type, bookingId, bookingToken }: Subscribe
       }
 
       subscribedRef.current = true;
-      console.log("[Push] subscribed successfully");
-    } catch (err) {
-      console.error("[Push] subscribe error:", err);
+    } catch {
     }
   }
 

@@ -1,22 +1,26 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios-crew";
 import { API_ERROR_CODES } from "@/lib/api-error";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
+import { useCrewAuthStore } from "@/store/crew-auth-store";
 import type { CrewLoginPayload, CrewSession } from "@/features/crew/types";
 
 export function useCrewSession() {
   const queryClient = useQueryClient();
+  const store = useCrewAuthStore();
 
-  const sessionQuery = useQuery<CrewSession | null>({
-    enabled: false,
-    meta: { persist: true },
-    placeholderData: null,
-    queryFn: async () => queryClient.getQueryData(queryKeys.crew.session()) ?? null,
-    queryKey: queryKeys.crew.session(),
-    staleTime: Infinity,
-  });
+  const session: CrewSession | null = store.isAuthenticated
+    ? {
+        id: store.crewId!,
+        crewId: store.crewId!,
+        crewName: store.crewName!,
+        siteId: store.siteId!,
+        expiresAt: "",
+        token: "",
+      }
+    : null;
 
   const mutation = useMutation({
     meta: { persist: false },
@@ -25,9 +29,10 @@ export function useCrewSession() {
       return response.data;
     },
     mutationKey: mutationKeys.crew.login(),
-    onSuccess: (session) => {
-      localStorage.setItem("crew-token", session.token);
-      queryClient.setQueryData(queryKeys.crew.session(), session);
+    onSuccess: (data) => {
+      localStorage.setItem("crew-token", data.token);
+      store.setCrewSession(data.crewId, data.crewName, data.siteId);
+      queryClient.setQueryData(queryKeys.crew.session(), data);
     },
   });
 
@@ -37,7 +42,9 @@ export function useCrewSession() {
 
   function clearSession() {
     localStorage.removeItem("crew-token");
+    store.clearCrewSession();
     queryClient.removeQueries({ queryKey: ["crew"] });
+    api.delete("/v1/crew/sessions/current").catch(() => {});
   }
 
   function getErrorKey(err: unknown): string | null {
@@ -56,6 +63,6 @@ export function useCrewSession() {
     isLoading: mutation.isPending,
     isOfflinePaused: mutation.isPaused,
     login,
-    session: sessionQuery.data ?? null,
+    session,
   };
 }

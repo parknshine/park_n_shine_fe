@@ -3,10 +3,6 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import type { Customer } from "@/types";
 
-// Token storage keys — shared with axios-customer interceptor.
-export const CUSTOMER_TOKEN_KEY = "pns_token";
-export const CUSTOMER_REFRESH_KEY = "pns_refresh";
-
 interface CustomerAuthState {
   customer: Customer | null;
   isAuthenticated: boolean;

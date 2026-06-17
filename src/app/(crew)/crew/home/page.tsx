@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,7 +13,6 @@ import { previewNextJob } from "@/features/crew/hooks/use-next-job";
 import type { CrewJob, JobPreview, RejectionReason } from "@/features/crew/types";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
-import { useRealtimeEvents, getCrewIdFromToken } from "@/lib/use-realtime-events";
 import { usePushNotification } from "@/lib/use-push-notification";
 import { queryKeys } from "@/lib/query-keys";
 
@@ -52,33 +51,8 @@ export function CrewHomePage() {
   const [now, setNow] = useState(() => Date.now());
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const crewId = useMemo(() => getCrewIdFromToken(), []);
   const { permission, subscribe: subscribePush } = usePushNotification({ type: "crew" });
   const pushEnabled = process.env.NEXT_PUBLIC_PUSH_ENABLED === "true";
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
-  const getSseUrl = useCallback(() => {
-    const token = localStorage.getItem("crew-token") ?? "";
-    return crewId ? `${baseUrl}/v1/crew/realtime/stream?token=${token}` : "";
-  }, [baseUrl, crewId]);
-
-  useRealtimeEvents({
-    url: getSseUrl,
-    enabled: !!crewId,
-    onEvent: (event) => {
-      if (event.type === "job_assigned" || event.type === "new_job") {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
-        const msg = event.type === "new_job"
-          ? t("home.newJobQueued", { defaultValue: "New job available in queue!" })
-          : t("home.newJobNotification", { defaultValue: "New job assigned to you!" });
-        toast.success(msg);
-      }
-      if (event.type === "job_assigned") {
-        // Re-fetch active job immediately so the auto-navigate effect fires
-        // without waiting for the 15-second queue poll.
-        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.nextJob() });
-      }
-    },
-  });
 
   useEffect(() => {
     if (!job || noResume) return;

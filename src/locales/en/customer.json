@@ -449,9 +449,13 @@
     "helpFaq": "Help & FAQ",
     "support": "Support",
     "changePhoto": "Change profile photo",
+    "uploadFromGallery": "Upload from Gallery",
+    "cancel": "Cancel",
+    "close": "Close",
     "photoSuccess": "Profile photo updated",
     "photoError": "Failed to update photo",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "appVersion": "Park & Shine · Version 1.0.0"
   },
   "postFlow": {
     "guestPromptTitle": "Save your wash history",

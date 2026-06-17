@@ -205,6 +205,7 @@ export default function HomePage() {
         {activeBooking && activeStatusLabel && (
           <ActiveBookingCard
             bookingId={activeBooking.id}
+            signedToken={activeBooking.bookingToken}
             plate={activeBooking.plate ?? "—"}
             siteName={activeBooking.site?.name ?? "—"}
             statusLabel={activeStatusLabel}

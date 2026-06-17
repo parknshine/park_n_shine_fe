@@ -1,96 +1,60 @@
 import axios from "axios";
 import { ApiContractError, normalizeApiError } from "@/lib/api-error";
-import {
-  CUSTOMER_TOKEN_KEY,
-  CUSTOMER_REFRESH_KEY,
-  useCustomerAuthStore,
-} from "@/store/customer-auth-store";
+import { useCustomerAuthStore } from "@/store/customer-auth-store";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 // Authenticated customer-account endpoints (/v1/me, /v1/me/bookings, …).
-// Uses the app session token (Bearer), NOT the Firebase ID token and NOT the
-// anonymous X-Booking-Token used by the public booking flow.
+// pns_token httpOnly cookie is sent automatically via withCredentials.
 const customerApi = axios.create({
   baseURL,
   headers: { "Content-Type": "application/json" },
   timeout: 10_000,
+  withCredentials: true,
 });
 
-// Attach app session token from localStorage.
-customerApi.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem(CUSTOMER_TOKEN_KEY);
-      if (token) config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Token refresh state (single-flight; queue concurrent 401s).
+// Single-flight queue for concurrent 401s.
 let isRefreshing = false;
 type QueueEntry = {
-  resolve: (token: string) => void;
+  resolve: () => void;
   reject: (err: unknown) => void;
 };
 let failedQueue: QueueEntry[] = [];
 
-function processQueue(error: unknown, token: string | null) {
-  failedQueue.forEach((entry) =>
-    error ? entry.reject(error) : entry.resolve(token!)
-  );
+function processQueue(error: unknown) {
+  failedQueue.forEach((entry) => (error ? entry.reject(error) : entry.resolve()));
   failedQueue = [];
 }
 
-// Refresh the app token. If the refresh token is dead but the Firebase user is
-// still signed in, re-exchange the Firebase ID token for a fresh session.
-async function refreshCustomerToken(): Promise<string> {
-  const refreshToken = localStorage.getItem(CUSTOMER_REFRESH_KEY);
-
-  if (refreshToken) {
-    try {
-      const { data } = await axios.post<{
-        success: boolean;
-        data: { token: string; refreshToken: string };
-      }>(
-        `${baseURL}/v1/auth/session/refresh`,
-        { refreshToken },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      if (data.success) {
-        localStorage.setItem(CUSTOMER_TOKEN_KEY, data.data.token);
-        localStorage.setItem(CUSTOMER_REFRESH_KEY, data.data.refreshToken);
-        return data.data.token;
-      }
-    } catch {
-      // fall through to Firebase re-exchange
-    }
+// Refresh the session. pns_refresh cookie is sent automatically (withCredentials).
+// If the refresh cookie is expired, fall back to Firebase ID token re-exchange.
+async function refreshCustomerToken(): Promise<void> {
+  // Try 1: refresh endpoint — pns_refresh cookie sent automatically.
+  try {
+    await axios.post(
+      `${baseURL}/v1/auth/session/refresh`,
+      {},
+      { headers: { "Content-Type": "application/json" }, withCredentials: true }
+    );
+    return;
+  } catch {
+    // fall through to Firebase re-exchange
   }
 
-  // Refresh token missing/expired — re-exchange the still-valid Firebase session.
+  // Try 2: re-exchange still-valid Firebase session for new cookies.
   const { auth } = await import("@/lib/firebase");
   const fbUser = auth.currentUser;
-  if (!fbUser) throw new Error("No refresh token and no Firebase session");
+  if (!fbUser) throw new Error("No refresh cookie and no Firebase session");
 
   const idToken = await fbUser.getIdToken(true);
-  const { data } = await axios.post<{
-    success: boolean;
-    data: { token: string; refreshToken: string };
-  }>(
+  await axios.post(
     `${baseURL}/v1/auth/session`,
     { idToken },
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { "Content-Type": "application/json" }, withCredentials: true }
   );
-  if (!data.success) throw new Error("Session re-exchange failed");
-
-  localStorage.setItem(CUSTOMER_TOKEN_KEY, data.data.token);
-  localStorage.setItem(CUSTOMER_REFRESH_KEY, data.data.refreshToken);
-  return data.data.token;
 }
 
-// Unwrap { success, data } envelope + handle 401 with token refresh.
+// Unwrap { success, data } envelope + handle 401 with cookie refresh.
 customerApi.interceptors.response.use(
   (response) => {
     if (
@@ -114,26 +78,22 @@ customerApi.interceptors.response.use(
 
     if (!originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return customerApi(originalRequest);
-        });
+        })
+          .then(() => customerApi(originalRequest))
+          .catch(() => Promise.reject(normalizedError));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        const newToken = await refreshCustomerToken();
-        processQueue(null, newToken);
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        await refreshCustomerToken();
+        processQueue(null);
         return customerApi(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError, null);
-        localStorage.removeItem(CUSTOMER_TOKEN_KEY);
-        localStorage.removeItem(CUSTOMER_REFRESH_KEY);
+        processQueue(refreshError);
         useCustomerAuthStore.getState().clearCustomer();
         const { auth } = await import("@/lib/firebase");
         await auth.signOut().catch(() => {});

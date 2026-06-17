@@ -2,57 +2,45 @@ import axios from "axios";
 import { ApiContractError, normalizeApiError } from "@/lib/api-error";
 import { useAuthStore } from "@/store/auth-store";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
+
 const adminApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "/api",
+  baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
   timeout: 10_000,
+  withCredentials: true,
 });
 
-// Attach admin token from localStorage
-adminApi.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("admin-token");
-      if (token) config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// ── Token refresh state ──────────────────────────────────────────────────────
 
-// Token refresh state
 let isRefreshing = false;
-type QueueEntry = { resolve: (token: string) => void; reject: (err: unknown) => void };
+type QueueEntry = { resolve: () => void; reject: (err: unknown) => void };
 let failedQueue: QueueEntry[] = [];
 
-function processQueue(error: unknown, token: string | null) {
-  failedQueue.forEach((entry) =>
-    error ? entry.reject(error) : entry.resolve(token!)
-  );
+function processQueue(error: unknown) {
+  failedQueue.forEach((entry) => (error ? entry.reject(error) : entry.resolve()));
   failedQueue = [];
 }
 
-async function refreshAdminToken(): Promise<string> {
-  const refreshToken = localStorage.getItem("admin-refresh-token");
-  if (!refreshToken) throw new Error("No refresh token");
-
-  const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
-  const response = await axios.post<{
-    success: boolean;
-    data: { token: string; refreshToken: string };
-  }>(
-    `${baseURL}/v1/admin/sessions/refresh`,
-    { refreshToken },
-    { headers: { "Content-Type": "application/json" } }
+async function refreshAdminToken(): Promise<void> {
+  // Cookie admin-refresh-token is sent automatically via withCredentials.
+  // Backend sets new admin-token + admin-refresh-token cookies on success.
+  await axios.post(
+    `${BASE_URL}/v1/admin/sessions/refresh`,
+    {},
+    { headers: { "Content-Type": "application/json" }, withCredentials: true }
   );
-
-  const { token, refreshToken: newRefreshToken } = response.data.data;
-  localStorage.setItem("admin-token", token);
-  localStorage.setItem("admin-refresh-token", newRefreshToken);
-  return token;
 }
 
-// Unwrap envelope + handle 401 with token refresh
+// ── Request interceptor — cookie sent automatically ──────────────────────────
+
+adminApi.interceptors.request.use(
+  (config) => config,
+  (error) => Promise.reject(error)
+);
+
+// ── Response interceptor — unwrap envelope + auto-refresh on 401 ─────────────
+
 adminApi.interceptors.response.use(
   (response) => {
     if (
@@ -78,27 +66,20 @@ adminApi.interceptors.response.use(
 
     if (!originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return adminApi(originalRequest);
-        });
+        }).then(() => adminApi(originalRequest));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        const newToken = await refreshAdminToken();
-        processQueue(null, newToken);
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        await refreshAdminToken();
+        processQueue(null);
         return adminApi(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError, null);
-        localStorage.removeItem("admin-token");
-        localStorage.removeItem("admin-refresh-token");
-        localStorage.removeItem("admin-sites");
+        processQueue(refreshError);
         useAuthStore.getState().clearAuth();
         if (path !== "/admin/login") {
           window.location.href = "/admin/login";

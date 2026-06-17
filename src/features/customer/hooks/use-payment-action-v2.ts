@@ -6,7 +6,6 @@ import api from "@/lib/axios";
 import { API_ERROR_CODES } from "@/lib/api-error";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { PaymentIntentResponse } from "@/features/customer/types";
-import { CUSTOMER_TOKEN_KEY } from "@/store/customer-auth-store";
 
 /** Type ini sengaja tidak dimasukkan ke types/index.ts agar flow baru berdiri sendiri */
 export interface ConfirmBookingPayloadV2 {
@@ -29,8 +28,6 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
     retry: 0,
     mutationFn: async (payload: ConfirmBookingPayloadV2) => {
       const { plateText, slotText, ...rest } = payload;
-      const customerToken =
-        typeof window !== "undefined" ? localStorage.getItem(CUSTOMER_TOKEN_KEY) : null;
       const response = await api.post<PaymentIntentResponse>(
         `/v1/bookings/${bookingId}/confirm`,
         { ...rest, plate: plateText, slot: slotText },
@@ -38,8 +35,8 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
           headers: {
             "Idempotency-Key": bookingId,
             "X-Booking-Token": signedToken,
-            ...(customerToken ? { Authorization: `Bearer ${customerToken}` } : {}),
           },
+          withCredentials: true,
         }
       );
       return response.data;

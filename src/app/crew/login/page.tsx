@@ -1,13 +1,12 @@
 "use client";
 
-"use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useCrewSession } from "@/features/crew/hooks";
+import { useCrewAuthStore } from "@/store/crew-auth-store";
 import { useTranslation } from "@/i18n";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { Button } from "@/components/ui/button";
@@ -19,16 +18,18 @@ export function CrewLoginPage() {
   const router = useRouter();
   const { t } = useTranslation("crew");
   const { login, session, isLoading, errorKey } = useCrewSession();
+  const hasHydrated = useCrewAuthStore((s) => s._hasHydrated);
 
   const [shiftCode, setShiftCode] = useState("");
   const [pin, setPin] = useState("");
   const [showPin, setShowPin] = useState(false);
 
   useEffect(() => {
-    if (session && localStorage.getItem("crew-token")) {
+    if (!hasHydrated) return;
+    if (session) {
       router.replace("/crew/home");
     }
-  }, [session, router]);
+  }, [hasHydrated, session, router]);
 
   const canSubmit = shiftCode.length === 6 && pin.length > 0 && !isLoading;
 

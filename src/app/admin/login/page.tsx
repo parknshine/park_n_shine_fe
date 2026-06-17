@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -18,11 +19,11 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { t } = useTranslation("admin");
 
-  const hasToken = globalThis.window !== undefined && !!localStorage.getItem("admin-token");
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   useEffect(() => {
-    if (hasToken) router.replace("/dashboard");
-  }, [hasToken, router]);
+    if (isAuthenticated) router.replace("/dashboard");
+  }, [isAuthenticated, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,7 +34,7 @@ export default function AdminLoginPage() {
     }
   }
 
-  if (hasToken) return null;
+  if (isAuthenticated) return null;
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-background px-4">

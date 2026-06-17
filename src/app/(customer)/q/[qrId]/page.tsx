@@ -13,44 +13,36 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { qrId } = await params;
-  const result = await getQrResolution(qrId);
+  const resolution = await getQrResolution(qrId);
   return {
-    title: result.ok ? `Book at ${result.data.siteName}` : "Book a Wash",
+    title: resolution ? `Book at ${resolution.siteName}` : "Book a Wash",
   };
 }
 
-type QrResult =
-  | { ok: true; data: SiteQrResolution }
-  | { ok: false; code: string | null };
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-async function getQrResolution(qrId: string): Promise<QrResult> {
+async function getQrResolution(
+  qrId: string
+): Promise<SiteQrResolution | null> {
+  if (!UUID_RE.test(qrId)) return null;
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "/api";
   try {
-    const res = await fetch(`${baseUrl}/v1/qr/${qrId}`, { cache: "no-store" });
-    const body = await res.json() as { data?: SiteQrResolution; error?: { code: string } };
-    if (!res.ok) return { ok: false, code: body.error?.code ?? null };
-    return { ok: true, data: body.data! };
+    const res = await fetch(`${baseUrl}/v1/qr/${qrId}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const body = await res.json() as { data: SiteQrResolution };
+    return body.data ?? null;
   } catch {
-    return { ok: false, code: null };
+    return null;
   }
 }
 
 export default async function LandingPage({ params }: Props) {
   const { qrId } = await params;
-  const result = await getQrResolution(qrId);
+  const resolution = await getQrResolution(qrId);
 
-  if (!result.ok) {
-    const isPastCutoff = result.code === "SITE_CUTOFF_REACHED";
-    const isPaused = result.code === "INTAKE_PAUSED";
-
-    if (isPastCutoff || isPaused) {
-      return (
-        <AppShell surface="customer">
-          <QrBlockingMessage reason={isPastCutoff ? "past_cutoff" : "paused"} />
-        </AppShell>
-      );
-    }
-
+  if (!resolution) {
     return (
       <AppShell surface="customer">
         <QrErrorState reason="invalid" />
@@ -58,7 +50,6 @@ export default async function LandingPage({ params }: Props) {
     );
   }
 
-  const resolution = result.data;
   const now = new Date();
   const isPastCutoff = resolution.cutoffTime
     ? (() => {

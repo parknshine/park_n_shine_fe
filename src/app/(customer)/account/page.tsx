@@ -92,8 +92,6 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [localPhotoUrl, setLocalPhotoUrl] = useState<string | null>(null);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
-  const [photoUrlInput, setPhotoUrlInput] = useState("");
-  const [isSavingPhotoUrl, setIsSavingPhotoUrl] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -140,28 +138,6 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
     } finally {
       setIsUploadingPhoto(false);
       e.target.value = "";
-    }
-  }
-
-  async function handleSavePhotoUrl() {
-    const url = photoUrlInput.trim();
-    if (!url) return;
-    setIsSavingPhotoUrl(true);
-    try {
-      const { data } = await customerApi.patch<Customer>("/v1/me", {
-        photoUrl: url,
-      });
-      if (data) {
-        updateCustomer(data);
-        setLocalPhotoUrl(url);
-      }
-      setPhotoDialogOpen(false);
-      setPhotoUrlInput("");
-      toast.success(t("account.photoSuccess"));
-    } catch {
-      toast.error(t("account.photoError"));
-    } finally {
-      setIsSavingPhotoUrl(false);
     }
   }
 
@@ -372,7 +348,7 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
         </button>
 
         <p className='pb-2 text-center text-[12px] text-[#b3bcc1]'>
-          Park &amp; Shine · Versi 1.0.0
+          {t("account.appVersion")}
         </p>
       </div>
 
@@ -382,7 +358,7 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
           <button
             type='button'
             className='absolute inset-0 bg-black/40'
-            aria-label='Tutup'
+            aria-label={t("account.close")}
             onClick={() => setPhotoDialogOpen(false)}
           />
           <dialog
@@ -393,41 +369,6 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
               {t("account.changePhoto")}
             </h3>
 
-            {/* URL input */}
-            <div className='space-y-2'>
-              <label
-                htmlFor='photo-url-input'
-                className='text-[12px] font-bold uppercase tracking-[0.04em] text-[#9aa6ad]'
-              >
-                URL Foto
-              </label>
-              <input
-                id='photo-url-input'
-                type='url'
-                value={photoUrlInput}
-                onChange={(e) => setPhotoUrlInput(e.target.value)}
-                placeholder='https://...'
-                className='h-12 w-full rounded-[14px] border border-[rgba(111,120,125,0.18)] bg-[#f4f9fc] px-4 font-sans text-[14px] text-[#273034] outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
-              />
-              <button
-                type='button'
-                disabled={!photoUrlInput.trim() || isSavingPhotoUrl}
-                onClick={handleSavePhotoUrl}
-                className='flex h-11 w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#006289] to-[#1db1f1] text-[14px] font-bold text-white disabled:opacity-50'
-              >
-                {isSavingPhotoUrl ? (
-                  <Loader2 className='h-4 w-4 animate-spin' />
-                ) : null}
-                Simpan URL
-              </button>
-            </div>
-
-            <div className='flex items-center gap-3'>
-              <div className='h-px flex-1 bg-[#e5eaed]' />
-              <span className='text-[12px] text-[#9aa6ad]'>atau</span>
-              <div className='h-px flex-1 bg-[#e5eaed]' />
-            </div>
-
             {/* Upload file */}
             <button
               type='button'
@@ -435,10 +376,10 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
                 setPhotoDialogOpen(false);
                 fileInputRef.current?.click();
               }}
-              className='flex h-11 w-full items-center justify-center gap-2 rounded-full border border-[rgba(0,98,137,0.25)] text-[14px] font-bold text-[#006289]'
+              className='flex h-11 w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#006289] to-[#1db1f1] text-[14px] font-bold text-white'
             >
               <Camera className='h-4 w-4' />
-              Upload dari Galeri
+              {t("account.uploadFromGallery")}
             </button>
 
             <button
@@ -446,7 +387,7 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
               onClick={() => setPhotoDialogOpen(false)}
               className='w-full py-2 text-[13px] text-[#9aa6ad]'
             >
-              Batal
+              {t("account.cancel")}
             </button>
           </dialog>
         </div>

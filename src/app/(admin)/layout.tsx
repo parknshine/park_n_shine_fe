@@ -8,6 +8,7 @@ import { AdminSidebar, AdminNavbar, BookingDetailDrawer } from "@/features/admin
 import { useAdminSites } from "@/features/admin/hooks";
 import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 import { useUIStore } from "@/store/ui-store";
+import { useAuthStore } from "@/store/auth-store";
 import { queryKeys } from "@/lib/query-keys";
 
 export default function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
@@ -18,12 +19,13 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
   const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
   const removeTimeExtNotification = useUIStore((s) => s.removeTimeExtNotification);
 
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
   useEffect(() => {
-    const token = localStorage.getItem("admin-token");
-    if (!token) {
+    if (!isAuthenticated) {
       router.replace("/admin/login");
     }
-  }, [router]);
+  }, [router, isAuthenticated]);
 
   // Always fetch fresh sites on every admin page so sidebar stays in sync
   useAdminSites();

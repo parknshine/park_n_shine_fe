@@ -12,16 +12,10 @@ import {
 import { auth, googleProvider } from "@/lib/firebase";
 import customerApi from "@/lib/axios-customer";
 import { mutationKeys } from "@/lib/query-keys";
-import {
-  CUSTOMER_TOKEN_KEY,
-  CUSTOMER_REFRESH_KEY,
-  useCustomerAuthStore,
-} from "@/store/customer-auth-store";
+import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import type { Customer } from "@/types";
 
 interface SessionResponse {
-  token: string;
-  refreshToken: string;
   customer: Customer;
 }
 
@@ -70,8 +64,6 @@ export function useCustomerAuth() {
         "/v1/auth/session",
         { idToken }
       );
-      localStorage.setItem(CUSTOMER_TOKEN_KEY, data.token);
-      localStorage.setItem(CUSTOMER_REFRESH_KEY, data.refreshToken);
       setCustomer(data.customer);
       return data.customer;
     },
@@ -126,16 +118,11 @@ export function useCustomerAuth() {
   });
 
   const logout = useCallback(async () => {
-    const refreshToken = localStorage.getItem(CUSTOMER_REFRESH_KEY);
     try {
-      if (refreshToken) {
-        await customerApi.post("/v1/auth/logout", { refreshToken });
-      }
+      await customerApi.post("/v1/auth/logout");
     } catch {
       // best-effort server-side revoke
     }
-    localStorage.removeItem(CUSTOMER_TOKEN_KEY);
-    localStorage.removeItem(CUSTOMER_REFRESH_KEY);
     clearCustomer();
     await auth.signOut().catch(() => {});
     router.replace("/login");

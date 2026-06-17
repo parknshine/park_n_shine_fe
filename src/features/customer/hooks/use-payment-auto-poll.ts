@@ -11,7 +11,7 @@ const IS_DEV_POLL_ENABLED =
   POLL_INTERVAL_MS > 0 ||
   (typeof process !== "undefined" && process.env.NODE_ENV === "development");
 
-const EFFECTIVE_INTERVAL_MS = POLL_INTERVAL_MS > 0 ? POLL_INTERVAL_MS : 5_000;
+const EFFECTIVE_INTERVAL_MS = POLL_INTERVAL_MS > 0 ? POLL_INTERVAL_MS : 15_000;
 
 interface UsePaymentAutoPollOptions {
   enabled: boolean;

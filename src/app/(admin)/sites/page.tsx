@@ -21,7 +21,19 @@ function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
   const url = globalThis.window === undefined ? "" : globalThis.window.location.origin;
 
   function handlePrint() {
-    const svg = globalThis.document.getElementById("generic-site-qr")?.outerHTML ?? "";
+    const svgEl = globalThis.document.getElementById("generic-site-qr");
+    if (!svgEl) return;
+
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgEl);
+
+    const safeUrl = globalThis.window.location.origin;
+    const encodedUrl = safeUrl
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+
     const html = [
       "<!DOCTYPE html><html><head>",
       "<title>Park &amp; Shine — Site QR</title>",
@@ -29,9 +41,9 @@ function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
       "h2{font-size:16px;margin-bottom:12px;}p{font-size:11px;color:#666;margin-top:8px;}</style>",
       "</head><body>",
       "<h2>Park &amp; Shine</h2>",
-      svg,
-      `<p>${url}</p>`,
-      "<script>window.onload=function(){window.print();window.close();}</script>",
+      svgString,
+      `<p>${encodedUrl}</p>`,
+      "<script>window.onload=function(){window.print();window.close();}<\/script>",
       "</body></html>",
     ].join("");
 
