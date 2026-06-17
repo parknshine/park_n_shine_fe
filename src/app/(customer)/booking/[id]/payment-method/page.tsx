@@ -149,7 +149,7 @@ function PaymentMethodContent() {
       </div>
 
       {/* ── Sticky footer ─────────────────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-10 border-t border-border bg-card/95 shadow-sm backdrop-blur-sm">
+      <div className="fixed bottom-16 left-0 right-0 z-10 border-t border-border bg-card/95 shadow-sm backdrop-blur-sm">
         <div className="mx-auto flex max-w-md items-center justify-between px-4 py-4">
           <div>
             <p className="text-xs font-medium text-muted-foreground">

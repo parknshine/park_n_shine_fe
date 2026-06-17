@@ -425,7 +425,7 @@ export default function PayPage() {
       </div>
 
       {/* ── Sticky bottom actions ─────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-10 bg-card/95 border-t border-border shadow-sm backdrop-blur-sm">
+      <div className="fixed bottom-16 left-0 right-0 z-10 bg-card/95 border-t border-border shadow-sm backdrop-blur-sm">
         <div className="max-w-md mx-auto px-4 py-4 flex flex-col gap-2">
           <p className="text-center text-sm text-muted-foreground">
             {t("booking.payment.alreadyPaid")}

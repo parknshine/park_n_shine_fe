@@ -231,8 +231,6 @@ function CardPayContent() {
     if (!XENDIT_PUBLIC_KEY) return;
     const script = document.createElement("script");
     script.src = "https://js.xendit.co/v1/xendit.min.js";
-    script.integrity = "sha384-KkI03psyBlU2p1WG+r+Q+xMqtuiT12InNNEEkdsjWxt/1ePB2j4Yhd+HR0V4BipY";
-    script.crossOrigin = "anonymous";
     script.async = true;
     script.onload = () => {
       (globalThis as { Xendit?: { setPublishableKey: (k: string) => void } }).Xendit?.setPublishableKey(XENDIT_PUBLIC_KEY);
@@ -468,7 +466,7 @@ function CardPayContent() {
         </div>
 
         {/* Sticky footer */}
-        <div className='fixed bottom-0 left-0 right-0 z-10 border-t border-border bg-card/95 shadow-sm backdrop-blur-sm'>
+        <div className='fixed bottom-16 left-0 right-0 z-10 border-t border-border bg-card/95 shadow-sm backdrop-blur-sm'>
           <div className='mx-auto max-w-md px-4 py-4 space-y-2'>
             <div className='flex items-center justify-between text-sm'>
               <span className='text-muted-foreground'>Total Pembayaran</span>
