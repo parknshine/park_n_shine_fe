@@ -284,7 +284,7 @@ export default function BookCapturePage() {
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
-            value={useProfilePhone ? profilePhone : phone}
+            value={useProfilePhone ? (profilePhone ?? "") : phone}
             onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
             placeholder={t("booking.capture.phonePlaceholder")}
             className="h-10 rounded-lg border-border bg-[#eff8fe]"
