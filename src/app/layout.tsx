@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | Park & Shine",
   },
   description:
-    "Waterless car wash PWA for booking, crew operations, and site supervision.",
+    "Book a waterless car wash at your parking spot — no water, no hassle. Park & Shine comes to you.",
   applicationName: "Park & Shine",
   manifest: "/manifest.webmanifest",
   appleWebApp: {

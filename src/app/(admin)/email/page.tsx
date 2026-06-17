@@ -187,7 +187,7 @@ function SingleEmailForm() {
 }
 
 function BroadcastForm() {
-  const { broadcastEmail, isBroadcasting } = useAdminEmail();
+  const { broadcastEmail, isBroadcasting, broadcastToAll, isBroadcastingAll } = useAdminEmail();
   const [recipientsRaw, setRecipientsRaw] = useState("");
   const [subject, setSubject] = useState("");
   const [templateType, setTemplateType] = useState<EmailTemplateType>("promotional");
@@ -213,6 +213,29 @@ function BroadcastForm() {
       const result = await broadcastEmail(payload);
       toast.success(`Email berhasil dikirim ke ${result.recipientCount} penerima`);
       setRecipientsRaw(""); setSubject("");
+      setTemplateData({});
+    } catch {
+      toast.error("Gagal broadcast email. Pastikan Maileroo sudah dikonfigurasi.");
+    }
+  }
+
+  async function handleBroadcastAll() {
+    if (!subject) {
+      toast.error("Subjek wajib diisi");
+      return;
+    }
+    try {
+      const payload =
+        templateType === "custom"
+          ? { subject, templateType, html: templateData.html }
+          : { subject, templateType, templateData: buildTemplateData(templateType, templateData) };
+      const result = await broadcastToAll(payload);
+      if (result.sent) {
+        toast.success(`Email berhasil dikirim ke ${result.recipientCount} pelanggan`);
+      } else {
+        toast.error("Tidak ada pelanggan dengan alamat email yang terdaftar");
+      }
+      setSubject("");
       setTemplateData({});
     } catch {
       toast.error("Gagal broadcast email. Pastikan Maileroo sudah dikonfigurasi.");
@@ -257,6 +280,29 @@ function BroadcastForm() {
       <Button onClick={handleBroadcast} disabled={isBroadcasting} className="w-full">
         {isBroadcasting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Users className="mr-2 h-4 w-4" />}
         {isBroadcasting ? "Mengirim..." : `Broadcast ke ${recipients.length > 0 ? recipients.length : "..."} Penerima`}
+      </Button>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">atau</span>
+        </div>
+      </div>
+
+      <Button
+        variant="outline"
+        onClick={handleBroadcastAll}
+        disabled={isBroadcastingAll || !subject}
+        className="w-full"
+      >
+        {isBroadcastingAll ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <Users className="mr-2 h-4 w-4" />
+        )}
+        {isBroadcastingAll ? "Mengirim ke semua..." : "Kirim ke Semua Pelanggan"}
       </Button>
     </div>
   );

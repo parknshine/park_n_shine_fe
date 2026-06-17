@@ -91,7 +91,11 @@ function LoginForm() {
   const isRegister = mode === "register";
 
   useEffect(() => {
-    if (isAuthenticated) router.replace(redirectTo);
+    if (!isAuthenticated) return;
+    claimBookingIfNeeded().then(() => {
+      router.replace(redirectTo);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, redirectTo, router]);
 
   useEffect(() => {

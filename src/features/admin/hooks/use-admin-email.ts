@@ -27,6 +27,13 @@ export interface BroadcastEmailPayload {
   html?: string;
 }
 
+export interface BroadcastAllPayload {
+  subject: string;
+  templateType: EmailTemplateType;
+  templateData?: Record<string, unknown>;
+  html?: string;
+}
+
 export function useAdminEmail() {
   const sendMutation = useMutation({
     mutationFn: async (payload: SendEmailPayload) => {
@@ -45,10 +52,22 @@ export function useAdminEmail() {
     },
   });
 
+  const broadcastAllMutation = useMutation({
+    mutationFn: async (payload: BroadcastAllPayload) => {
+      const res = await api.post<{ sent: boolean; recipientCount: number }>(
+        "/v1/admin/email/broadcast-all",
+        payload
+      );
+      return res.data;
+    },
+  });
+
   return {
     sendEmail: sendMutation.mutateAsync,
     isSending: sendMutation.isPending,
     broadcastEmail: broadcastMutation.mutateAsync,
     isBroadcasting: broadcastMutation.isPending,
+    broadcastToAll: broadcastAllMutation.mutateAsync,
+    isBroadcastingAll: broadcastAllMutation.isPending,
   };
 }

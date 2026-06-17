@@ -13,7 +13,7 @@ export { useAdminShifts } from "./use-admin-shifts";
 export { useAdminWhatsapp } from "./use-admin-whatsapp";
 export type { WaStatus, WaState } from "./use-admin-whatsapp";
 export { useAdminEmail } from "./use-admin-email";
-export type { EmailTemplateType, SendEmailPayload, BroadcastEmailPayload, BroadcastRecipient } from "./use-admin-email";
+export type { EmailTemplateType, SendEmailPayload, BroadcastEmailPayload, BroadcastRecipient, BroadcastAllPayload } from "./use-admin-email";
 export * from "./use-admin-testimonials";
 export { useSiteSelection } from "./use-site-selection";
 export { useAdminEscalations } from "./use-admin-escalations";
