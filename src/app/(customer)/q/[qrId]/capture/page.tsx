@@ -17,9 +17,10 @@ import {
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { useBookingStatus, usePhotoUpload, usePublicSettings } from "@/features/customer/hooks";
-import { isValidPhone } from "@/features/customer/utils/phone";
+import { isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
 import { useTranslation } from "@/i18n";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
+import { useCustomerAuthStore } from "@/store/customer-auth-store";
 
 export default function CapturePage() {
   return (
@@ -52,7 +53,11 @@ function CaptureContent() {
 
   const [plateText, setPlateText] = useState(savedSession?.plateText ?? "");
   const [slotText, setSlotText] = useState(savedSession?.slotText ?? "");
+  const profilePhone = useCustomerAuthStore((s) => s.customer?.phone ?? null);
   const [phone, setPhone] = useState(savedSession?.phone ?? "");
+  const [useProfilePhone, setUseProfilePhone] = useState(
+    !savedSession && !!profilePhone,
+  );
 
   const { loyaltyEnabled } = usePublicSettings();
 
@@ -104,12 +109,14 @@ function CaptureContent() {
     if (text) startTransition(() => setSlotText(text));
   }, [slotUpload.media?.ocrText]);
 
+  const effectivePhone = useProfilePhone ? (profilePhone ?? "") : phone;
+
   const canContinue =
     plateUpload.status === "success" &&
     slotUpload.status === "success" &&
     plateText.trim().length > 0 &&
     slotText.trim().length > 0 &&
-    (phone === "" || isValidPhone(phone));
+    (effectivePhone === "" || isValidPhone(effectivePhone));
 
   function handleContinue() {
     const plate = plateText.trim().toUpperCase();
@@ -121,14 +128,14 @@ function CaptureContent() {
       plateText: plate,
       slotText: slot,
       location: "",
-      phone: phone.trim(),
+      phone: normalizePhone(effectivePhone),
       plateState: { progress: plateUpload.progress, status: plateUpload.status, error: plateUpload.error, media: plateUpload.media },
       slotState: { progress: slotUpload.progress, status: slotUpload.status, error: slotUpload.error, media: slotUpload.media },
     });
     const params = new URLSearchParams({
       bookingId: bookingId ?? "",
       token: token ?? "",
-      phone: phone.trim(),
+      phone: normalizePhone(effectivePhone),
       plate,
       slot,
     });
@@ -209,15 +216,33 @@ function CaptureContent() {
           <label htmlFor="phone" className="text-sm font-bold text-foreground">
             {t("booking.capture.phoneLabel")}
           </label>
+          {profilePhone && (
+            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                id="use-profile-phone"
+                checked={useProfilePhone}
+                onChange={(e) => {
+                  setUseProfilePhone(e.target.checked);
+                  if (!e.target.checked) setPhone("");
+                }}
+                className="h-4 w-4 rounded border-border accent-primary"
+              />
+              <span className="text-sm text-muted-foreground">
+                {t("booking.capture.useProfilePhone", { phone: profilePhone })}
+              </span>
+            </label>
+          )}
           <Input
             id="phone"
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
-            value={phone}
+            value={useProfilePhone ? profilePhone : phone}
             onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
             placeholder={t("booking.capture.phonePlaceholder")}
             className="h-10 rounded-lg border-border bg-[#eff8fe]"
+            readOnly={useProfilePhone}
           />
           {loyaltyEnabled && (
             <p className="text-xs text-muted-foreground">

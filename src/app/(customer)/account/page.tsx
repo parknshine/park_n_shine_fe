@@ -21,6 +21,7 @@ import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Customer } from "@/types";
+import { normalizePhone } from "@/features/customer/utils/phone";
 
 function getInitials(name: string | null): string {
   if (!name) return "?";
@@ -103,7 +104,7 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
       if (name.trim() && name.trim() !== customer.name)
         payload.name = name.trim();
       if (phone.trim() && phone.trim() !== customer.phone)
-        payload.phone = phone.trim();
+        payload.phone = normalizePhone(phone);
       if (Object.keys(payload).length === 0) return;
 
       const { data } = await customerApi.patch<Customer>("/v1/me", payload);

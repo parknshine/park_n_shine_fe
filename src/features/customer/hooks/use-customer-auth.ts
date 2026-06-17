@@ -7,6 +7,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   type User as FirebaseUser,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
@@ -41,11 +43,14 @@ function mapFirebaseError(error: unknown): string {
       return "auth.errors.weakPassword";
     case "auth/invalid-email":
       return "auth.errors.invalidEmail";
-    case "auth/popup-closed-by-user":
-    case "auth/cancelled-popup-request":
-      return "auth.errors.popupClosed";
     case "auth/too-many-requests":
       return "auth.errors.tooManyRequests";
+    case "auth/user-disabled":
+      return "auth.errors.userDisabled";
+    case "auth/account-exists-with-different-credential":
+      return "auth.errors.accountExistsDifferentProvider";
+    case "auth/network-request-failed":
+      return "auth.errors.networkError";
     default:
       return "auth.errors.generic";
   }
@@ -104,18 +109,53 @@ export function useCustomerAuth() {
     },
   });
 
-  const googleMutation = useMutation({
-    meta: { persist: false },
-    mutationKey: mutationKeys.customer.session(),
-    mutationFn: async () => {
-      try {
-        const { user } = await signInWithPopup(auth, googleProvider);
-        return startSession(user);
-      } catch (error) {
-        throw new Error(mapFirebaseError(error));
+  // Popup-first Google sign-in. Falls back to redirect only when the browser
+  // blocks popups (or popups are unsupported), since redirect requires authDomain
+  // to match the app origin to round-trip the credential. Returns the customer on
+  // popup success, or null when a redirect was started (completion happens on the
+  // page reload via checkGoogleRedirect) or the user dismissed the popup.
+  const loginGoogle = useCallback(async (): Promise<Customer | null> => {
+    try {
+      const { user } = await signInWithPopup(auth, googleProvider);
+      return startSession(user);
+    } catch (error) {
+      const code =
+        typeof error === "object" && error && "code" in error
+          ? String((error as { code: unknown }).code)
+          : "";
+      // Popup unavailable -> fall back to full-page redirect.
+      if (
+        code === "auth/popup-blocked" ||
+        code === "auth/operation-not-supported-in-this-environment"
+      ) {
+        sessionStorage.setItem("google-redirect-pending", "1");
+        await signInWithRedirect(auth, googleProvider);
+        return null;
       }
-    },
-  });
+      // User closed the popup or a newer attempt superseded it -> silent cancel.
+      if (
+        code === "auth/popup-closed-by-user" ||
+        code === "auth/cancelled-popup-request"
+      ) {
+        return null;
+      }
+      throw new Error(mapFirebaseError(error));
+    }
+  }, [startSession]);
+
+  // Completes a redirect-based sign-in after returning from the OAuth provider.
+  // Only runs when loginGoogle previously started a redirect (guarded by the flag).
+  const checkGoogleRedirect = useCallback(async (): Promise<Customer | null> => {
+    if (!sessionStorage.getItem("google-redirect-pending")) return null;
+    sessionStorage.removeItem("google-redirect-pending");
+    try {
+      const result = await getRedirectResult(auth);
+      if (!result) return null;
+      return startSession(result.user);
+    } catch (error) {
+      throw new Error(mapFirebaseError(error));
+    }
+  }, [startSession]);
 
   const logout = useCallback(async () => {
     try {
@@ -128,15 +168,13 @@ export function useCustomerAuth() {
     router.replace("/login");
   }, [clearCustomer, router]);
 
-  const pending =
-    loginMutation.isPending ||
-    registerMutation.isPending ||
-    googleMutation.isPending;
+  const pending = loginMutation.isPending || registerMutation.isPending;
 
   return {
     loginEmail: loginMutation.mutateAsync,
     registerEmail: registerMutation.mutateAsync,
-    loginGoogle: googleMutation.mutateAsync,
+    loginGoogle,
+    checkGoogleRedirect,
     startSession,
     logout,
     isSubmitting: pending,

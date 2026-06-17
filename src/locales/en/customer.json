@@ -170,8 +170,9 @@
       "locationDisabledPlaceholder": "Determined by QR Code",
       "locationLoading": "Loading locations...",
       "phoneLabel": "Phone Number",
-      "phonePlaceholder": "08xxxxxxxxxx",
+      "phonePlaceholder": "8xxxxxxxxxx",
       "phoneHelper": "To receive WhatsApp notifications on your car wash progress, please enter your phone number.",
+      "useProfilePhone": "Use number from my profile ({{phone}})",
       "ocrHint": "Correct if needed.",
       "errorCreate": "Failed to create booking. Please try again."
     },
@@ -354,12 +355,14 @@
     "phonePlaceholder": "081234567890",
     "phoneRequired": "Phone number is required",
     "errors": {
-      "invalidCredentials": "Incorrect email or password.",
-      "emailInUse": "An account with this email already exists.",
-      "weakPassword": "Password must be at least 6 characters.",
+      "invalidCredentials": "The email or password you entered is incorrect.",
+      "emailInUse": "An account with this email already exists. Try signing in.",
+      "weakPassword": "Password is too short — use at least 6 characters.",
       "invalidEmail": "Please enter a valid email address.",
-      "popupClosed": "Sign-in was cancelled.",
-      "tooManyRequests": "Too many attempts. Please try again later.",
+      "tooManyRequests": "Too many attempts. Wait a few minutes and try again.",
+      "userDisabled": "Your account has been disabled. Please contact our support team.",
+      "accountExistsDifferentProvider": "This email is already registered with a different sign-in method. Try signing in with email and password.",
+      "networkError": "Network connection issue. Check your internet and try again.",
       "generic": "Something went wrong. Please try again."
     }
   },

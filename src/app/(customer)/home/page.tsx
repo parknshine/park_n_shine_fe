@@ -276,7 +276,7 @@ export default function HomePage() {
               </span>
             </div>
             <div className='flex flex-col gap-2.5'>
-              {sites.slice(0, 2).map((site) => (
+              {sites.map((site) => (
                 <button
                   key={site.id}
                   type='button'

@@ -13,11 +13,12 @@ import { Button } from "@/components/ui/button";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { usePhotoUpload, usePublicSettings, usePublicSites } from "@/features/customer/hooks";
-import { isValidPhone } from "@/features/customer/utils/phone";
+import { isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
 import type { CustomerBooking } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
+import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -54,6 +55,8 @@ function WalkInCaptureContent() {
   const { clear: clearCapture, save: saveCapture } = useBookingCaptureStore();
   const setCaptureHasProgress = useBookingCaptureStore((s) => s.setCaptureHasProgress);
 
+  const profilePhone = useCustomerAuthStore((s) => s.customer?.phone ?? null);
+
   // Read store state once at mount via lazy initializer to avoid ref-during-render error
   const [savedSession] = useState(() => {
     const s = useBookingCaptureStore.getState();
@@ -65,6 +68,9 @@ function WalkInCaptureContent() {
   const [slotText, setSlotText] = useState(savedSession?.slotText ?? "");
   const [location, setLocation] = useState(savedSession?.location ?? siteIdParam ?? "");
   const [phone, setPhone] = useState(savedSession?.phone ?? "");
+  const [useProfilePhone, setUseProfilePhone] = useState(
+    !savedSession && !!profilePhone,
+  );
 
   const hasCreatedRef = useRef(false);
 
@@ -126,6 +132,8 @@ function WalkInCaptureContent() {
     if (text) startTransition(() => setSlotText(text));
   }, [slotUpload.media?.ocrText]);
 
+  const effectivePhone = useProfilePhone ? (profilePhone ?? "") : phone;
+
   const canContinue =
     !!bookingId &&
     plateUpload.status === "success" &&
@@ -133,7 +141,7 @@ function WalkInCaptureContent() {
     plateText.trim().length > 0 &&
     slotText.trim().length > 0 &&
     location.length > 0 &&
-    (phone === "" || isValidPhone(phone));
+    (effectivePhone === "" || isValidPhone(effectivePhone));
 
   function handleContinue() {
     if (!bookingId || !signedToken) return;
@@ -146,7 +154,7 @@ function WalkInCaptureContent() {
       plateText: plate,
       slotText: slot,
       location,
-      phone: phone.trim(),
+      phone: normalizePhone(effectivePhone),
       plateState: { progress: plateUpload.progress, status: plateUpload.status, error: plateUpload.error, media: plateUpload.media },
       slotState: { progress: slotUpload.progress, status: slotUpload.status, error: slotUpload.error, media: slotUpload.media },
     });
@@ -159,7 +167,7 @@ function WalkInCaptureContent() {
       loc: selectedSite?.name ?? loc ?? "",
       addr: selectedSite?.address ?? "",
       siteId: selectedSite?.id ?? "",
-      phone: phone.trim(),
+      phone: normalizePhone(effectivePhone),
       plate,
       slot,
     });
@@ -284,15 +292,33 @@ function WalkInCaptureContent() {
           <label htmlFor="phone" className="text-sm font-bold text-foreground">
             {t("booking.capture.phoneLabel")}
           </label>
+          {profilePhone && (
+            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                id="use-profile-phone"
+                checked={useProfilePhone}
+                onChange={(e) => {
+                  setUseProfilePhone(e.target.checked);
+                  if (!e.target.checked) setPhone("");
+                }}
+                className="h-4 w-4 rounded border-border accent-primary"
+              />
+              <span className="text-sm text-muted-foreground">
+                {t("booking.capture.useProfilePhone", { phone: profilePhone })}
+              </span>
+            </label>
+          )}
           <Input
             id="phone"
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
-            value={phone}
+            value={useProfilePhone ? profilePhone : phone}
             onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
             placeholder={t("booking.capture.phonePlaceholder")}
             className="h-10 rounded-lg border-border bg-[#eff8fe]"
+            readOnly={useProfilePhone}
           />
           {loyaltyEnabled && (
             <p className="text-xs text-muted-foreground">

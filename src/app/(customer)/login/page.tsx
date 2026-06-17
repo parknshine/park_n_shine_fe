@@ -74,7 +74,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation("customer");
-  const { loginEmail, registerEmail, loginGoogle, isSubmitting } =
+  const { loginEmail, registerEmail, loginGoogle, checkGoogleRedirect, isSubmitting } =
     useCustomerAuth();
   const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
 
@@ -93,6 +93,21 @@ function LoginForm() {
   useEffect(() => {
     if (isAuthenticated) router.replace(redirectTo);
   }, [isAuthenticated, redirectTo, router]);
+
+  useEffect(() => {
+    checkGoogleRedirect()
+      .then(async (customer) => {
+        if (!customer) return;
+        toast.success(t("auth.loginSuccess"));
+        await claimBookingIfNeeded();
+        router.replace(redirectTo);
+      })
+      .catch((err) => {
+        const key = err instanceof Error ? err.message : "auth.errors.generic";
+        toast.error(t(key));
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function claimBookingIfNeeded() {
     if (!claimToken) return;
@@ -134,7 +149,9 @@ function LoginForm() {
 
   async function handleGoogle() {
     try {
-      await loginGoogle();
+      const customer = await loginGoogle();
+      // null = redirect fallback in progress (page navigates away) or popup dismissed.
+      if (!customer) return;
       toast.success(t("auth.loginSuccess"));
       await claimBookingIfNeeded();
       router.replace(redirectTo);

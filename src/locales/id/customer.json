@@ -170,8 +170,9 @@
       "locationDisabledPlaceholder": "Ditentukan oleh QR Code",
       "locationLoading": "Memuat lokasi...",
       "phoneLabel": "Nomor HP",
-      "phonePlaceholder": "08xxxxxxxxxx",
+      "phonePlaceholder": "8xxxxxxxxxx",
       "phoneHelper": "Untuk menerima notifikasi progress cuci mobil via WhatsApp, masukkan nomor HP Anda.",
+      "useProfilePhone": "Gunakan nomor dari profil saya ({{phone}})",
       "ocrHint": "Perbaiki jika ada yang salah.",
       "errorCreate": "Gagal membuat booking. Silakan coba lagi."
     },
@@ -354,12 +355,14 @@
     "phonePlaceholder": "081234567890",
     "phoneRequired": "Nomor telepon wajib diisi",
     "errors": {
-      "invalidCredentials": "Email atau kata sandi salah.",
-      "emailInUse": "Akun dengan email ini sudah terdaftar.",
-      "weakPassword": "Kata sandi minimal 6 karakter.",
+      "invalidCredentials": "Email atau kata sandi yang kamu masukkan tidak tepat.",
+      "emailInUse": "Akun dengan email ini sudah terdaftar. Coba masuk.",
+      "weakPassword": "Kata sandi terlalu pendek — minimal 6 karakter.",
       "invalidEmail": "Masukkan alamat email yang valid.",
-      "popupClosed": "Proses masuk dibatalkan.",
-      "tooManyRequests": "Terlalu banyak percobaan. Coba lagi nanti.",
+      "tooManyRequests": "Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.",
+      "userDisabled": "Akun kamu telah dinonaktifkan. Hubungi tim dukungan kami.",
+      "accountExistsDifferentProvider": "Email ini sudah terdaftar dengan metode login lain. Coba masuk dengan email dan kata sandi.",
+      "networkError": "Koneksi internet bermasalah. Periksa jaringan kamu lalu coba lagi.",
       "generic": "Terjadi kesalahan. Silakan coba lagi."
     }
   },
