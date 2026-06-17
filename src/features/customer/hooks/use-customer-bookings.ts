@@ -37,5 +37,7 @@ export function useCustomerBookings(enabled = true) {
     getNextPageParam: (lastPage: BookingsPage) => lastPage.nextCursor ?? undefined,
     initialPageParam: undefined as string | undefined,
     enabled,
+    refetchOnMount: true,
+    staleTime: 0,
   });
 }

@@ -16,7 +16,6 @@ import { usePaymentAutoPoll } from "@/features/customer/hooks/use-payment-auto-p
 import { useRealtimeEvents } from "@/lib/use-realtime-events";
 import { TIP_PRESETS } from "@/features/customer/types/tip";
 import type { TipInstructions, TipPaymentMethod } from "@/features/customer/types/tip";
-import { useCustomerAuthStore } from "@/store/customer-auth-store";
 
 const TIP_METHOD_LABELS: Record<TipPaymentMethod, string> = {
   qris: "QRIS",
@@ -65,7 +64,7 @@ function TipPayStep({
           </p>
           <a
             href={instructions.deepLinkUrl}
-            className="inline-block w-full rounded-full bg-primary py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-block w-full rounded-full bg-primary py-3 text-sm font-semibold !text-white transition-opacity hover:opacity-90"
           >
             {t("rate.tip.pay.openBtn")} {providerName}
           </a>
@@ -203,7 +202,6 @@ export default function BookingRatePage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const router = useRouter();
-  const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
   const { t } = useTranslation("customer");
 
   const [score, setScore] = useState(0);
@@ -285,7 +283,7 @@ export default function BookingRatePage() {
         isPending={tipMutation.isPending}
         isError={tipMutation.isError}
         onPay={handleTipPay}
-        onSkip={() => router.push(isAuthenticated ? "/home" : "/")}
+        onSkip={goToThankYou}
       />
     );
   }
@@ -355,7 +353,7 @@ export default function BookingRatePage() {
 
       <button
         type="button"
-        onClick={() => router.replace("/")}
+        onClick={goToThankYou}
         className="w-full py-2 text-sm text-muted-foreground hover:text-foreground"
       >
         {t("action.skip", { ns: "common" })}

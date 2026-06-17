@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,7 @@ import { useCustomerAuth } from "@/features/customer/hooks";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import { useTranslation } from "@/i18n";
 import customerApi from "@/lib/axios-customer";
+import { queryKeys } from "@/lib/query-keys";
 
 const INPUT_CLASS =
   "h-[52px] rounded-[14px] border-[1.5px] border-[rgba(111,120,125,0.18)] bg-white/70 text-[15px] focus:border-[#1db1f1] focus:ring-[rgba(29,177,241,0.14)]";
@@ -77,6 +79,7 @@ function LoginForm() {
   const { loginEmail, registerEmail, loginGoogle, checkGoogleRedirect, isSubmitting } =
     useCustomerAuth();
   const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
+  const queryClient = useQueryClient();
 
   const redirectTo = searchParams.get("redirect") || "/home";
   const claimToken = searchParams.get("claim");
@@ -119,6 +122,7 @@ function LoginForm() {
       await customerApi.post("/v1/me/bookings/claim", {
         bookingToken: claimToken,
       });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.customer.bookings() });
     } catch {
       // best-effort
     }

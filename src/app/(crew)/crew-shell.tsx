@@ -86,6 +86,9 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
       }
       if (event.type === "job_assigned" || event.type === "new_job") {
         void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
+        if (event.type === "job_assigned") {
+          void queryClient.invalidateQueries({ queryKey: queryKeys.crew.nextJob() });
+        }
         const msg = event.type === "new_job"
           ? t("home.newJobQueued", { defaultValue: "New job available in queue!" })
           : t("home.newJobNotification", { defaultValue: "New job assigned to you!" });

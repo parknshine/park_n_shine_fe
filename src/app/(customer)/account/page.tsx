@@ -93,6 +93,7 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [localPhotoUrl, setLocalPhotoUrl] = useState<string | null>(null);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
+  const [failedPhotoUrl, setFailedPhotoUrl] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -132,8 +133,11 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (data) updateCustomer(data);
+      URL.revokeObjectURL(previewUrl);
+      setLocalPhotoUrl(null);
       toast.success(t("account.photoSuccess"));
     } catch {
+      URL.revokeObjectURL(previewUrl);
       setLocalPhotoUrl(null);
       toast.error(t("account.photoError"));
     } finally {
@@ -144,6 +148,7 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
 
   const displayPhotoUrl = localPhotoUrl ?? customer.photoUrl ?? null;
   const initials = getInitials(customer.name ?? null);
+
 
   const prefRows = [
     {
@@ -178,11 +183,12 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
               className='relative shrink-0 cursor-pointer'
               aria-label={t("account.changePhoto")}
             >
-              {displayPhotoUrl ? (
+              {displayPhotoUrl && failedPhotoUrl !== displayPhotoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={displayPhotoUrl}
                   alt={customer.name ?? ""}
+                  onError={() => setFailedPhotoUrl(displayPhotoUrl)}
                   className={cn(
                     "h-15.5 w-15.5 rounded-[20px] object-cover border-[2.5px] border-white/40 shadow-[0_10px_22px_rgba(0,0,0,0.22)] transition-opacity",
                     isUploadingPhoto && "opacity-60",

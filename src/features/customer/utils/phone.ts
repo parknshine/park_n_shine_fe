@@ -18,6 +18,7 @@ export function isValidPhone(phone: string): boolean {
  */
 export function normalizePhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
+  if (!digits) return "";
   if (digits.startsWith("62") || digits.startsWith("0")) return digits;
   // bare number like "81234..." — add leading 0 so backend maps it to "62..."
   return "0" + digits;
