@@ -48,8 +48,8 @@ export function useNextJob() {
 
   const rejectMutation = useMutation({
     meta: { persist: false },
-    mutationFn: async ({ bookingId, reason }: { bookingId: string; reason: RejectionReason }) => {
-      await api.post("/v1/crew/jobs/reject", { bookingId, reason });
+    mutationFn: async ({ bookingId, reason, note }: { bookingId: string; reason: RejectionReason; note?: string }) => {
+      await api.post("/v1/crew/jobs/reject", { bookingId, reason, note: note?.trim() || undefined });
     },
   });
 
@@ -78,8 +78,8 @@ export function useNextJob() {
     return claimMutation.mutateAsync();
   }
 
-  function rejectJob(bookingId: string, reason: RejectionReason) {
-    return rejectMutation.mutateAsync({ bookingId, reason });
+  function rejectJob(bookingId: string, reason: RejectionReason, note?: string) {
+    return rejectMutation.mutateAsync({ bookingId, reason, note });
   }
 
   function requestWait(bookingId: string, minutes: 10 | 30) {

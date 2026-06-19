@@ -146,7 +146,7 @@ export function BeforePhotosPage() {
             variant='default'
             className='h-14 w-full rounded-xl text-base font-bold'
             disabled={!allDone}
-            onClick={() => router.replace(`/crew/jobs/${jobId}/checklist`)}
+            onClick={() => router.replace(`/crew/jobs/${jobId}/wash`)}
             suffix={<ArrowRight className='h-5 w-5' />}
             aria-label={
               allDone

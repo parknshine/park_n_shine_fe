@@ -28,13 +28,23 @@
   "audit": {
     "title": "Audit Trail",
     "subtitle": "All admin actions — read-only, cannot be deleted",
-    "filterLabel": "Filter action",
+    "filterLabel": "Action",
+    "siteLabel": "Location",
+    "actorLabel": "Actor",
+    "fromLabel": "From",
+    "toLabel": "To",
     "loading": "Loading audit log...",
+    "applyFilter": "Apply",
+    "resetFilter": "Reset all",
+    "activeFilters": "active filters",
     "actions": {
       "all": "All actions",
       "status_override": "Override Status",
       "refund": "Refund",
-      "reassign": "Reassign"
+      "reassign": "Reassign",
+      "crew": {
+        "job_rejected": "Job Rejected by Crew"
+      }
     }
   },
   "reports": {
@@ -381,7 +391,8 @@
       "plate": "Plate",
       "action": "Action",
       "detail": "Detail",
-      "admin": "Admin"
+      "admin": "Admin",
+      "actor": "Actor"
     },
     "actions": {
       "refund": "Refund",

@@ -38,6 +38,15 @@ export default function WalkInCapturePage() {
 
 const WALKIN_FLOW_KEY = "walkin";
 
+function isSitePastCutoff(cutoffTime: string | null): boolean {
+  if (!cutoffTime) return false;
+  const now = new Date();
+  const [h, m] = cutoffTime.split(":").map(Number);
+  const cutoff = new Date(now);
+  cutoff.setHours(h, m, 0, 0);
+  return now > cutoff;
+}
+
 function WalkInCaptureContent() {
   const router = useRouter();
   const { t } = useTranslation("customer");
@@ -275,11 +284,18 @@ function WalkInCaptureContent() {
               />
             </SelectTrigger>
             <SelectContent>
-              {sites.map((site) => (
-                <SelectItem key={site.id} value={site.id}>
-                  {site.name}
-                </SelectItem>
-              ))}
+              {sites.map((site) => {
+                const unavailable = site.intakePaused || isSitePastCutoff(site.cutoffTime);
+                return (
+                  <SelectItem key={site.id} value={site.id} disabled={unavailable}>
+                    <span className={unavailable ? "text-muted-foreground" : undefined}>
+                      {site.name}
+                      {site.intakePaused && " (Sedang tutup)"}
+                      {!site.intakePaused && isSitePastCutoff(site.cutoffTime) && " (Sudah cutoff)"}
+                    </span>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">

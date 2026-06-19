@@ -157,12 +157,6 @@ export default function BookingStatusPage() {
           <p className='text-sm text-muted-foreground'>
             {t("status.thankYou")}
           </p>
-          <Link
-            href={`/booking/${bookingId}/rate?token=${token}`}
-            className='inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground! transition-opacity hover:opacity-90'
-          >
-            {t("status.rateButton")}
-          </Link>
         </div>
       )}
 

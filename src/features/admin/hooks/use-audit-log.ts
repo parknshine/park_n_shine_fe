@@ -9,6 +9,15 @@ interface AuditLogFilters {
   action?: string;
   from?: string;
   to?: string;
+  actor?: string;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+interface AuditLogResponse {
+  entries: AuditEntry[];
+  totalCount: number;
 }
 
 export function useAuditLog(siteId: string, filters: AuditLogFilters = {}) {
@@ -16,12 +25,16 @@ export function useAuditLog(siteId: string, filters: AuditLogFilters = {}) {
   if (filters.action && filters.action !== "all") params.set("action", filters.action);
   if (filters.from) params.set("from", filters.from);
   if (filters.to) params.set("to", filters.to);
+  if (filters.actor) params.set("actor", filters.actor);
+  if (filters.search) params.set("search", filters.search);
+  if (filters.page) params.set("page", String(filters.page));
+  if (filters.pageSize) params.set("pageSize", String(filters.pageSize));
 
   const query = useQuery({
-    enabled: !!siteId,
+    enabled: true,
     queryKey: [...queryKeys.admin.auditLog(siteId), filters],
     queryFn: async () => {
-      const response = await api.get<AuditEntry[]>(
+      const response = await api.get<AuditLogResponse>(
         `/v1/admin/sites/${siteId}/audit-log?${params.toString()}`
       );
       return response.data;
@@ -36,7 +49,8 @@ export function useAuditLog(siteId: string, filters: AuditLogFilters = {}) {
   }
 
   return {
-    entries: query.data ?? [],
+    entries: query.data?.entries ?? [],
+    totalCount: query.data?.totalCount ?? 0,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     error,

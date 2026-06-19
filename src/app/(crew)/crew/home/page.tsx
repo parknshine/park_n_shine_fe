@@ -117,9 +117,9 @@ export function CrewHomePage() {
     setPreview(null);
   }
 
-  async function handleReject(reason: RejectionReason) {
+  async function handleReject(reason: RejectionReason, note?: string) {
     if (!preview) return;
-    await rejectJob(preview.id, reason);
+    await rejectJob(preview.id, reason, note);
     setPreview(null);
     void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
   }

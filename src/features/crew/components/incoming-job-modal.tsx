@@ -21,7 +21,7 @@ interface IncomingJobModalProps {
   readonly preview: JobPreview;
   readonly onAccept: () => Promise<void>;
   readonly onWait: (minutes: 10 | 30) => Promise<void>;
-  readonly onReject: (reason: RejectionReason) => Promise<void>;
+  readonly onReject: (reason: RejectionReason, note?: string) => Promise<void>;
   readonly onClose: () => void;
 }
 
@@ -36,6 +36,7 @@ export function IncomingJobModal({
   const { t } = useTranslation("crew");
   const [step, setStep] = useState<Step>("choose");
   const [selectedReason, setSelectedReason] = useState<RejectionReason | null>(null);
+  const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState<Submitting>(null);
 
   async function handleAccept() {
@@ -51,7 +52,7 @@ export function IncomingJobModal({
   async function handleReject() {
     if (!selectedReason) return;
     setSubmitting("reject");
-    try { await onReject(selectedReason); } finally { setSubmitting(null); }
+    try { await onReject(selectedReason, note); } finally { setSubmitting(null); }
   }
 
   const isSubmitting = submitting !== null;
@@ -204,6 +205,20 @@ export function IncomingJobModal({
                 </button>
               ))}
             </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                {t("job.incomingModal.noteLabel")}
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder={t("job.incomingModal.notePlaceholder")}
+                maxLength={300}
+                rows={2}
+                disabled={isSubmitting}
+                className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+              />
+            </div>
             <button
               className="w-full rounded-lg border-2 border-destructive/30 bg-destructive/5 p-3 text-sm font-semibold text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
               onClick={handleReject}
@@ -213,7 +228,7 @@ export function IncomingJobModal({
             </button>
             <button
               className="w-full rounded-lg border border-border p-3 text-center text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
-              onClick={() => { setStep("choose"); setSelectedReason(null); }}
+              onClick={() => { setStep("choose"); setSelectedReason(null); setNote(""); }}
               disabled={isSubmitting}
             >
               ← Back

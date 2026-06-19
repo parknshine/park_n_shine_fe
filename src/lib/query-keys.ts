@@ -16,7 +16,7 @@ export const queryKeys = {
     crew: () => ["admin", "crew"] as const,
     shifts: (siteId: string) => ["admin", "sites", siteId, "shifts"] as const,
     testimonials: () => ["admin", "testimonials"] as const,
-    tipCrewSummary: (period: string) => ["admin", "tips", "crew-summary", period] as const,
+    tipCrewSummary: (period: string, siteId: string) => ["admin", "tips", "crew-summary", period, siteId] as const,
     tipList: (period: string, page: number, pageSize: number, search: string, siteId: string) =>
       ["admin", "tips", "list", period, page, pageSize, search, siteId] as const,
     disbursements: () => ["admin", "disbursements"] as const,

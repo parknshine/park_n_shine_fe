@@ -103,6 +103,8 @@
       "rejectDesc": "Tolak job ini dengan alasan.",
       "rejectConfirm": "Konfirmasi Penolakan",
       "reasonLabel": "Pilih alasan",
+      "noteLabel": "Catatan tambahan (opsional)",
+      "notePlaceholder": "Jelaskan situasinya…",
       "reasons": {
         "VEHICLE_TOO_DIRTY": "Kendaraan terlalu kotor / berat",
         "PARKING_TOO_TIGHT": "Parkir terlalu sempit",
@@ -175,6 +177,15 @@
       "clean_rims": "Bersihkan velg",
       "dry_finish": "Keringkan & finishing"
     }
+  },
+  "wash": {
+    "title": "Sedang Mencuci",
+    "subtitle": "Cuci kendaraan, lalu tekan tombol di bawah saat sudah selesai.",
+    "plate": "Plat",
+    "slot": "Slot",
+    "hint": "Customer dapat melihat progres cuci secara real time.",
+    "doneButton": "Sudah Cuci",
+    "error": "Gagal memperbarui status cuci. Coba lagi."
   },
   "finish": {
     "title": "Selesai",

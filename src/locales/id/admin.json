@@ -28,13 +28,23 @@
   "audit": {
     "title": "Audit Trail",
     "subtitle": "Semua aksi admin — read-only, tidak dapat dihapus",
-    "filterLabel": "Filter aksi",
+    "filterLabel": "Aksi",
+    "siteLabel": "Lokasi",
+    "actorLabel": "Actor",
+    "fromLabel": "Dari",
+    "toLabel": "Sampai",
     "loading": "Memuat audit log...",
+    "applyFilter": "Terapkan",
+    "resetFilter": "Reset semua",
+    "activeFilters": "filter aktif",
     "actions": {
       "all": "Semua aksi",
       "status_override": "Override Status",
       "refund": "Refund",
-      "reassign": "Reassign"
+      "reassign": "Reassign",
+      "crew": {
+        "job_rejected": "Job Ditolak Crew"
+      }
     }
   },
   "reports": {
@@ -381,7 +391,8 @@
       "plate": "Plate",
       "action": "Action",
       "detail": "Detail",
-      "admin": "Admin"
+      "admin": "Admin",
+      "actor": "Aktor"
     },
     "actions": {
       "refund": "Refund",

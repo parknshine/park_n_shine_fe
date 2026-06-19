@@ -103,6 +103,8 @@
       "rejectDesc": "Decline this job with a reason.",
       "rejectConfirm": "Confirm Rejection",
       "reasonLabel": "Select a reason",
+      "noteLabel": "Additional note (optional)",
+      "notePlaceholder": "Describe the situation…",
       "reasons": {
         "VEHICLE_TOO_DIRTY": "Vehicle too dirty / heavy soiling",
         "PARKING_TOO_TIGHT": "Parking too tight",
@@ -175,6 +177,15 @@
       "clean_rims": "Clean rims",
       "dry_finish": "Dry & finish"
     }
+  },
+  "wash": {
+    "title": "Washing in Progress",
+    "subtitle": "Wash the vehicle, then tap the button below when done.",
+    "plate": "Plate",
+    "slot": "Slot",
+    "hint": "Customer can see the wash progress in real time.",
+    "doneButton": "Done Washing",
+    "error": "Failed to update wash status. Please try again."
   },
   "finish": {
     "title": "Finish",

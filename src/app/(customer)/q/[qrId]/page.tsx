@@ -19,21 +19,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const SAFE_QR_ID_RE = /^[a-zA-Z0-9_-]{1,128}$/;
 
-async function getQrResolution(
-  qrId: string
-): Promise<SiteQrResolution | null> {
-  if (!UUID_RE.test(qrId)) return null;
+async function getQrResolution(qrId: string): Promise<SiteQrResolution | null> {
+  if (!SAFE_QR_ID_RE.test(qrId)) return null;
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "/api";
   try {
+    console.log("Fetching QR resolution for ID:", qrId);
     const res = await fetch(`${baseUrl}/v1/qr/${qrId}`, {
       cache: "no-store",
     });
-    if (!res.ok) return null;
-    const body = await res.json() as { data: SiteQrResolution };
+    if (!res.ok) {
+      console.log("QR resolution fetch failed with status:", res.status);
+      return null;
+    }
+    const body = (await res.json()) as { data: SiteQrResolution };
+    console.log("QR resolution fetched successfully:", body.data);
     return body.data ?? null;
-  } catch {
+  } catch (error) {
+    console.error("Error fetching QR resolution:", error);
     return null;
   }
 }
@@ -41,22 +45,29 @@ async function getQrResolution(
 export default async function LandingPage({ params }: Props) {
   const { qrId } = await params;
   const resolution = await getQrResolution(qrId);
-
+  console.log("resolution", resolution);
   if (!resolution) {
     return (
-      <AppShell surface="customer">
-        <QrErrorState reason="invalid" />
+      <AppShell surface='customer'>
+        <QrErrorState reason='invalid' />
       </AppShell>
     );
   }
 
   const now = new Date();
-  const isPastCutoff = resolution.cutoffTime
+  const isPastCutoff = resolution.cutoffTime && resolution.timezone
     ? (() => {
         const [cutoffHour, cutoffMinute] = resolution.cutoffTime.split(":").map(Number);
-        const cutoff = new Date(now);
-        cutoff.setHours(cutoffHour, cutoffMinute, 0, 0);
-        return now > cutoff;
+        const formatter = new Intl.DateTimeFormat("en-US", {
+          timeZone: resolution.timezone,
+          hour: "numeric",
+          minute: "numeric",
+          hour12: false,
+        });
+        const parts = formatter.formatToParts(now);
+        const currentHour = Number.parseInt(parts.find((p) => p.type === "hour")?.value ?? "0", 10);
+        const currentMinute = Number.parseInt(parts.find((p) => p.type === "minute")?.value ?? "0", 10);
+        return currentHour * 60 + currentMinute >= cutoffHour! * 60 + cutoffMinute!;
       })()
     : false;
 
@@ -67,8 +78,8 @@ export default async function LandingPage({ params }: Props) {
       : null;
 
   return (
-    <AppShell surface="customer">
-      <div className="space-y-8 pb-10">
+    <AppShell surface='customer'>
+      <div className='space-y-8 pb-10'>
         <LandingHero siteName={resolution.siteName} />
         <HowItWorksPanel />
         {blockingReason ? (

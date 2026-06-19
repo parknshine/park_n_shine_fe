@@ -5,6 +5,7 @@ export { useBookingActions } from "./use-booking-actions";
 export { useAdminReport } from "./use-admin-report";
 export { useAdminReportBookings } from "./use-admin-report-bookings";
 export { useAuditLog } from "./use-audit-log";
+export { useAuditActors } from "./use-audit-actors";
 export { useAdminSettings } from "./use-admin-settings";
 export { useAdminSites, useAdminSite } from "./use-admin-sites";
 export { useAdminQr } from "./use-admin-qr";

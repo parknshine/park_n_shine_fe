@@ -1,4 +1,6 @@
 export { useCompleteJob } from "./use-complete-job";
+export { useStartWash } from "./use-start-wash";
+export { useDoneWashing } from "./use-done-washing";
 export { useCrewJob } from "./use-crew-job";
 export { useCrewSession } from "./use-crew-session";
 export { useJobQueue } from "./use-job-queue";

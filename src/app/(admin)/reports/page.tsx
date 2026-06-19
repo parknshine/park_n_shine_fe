@@ -2,14 +2,13 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Download, X, ArrowRight, Star, Wallet } from "lucide-react";
+import { Download, X, ArrowRight, Star, Wallet, SlidersHorizontal, Calendar, Building2, Check } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { KpiSummary, SiteSelector } from "@/features/admin/components";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { KpiSummary } from "@/features/admin/components";
 import { useAdminReport, useSiteSelection } from "@/features/admin/hooks";
 import { useAdminTipCrewSummary } from "@/features/admin/hooks/use-admin-tips";
 import type { AdminReport, ReportCrewPerformance } from "@/features/admin/types";
@@ -128,15 +127,17 @@ export default function ReportsPage() {
   const [siteId, setSiteId] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [appliedSiteId, setAppliedSiteId] = useState("");
   const [appliedFrom, setAppliedFrom] = useState("");
   const [appliedTo, setAppliedTo] = useState("");
 
   const tipPeriod = deriveTipPeriod(appliedFrom);
 
-  const { report, isLoading } = useAdminReport(siteId || undefined, appliedFrom, appliedTo);
-  const { crewSummary } = useAdminTipCrewSummary(tipPeriod);
+  const { report, isLoading } = useAdminReport(appliedSiteId || undefined, appliedFrom, appliedTo);
+  const { crewSummary } = useAdminTipCrewSummary(tipPeriod, appliedSiteId);
 
-  const hasFilter = appliedFrom !== "" || appliedTo !== "";
+  const activeFilterCount = [appliedSiteId, appliedFrom, appliedTo].filter(Boolean).length;
+  const hasFilter = activeFilterCount > 0;
 
   const statusEntries = useMemo(() => Object.entries(report?.bookings.byStatus ?? {}), [report?.bookings.byStatus]);
 
@@ -299,13 +300,16 @@ export default function ReportsPage() {
   );
 
   function handleApply() {
+    setAppliedSiteId(siteId);
     setAppliedFrom(from);
     setAppliedTo(to);
   }
 
   function handleClear() {
+    setSiteId("");
     setFrom("");
     setTo("");
+    setAppliedSiteId("");
     setAppliedFrom("");
     setAppliedTo("");
   }
@@ -324,59 +328,150 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-foreground">{t("reports.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("reports.subtitle")}</p>
-        </div>
-        <SiteSelector sites={sites} value={siteId} onChange={setSiteId} allowAll />
+      <div>
+        <h1 className="text-xl font-bold text-foreground">{t("reports.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("reports.subtitle")}</p>
       </div>
 
       <ReportTabs />
 
-      {/* Date controls */}
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="space-y-1">
-          <Label htmlFor="from-date">{t("reports.fromLabel")}</Label>
-          <Input
-            id="from-date"
-            type="date"
-            value={from}
-            max={to}
-            onChange={(e) => setFrom(e.target.value)}
-            className="w-40"
-          />
+      {/* Filter panel */}
+      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        <div className="flex items-center justify-between border-b border-border bg-muted/40 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-semibold uppercase tracking-widest text-foreground">
+              Filters
+            </span>
+            {activeFilterCount > 0 && (
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+                {activeFilterCount}
+              </span>
+            )}
+          </div>
+          {hasFilter && (
+            <button
+              onClick={handleClear}
+              className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
+            >
+              <X className="h-3 w-3" /> Reset all
+            </button>
+          )}
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="to-date">{t("reports.toLabel")}</Label>
-          <Input
-            id="to-date"
-            type="date"
-            value={to}
-            min={from}
-            max={toISODate(new Date())}
-            onChange={(e) => setTo(e.target.value)}
-            className="w-40"
-          />
+
+        <div className="divide-y divide-border">
+          <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+            {/* Date range */}
+            <div className="space-y-2 px-4 py-3">
+              <div className="flex items-center gap-1.5">
+                <Calendar className="h-3 w-3 text-muted-foreground" />
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  {t("reports.fromLabel")} — {t("reports.toLabel")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="date"
+                  value={from}
+                  max={to || toISODate(new Date())}
+                  onChange={(e) => setFrom(e.target.value)}
+                  className={cn(
+                    "h-8 min-w-0 flex-1 rounded-lg border px-2.5 text-xs bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring",
+                    from ? "border-primary/40 text-foreground" : "border-border text-muted-foreground",
+                  )}
+                />
+                <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground" />
+                <input
+                  type="date"
+                  value={to}
+                  min={from}
+                  max={toISODate(new Date())}
+                  onChange={(e) => setTo(e.target.value)}
+                  className={cn(
+                    "h-8 min-w-0 flex-1 rounded-lg border px-2.5 text-xs bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring",
+                    to ? "border-primary/40 text-foreground" : "border-border text-muted-foreground",
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Mall */}
+            <div className="space-y-2 px-4 py-3">
+              <div className="flex items-center gap-1.5">
+                <Building2 className="h-3 w-3 text-muted-foreground" />
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  Mall
+                </span>
+              </div>
+              <Select
+                value={siteId || "__all__"}
+                onValueChange={(v) => setSiteId(v === "__all__" ? "" : v)}
+              >
+                <SelectTrigger className={cn("h-8 w-full text-xs", siteId ? "border-primary/40 font-medium" : "")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">Semua Mall</SelectItem>
+                  {sites.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Apply + Export */}
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+            <Button
+              variant="outline"
+              disabled={!report || isLoading}
+              onClick={() => report && exportToCSV(report, appliedFrom, appliedTo)}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {t("reports.exportCsv")}
+            </Button>
+            <Button onClick={handleApply} disabled={isLoading} className="gap-2 px-5">
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  {t("reports.loading")}
+                </span>
+              ) : (
+                <>
+                  {t("reports.apply")}
+                  {activeFilterCount > 0 && (
+                    <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-white/20 px-1 text-[10px] font-bold">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                  <Check className="h-3.5 w-3.5" />
+                </>
+              )}
+            </Button>
+          </div>
         </div>
-        <Button onClick={handleApply} disabled={isLoading}>
-          {isLoading ? t("reports.loading") : t("reports.apply")}
-        </Button>
-        {hasFilter && (
-          <Button variant="ghost" onClick={handleClear} disabled={isLoading}>
-            <X className="mr-1.5 h-3.5 w-3.5" />
-            {t("reports.clearFilter")}
-          </Button>
-        )}
-        <Button
-          variant="outline"
-          disabled={!report || isLoading}
-          onClick={() => report && exportToCSV(report, appliedFrom, appliedTo)}
-        >
-          <Download className="mr-2 h-4 w-4" />
-          {t("reports.exportCsv")}
-        </Button>
       </div>
+
+      {/* Active filter chips */}
+      {hasFilter && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Aktif:</span>
+          {appliedSiteId && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+              <Building2 className="h-2.5 w-2.5" />
+              {sites.find((s) => s.id === appliedSiteId)?.name ?? appliedSiteId}
+            </span>
+          )}
+          {(appliedFrom || appliedTo) && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+              <Calendar className="h-2.5 w-2.5" />
+              {appliedFrom || "…"} → {appliedTo || "…"}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Car wash KPI cards */}
       {report && <KpiSummary report={report} />}

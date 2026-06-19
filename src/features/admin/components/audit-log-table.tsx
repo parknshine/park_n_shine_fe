@@ -3,15 +3,30 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import type { AuditEntry } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
-import { formatAuditDetail } from "@/features/admin/utils/format-audit-detail";
+import { formatAuditDetail, formatAuditAction } from "@/features/admin/utils/format-audit-detail";
 import { DataTable } from "@/components/ui/data-table";
 
 interface AuditLogTableProps {
   entries: AuditEntry[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
   onRowClick?: (entry: AuditEntry) => void;
 }
 
-export function AuditLogTable({ entries, onRowClick }: Readonly<AuditLogTableProps>) {
+const PAGE_SIZE_OPTIONS = [25, 50, 100];
+
+export function AuditLogTable({
+  entries,
+  totalCount,
+  page,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+  onRowClick,
+}: Readonly<AuditLogTableProps>) {
   const { t } = useTranslation("admin");
 
   const columns: ColumnDef<AuditEntry>[] = [
@@ -42,7 +57,7 @@ export function AuditLogTable({ entries, onRowClick }: Readonly<AuditLogTablePro
       accessorKey: "action",
       header: t("auditTable.columns.action"),
       cell: ({ row }) => (
-        <span>{t(`auditTable.actions.${row.original.action}`)}</span>
+        <span>{formatAuditAction(row.original.action)}</span>
       ),
     },
     {
@@ -56,7 +71,7 @@ export function AuditLogTable({ entries, onRowClick }: Readonly<AuditLogTablePro
     },
     {
       accessorKey: "adminEmail",
-      header: t("auditTable.columns.admin"),
+      header: t("auditTable.columns.actor"),
       cell: ({ row }) => (
         <span className="text-muted-foreground">{row.original.adminEmail}</span>
       ),
@@ -68,6 +83,13 @@ export function AuditLogTable({ entries, onRowClick }: Readonly<AuditLogTablePro
       columns={columns}
       data={entries}
       emptyMessage={t("auditTable.empty")}
+      totalCount={totalCount}
+      page={page}
+      pageSize={pageSize}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
+      pageSizeOptions={PAGE_SIZE_OPTIONS}
+      resultsLabel={(start, end, total) => `${start}–${end} of ${total}`}
       onRowClick={onRowClick}
     />
   );

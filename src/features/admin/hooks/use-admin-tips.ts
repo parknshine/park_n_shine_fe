@@ -3,13 +3,13 @@ import api from "@/lib/axios-admin";
 import { queryKeys, mutationKeys } from "@/lib/query-keys";
 import type { CrewSummaryResponse, DisbursementEvent, TipListResponse } from "@/features/admin/types/tip";
 
-export function useAdminTipCrewSummary(period: string) {
+export function useAdminTipCrewSummary(period: string, siteId = "") {
   const { data, isLoading, error } = useQuery({
-    queryKey: queryKeys.admin.tipCrewSummary(period),
+    queryKey: queryKeys.admin.tipCrewSummary(period, siteId),
     queryFn: async () => {
-      const res = await api.get<CrewSummaryResponse>(
-        `/v1/admin/tips/crew-summary?period=${period}`
-      );
+      const params = new URLSearchParams({ period });
+      if (siteId) params.set("siteId", siteId);
+      const res = await api.get<CrewSummaryResponse>(`/v1/admin/tips/crew-summary?${params}`);
       return res.data;
     },
     enabled: !!period,
@@ -72,7 +72,7 @@ export function useCreateDisbursement() {
     },
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.admin.tipCrewSummary(variables.period),
+        queryKey: ["admin", "tips", "crew-summary", variables.period],
       });
       void queryClient.invalidateQueries({
         queryKey: ["admin", "tips", "list", variables.period],

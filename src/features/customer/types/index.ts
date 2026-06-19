@@ -38,7 +38,8 @@ export interface SiteQrResolution {
   qrId: string;
   siteName: string;
   intakePaused: boolean;
-  cutoffTime: string;
+  cutoffTime: string | null;
+  timezone: string;
   rotatedAt?: string | null;
 }
 

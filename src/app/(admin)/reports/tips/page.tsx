@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, X, Calendar, Wallet, Users, TrendingUp } from "lucide-react";
+import { Search, X, Calendar, Building2, SlidersHorizontal } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { Input } from "@/components/ui/input";
@@ -11,13 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useAdminTipList, useAdminTipCrewSummary } from "@/features/admin/hooks/use-admin-tips";
 import { useSiteSelection } from "@/features/admin/hooks";
 import type { AdminTipRow } from "@/features/admin/types/tip";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SiteSelector } from "@/features/admin/components";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
@@ -79,7 +73,6 @@ export default function TipsReportPage() {
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
-  const [appliedSiteId, setAppliedSiteId] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
@@ -90,10 +83,10 @@ export default function TipsReportPage() {
     page,
     pageSize,
     appliedSearch,
-    appliedSiteId,
+    selectedSiteId,
   );
 
-  const { crewSummary, isLoading: isCrewSummaryLoading } = useAdminTipCrewSummary(period);
+  const { crewSummary, isLoading: isCrewSummaryLoading } = useAdminTipCrewSummary(period, selectedSiteId);
 
   const STATUS_STYLES: Record<AdminTipRow["status"], string> = {
     PAID: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
@@ -181,14 +174,11 @@ export default function TipsReportPage() {
   function applySearch() {
     setPage(1);
     setAppliedSearch(searchInput.trim());
-    setAppliedSiteId(selectedSiteId);
   }
 
   function clearSearch() {
     setSearchInput("");
     setAppliedSearch("");
-    setSelectedSiteId("");
-    setAppliedSiteId("");
     setPage(1);
   }
 
@@ -197,79 +187,9 @@ export default function TipsReportPage() {
       if (e.key === "Enter") applySearch();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchInput, selectedSiteId],
+    [searchInput],
   );
 
-  const toolbar = (
-    <>
-      <div className='flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 h-9'>
-        <Calendar className='h-3.5 w-3.5 shrink-0 text-muted-foreground' />
-        <input
-          type='month'
-          value={period}
-          max={toCurrentMonth()}
-          onChange={(e) => {
-            setPeriod(e.target.value);
-            setPage(1);
-          }}
-          className='bg-transparent text-sm text-foreground focus:outline-none'
-        />
-      </div>
-
-      <Select
-        value={selectedSiteId || "__all__"}
-        onValueChange={(v) => setSelectedSiteId(v === "__all__" ? "" : v)}
-      >
-        <SelectTrigger
-          className={cn(
-            "h-9 w-44 text-xs",
-            selectedSiteId ? "border-primary/50 font-medium" : "",
-          )}
-        >
-          <SelectValue placeholder={t("reports.tips.filter.allMalls")} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='__all__'>
-            {t("reports.tips.filter.allMalls")}
-          </SelectItem>
-          {sites.map((s) => (
-            <SelectItem key={s.id} value={s.id}>
-              {s.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <div className='flex gap-1.5'>
-        <div className='relative'>
-          <Input
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={t("reports.tips.filter.searchPlaceholder")}
-            prefix={<Search />}
-            className={cn("w-56", appliedSearch ? "border-primary/50" : "")}
-          />
-          {searchInput && (
-            <button
-              type='button'
-              onClick={clearSearch}
-              className='absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
-            >
-              <X className='h-3.5 w-3.5' />
-            </button>
-          )}
-        </div>
-        <button
-          type='button'
-          onClick={applySearch}
-          className='h-9 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90'
-        >
-          {t("reports.tips.filter.search")}
-        </button>
-      </div>
-    </>
-  );
 
   return (
     <div className='space-y-6'>
@@ -284,35 +204,136 @@ export default function TipsReportPage() {
 
       <ReportTabs />
 
+      {/* Filter panel */}
+      {(() => {
+        const activeFilterCount = (selectedSiteId ? 1 : 0) + (appliedSearch ? 1 : 0);
+        const hasFilter = activeFilterCount > 0 || !!searchInput;
+        return (
+          <div className='overflow-hidden rounded-xl border border-border bg-card shadow-sm'>
+            <div className='flex items-center justify-between border-b border-border bg-muted/40 px-4 py-3'>
+              <div className='flex items-center gap-2'>
+                <SlidersHorizontal className='h-3.5 w-3.5 text-primary' />
+                <span className='text-xs font-semibold uppercase tracking-widest text-foreground'>
+                  Filters
+                </span>
+                {activeFilterCount > 0 && (
+                  <span className='flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white'>
+                    {activeFilterCount}
+                  </span>
+                )}
+              </div>
+              {hasFilter && (
+                <button
+                  type='button'
+                  onClick={() => {
+                    setSelectedSiteId("");
+                    setSearchInput("");
+                    setAppliedSearch("");
+                    setPage(1);
+                  }}
+                  className='flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-destructive'
+                >
+                  <X className='h-3 w-3' /> Reset all
+                </button>
+              )}
+            </div>
+
+            <div className='divide-y divide-border'>
+              <div className='grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0'>
+                <div className='space-y-2 px-4 py-3'>
+                  <div className='flex items-center gap-1.5'>
+                    <Calendar className='h-3 w-3 text-muted-foreground' />
+                    <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                      Periode
+                    </span>
+                  </div>
+                  <input
+                    type='month'
+                    value={period}
+                    max={toCurrentMonth()}
+                    onChange={(e) => { setPeriod(e.target.value); setPage(1); }}
+                    className='h-8 w-full rounded-lg border border-border bg-background px-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-ring'
+                  />
+                </div>
+
+                <div className='space-y-2 px-4 py-3'>
+                  <div className='flex items-center gap-1.5'>
+                    <Building2 className='h-3 w-3 text-muted-foreground' />
+                    <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                      Lokasi
+                    </span>
+                  </div>
+                  <SiteSelector
+                    sites={sites}
+                    value={selectedSiteId}
+                    onChange={(v) => { setSelectedSiteId(v); setPage(1); }}
+                    allowAll
+                    className={cn("h-8 w-full text-xs", selectedSiteId ? "border-primary/40 font-medium" : "")}
+                  />
+                </div>
+
+                <div className='space-y-2 px-4 py-3'>
+                  <div className='flex items-center gap-1.5'>
+                    <Search className='h-3 w-3 text-muted-foreground' />
+                    <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                      Cari
+                    </span>
+                  </div>
+                  <div className='relative'>
+                    <Input
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder={t("reports.tips.filter.searchPlaceholder")}
+                      prefix={<Search />}
+                      className={cn("h-8 w-full text-xs", appliedSearch ? "border-primary/50" : "")}
+                    />
+                    {searchInput && (
+                      <button
+                        type='button'
+                        onClick={clearSearch}
+                        className='absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                      >
+                        <X className='h-3.5 w-3.5' />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className='flex items-center justify-end px-4 py-3'>
+                <button
+                  type='button'
+                  onClick={applySearch}
+                  className='h-8 rounded-lg bg-primary px-4 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90'
+                >
+                  {t("reports.tips.filter.search")}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Summary KPI cards */}
-      <dl className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-950/20">
-          <dt className="flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-400">
-            <Wallet className="h-3.5 w-3.5" />
-            Total Tip Diterima
-          </dt>
-          <dd className="mt-2 text-2xl font-semibold text-amber-800 dark:text-amber-300">
+      <dl className='grid gap-3 sm:grid-cols-3'>
+        <div className='rounded-lg border border-border p-4'>
+          <dt className='text-xs font-medium text-muted-foreground'>Total Tip Diterima</dt>
+          <dd className='mt-2 text-2xl font-semibold text-foreground'>
             {isCrewSummaryLoading ? "—" : formatRupiah(crewSummary?.summary.totalPaid ?? 0)}
           </dd>
-          <p className="mt-1 text-xs text-amber-600/70 dark:text-amber-500/60">Terpisah dari revenue car wash</p>
         </div>
-        <div className="rounded-lg border border-border p-4">
-          <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <TrendingUp className="h-3.5 w-3.5" />
-            Total Sudah Dicairkan
-          </dt>
-          <dd className="mt-2 text-2xl font-semibold text-foreground">
+        <div className='rounded-lg border border-border p-4'>
+          <dt className='text-xs font-medium text-muted-foreground'>Total Sudah Dicairkan</dt>
+          <dd className='mt-2 text-2xl font-semibold text-foreground'>
             {isCrewSummaryLoading ? "—" : formatRupiah(crewSummary?.summary.totalDisbursed ?? 0)}
           </dd>
         </div>
-        <div className="rounded-lg border border-border p-4">
-          <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <Users className="h-3.5 w-3.5" />
-            Crew Menerima Tip
-          </dt>
-          <dd className="mt-2 text-2xl font-semibold text-foreground">
+        <div className='rounded-lg border border-border p-4'>
+          <dt className='text-xs font-medium text-muted-foreground'>Crew Menerima Tip</dt>
+          <dd className='mt-2 text-2xl font-semibold text-foreground'>
             {isCrewSummaryLoading ? "—" : (crewSummary?.summary.crewCount ?? 0)}
-            <span className="ml-1 text-sm font-normal text-muted-foreground">orang</span>
+            <span className='ml-1 text-sm font-normal text-muted-foreground'>orang</span>
           </dd>
         </div>
       </dl>
@@ -367,7 +388,6 @@ export default function TipsReportPage() {
                 )
               : t("reports.tips.noData")
           }
-          toolbar={toolbar}
           totalCount={tipList?.total ?? 0}
           page={page}
           pageSize={pageSize}

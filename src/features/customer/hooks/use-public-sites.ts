@@ -8,6 +8,8 @@ export interface PublicSite {
   id: string;
   name: string;
   address: string;
+  intakePaused: boolean;
+  cutoffTime: string | null;
 }
 
 export function usePublicSites() {
