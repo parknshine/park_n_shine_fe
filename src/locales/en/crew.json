@@ -204,6 +204,10 @@
       "retrying": "Retrying…"
     }
   },
+  "stale": {
+    "bannerTitle": "Job Needs Attention",
+    "bannerDesc": "This job has exceeded its estimated time. Please wait for a supervisor to reassign or extend the time."
+  },
   "needsHelp": {
     "button": "Needs Help",
     "modalTitle": "Request Help",

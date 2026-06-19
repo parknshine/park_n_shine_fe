@@ -372,6 +372,12 @@
     "resetPasswordSuccess": "Password berhasil diubah. Silakan masuk.",
     "resetPasswordInvalidLink": "Link reset ini tidak valid atau sudah kadaluarsa.",
     "resetPasswordRequestNew": "Kirim ulang email reset",
+    "verifyEmailTitle": "Verifikasi Email",
+    "verifyEmailVerifying": "Memverifikasi email kamu...",
+    "verifyEmailSuccess": "Email kamu berhasil diverifikasi.",
+    "verifyEmailContinue": "Lanjut ke Login",
+    "verifyEmailInvalid": "Link verifikasi ini tidak valid atau sudah kadaluarsa.",
+    "verifyEmailBackToLogin": "Kembali ke Login",
     "errors": {
       "invalidCredentials": "Email atau kata sandi yang kamu masukkan tidak tepat.",
       "emailInUse": "Akun dengan email ini sudah terdaftar. Coba masuk.",

@@ -204,6 +204,10 @@
       "retrying": "Mencoba ulang…"
     }
   },
+  "stale": {
+    "bannerTitle": "Job Perlu Perhatian",
+    "bannerDesc": "Job ini telah melewati estimasi waktu. Mohon tunggu supervisor untuk menugaskan ulang atau memperpanjang waktu."
+  },
   "needsHelp": {
     "button": "Butuh Bantuan",
     "modalTitle": "Minta Bantuan",

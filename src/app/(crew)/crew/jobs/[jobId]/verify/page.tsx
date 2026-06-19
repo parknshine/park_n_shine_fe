@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   ArrowRight,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCrewJob, useVerifyPlate } from "@/features/crew/hooks";
+import { queryKeys } from "@/lib/query-keys";
 import { useTranslation } from "@/i18n";
 
 // ---------------------------------------------------------------------------
@@ -20,6 +22,7 @@ import { useTranslation } from "@/i18n";
 export function VerifyPlatePage() {
   const { jobId } = useParams<{ jobId: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { t } = useTranslation("crew");
 
   const { job, isLoading: isJobLoading } = useCrewJob(jobId);
@@ -131,7 +134,10 @@ export function VerifyPlatePage() {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => router.replace("/crew/home")}
+              onClick={() => {
+                queryClient.removeQueries({ queryKey: queryKeys.crew.nextJob() });
+                router.replace("/crew/home?noResume=true");
+              }}
             >
               {t("verify.backToQueue")}
             </Button>

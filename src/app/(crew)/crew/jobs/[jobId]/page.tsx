@@ -215,10 +215,27 @@ export function CrewJobDetailPage() {
             </p>
           </div>
         )}
+
+        {job.status === "STALE" && (
+          <div className="rounded-xl border border-orange-300 bg-orange-50 p-4 dark:border-orange-700 dark:bg-orange-950/40">
+            <div className="mb-1 flex items-center gap-2">
+              <HelpCircle
+                className="h-4 w-4 text-orange-600 dark:text-orange-400"
+                aria-hidden="true"
+              />
+              <span className="font-semibold text-orange-700 dark:text-orange-300">
+                {t("stale.bannerTitle")}
+              </span>
+            </div>
+            <p className="text-sm text-orange-700 dark:text-orange-300">
+              {t("stale.bannerDesc")}
+            </p>
+          </div>
+        )}
       </main>
 
       {/* ── Sticky CTA ──────────────────────────────────────────────────── */}
-      {job.status !== "NEEDS_HELP" && (
+      {job.status !== "NEEDS_HELP" && job.status !== "STALE" && (
       <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
         <div className="mx-auto max-w-md">
           {job.status === "ASSIGNED" && (

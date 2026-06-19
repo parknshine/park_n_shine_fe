@@ -19,12 +19,15 @@ import { queryKeys } from "@/lib/query-keys";
 function getResumeTarget(job: CrewJob): string {
   const base = `/crew/jobs/${job.id}`;
   if (job.status === "ASSIGNED") return base;
+  if (job.status === "LOCATED") return base;
   if (job.status === "IN_PROGRESS") {
     const crewKinds = ["front", "back", "left", "right"];
     const hasAllPhotos = crewKinds.every((k) => job.media.some((m) => m.kind === k));
     if (!hasAllPhotos) return `${base}/before-photos`;
     return `${base}/wash`;
   }
+  if (job.status === "NEEDS_HELP") return base;
+  if (job.status === "STALE") return base;
   return base;
 }
 

@@ -372,6 +372,12 @@
     "resetPasswordSuccess": "Password updated. Please sign in.",
     "resetPasswordInvalidLink": "This reset link is invalid or has expired.",
     "resetPasswordRequestNew": "Send a new reset email",
+    "verifyEmailTitle": "Verify Email",
+    "verifyEmailVerifying": "Verifying your email...",
+    "verifyEmailSuccess": "Your email has been verified successfully.",
+    "verifyEmailContinue": "Continue to Login",
+    "verifyEmailInvalid": "This verification link is invalid or has expired.",
+    "verifyEmailBackToLogin": "Back to Login",
     "errors": {
       "invalidCredentials": "The email or password you entered is incorrect.",
       "emailInUse": "An account with this email already exists. Try signing in.",
