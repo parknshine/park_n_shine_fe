@@ -120,8 +120,7 @@ export function useCustomerAuth() {
     mutationFn: async (email: string) => {
       try {
         await sendPasswordResetEmail(auth, email, {
-          url: `${globalThis.location.origin}/reset-password`,
-          handleCodeInApp: true,
+          url: `${globalThis.location.origin}/login`,
         });
       } catch (error) {
         throw new Error(mapFirebaseError(error));
