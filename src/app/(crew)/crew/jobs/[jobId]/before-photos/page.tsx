@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { OfflineBanner } from "@/components/shared";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { usePhotoUpload } from "@/features/customer/hooks/use-photo-upload";
+import { useCrewJob } from "@/features/crew/hooks";
 import crewApi from "@/lib/axios-crew";
 import type { MediaKind } from "@/types/media";
 import { useTranslation } from "@/i18n";
@@ -60,11 +61,12 @@ export function BeforePhotosPage() {
   };
 
   const uploadUrl = `/v1/crew/jobs/${jobId}/media`;
+  const { job } = useCrewJob(jobId);
 
-  const frontUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
-  const backUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
-  const leftUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
-  const rightUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi });
+  const frontUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_front") ?? null });
+  const backUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_back") ?? null });
+  const leftUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_left") ?? null });
+  const rightUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_right") ?? null });
 
   const uploadMap: Record<string, ReturnType<typeof usePhotoUpload>> = {
     before_front: frontUpload,
@@ -124,6 +126,7 @@ export function BeforePhotosPage() {
                 kind={angle.kind}
                 state={upload}
                 labels={uploadLabels}
+                showDownload={true}
                 onSelect={(file, kind) => {
                   upload.uploadPhoto({ file, kind });
                 }}

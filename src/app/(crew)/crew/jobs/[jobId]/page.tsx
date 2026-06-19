@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowRight, ChevronLeft, HelpCircle, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { useCrewJob } from "@/features/crew/hooks";
 import { EtaCountdown, NeedsHelpModal } from "@/features/crew";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
 import { queryKeys } from "@/lib/query-keys";
-import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
 // ---------------------------------------------------------------------------
@@ -274,10 +273,10 @@ export function CrewJobDetailPage() {
                 size="lg"
                 variant="default"
                 className="h-14 w-full rounded-xl text-base font-bold"
-                onClick={() => router.push(`/crew/jobs/${jobId}/checklist`)}
+                onClick={() => router.push(`/crew/jobs/${jobId}/wash`)}
                 suffix={<ArrowRight className="h-5 w-5" />}
               >
-                {t("job.viewChecklist")}
+                {t("job.continueWash")}
               </Button>
             </div>
           )}

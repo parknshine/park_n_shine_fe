@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   Camera,
   CheckCircle,
+  Download,
   Grid3X3,
   ImageIcon,
   Pencil,
@@ -39,6 +40,8 @@ interface PhotoUploadFieldProps {
   ocrLabel?: string;
   ocrHint?: string;
   ocrPlaceholder?: string;
+  /** When true, shows a download button after a successful upload. */
+  showDownload?: boolean;
 }
 
 export function PhotoUploadField({
@@ -55,6 +58,7 @@ export function PhotoUploadField({
   ocrLabel,
   ocrHint,
   ocrPlaceholder,
+  showDownload,
 }: Readonly<PhotoUploadFieldProps>) {
   const { t } = useTranslation("customer");
   const defaults = {
@@ -73,7 +77,12 @@ export function PhotoUploadField({
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const prevUrlRef = useRef<string | null>(null);
-  const displayUrl = state.status === "idle" ? null : (previewUrl ?? state.media?.url ?? null);
+  let displayUrl: string | null = null;
+  if (state.status !== "idle") {
+    displayUrl = state.status === "success"
+      ? (state.media?.url ?? previewUrl ?? null)
+      : (previewUrl ?? state.media?.url ?? null);
+  }
 
   useEffect(() => {
     if (state.status === "idle" && prevUrlRef.current) {
@@ -105,6 +114,19 @@ export function PhotoUploadField({
 
   const showOcr =
     state.status === "success" && ocrValue !== undefined && onOcrChange;
+
+  function handleDownload() {
+    const url = state.media?.url;
+    if (!url) return;
+    const filename = `park-n-shine_${kind}.jpg`;
+    const proxyUrl = `/api/crew/photo-download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+    const a = document.createElement("a");
+    a.href = proxyUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 
   return (
     <div className='rounded-2xl border border-border bg-white p-4 shadow-sm space-y-3'>
@@ -220,6 +242,19 @@ export function PhotoUploadField({
             </div>
           )}
         </div>
+      )}
+
+      {/* Download button */}
+      {showDownload && state.status === "success" && state.media?.url && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="w-full rounded-full"
+          onClick={handleDownload}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Download
+        </Button>
       )}
 
       {/* Progress bar */}

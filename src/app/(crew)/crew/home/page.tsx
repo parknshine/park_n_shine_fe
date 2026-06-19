@@ -23,8 +23,7 @@ function getResumeTarget(job: CrewJob): string {
     const crewKinds = ["front", "back", "left", "right"];
     const hasAllPhotos = crewKinds.every((k) => job.media.some((m) => m.kind === k));
     if (!hasAllPhotos) return `${base}/before-photos`;
-    const allDone = job.checklist.length > 0 && job.checklist.every((i) => !!i.completedAt);
-    return allDone ? `${base}/finish` : `${base}/checklist`;
+    return `${base}/wash`;
   }
   return base;
 }

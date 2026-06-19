@@ -334,6 +334,7 @@
     "error": "Gagal reassign. Coba lagi.",
     "crewBusy": "Crew ini sedang mengerjakan job lain. Pilih crew yang berbeda.",
     "busyBadge": "Sibuk",
+    "staleBadge": "Perlu Perhatian",
     "cancel": "Batal",
     "saving": "Menyimpan...",
     "confirm": "Konfirmasi"

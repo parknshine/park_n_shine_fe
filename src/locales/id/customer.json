@@ -354,6 +354,24 @@
     "phoneLabel": "Nomor Telepon",
     "phonePlaceholder": "081234567890",
     "phoneRequired": "Nomor telepon wajib diisi",
+    "forgotPassword": "Lupa password?",
+    "forgotPasswordTitle": "Reset Password",
+    "forgotPasswordSubtitle": "Masukkan email kamu dan kami akan mengirim link untuk reset password.",
+    "forgotPasswordEmailLabel": "Email",
+    "forgotPasswordSubmit": "Kirim Link Reset",
+    "forgotPasswordSending": "Mengirim...",
+    "forgotPasswordSent": "Jika email tersebut terdaftar, link reset telah dikirim. Cek inbox kamu.",
+    "forgotPasswordBackToLogin": "Kembali ke Login",
+    "resetPasswordTitle": "Password Baru",
+    "resetPasswordSubtitle": "Masukkan password baru untuk akunmu.",
+    "resetPasswordNewPassword": "Password Baru",
+    "resetPasswordConfirm": "Konfirmasi Password",
+    "resetPasswordPasswordMismatch": "Password tidak sama.",
+    "resetPasswordSubmit": "Simpan Password",
+    "resetPasswordSaving": "Menyimpan...",
+    "resetPasswordSuccess": "Password berhasil diubah. Silakan masuk.",
+    "resetPasswordInvalidLink": "Link reset ini tidak valid atau sudah kadaluarsa.",
+    "resetPasswordRequestNew": "Kirim ulang email reset",
     "errors": {
       "invalidCredentials": "Email atau kata sandi yang kamu masukkan tidak tepat.",
       "emailInUse": "Akun dengan email ini sudah terdaftar. Coba masuk.",
@@ -363,7 +381,9 @@
       "userDisabled": "Akun kamu telah dinonaktifkan. Hubungi tim dukungan kami.",
       "accountExistsDifferentProvider": "Email ini sudah terdaftar dengan metode login lain. Coba masuk dengan email dan kata sandi.",
       "networkError": "Koneksi internet bermasalah. Periksa jaringan kamu lalu coba lagi.",
-      "generic": "Terjadi kesalahan. Silakan coba lagi."
+      "generic": "Terjadi kesalahan. Silakan coba lagi.",
+      "invalidActionCode": "Link reset tidak valid.",
+      "expiredActionCode": "Link reset sudah kadaluarsa. Minta link baru."
     }
   },
   "bookNowModal": {

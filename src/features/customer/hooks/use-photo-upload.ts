@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import type { AxiosInstance } from "axios";
@@ -24,6 +24,8 @@ interface UsePhotoUploadOptions {
   apiClient?: AxiosInstance;
   /** Seed the upload state (e.g. when restoring from a saved session after back-navigation). */
   initialState?: UploadState;
+  /** Already-uploaded media from the server. Seeds state to `success` on first load after refresh. */
+  serverMedia?: BookingMedia | null;
 }
 
 interface UploadPhotoOptions {
@@ -100,12 +102,21 @@ export function usePhotoUpload({
   uploadUrl,
   apiClient,
   initialState,
+  serverMedia,
 }: UsePhotoUploadOptions) {
   const httpClient = apiClient ?? api;
   const queryClient = useQueryClient();
   const [state, setState] = useState<UploadState>(
     initialState ?? { progress: 0, status: "idle", error: null, media: null }
   );
+
+  const hasSeeded = useRef(false);
+  useEffect(() => {
+    if (!hasSeeded.current && serverMedia) {
+      hasSeeded.current = true;
+      setState({ progress: 100, status: "success", error: null, media: serverMedia });
+    }
+  }, [serverMedia]);
 
   const endpoint = uploadUrl ?? `/v1/bookings/${bookingId}/media`;
   const mutKey = bookingId

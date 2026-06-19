@@ -100,7 +100,16 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
       ) {
         queryClient.setQueryData<CrewJob | null>(
           queryKeys.crew.job(event.bookingId as string),
-          (prev) => prev ? { ...prev, etaEndsAt: event.etaEndsAt as string } : prev,
+          (prev) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              etaEndsAt: event.etaEndsAt as string,
+              ...(event.type === "time_extension_approved" && event.status
+                ? { status: event.status as CrewJob["status"] }
+                : {}),
+            };
+          },
         );
       }
       if (event.type === "time_extension_rejected" && event.bookingId) {
@@ -175,7 +184,11 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
 
           <div className="flex items-center gap-1">
             {activeEtaEndsAt && (
-              <EtaCountdown etaEndsAt={activeEtaEndsAt} compact />
+              <EtaCountdown
+                etaEndsAt={activeEtaEndsAt}
+                compact
+                onExpire={() => setActiveEtaEndsAt(null)}
+              />
             )}
             <LanguageSwitcher />
 

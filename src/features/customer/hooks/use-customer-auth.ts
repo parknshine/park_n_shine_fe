@@ -9,6 +9,8 @@ import {
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
+  sendPasswordResetEmail,
+  confirmPasswordReset,
   type User as FirebaseUser,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
@@ -51,6 +53,10 @@ function mapFirebaseError(error: unknown): string {
       return "auth.errors.accountExistsDifferentProvider";
     case "auth/network-request-failed":
       return "auth.errors.networkError";
+    case "auth/invalid-action-code":
+      return "auth.errors.invalidActionCode";
+    case "auth/expired-action-code":
+      return "auth.errors.expiredActionCode";
     default:
       return "auth.errors.generic";
   }
@@ -103,6 +109,34 @@ export function useCustomerAuth() {
           password
         );
         return startSession(user);
+      } catch (error) {
+        throw new Error(mapFirebaseError(error));
+      }
+    },
+  });
+
+  const sendPasswordResetMutation = useMutation({
+    meta: { persist: false },
+    mutationFn: async (email: string) => {
+      try {
+        await sendPasswordResetEmail(auth, email);
+      } catch (error) {
+        throw new Error(mapFirebaseError(error));
+      }
+    },
+  });
+
+  const resetPasswordMutation = useMutation({
+    meta: { persist: false },
+    mutationFn: async ({
+      oobCode,
+      newPassword,
+    }: {
+      oobCode: string;
+      newPassword: string;
+    }) => {
+      try {
+        await confirmPasswordReset(auth, oobCode, newPassword);
       } catch (error) {
         throw new Error(mapFirebaseError(error));
       }
@@ -168,15 +202,19 @@ export function useCustomerAuth() {
     router.replace("/login");
   }, [clearCustomer, router]);
 
-  const pending = loginMutation.isPending || registerMutation.isPending;
-
   return {
     loginEmail: loginMutation.mutateAsync,
     registerEmail: registerMutation.mutateAsync,
+    sendPasswordReset: sendPasswordResetMutation.mutateAsync,
+    resetPassword: resetPasswordMutation.mutateAsync,
     loginGoogle,
     checkGoogleRedirect,
     startSession,
     logout,
-    isSubmitting: pending,
+    isSubmitting:
+      loginMutation.isPending ||
+      registerMutation.isPending ||
+      sendPasswordResetMutation.isPending ||
+      resetPasswordMutation.isPending,
   };
 }

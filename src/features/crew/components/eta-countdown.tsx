@@ -16,14 +16,17 @@ export function formatCountdown(ms: number): string {
 interface EtaCountdownProps {
   etaEndsAt: string;
   compact?: boolean;
+  onExpire?: () => void;
 }
 
-export function EtaCountdown({ etaEndsAt, compact = false }: EtaCountdownProps) {
+export function EtaCountdown({ etaEndsAt, compact = false, onExpire }: Readonly<EtaCountdownProps>) {
   const { t } = useTranslation("crew");
   const [remaining, setRemaining] = useState<number>(() =>
     Math.max(0, new Date(etaEndsAt).getTime() - Date.now())
   );
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const onExpireRef = useRef(onExpire);
+  onExpireRef.current = onExpire;
 
   useEffect(() => {
     function tick() {
@@ -32,6 +35,7 @@ export function EtaCountdown({ etaEndsAt, compact = false }: EtaCountdownProps) 
       if (ms <= 0 && intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
+        onExpireRef.current?.();
       }
     }
     intervalRef.current = setInterval(tick, 1000);

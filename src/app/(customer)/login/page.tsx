@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -230,6 +231,18 @@ function LoginForm() {
               </button>
             </div>
           </div>
+
+          {/* Forgot password — sign-in mode only */}
+          {!isRegister && (
+            <div className='flex justify-end -mt-2'>
+              <Link
+                href='/forgot-password'
+                className='text-[13px] text-primary hover:underline'
+              >
+                {t("auth.forgotPassword")}
+              </Link>
+            </div>
+          )}
 
           {/* Phone (register only) */}
           {isRegister && (

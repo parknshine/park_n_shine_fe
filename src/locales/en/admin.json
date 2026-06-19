@@ -334,6 +334,7 @@
     "error": "Failed to reassign. Please try again.",
     "crewBusy": "This crew member is currently busy with another job. Please select a different crew member.",
     "busyBadge": "Busy",
+    "staleBadge": "Needs Attention",
     "cancel": "Cancel",
     "saving": "Saving...",
     "confirm": "Confirm"

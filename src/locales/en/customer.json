@@ -354,6 +354,24 @@
     "phoneLabel": "Phone Number",
     "phonePlaceholder": "081234567890",
     "phoneRequired": "Phone number is required",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Reset Password",
+    "forgotPasswordSubtitle": "Enter your email and we'll send you a reset link.",
+    "forgotPasswordEmailLabel": "Email",
+    "forgotPasswordSubmit": "Send Reset Link",
+    "forgotPasswordSending": "Sending...",
+    "forgotPasswordSent": "If that email is registered, a reset link has been sent. Check your inbox.",
+    "forgotPasswordBackToLogin": "Back to Login",
+    "resetPasswordTitle": "New Password",
+    "resetPasswordSubtitle": "Enter a new password for your account.",
+    "resetPasswordNewPassword": "New Password",
+    "resetPasswordConfirm": "Confirm Password",
+    "resetPasswordPasswordMismatch": "Passwords do not match.",
+    "resetPasswordSubmit": "Save Password",
+    "resetPasswordSaving": "Saving...",
+    "resetPasswordSuccess": "Password updated. Please sign in.",
+    "resetPasswordInvalidLink": "This reset link is invalid or has expired.",
+    "resetPasswordRequestNew": "Send a new reset email",
     "errors": {
       "invalidCredentials": "The email or password you entered is incorrect.",
       "emailInUse": "An account with this email already exists. Try signing in.",
@@ -363,7 +381,9 @@
       "userDisabled": "Your account has been disabled. Please contact our support team.",
       "accountExistsDifferentProvider": "This email is already registered with a different sign-in method. Try signing in with email and password.",
       "networkError": "Network connection issue. Check your internet and try again.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "invalidActionCode": "This reset link is invalid.",
+      "expiredActionCode": "This reset link has expired. Request a new one."
     }
   },
   "bookNowModal": {

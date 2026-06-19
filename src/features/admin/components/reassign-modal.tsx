@@ -80,11 +80,16 @@ export function ReassignModal({
                 <SelectValue placeholder={t("reassignModal.crewPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                {crewOptions.map((c) => (
-                  <SelectItem key={c.id} value={c.id} disabled={c.isBusy}>
-                    {c.name}{c.isBusy ? ` (${t("reassignModal.busyBadge")})` : ""}
-                  </SelectItem>
-                ))}
+                {crewOptions.map((c) => {
+                  let badge = "";
+                  if (c.busyStatus === "STALE") badge = ` (${t("reassignModal.staleBadge")})`;
+                  else if (c.isBusy) badge = ` (${t("reassignModal.busyBadge")})`;
+                  return (
+                    <SelectItem key={c.id} value={c.id} disabled={c.isBusy}>
+                      {c.name}{badge}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>

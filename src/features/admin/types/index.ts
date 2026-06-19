@@ -209,6 +209,7 @@ export interface AdminCrewMember {
   active: boolean;
   createdAt: string;
   isBusy: boolean;
+  busyStatus: string | null;
 }
 
 export interface AdminShiftCrewMember {
