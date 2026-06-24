@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, BellOff, BriefcaseBusiness, CheckCircle2, Clock, Inbox, Loader2, Star, Wallet } from "lucide-react";
+import { ArrowRight, Bell, BellOff, BriefcaseBusiness, CheckCircle2, Clock, Inbox, Loader2, Star, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useJobQueue, useNextJob, useCrewMonthlyStats } from "@/features/crew/hooks";
@@ -130,6 +130,32 @@ export function CrewHomePage() {
   const claimBusy = isLoading || isPreviewing;
 
   function renderMainContent() {
+    // Crew still holds an active (claimed) job — let them resume it instead of
+    // hiding it. The auto-redirect above is suppressed by noResume, so without
+    // this card the job would be unreachable from home.
+    if (job) {
+      return (
+        <div className="w-full space-y-4">
+          <div className="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 p-5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+              {t("home.activeJobLabel", { defaultValue: "Job aktif kamu" })}
+            </p>
+            <p className="font-mono text-2xl font-bold tracking-widest text-foreground">
+              {job.plateText}
+            </p>
+            <Button
+              size="lg"
+              className="h-14 w-full rounded-xl text-base font-bold"
+              suffix={<ArrowRight className="h-5 w-5" />}
+              onClick={() => router.replace(getResumeTarget(job))}
+            >
+              {t("home.resumeJob", { defaultValue: "Lanjutkan job" })}
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
     if (hasNoJob && !hasJob && !isWaiting) {
       return (
         <EmptyState

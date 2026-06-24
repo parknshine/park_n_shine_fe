@@ -49,7 +49,8 @@ export function CrewJobDetailPage() {
   const [helpModalOpen, setHelpModalOpen] = useState(false);
 
   function goBackToQueue() {
-    queryClient.removeQueries({ queryKey: queryKeys.crew.nextJob() });
+    // Keep the active job cached so home can offer to resume it; noResume only
+    // suppresses the auto-redirect, not the resume card.
     router.replace("/crew/home?noResume=true");
   }
 
