@@ -38,12 +38,14 @@ function PaymentMethodContent() {
   const { charge, isCharging, error } = useChargePayment(bookingId, token);
   const [loadingMethod, setLoadingMethod] = useState<string | null>(null);
 
-  // If booking is already charged (user navigated back from pay page), go directly
+  // If booking is already charged (user navigated back from pay page), go directly —
+  // unless they explicitly chose to change method (change=1), which must keep them here.
+  const isChanging = searchParams.get("change") === "1";
   useEffect(() => {
-    if (booking?.paymentInstructions) {
+    if (!isChanging && booking?.paymentInstructions) {
       router.replace(`/booking/${bookingId}/pay?token=${token}`);
     }
-  }, [booking?.paymentInstructions, bookingId, token, router]);
+  }, [isChanging, booking?.paymentInstructions, bookingId, token, router]);
 
   function handleSelect(code: string) {
     if (isCharging) return;

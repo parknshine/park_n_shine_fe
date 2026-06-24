@@ -340,7 +340,7 @@ export default function PayPage() {
   }, [booking, bookingId, token, router]);
 
   function handleChangeMethod() {
-    router.push(`/booking/${bookingId}/payment-method?token=${token}`);
+    router.push(`/booking/${bookingId}/payment-method?token=${token}&change=1`);
   }
 
   return (
