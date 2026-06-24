@@ -48,6 +48,7 @@
     "assignedAt": "Assigned",
     "timeRemaining": "Time Remaining",
     "timeExpired": "Time's up",
+    "timeExpiredHint": "Time's up. Request a time extension or ask for help to continue.",
     "timeAriaLabel": "Time remaining: {{time}}",
     "vehiclePhotos": "Vehicle Photos",
     "vehiclePhotosAriaLabel": "Customer vehicle photos",

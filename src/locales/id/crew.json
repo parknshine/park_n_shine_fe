@@ -48,6 +48,7 @@
     "assignedAt": "Ditugaskan",
     "timeRemaining": "Sisa Waktu",
     "timeExpired": "Waktu habis",
+    "timeExpiredHint": "Waktu habis. Minta tambah waktu atau bantuan untuk lanjut.",
     "timeAriaLabel": "Sisa waktu: {{time}}",
     "vehiclePhotos": "Foto Kendaraan",
     "vehiclePhotosAriaLabel": "Foto kendaraan pelanggan",

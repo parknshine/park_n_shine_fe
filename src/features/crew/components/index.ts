@@ -4,3 +4,4 @@ export { WashChecklist } from "./wash-checklist";
 export { JobStaleModal } from "./job-stale-modal";
 export { IncomingJobModal } from "./incoming-job-modal";
 export { NeedsHelpModal } from "./needs-help-modal";
+export { TimeExtensionControl } from "./time-extension-control";

@@ -158,6 +158,10 @@ export const API_ERROR_MESSAGES = {
     "id-ID": "Booking sudah kadaluarsa.",
     "en-US": "This booking has expired.",
   },
+  [API_ERROR_CODES.BOOKING_ETA_EXPIRED]: {
+    "id-ID": "Waktu pengerjaan habis. Minta tambah waktu untuk lanjut.",
+    "en-US": "Job time has expired. Request a time extension to continue.",
+  },
   [API_ERROR_CODES.BOOKING_INVALID_STATUS_TRANSITION]: {
     "id-ID": "Perubahan status ini tidak diizinkan.",
     "en-US": "This status transition is not allowed.",

@@ -17,6 +17,7 @@ export const API_ERROR_CODES = {
   BEFORE_PHOTOS_REQUIRED: "BEFORE_PHOTOS_REQUIRED",
   BOOKING_CANCELLED: "BOOKING_CANCELLED",
   BOOKING_CUTOFF_PASSED: "BOOKING_CUTOFF_PASSED",
+  BOOKING_ETA_EXPIRED: "BOOKING_ETA_EXPIRED",
   BOOKING_EXPIRED: "BOOKING_EXPIRED",
   BOOKING_NOT_FOUND: "BOOKING_NOT_FOUND",
   BOOKING_TOKEN_INVALID: "BOOKING_TOKEN_INVALID",
@@ -163,6 +164,14 @@ export const API_ERROR_DEFINITIONS: Record<ApiErrorCode, ApiErrorDefinition> = {
     requirement: "FR-04",
     severity: "warning",
     surface: "customer",
+  },
+  BOOKING_ETA_EXPIRED: {
+    defaultHttpStatus: 422,
+    isRetryable: false,
+    messageKey: "errors.crew.etaExpired",
+    requirement: "FR-06",
+    severity: "warning",
+    surface: "crew",
   },
   BOOKING_ALREADY_CONFIRMED: {
     defaultHttpStatus: 409,

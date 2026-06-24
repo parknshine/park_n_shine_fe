@@ -6,8 +6,8 @@ import { ArrowRight, ChevronLeft, HelpCircle, Loader2, MapPin } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCrewJob } from "@/features/crew/hooks";
-import { EtaCountdown, NeedsHelpModal } from "@/features/crew";
+import { useCrewJob, useEtaExpired } from "@/features/crew/hooks";
+import { EtaCountdown, NeedsHelpModal, TimeExtensionControl } from "@/features/crew";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
 import { queryKeys } from "@/lib/query-keys";
 import { useTranslation } from "@/i18n";
@@ -44,6 +44,7 @@ export function CrewJobDetailPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { job, isLoading, error } = useCrewJob(jobId);
+  const expired = useEtaExpired(job?.etaEndsAt);
   const { t } = useTranslation("crew");
 
   const [helpModalOpen, setHelpModalOpen] = useState(false);
@@ -239,12 +240,18 @@ export function CrewJobDetailPage() {
       {job.status !== "NEEDS_HELP" && job.status !== "STALE" && (
       <div className="fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3">
         <div className="mx-auto max-w-md">
+          {expired && (
+            <p className="mb-2 text-center text-xs font-medium text-red-500">
+              {t("job.timeExpiredHint")}
+            </p>
+          )}
           {job.status === "ASSIGNED" && (
             <div className="flex flex-col gap-2">
               <Button
                 size="lg"
                 variant="default"
                 className="h-14 w-full rounded-xl text-base font-bold"
+                disabled={expired}
                 onClick={() => router.push(`/crew/jobs/${jobId}/verify`)}
                 suffix={<ArrowRight className="h-5 w-5" />}
                 aria-label={t("job.verifyAriaLabel")}
@@ -268,6 +275,7 @@ export function CrewJobDetailPage() {
                 size="lg"
                 variant="default"
                 className="h-14 w-full rounded-xl text-base font-bold"
+                disabled={expired}
                 onClick={() => router.push(`/crew/jobs/${jobId}/before-photos`)}
                 suffix={<ArrowRight className="h-5 w-5" />}
                 aria-label={t("job.continueToPhotos")}
@@ -291,11 +299,17 @@ export function CrewJobDetailPage() {
                 size="lg"
                 variant="default"
                 className="h-14 w-full rounded-xl text-base font-bold"
+                disabled={expired}
                 onClick={() => router.push(`/crew/jobs/${jobId}/wash`)}
                 suffix={<ArrowRight className="h-5 w-5" />}
               >
                 {t("job.continueWash")}
               </Button>
+            </div>
+          )}
+          {expired && (
+            <div className="mt-2">
+              <TimeExtensionControl jobId={jobId} etaEndsAt={job.etaEndsAt} />
             </div>
           )}
         </div>
