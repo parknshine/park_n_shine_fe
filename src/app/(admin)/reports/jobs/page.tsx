@@ -363,10 +363,6 @@ function JobDetailModal({
     },
   });
 
-  useEffect(() => {
-    if (!open) { setLightboxIndex(null); setConfirmRefund(false); }
-  }, [open]);
-
   if (!row) return null;
 
   const canRefund = !!row.paidAt && row.refundedAmount === 0;
@@ -388,8 +384,9 @@ function JobDetailModal({
         open={open}
         onOpenChange={(v) => {
           if (!v) {
-            if (lightboxIndex !== null) setLightboxIndex(null);
-            else onClose();
+            setLightboxIndex(null);
+            setConfirmRefund(false);
+            onClose();
           }
         }}
       >
