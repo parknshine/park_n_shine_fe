@@ -24,27 +24,43 @@ export function KpiSummary({ report }: KpiSummaryProps) {
 
   const closed = report.bookings.byStatus["CLOSED"] ?? 0;
   const cancelled = (report.bookings.byStatus["CANCELLED"] ?? 0) + (report.bookings.byStatus["EXPIRED"] ?? 0);
-
-  const metrics = [
-    { labelKey: "reports.kpi.totalBookings", value: report.bookings.total },
-    { labelKey: "reports.kpi.closed", value: closed },
-    { labelKey: "reports.kpi.revenue", value: formatRupiah(report.revenue.totalGross) },
-    { labelKey: "reports.kpi.avgTurnaround", value: formatTurnaround(report.avgTurnaroundSeconds) },
-    { labelKey: "reports.kpi.cancelled", value: cancelled },
-  ];
+  const netPaid = report.revenue.totalPaid - report.revenue.totalRefunded;
 
   return (
-    <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-      {metrics.map((metric) => (
-        <div key={metric.labelKey} className="rounded-lg border border-border p-4">
-          <dt className="text-xs font-medium text-muted-foreground">
-            {t(metric.labelKey)}
-          </dt>
-          <dd className="mt-2 text-2xl font-semibold text-foreground">
-            {metric.value}
-          </dd>
+    <div className="space-y-3">
+      <dl className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-lg border border-border p-4">
+          <dt className="text-xs font-medium text-muted-foreground">{t("reports.kpi.paid")}</dt>
+          <dd className="mt-2 text-2xl font-semibold text-foreground">{formatRupiah(netPaid)}</dd>
+          {report.revenue.totalRefunded > 0 && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              {formatRupiah(report.revenue.totalPaid)} &minus; <span className="text-red-500">{formatRupiah(report.revenue.totalRefunded)}</span> {t("reports.kpi.refunded").toLowerCase()}
+            </p>
+          )}
         </div>
-      ))}
-    </dl>
+        <div className="rounded-lg border border-border p-4">
+          <dt className="text-xs font-medium text-muted-foreground">{t("reports.kpi.revenue")}</dt>
+          <dd className="mt-2 text-2xl font-semibold text-foreground">{formatRupiah(report.revenue.totalGross)}</dd>
+        </div>
+        <div className="rounded-lg border border-border p-4">
+          <dt className="text-xs font-medium text-muted-foreground">{t("reports.kpi.avgTurnaround")}</dt>
+          <dd className="mt-2 text-2xl font-semibold text-foreground">{formatTurnaround(report.avgTurnaroundSeconds)}</dd>
+        </div>
+      </dl>
+      <dl className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-lg border border-border p-4">
+          <dt className="text-xs font-medium text-muted-foreground">{t("reports.kpi.totalBookings")}</dt>
+          <dd className="mt-2 text-2xl font-semibold text-foreground">{report.bookings.total}</dd>
+        </div>
+        <div className="rounded-lg border border-border p-4">
+          <dt className="text-xs font-medium text-muted-foreground">{t("reports.kpi.closed")}</dt>
+          <dd className="mt-2 text-2xl font-semibold text-foreground">{closed}</dd>
+        </div>
+        <div className="rounded-lg border border-border p-4">
+          <dt className="text-xs font-medium text-muted-foreground">{t("reports.kpi.cancelled")}</dt>
+          <dd className="mt-2 text-2xl font-semibold text-foreground">{cancelled}</dd>
+        </div>
+      </dl>
+    </div>
   );
 }

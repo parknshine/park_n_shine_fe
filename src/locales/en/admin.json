@@ -67,6 +67,8 @@
     "kpi": {
       "totalBookings": "Total Bookings",
       "closed": "Completed",
+      "paid": "Collected",
+      "refunded": "Refunded",
       "revenue": "Revenue",
       "avgTurnaround": "Avg Turnaround",
       "cancelled": "Cancelled / Expired"

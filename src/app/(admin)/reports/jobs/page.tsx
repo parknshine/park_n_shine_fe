@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/axios-admin";
 import {
   X,
   ZoomIn,
@@ -21,6 +23,7 @@ import {
   Eye,
   Hash,
   Search,
+  Undo2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -344,12 +347,30 @@ function JobDetailModal({
   t: (key: string) => string;
 }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [confirmRefund, setConfirmRefund] = useState(false);
+  const queryClient = useQueryClient();
+
+  const refundMutation = useMutation({
+    mutationFn: (bookingId: string) =>
+      api.post(`/v1/admin/bookings/${bookingId}/refund`, {
+        amountType: "full",
+        reasonCode: "admin_manual",
+      }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["admin", "report-bookings"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
+      setConfirmRefund(false);
+    },
+  });
 
   useEffect(() => {
-    if (!open) setLightboxIndex(null);
+    if (!open) { setLightboxIndex(null); setConfirmRefund(false); }
   }, [open]);
 
   if (!row) return null;
+
+  const canRefund = !!row.paidAt && row.refundedAmount === 0;
+  const isRefunded = row.refundedAmount > 0;
 
   const before = row.photos.filter((p) => BEFORE_TYPES.has(p.type));
   const after = row.photos.filter((p) => AFTER_TYPES.has(p.type));
@@ -436,6 +457,63 @@ function JobDetailModal({
                 </span>
               </div>
             </div>
+
+            {/* Refund */}
+            {(canRefund || isRefunded) && (
+              <div className={cn(
+                "rounded-lg border px-4 py-3",
+                isRefunded
+                  ? "border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950/20"
+                  : "border-border bg-muted/30",
+              )}>
+                {isRefunded ? (
+                  <div className='flex items-center gap-2'>
+                    <Undo2 className='h-3.5 w-3.5 text-red-500' />
+                    <span className='text-xs font-medium text-red-600 dark:text-red-400'>
+                      Refunded {formatRupiah(row.refundedAmount)}
+                    </span>
+                  </div>
+                ) : confirmRefund ? (
+                  <div className='space-y-2'>
+                    <p className='text-xs text-muted-foreground'>
+                      Refund <span className='font-semibold text-foreground'>{formatRupiah(row.price)}</span> ke customer
+                      {row.paymentMethod && <span className='ml-1'>via <span className='font-medium'>{row.paymentMethod}</span></span>}.
+                    </p>
+                    <div className='flex gap-2'>
+                      <Button
+                        size='sm'
+                        variant='destructive'
+                        disabled={refundMutation.isPending}
+                        onClick={() => refundMutation.mutate(row.id)}
+                        className='h-7 text-xs'
+                      >
+                        {refundMutation.isPending ? "Processing..." : "Ya, tandai refund"}
+                      </Button>
+                      <Button
+                        size='sm'
+                        variant='ghost'
+                        onClick={() => setConfirmRefund(false)}
+                        className='h-7 text-xs'
+                      >
+                        Batal
+                      </Button>
+                    </div>
+                    {refundMutation.isError && (
+                      <p className='text-xs text-destructive'>Gagal. Coba lagi.</p>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    type='button'
+                    onClick={() => setConfirmRefund(true)}
+                    className='flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-destructive transition-colors'
+                  >
+                    <Undo2 className='h-3.5 w-3.5' />
+                    Proses Refund
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Duration */}
             <div className='space-y-3'>

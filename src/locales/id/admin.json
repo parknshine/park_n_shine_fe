@@ -67,6 +67,8 @@
     "kpi": {
       "totalBookings": "Total Booking",
       "closed": "Selesai",
+      "paid": "Terkumpul",
+      "refunded": "Direfund",
       "revenue": "Revenue",
       "avgTurnaround": "Rata-rata Waktu",
       "cancelled": "Batal / Expired"

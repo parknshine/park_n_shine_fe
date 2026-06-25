@@ -88,6 +88,8 @@ export interface AdminReport {
   };
   revenue: {
     totalGross: number;
+    totalPaid: number;
+    totalRefunded: number;
     currency: "IDR";
   };
   avgTurnaroundSeconds: number | null;
@@ -114,6 +116,9 @@ export interface ReportBookingRow {
   crewName: string | null;
   status: string;
   price: number;
+  paidAt: string | null;
+  refundedAmount: number;
+  paymentMethod: string | null;
   rating: number | null;
   ratingNote: string | null;
   duration: ReportBookingDuration;
