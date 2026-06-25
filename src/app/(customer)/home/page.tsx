@@ -79,7 +79,7 @@ export default function HomePage() {
       icon: HelpCircle,
       tint: "#f1f0fb",
       color: "#514eb6",
-      onClick: () => {},
+      onClick: () => router.push("/support"),
     },
   ];
 

@@ -23,5 +23,29 @@
   "error": {
     "generic": "Terjadi kesalahan. Coba lagi.",
     "notFound": "Tidak ditemukan."
+  },
+  "contact": {
+    "title": "Hubungi Kami",
+    "subtitle": "Butuh bantuan lebih lanjut? Tim dukungan kami tersedia setiap hari dari pukul 09.00 – 21.00 WIB. Hubungi kami melalui salah satu saluran di bawah ini.",
+    "backHome": "Kembali ke Beranda",
+    "email": "Email",
+    "whatsapp": "WhatsApp (Tanpa Telepon)",
+    "numberTba": "Nomor Segera Hadir",
+    "office": "Kantor",
+    "businessHours": "Jam Operasional",
+    "businessHoursValue": "Setiap Hari, 09.00 – 21.00 WIB",
+    "form": {
+      "title": "Kirim pesan kepada kami",
+      "subtitle": "Isi formulir dan tim kami akan menghubungi Anda dalam 1 hari kerja.",
+      "fullName": "Nama Lengkap",
+      "namePlaceholder": "Nama Anda",
+      "emailAddress": "Alamat Email",
+      "emailPlaceholder": "anda@contoh.com",
+      "subject": "Subjek",
+      "subjectPlaceholder": "Apa yang ingin Anda sampaikan?",
+      "message": "Pesan",
+      "messagePlaceholder": "Ceritakan bagaimana kami bisa membantu...",
+      "send": "Kirim Pesan"
+    }
   }
 }

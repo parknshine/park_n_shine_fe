@@ -23,5 +23,29 @@
   "error": {
     "generic": "Something went wrong. Please try again.",
     "notFound": "Not found."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Need further assistance? Our support team is available daily from 9:00 AM to 9:00 PM WIB. Reach out through any of the channels below.",
+    "backHome": "Back to Home",
+    "email": "Email",
+    "whatsapp": "WhatsApp (No Calls)",
+    "numberTba": "Number TBA",
+    "office": "Office",
+    "businessHours": "Business Hours",
+    "businessHoursValue": "Everyday, 09:00 – 21:00 WIB",
+    "form": {
+      "title": "Send us a message",
+      "subtitle": "Fill out the form and our team will get back to you within 1 business day.",
+      "fullName": "Full Name",
+      "namePlaceholder": "Your name",
+      "emailAddress": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "What is your message about?",
+      "message": "Message",
+      "messagePlaceholder": "Tell us how we can help...",
+      "send": "Send Message"
+    }
   }
 }

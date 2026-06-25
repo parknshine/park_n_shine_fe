@@ -181,7 +181,8 @@
       "subtitle": "Periksa detail booking sebelum membayar.",
       "back": "Ubah foto",
       "pay": "Bayar Sekarang",
-      "processing": "Memproses..."
+      "processing": "Memproses...",
+      "disclaimer": "*Dengan mengklik \"Bayar Sekarang\", Anda menyetujui Syarat & Ketentuan serta Kebijakan Privasi yang berlaku untuk layanan Park and Shine."
     },
     "summary": {
       "plate": "Plat Nomor",
@@ -404,7 +405,7 @@
   "bottomNav": {
     "home": "Home",
     "wash": "Cuci",
-    "history": "Riwayat",
+    "history": "Riwayat Saya",
     "account": "Akun",
     "authPromptTitle": "Yuk buat akun!",
     "authPromptDesc": "Riwayat cucimu tersimpan otomatis kalau kamu punya akun.",
@@ -425,8 +426,8 @@
     "guestHeading": "Mulai Cuci Mobilmu",
     "washCountLabel": "Total Cuci",
     "washCountUnit": "kali",
-    "completePhoneTitle": "Lengkapi nomor telepon",
-    "completePhoneDesc": "Agar kami bisa menghubungimu saat cuci siap.",
+    "completePhoneTitle": "Tambahkan nomor telepon",
+    "completePhoneDesc": "Agar kami dapat menghubungi Anda ketika kendaraan sudah siap",
     "completePhoneFill": "Isi",
     "completePhoneCta": "Lengkapi Sekarang",
     "quickActionsTitle": "Aksi Cepat",

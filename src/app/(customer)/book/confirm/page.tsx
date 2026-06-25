@@ -2,21 +2,14 @@
 
 export const dynamic = "force-dynamic";
 
-import { Suspense, useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Zap } from "lucide-react";
-import api from "@/lib/axios";
 import { AppShell } from "@/components/shared";
-import { Button } from "@/components/ui/button";
 import { BookingSummaryCard } from "@/features/customer/components/booking-summary-card";
 import { BookingLocationCard } from "@/features/customer/components/booking-location-card";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
+import { PayButton } from "@/features/customer/components/pay-button";
 import { useBookingStatus } from "@/features/customer/hooks";
-import {
-  usePaymentActionV2,
-  type ConfirmBookingPayloadV2,
-} from "@/features/customer/hooks/use-payment-action-v2";
 import { useTranslation } from "@/i18n";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
 
@@ -58,58 +51,17 @@ function WalkInConfirmContent() {
     enabled: !!bookingId && !!token,
   });
 
-  // Route based on current booking state
   useEffect(() => {
     if (!booking || !bookingId || !token) return;
     if (booking.status === "PENDING") {
-      // PENDING but no payment method chosen yet — go to payment method selection
       router.replace(`/booking/${bookingId}/payment-method?token=${token}`);
     } else if (booking.status !== "DRAFT") {
-      // PAID or beyond — go to status page
       router.replace(`/booking/${bookingId}/status?token=${token}`);
     }
   }, [booking, bookingId, token, router]);
 
-  const [isSimulating, setIsSimulating] = useState(false);
-
-  const { canSubmit, confirmAndRedirect, error, isSubmitting } =
-    usePaymentActionV2(bookingId ?? "", token ?? "");
-
-  useEffect(() => {
-    if (error) toast.error(error);
-  }, [error]);
-
   if (!bookingId || !token || !plate || !slot) {
     return null;
-  }
-
-  async function handleSimulatePay() {
-    if (isSimulating) return;
-    setIsSimulating(true);
-    try {
-      await api.post(
-        `/v1/dev/bookings/${bookingId}/simulate-payment`,
-        { plate: plate, slot: slot, ...(phone ? { phone } : {}) },
-        { headers: { "X-Booking-Token": token } },
-      );
-      globalThis.location.assign(`/booking/${bookingId}/status?token=${token}`);
-    } catch {
-      toast.error("Simulasi pembayaran gagal");
-      setIsSimulating(false);
-    }
-  }
-
-  function handlePay() {
-    clearCapture();
-    const payload: ConfirmBookingPayloadV2 = {
-      plateText: plate!,
-      slotText: slot!,
-      ...(phone ? { phone } : {}),
-      ...(lat && lng ? { locationLat: Number.parseFloat(lat), locationLng: Number.parseFloat(lng) } : {}),
-      ...(loc ? { locationName: loc } : {}),
-      ...(siteId ? { siteId } : {}),
-    };
-    void confirmAndRedirect(payload);
   }
 
   return (
@@ -142,40 +94,18 @@ function WalkInConfirmContent() {
           />
         </div>
 
-        <div className='space-y-3 pt-1'>
-          <Button
-            size='lg'
-            className='w-full rounded-full'
-            disabled={!canSubmit}
-            onClick={handlePay}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                {t("booking.confirm.processing")}
-              </>
-            ) : (
-              t("booking.confirm.pay")
-            )}
-          </Button>
-
-          {/* ── Dev-only: skip payment gateway ─────────────────────────────── */}
-          {process.env.NODE_ENV !== "production" && (
-            <button
-              type='button'
-              disabled={isSimulating}
-              onClick={handleSimulatePay}
-              className='flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400'
-            >
-              {isSimulating ? (
-                <Loader2 className='h-4 w-4 animate-spin' />
-              ) : (
-                <Zap className='h-4 w-4' />
-              )}
-              {isSimulating ? "Memproses..." : "⚡ Simulasi Bayar (Dev Only)"}
-            </button>
-          )}
-        </div>
+        <PayButton
+          bookingId={bookingId}
+          signedToken={token}
+          plateText={plate}
+          slotText={slot}
+          phone={phone ?? undefined}
+          locationLat={lat ? Number.parseFloat(lat) : undefined}
+          locationLng={lng ? Number.parseFloat(lng) : undefined}
+          locationName={loc ?? undefined}
+          siteId={siteId ?? undefined}
+          onBeforePay={clearCapture}
+        />
       </div>
     </AppShell>
   );

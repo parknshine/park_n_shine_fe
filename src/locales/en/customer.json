@@ -181,7 +181,8 @@
       "subtitle": "Review your booking details before paying.",
       "back": "Change photos",
       "pay": "Pay Now",
-      "processing": "Processing..."
+      "processing": "Processing...",
+      "disclaimer": "*By clicking \"Pay Now\", you agree to the Terms & Conditions and Privacy Policy applicable to the Park and Shine service."
     },
     "summary": {
       "plate": "Plate Number",
@@ -404,7 +405,7 @@
   "bottomNav": {
     "home": "Home",
     "wash": "Wash",
-    "history": "History",
+    "history": "My History",
     "account": "Account",
     "authPromptTitle": "Create an account!",
     "authPromptDesc": "Your wash history is saved automatically when you have an account.",
