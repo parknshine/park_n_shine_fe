@@ -345,6 +345,10 @@ function JobDetailModal({
 }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (!open) setLightboxIndex(null);
+  }, [open]);
+
   if (!row) return null;
 
   const before = row.photos.filter((p) => BEFORE_TYPES.has(p.type));
@@ -359,7 +363,15 @@ function JobDetailModal({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <Dialog
+        open={open}
+        onOpenChange={(v) => {
+          if (!v) {
+            if (lightboxIndex !== null) setLightboxIndex(null);
+            else onClose();
+          }
+        }}
+      >
         <DialogContent className='max-w-lg'>
           <DialogHeader>
             <DialogTitle className='flex items-center justify-between pr-6'>
