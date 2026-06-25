@@ -55,18 +55,6 @@ import type { ReportBookingFilters } from "@/features/admin/hooks/use-admin-repo
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
 
-const BOOKING_STATUSES = [
-  "CLOSED",
-  "CANCELLED",
-  "EXPIRED",
-  "STALE",
-  "NEEDS_HELP",
-  "IN_PROGRESS",
-  "LOCATED",
-  "ASSIGNED",
-  "PAID",
-];
-
 const BEFORE_TYPES = new Set([
   "BEFORE_FRONT",
   "BEFORE_BACK",
@@ -598,7 +586,6 @@ export default function ReportJobsPage() {
 
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedCrewId, setSelectedCrewId] = useState("");
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [hasRatingFilter, setHasRatingFilter] = useState<"" | "true" | "false">(
     "",
   );
@@ -642,7 +629,6 @@ export default function ReportJobsPage() {
     );
     setAppliedFilters({
       crewId: selectedCrewId || undefined,
-      statuses: selectedStatuses.length > 0 ? selectedStatuses : undefined,
       hasRating:
         hasRatingFilter === "true"
           ? true
@@ -663,19 +649,10 @@ export default function ReportJobsPage() {
     setSelectedSiteId("");
     setAppliedSiteId(undefined);
     setSelectedCrewId("");
-    setSelectedStatuses([]);
     setHasRatingFilter("");
     setHasPhotosFilter(false);
     setSearchInput("");
     setAppliedFilters({});
-  }
-
-  function toggleStatus(status: string) {
-    setSelectedStatuses((prev) =>
-      prev.includes(status)
-        ? prev.filter((s) => s !== status)
-        : [...prev, status],
-    );
   }
 
   const hasFilter =
@@ -683,7 +660,6 @@ export default function ReportJobsPage() {
     appliedFrom !== "" ||
     appliedTo !== "" ||
     !!appliedFilters.crewId ||
-    (appliedFilters.statuses?.length ?? 0) > 0 ||
     appliedFilters.hasRating !== undefined ||
     appliedFilters.hasPhotos ||
     !!appliedFilters.search;
@@ -708,7 +684,6 @@ export default function ReportJobsPage() {
     selectedCrewId,
     hasRatingFilter !== "",
     hasPhotosFilter,
-    selectedStatuses.length > 0,
     searchInput.trim() !== "",
   ].filter(Boolean).length;
 
@@ -969,40 +944,6 @@ export default function ReportJobsPage() {
             </div>
           </div>
 
-          <div className='space-y-2 px-4 py-3'>
-            <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
-              {t("reports.jobDetail.filterStatus")}
-            </span>
-            <div className='flex flex-wrap gap-1.5'>
-              {BOOKING_STATUSES.map((status) => {
-                const isActive = selectedStatuses.includes(status);
-                return (
-                  <button
-                    key={status}
-                    type='button'
-                    onClick={() => toggleStatus(status)}
-                    className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold transition-all select-none",
-                      isActive
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:bg-muted hover:text-foreground",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "h-1.5 w-1.5 shrink-0 rounded-full",
-                        isActive
-                          ? "bg-primary-foreground/60"
-                          : "bg-muted-foreground/40",
-                      )}
-                    />
-                    {status.replaceAll("_", "​_")}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           <div className='px-4 py-3'>
             <div className='flex items-center gap-1.5'>
               <Search className='h-3 w-3 text-muted-foreground' />
@@ -1130,14 +1071,6 @@ export default function ReportJobsPage() {
               {selectedCrewName ?? appliedFilters.crewId}
             </span>
           )}
-          {(appliedFilters.statuses ?? []).map((s) => (
-            <span
-              key={s}
-              className='inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'
-            >
-              {s}
-            </span>
-          ))}
           {appliedFilters.hasRating === true && (
             <span className='inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'>
               <Star className='h-2.5 w-2.5' />

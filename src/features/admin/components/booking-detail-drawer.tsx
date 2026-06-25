@@ -237,7 +237,7 @@ export function BookingDetailDrawer({
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={["READY", "CLOSED", "CANCELLED", "EXPIRED"].includes(booking.status)}
+                    disabled={["READY", "CLOSED", "CANCELLED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status)}
                     onClick={() => setActiveModal("reassign")}
                   >
                     {t("drawer.reassignCrew")}
@@ -245,7 +245,7 @@ export function BookingDetailDrawer({
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={["CLOSED", "EXPIRED"].includes(booking.status)}
+                    disabled={["CLOSED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status)}
                     onClick={() => setActiveModal("override")}
                   >
                     {t("drawer.overrideStatus")}
@@ -342,7 +342,7 @@ export function BookingDetailDrawer({
                     <Button
                       variant="destructive"
                       size="sm"
-                      disabled={["DRAFT", "PENDING", "CLOSED", "CANCELLED", "EXPIRED"].includes(booking.status)}
+                      disabled={["DRAFT", "PENDING", "CLOSED", "CANCELLED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status)}
                       onClick={() => setActiveModal("refund")}
                     >
                       {t("drawer.refund")}
