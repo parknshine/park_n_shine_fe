@@ -8,6 +8,7 @@ import type { ReportBookingRow } from "@/features/admin/types";
 export interface ReportBookingFilters {
   crewId?: string;
   statuses?: string[];
+  refunded?: boolean;
   hasRating?: boolean;
   hasPhotos?: boolean;
   search?: string;
@@ -39,6 +40,7 @@ export function useAdminReportBookings(
       if (to) params.set("to", to);
       if (filters?.crewId) params.set("crewId", filters.crewId);
       if (filters?.statuses?.length) params.set("statuses", filters.statuses.join(","));
+      if (filters?.refunded) params.set("refunded", "true");
       if (filters?.hasRating !== undefined) params.set("hasRating", String(filters.hasRating));
       if (filters?.hasPhotos !== undefined) params.set("hasPhotos", String(filters.hasPhotos));
       if (filters?.search) params.set("search", filters.search);

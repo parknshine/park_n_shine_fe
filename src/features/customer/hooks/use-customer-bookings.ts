@@ -16,6 +16,7 @@ export interface CustomerBookingSummary {
   closedAt: string | null;
   bookingToken: string;
   paymentMethod: string | null;
+  refundedAmount: number;
   site: { name: string; address: string | null } | null;
 }
 

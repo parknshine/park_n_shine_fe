@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Bell } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
 import { useCheckPayment } from "@/features/customer/hooks/use-check-payment";
 import { usePaymentAutoPoll } from "@/features/customer/hooks/use-payment-auto-poll";
+import { useCancelBooking } from "@/features/customer/hooks/use-cancel-booking";
 import { useRealtimeEvents } from "@/lib/use-realtime-events";
 import { usePushNotification } from "@/lib/use-push-notification";
 import { StatusHero } from "@/features/customer/components/status-hero";
@@ -69,6 +71,13 @@ export default function BookingStatusPage() {
     bookingToken: token ?? undefined,
   });
 
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const { cancel, isPending: isCancelling } = useCancelBooking({
+    bookingId,
+    signedToken: token ?? "",
+    onSuccess: () => void refresh(),
+  });
+
   if (!token) {
     return (
       <div className='flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center'>
@@ -101,6 +110,7 @@ export default function BookingStatusPage() {
     booking.status === BOOKING_STATUSES.CANCELLED;
 
   const isPending = booking.status === BOOKING_STATUSES.PENDING;
+  const isPaid = booking.status === BOOKING_STATUSES.PAID;
   const isReady = booking.status === BOOKING_STATUSES.READY;
   const isCancelled = booking.status === BOOKING_STATUSES.CANCELLED;
   const isNeedsHelp = booking.status === BOOKING_STATUSES.NEEDS_HELP;
@@ -138,6 +148,46 @@ export default function BookingStatusPage() {
             </span>
           </button>
         )}
+
+      {(isPending || isPaid) && !showCancelConfirm && (
+        <button
+          onClick={() => setShowCancelConfirm(true)}
+          className='w-full rounded-xl border border-destructive/40 py-3 text-sm text-destructive transition-colors hover:bg-destructive/5'
+        >
+          {t("status.cancelBooking", { defaultValue: "Cancel Booking" })}
+        </button>
+      )}
+
+      {showCancelConfirm && (
+        <div className='rounded-2xl border border-destructive/30 bg-destructive/5 p-5 space-y-3 text-center'>
+          <p className='text-sm font-medium text-foreground'>
+            {t("status.cancelConfirmTitle", { defaultValue: "Cancel this booking?" })}
+          </p>
+          <p className='text-xs text-muted-foreground'>
+            {isPaid
+              ? t("status.cancelConfirmPaid", { defaultValue: "Your payment will be refunded." })
+              : t("status.cancelConfirmPending", { defaultValue: "Your booking will be cancelled." })}
+          </p>
+          <div className='flex gap-2 justify-center'>
+            <button
+              onClick={() => setShowCancelConfirm(false)}
+              disabled={isCancelling}
+              className='rounded-full border border-border px-5 py-2 text-sm text-foreground transition-colors hover:bg-muted'
+            >
+              {t("status.cancelBack", { defaultValue: "Go back" })}
+            </button>
+            <button
+              onClick={() => void cancel()}
+              disabled={isCancelling}
+              className='rounded-full bg-destructive px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50'
+            >
+              {isCancelling
+                ? t("status.cancellingLabel", { defaultValue: "Cancelling…" })
+                : t("status.cancelConfirm", { defaultValue: "Yes, cancel" })}
+            </button>
+          </div>
+        </div>
+      )}
 
       {isPending && (
         <div className='space-y-3'>

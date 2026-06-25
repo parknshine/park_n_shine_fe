@@ -56,9 +56,8 @@ function parseDetail(action: string, p: Record<string, unknown>, raw: string): s
     return `${from} → ${to}${reason}`;
   }
   if (action === "refund") {
-    const type = (p.amountType as string) ?? "—";
-    const reason = p.reasonCode ? ` • ${p.reasonCode as string}` : "";
-    return `${type}${reason}`;
+    const reason = (p.reasonCode as string) ?? "—";
+    return reason;
   }
   if (action === "extend_time") return formatExtendTime(p);
   if (action === "approve_time_extension") return formatApproveTimeExtension(p);

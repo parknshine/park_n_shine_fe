@@ -8,12 +8,18 @@ import { useCustomerBookings } from "@/features/customer/hooks/use-customer-book
 import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
 
-type StatusKind = "ok" | "fail" | "pending";
+type StatusKind = "ok" | "fail" | "refunded" | "pending";
 
 const DONE = new Set(["READY", "CLOSED"]);
 const FAIL = new Set(["CANCELLED", "EXPIRED"]);
 
+function effectiveStatus(status: string, refundedAmount: number): string {
+  if (status === "CANCELLED" && refundedAmount > 0) return "REFUNDED";
+  return status;
+}
+
 function statusKind(s: string): StatusKind {
+  if (s === "REFUNDED") return "refunded";
   if (DONE.has(s)) return "ok";
   if (FAIL.has(s)) return "fail";
   return "pending";
@@ -30,11 +36,13 @@ const STATUS_LABEL: Record<string, string> = {
   EXPIRED: "Kadaluarsa",
   NEEDS_HELP: "Butuh Bantuan",
   STALE: "Kadaluarsa",
+  REFUNDED: "Direfund",
 };
 
 const KIND_STYLE: Record<StatusKind, { color: string; bg: string }> = {
   ok: { color: "#1f8a5b", bg: "#e7f5ee" },
   fail: { color: "#ef4444", bg: "#fdeaea" },
+  refunded: { color: "#0077a8", bg: "#e0f2fb" },
   pending: { color: "#a07c00", bg: "#fff3d6" },
 };
 
@@ -75,11 +83,11 @@ function DropletSVG({ color }: Readonly<{ color: string }>) {
   );
 }
 
-function amountDisplay(price: number, kind: StatusKind): { text: string; color: string } {
-  const fmt = fmtPrice(price);
-  if (kind === "ok") return { text: `+${fmt}`, color: "#1f8a5b" };
-  if (kind === "fail") return { text: `-${fmt}`, color: "#ef4444" };
-  return { text: fmt, color: "#273034" };
+function amountDisplay(price: number, kind: StatusKind, refundedAmount?: number): { text: string; color: string } {
+  if (kind === "ok") return { text: `+${fmtPrice(price)}`, color: "#1f8a5b" };
+  if (kind === "refunded") return { text: `↩ ${fmtPrice(refundedAmount ?? price)}`, color: "#0077a8" };
+  if (kind === "fail") return { text: "—", color: "#9aa6ad" };
+  return { text: fmtPrice(price), color: "#273034" };
 }
 
 export default function HistoryPage() {
@@ -249,9 +257,10 @@ export default function HistoryPage() {
               </div>
             ) : (
               bookings.map((booking) => {
-                const kind = statusKind(booking.status);
+                const eff = effectiveStatus(booking.status, booking.refundedAmount);
+                const kind = statusKind(eff);
                 const st = KIND_STYLE[kind];
-                const { text: amountText, color: amountColor } = amountDisplay(booking.price, kind);
+                const { text: amountText, color: amountColor } = amountDisplay(booking.price, kind, booking.refundedAmount);
 
                 return (
                   <button
@@ -281,21 +290,21 @@ export default function HistoryPage() {
                         {shortId(booking.id)}
                       </span>
                       <span
-                        className='flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-bold px-[11px] py-[5px] rounded-full'
+                        className='shrink-0 inline-flex items-center gap-1.5 text-[11px] font-bold px-[11px] py-[5px] rounded-full'
                         style={{ color: st.color, background: st.bg }}
                       >
                         <span
-                          className='w-1.5 h-1.5 rounded-full flex-shrink-0'
+                          className='w-1.5 h-1.5 rounded-full shrink-0'
                           style={{ background: st.color }}
                         />
-                        {STATUS_LABEL[booking.status] ?? booking.status}
+                        {STATUS_LABEL[eff] ?? eff}
                       </span>
                     </div>
 
                     {/* row 2: icon + main info + amount/date */}
                     <div className='flex items-center gap-3.5'>
                       <div
-                        className='w-[46px] h-[46px] rounded-[14px] flex items-center justify-center flex-shrink-0'
+                        className='w-[46px] h-[46px] rounded-[14px] flex items-center justify-center shrink-0'
                         style={{ background: "#e8f2f9" }}
                       >
                         <DropletSVG color='#006289' />
@@ -318,7 +327,7 @@ export default function HistoryPage() {
                           {booking.paymentMethod ?? t("history.noPayment")}
                         </div>
                       </div>
-                      <div className='text-right flex-shrink-0'>
+                      <div className='text-right shrink-0'>
                         <div
                           className='font-extrabold'
                           style={{ fontSize: 14, color: amountColor }}

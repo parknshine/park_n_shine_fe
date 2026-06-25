@@ -40,8 +40,6 @@ export interface AdminEscalationsResponse {
 }
 
 export interface RefundPayload {
-  amountType: "full" | "partial";
-  amount?: number;
   reasonCode: string;
 }
 

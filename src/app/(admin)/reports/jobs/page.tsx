@@ -83,6 +83,7 @@ const STATUS_STYLES: Record<string, string> = {
   CLOSED:
     "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
   CANCELLED: "bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400",
+  REFUNDED: "bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-400",
   EXPIRED:
     "bg-orange-100 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
   STALE:
@@ -382,7 +383,6 @@ function JobDetailModal({
   const refundMutation = useMutation({
     mutationFn: (bookingId: string) =>
       api.post(`/v1/admin/bookings/${bookingId}/refund`, {
-        amountType: "full",
         reasonCode: "admin_manual",
       }),
     onSuccess: () => {
@@ -404,8 +404,8 @@ function JobDetailModal({
   );
   const viewable = [...before, ...after, ...other];
 
-  const statusStyle =
-    STATUS_STYLES[row.status] ?? "bg-muted text-muted-foreground";
+  const effStatus = row.status === "CANCELLED" && row.refundedAmount > 0 ? "REFUNDED" : row.status;
+  const statusStyle = STATUS_STYLES[effStatus] ?? "bg-muted text-muted-foreground";
 
   return (
     <>
@@ -431,7 +431,7 @@ function JobDetailModal({
                   statusStyle,
                 )}
               >
-                {row.status}
+                {effStatus}
               </span>
             </DialogTitle>
           </DialogHeader>
@@ -747,7 +747,8 @@ export default function ReportJobsPage() {
     );
     setAppliedFilters({
       crewId: selectedCrewId || undefined,
-      statuses: statusFilter ? [statusFilter] : undefined,
+      statuses: statusFilter && statusFilter !== "REFUNDED" ? [statusFilter] : undefined,
+      refunded: statusFilter === "REFUNDED" ? true : undefined,
       hasRating:
         hasRatingFilter === "true"
           ? true
@@ -887,9 +888,8 @@ export default function ReportJobsPage() {
       accessorKey: "status",
       header: t("reports.jobDetail.status"),
       cell: ({ row }) => {
-        const style =
-          STATUS_STYLES[row.original.status] ??
-          "bg-muted text-muted-foreground";
+        const eff = row.original.status === "CANCELLED" && row.original.refundedAmount > 0 ? "REFUNDED" : row.original.status;
+        const style = STATUS_STYLES[eff] ?? "bg-muted text-muted-foreground";
         return (
           <span
             className={cn(
@@ -897,7 +897,7 @@ export default function ReportJobsPage() {
               style,
             )}
           >
-            {row.original.status}
+            {eff}
           </span>
         );
       },
@@ -906,14 +906,19 @@ export default function ReportJobsPage() {
       accessorKey: "price",
       header: t("reports.jobDetail.price"),
       meta: { align: "right" },
-      cell: ({ row }) =>
-        row.original.status === "EXPIRED" ? (
-          <span className='font-mono text-xs text-muted-foreground'>—</span>
-        ) : (
-          <span className='font-mono text-xs'>
-            {formatRupiah(row.original.price)}
-          </span>
-        ),
+      cell: ({ row }) => {
+        const { status, price, refundedAmount } = row.original;
+        if (status === "EXPIRED") return <span className='font-mono text-xs text-muted-foreground'>—</span>;
+        if (refundedAmount > 0)
+          return (
+            <span className='inline-flex items-center gap-1 font-mono text-xs font-semibold text-red-600 dark:text-red-400'>
+              <Undo2 className='h-3 w-3' />
+              -{formatRupiah(refundedAmount)}
+            </span>
+          );
+        if (status === "CANCELLED") return <span className='font-mono text-xs text-muted-foreground'>—</span>;
+        return <span className='font-mono text-xs'>{formatRupiah(price)}</span>;
+      },
     },
     {
       accessorKey: "rating",

@@ -10,7 +10,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -45,36 +44,20 @@ export function RefundModal({
   onClose,
   onSuccess,
 }: Readonly<RefundModalProps>) {
-  const [amountType, setAmountType] = useState<"full" | "partial">("full");
-  const [partialAmount, setPartialAmount] = useState("");
   const [reasonCode, setReasonCode] = useState("");
-  const { refund, isSubmitting, error } = useBookingActions(bookingId);
+  const { refund, isSubmitting } = useBookingActions(bookingId);
   const { t } = useTranslation("admin");
-
-  const refundAmount =
-    amountType === "full" ? priceAmount : Number(partialAmount) || 0;
 
   async function handleConfirm() {
     if (!reasonCode) return;
     try {
-      await refund({
-        amountType,
-        amount: amountType === "partial" ? Number(partialAmount) : undefined,
-        reasonCode,
-      });
-      setAmountType("full");
-      setPartialAmount("");
+      await refund({ reasonCode });
       setReasonCode("");
       onSuccess();
     } catch {
       toast.error(t("refundModal.error"));
     }
   }
-
-  const canConfirm =
-    !!reasonCode &&
-    (amountType === "full" ||
-      (amountType === "partial" && Number(partialAmount) > 0));
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -84,39 +67,9 @@ export function RefundModal({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label>{t("refundModal.typeLabel")}</Label>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant={amountType === "full" ? "default" : "outline"}
-                onClick={() => setAmountType("full")}
-              >
-                {t("refundModal.fullLabel", { amount: priceAmount.toLocaleString("id-ID") })}
-              </Button>
-              <Button
-                size="sm"
-                variant={amountType === "partial" ? "default" : "outline"}
-                onClick={() => setAmountType("partial")}
-              >
-                {t("refundModal.partial")}
-              </Button>
-            </div>
-          </div>
-
-          {amountType === "partial" && (
-            <div className="space-y-1.5">
-              <Label htmlFor="partial-amount">{t("refundModal.amountLabel")}</Label>
-              <Input
-                id="partial-amount"
-                type="text"
-                inputMode="numeric"
-                placeholder="0"
-                value={partialAmount}
-                onChange={(e) => setPartialAmount(e.target.value)}
-              />
-            </div>
-          )}
+          <p className="rounded-md bg-muted px-3 py-2 text-sm text-foreground">
+            {t("refundModal.confirmation", { amount: priceAmount.toLocaleString("id-ID") })}
+          </p>
 
           <div className="space-y-1.5">
             <Label>{t("refundModal.reasonLabel")}</Label>
@@ -133,13 +86,6 @@ export function RefundModal({
               </SelectContent>
             </Select>
           </div>
-
-          {canConfirm && (
-            <p className="rounded-md bg-muted px-3 py-2 text-sm text-foreground">
-              {t("refundModal.confirmation", { amount: refundAmount.toLocaleString("id-ID") })}
-            </p>
-          )}
-
         </div>
 
         <DialogFooter>
@@ -149,7 +95,7 @@ export function RefundModal({
           <Button
             variant="destructive"
             onClick={handleConfirm}
-            disabled={!canConfirm || isSubmitting}
+            disabled={!reasonCode || isSubmitting}
           >
             {isSubmitting ? t("refundModal.processing") : t("refundModal.confirm")}
           </Button>

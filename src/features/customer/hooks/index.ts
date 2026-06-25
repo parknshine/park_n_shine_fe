@@ -12,3 +12,4 @@ export { usePublicTestimonials } from "./use-public-testimonials";
 export { useCustomerAuth } from "./use-customer-auth";
 export { useNavigationGuardConfig } from "./use-navigation-guard-config";
 export type { GuardConfig } from "./use-navigation-guard-config";
+export { useCancelBooking } from "./use-cancel-booking";

@@ -771,7 +771,7 @@ export const adminSuccessExamples = {
           EXPIRED: 1,
         },
       },
-      revenue: { totalGross: 3150000, currency: "IDR" },
+      revenue: { totalGross: 3150000, totalPaid: 3150000, totalRefunded: 0, currency: "IDR" },
       avgTurnaroundSeconds: 1320,
       crew: [
         {
