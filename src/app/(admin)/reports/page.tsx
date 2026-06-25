@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Download, X, ArrowRight, Star, Wallet, SlidersHorizontal, Calendar, Building2, Check } from "lucide-react";
+import { X, ArrowRight, Star, Wallet, SlidersHorizontal, Calendar, Building2, Check } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -60,35 +60,6 @@ function reliabilityTextColor(score: number): string {
   return "text-red-600 dark:text-red-400";
 }
 
-function exportToCSV(report: AdminReport, from: string, to: string) {
-  const lines: string[] = [
-    `Park & Shine Report,${from},${to}`,
-    "",
-    "Summary",
-    `Total Bookings,${report.bookings.total}`,
-    `Closed,${report.bookings.byStatus["CLOSED"] ?? 0}`,
-    `Revenue,${report.revenue.totalGross}`,
-    `Avg Turnaround (s),${report.avgTurnaroundSeconds ?? ""}`,
-    "",
-    "Bookings by Status",
-    "Status,Count",
-    ...Object.entries(report.bookings.byStatus).map(([s, count]) => `${s},${count.toString()}`),
-    "",
-    "Crew Performance",
-    "Name,Jobs,Stale,Needs Help,Rejected,Time Ext,Reliability (%),Avg Turnaround (s),Avg Rating,Est. Revenue (IDR)",
-    ...report.crew.map((c) =>
-      `${c.crewName},${c.jobsCompleted},${c.staleCount},${c.needsHelpCount},${c.rejectedCount},${c.timeExtensionCount},${c.reliabilityScore ?? ""},${c.avgTurnaroundSeconds ?? ""},${c.avgRating ?? ""},${c.estimatedRevenue}`
-    ),
-  ];
-
-  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `park-n-shine-report-${from}-${to}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
 
 function ReportTabs() {
   const pathname = usePathname();
@@ -422,16 +393,8 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          {/* Apply + Export */}
-          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-            <Button
-              variant="outline"
-              disabled={!report || isLoading}
-              onClick={() => report && exportToCSV(report, appliedFrom, appliedTo)}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              {t("reports.exportCsv")}
-            </Button>
+          {/* Apply */}
+          <div className="flex flex-wrap items-center justify-end gap-3 px-4 py-3">
             <Button onClick={handleApply} disabled={isLoading} className="gap-2 px-5">
               {isLoading ? (
                 <span className="flex items-center gap-2">

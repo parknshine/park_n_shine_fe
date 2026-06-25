@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import * as XLSX from "xlsx";
 import { createPortal } from "react-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios-admin";
@@ -24,6 +25,7 @@ import {
   Hash,
   Search,
   Undo2,
+  FileDown,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -54,7 +56,7 @@ import type {
   ReportBookingRow,
   ReportPhotoAsset,
 } from "@/features/admin/types";
-import type { ReportBookingFilters } from "@/features/admin/hooks/use-admin-report-bookings";
+import type { ReportBookingFilters, ReportBookingsResponse } from "@/features/admin/hooks/use-admin-report-bookings";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
 
@@ -119,6 +121,33 @@ function formatDate(iso: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function rowsToSheetData(rows: import("@/features/admin/types").ReportBookingRow[]) {
+  return rows.map((r) => ({
+    "Booking ID": r.id,
+    "Date": formatDate(r.createdAt),
+    "Site": r.siteName ?? "—",
+    "Slot": r.slot ?? "—",
+    "Crew": r.crewName ?? "—",
+    "Status": r.status,
+    "Price (IDR)": r.price,
+    "Payment Method": r.paymentMethod ?? "—",
+    "Paid At": r.paidAt ? formatDate(r.paidAt) : "—",
+    "Refunded (IDR)": r.refundedAmount,
+    "Rating": r.rating ?? "—",
+    "Rating Note": r.ratingNote ?? "—",
+    "Locate (s)": r.duration.locateSeconds ?? "—",
+    "Wash (s)": r.duration.washSeconds ?? "—",
+    "Total (s)": r.duration.totalJobSeconds ?? "—",
+  }));
+}
+
+function downloadExcel(rows: import("@/features/admin/types").ReportBookingRow[], filename: string) {
+  const ws = XLSX.utils.json_to_sheet(rowsToSheetData(rows));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Jobs");
+  XLSX.writeFile(wb, `${filename}.xlsx`);
 }
 
 // ─── Photo Lightbox ───────────────────────────────────────────────────────────
@@ -673,6 +702,7 @@ export default function ReportJobsPage() {
 
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedCrewId, setSelectedCrewId] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [hasRatingFilter, setHasRatingFilter] = useState<"" | "true" | "false">(
     "",
   );
@@ -689,6 +719,7 @@ export default function ReportJobsPage() {
   const [pageSize, setPageSize] = useState(25);
 
   const [detailRow, setDetailRow] = useState<ReportBookingRow | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const effectiveSiteId =
     appliedSiteId === undefined ? undefined : appliedSiteId || undefined;
@@ -716,6 +747,7 @@ export default function ReportJobsPage() {
     );
     setAppliedFilters({
       crewId: selectedCrewId || undefined,
+      statuses: statusFilter ? [statusFilter] : undefined,
       hasRating:
         hasRatingFilter === "true"
           ? true
@@ -727,6 +759,31 @@ export default function ReportJobsPage() {
     });
   }
 
+  function handleExportCurrent() {
+    downloadExcel(jobRows, `park-n-shine-jobs-page${page}`);
+  }
+
+  async function handleExportAll() {
+    setIsExporting(true);
+    try {
+      const params = new URLSearchParams();
+      if (effectiveSiteId) params.set("siteId", effectiveSiteId);
+      if (appliedFrom) params.set("from", appliedFrom);
+      if (appliedTo) params.set("to", appliedTo);
+      if (appliedFilters.crewId) params.set("crewId", appliedFilters.crewId);
+      if (appliedFilters.statuses?.length) params.set("statuses", appliedFilters.statuses.join(","));
+      if (appliedFilters.hasRating !== undefined) params.set("hasRating", String(appliedFilters.hasRating));
+      if (appliedFilters.hasPhotos !== undefined) params.set("hasPhotos", String(appliedFilters.hasPhotos));
+      if (appliedFilters.search) params.set("search", appliedFilters.search);
+      params.set("page", "1");
+      params.set("limit", String(jobTotal || 10000));
+      const res = await api.get<ReportBookingsResponse>(`/v1/admin/reports/bookings?${params}`);
+      downloadExcel(res.data.rows, `park-n-shine-jobs-all`);
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   function handleClear() {
     setPage(1);
     setFrom("");
@@ -736,6 +793,7 @@ export default function ReportJobsPage() {
     setSelectedSiteId("");
     setAppliedSiteId(undefined);
     setSelectedCrewId("");
+    setStatusFilter("");
     setHasRatingFilter("");
     setHasPhotosFilter(false);
     setSearchInput("");
@@ -747,6 +805,7 @@ export default function ReportJobsPage() {
     appliedFrom !== "" ||
     appliedTo !== "" ||
     !!appliedFilters.crewId ||
+    !!appliedFilters.statuses?.length ||
     appliedFilters.hasRating !== undefined ||
     appliedFilters.hasPhotos ||
     !!appliedFilters.search;
@@ -769,6 +828,7 @@ export default function ReportJobsPage() {
     appliedSiteId !== undefined,
     from || to,
     selectedCrewId,
+    statusFilter !== "",
     hasRatingFilter !== "",
     hasPhotosFilter,
     searchInput.trim() !== "",
@@ -846,11 +906,14 @@ export default function ReportJobsPage() {
       accessorKey: "price",
       header: t("reports.jobDetail.price"),
       meta: { align: "right" },
-      cell: ({ row }) => (
-        <span className='font-mono text-xs'>
-          {formatRupiah(row.original.price)}
-        </span>
-      ),
+      cell: ({ row }) =>
+        row.original.status === "EXPIRED" ? (
+          <span className='font-mono text-xs text-muted-foreground'>—</span>
+        ) : (
+          <span className='font-mono text-xs'>
+            {formatRupiah(row.original.price)}
+          </span>
+        ),
     },
     {
       accessorKey: "rating",
@@ -924,7 +987,7 @@ export default function ReportJobsPage() {
         </div>
 
         <div className='divide-y divide-border'>
-          <div className='grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0 divide-border'>
+          <div className='grid grid-cols-1 divide-y sm:grid-cols-2 lg:grid-cols-4 sm:divide-x sm:divide-y-0 divide-border'>
             <div className='space-y-2 px-4 py-3'>
               <div className='flex items-center gap-1.5'>
                 <Calendar className='h-3 w-3 text-muted-foreground' />
@@ -1026,6 +1089,35 @@ export default function ReportJobsPage() {
                       {c.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className='space-y-2 px-4 py-3'>
+              <div className='flex items-center gap-1.5'>
+                <SlidersHorizontal className='h-3 w-3 text-muted-foreground' />
+                <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                  Status
+                </span>
+              </div>
+              <Select
+                value={statusFilter || "__all__"}
+                onValueChange={(v) => setStatusFilter(v === "__all__" ? "" : v)}
+              >
+                <SelectTrigger
+                  className={cn(
+                    "h-8 w-full text-xs",
+                    statusFilter ? "border-primary/40 font-medium" : "",
+                  )}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='__all__'>All Status</SelectItem>
+                  <SelectItem value='CLOSED'>Closed</SelectItem>
+                  <SelectItem value='CANCELLED'>Canceled</SelectItem>
+                  <SelectItem value='EXPIRED'>Expired</SelectItem>
+                  <SelectItem value='REFUNDED'>Refunded</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1183,6 +1275,39 @@ export default function ReportJobsPage() {
           )}
         </div>
       )}
+
+      {/* Export toolbar */}
+      <div className='flex items-center justify-between gap-3'>
+        <span className='text-sm text-muted-foreground'>
+          <span className='font-semibold text-foreground'>{jobTotal}</span> results
+        </span>
+        <div className='flex items-center gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            disabled={isLoading || jobRows.length === 0}
+            onClick={handleExportCurrent}
+            className='gap-1.5 text-xs'
+          >
+            <FileDown className='h-3.5 w-3.5' />
+            Export Current View
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            disabled={isLoading || jobTotal === 0 || isExporting}
+            onClick={handleExportAll}
+            className='gap-1.5 text-xs'
+          >
+            {isExporting ? (
+              <span className='h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground' />
+            ) : (
+              <FileDown className='h-3.5 w-3.5' />
+            )}
+            Export All ({jobTotal})
+          </Button>
+        </div>
+      </div>
 
       {/* Data table */}
       <DataTable
