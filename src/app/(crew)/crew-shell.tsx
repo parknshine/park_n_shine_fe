@@ -19,6 +19,8 @@ import type { CrewJob } from "@/features/crew/types";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "@/i18n";
 
+const TIMER_HIDDEN_STATUSES = new Set(["READY", "CLOSED", "CANCELLED", "EXPIRED"]);
+
 interface CrewShellProps {
   children: ReactNode;
 }
@@ -33,7 +35,7 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
   const [activeEtaEndsAt, setActiveEtaEndsAt] = useState<string | null>(() => {
     for (const query of queryClient.getQueryCache().findAll({ queryKey: ["crew", "job"] })) {
       const data = query.state.data as CrewJob | null;
-      if (data?.etaEndsAt) return data.etaEndsAt;
+      if (data?.etaEndsAt && !TIMER_HIDDEN_STATUSES.has(data.status)) return data.etaEndsAt;
     }
     return null;
   });
@@ -53,7 +55,8 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
           return;
         }
         const data = event.query.state.data as CrewJob | null;
-        setActiveEtaEndsAt(data?.etaEndsAt ?? null);
+        const isTerminal = data?.status ? TIMER_HIDDEN_STATUSES.has(data.status) : false;
+        setActiveEtaEndsAt(isTerminal ? null : (data?.etaEndsAt ?? null));
       }
     });
   }, [queryClient]);
