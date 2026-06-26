@@ -75,7 +75,7 @@ export default function BookingStatusPage() {
   const { cancel, isPending: isCancelling } = useCancelBooking({
     bookingId,
     signedToken: token ?? "",
-    onSuccess: () => void refresh(),
+    onSuccess: () => { setShowCancelConfirm(false); void refresh(); },
   });
 
   if (!token) {
