@@ -413,7 +413,10 @@ function JobDetailModal({
         open={open}
         onOpenChange={(v) => {
           if (!v) {
-            setLightboxIndex(null);
+            if (lightboxIndex !== null) {
+              setLightboxIndex(null);
+              return;
+            }
             setConfirmRefund(false);
             onClose();
           }
