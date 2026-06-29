@@ -89,7 +89,7 @@ export function SupportContent() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="mailto:support@parknshine.id"
+              href="mailto:info@parknshine.net"
               className="bg-[#024ad8] text-white text-sm tracking-[0.7px] px-8 py-3 rounded text-center"
               style={{ fontFamily: inter, fontWeight: 600, textTransform: "uppercase" }}
             >

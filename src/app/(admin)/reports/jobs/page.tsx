@@ -26,6 +26,7 @@ import {
   Search,
   Undo2,
   FileDown,
+  ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,6 +48,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DataTable } from "@/components/ui/data-table";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import {
   useAdminReportBookings,
   useAdminCrew,
@@ -138,17 +145,69 @@ function rowsToSheetData(rows: import("@/features/admin/types").ReportBookingRow
     "Refunded (IDR)": r.refundedAmount,
     "Rating": r.rating ?? "—",
     "Rating Note": r.ratingNote ?? "—",
-    "Locate (s)": r.duration.locateSeconds ?? "—",
-    "Wash (s)": r.duration.washSeconds ?? "—",
-    "Total (s)": r.duration.totalJobSeconds ?? "—",
   }));
 }
 
+function computeTotals(rows: import("@/features/admin/types").ReportBookingRow[]) {
+  return {
+    totalPrice: rows.reduce((sum, r) => sum + (r.refundedAmount > 0 || r.status === "CANCELLED" || r.status === "EXPIRED" ? 0 : r.price), 0),
+    totalRefunded: rows.reduce((sum, r) => sum + r.refundedAmount, 0),
+  };
+}
+
 function downloadExcel(rows: import("@/features/admin/types").ReportBookingRow[], filename: string) {
-  const ws = XLSX.utils.json_to_sheet(rowsToSheetData(rows));
+  const data = rowsToSheetData(rows);
+  const { totalPrice, totalRefunded } = computeTotals(rows);
+  data.push({
+    "Booking ID": "TOTAL",
+    "Date": "",
+    "Site": "",
+    "Slot": "",
+    "Crew": "",
+    "Status": "",
+    "Price (IDR)": totalPrice,
+    "Payment Method": "",
+    "Paid At": "",
+    "Refunded (IDR)": totalRefunded,
+    "Rating": "",
+    "Rating Note": "",
+  });
+  const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Jobs");
   XLSX.writeFile(wb, `${filename}.xlsx`);
+}
+
+function downloadCSV(rows: import("@/features/admin/types").ReportBookingRow[], filename: string) {
+  function csvField(val: string | number | null | undefined): string {
+    if (val === null || val === undefined || val === "—") return "";
+    return `"${String(val).replace(/"/g, '""')}"`;
+  }
+  const { totalPrice, totalRefunded } = computeTotals(rows);
+  const header = "Booking ID,Date,Site,Slot,Crew,Status,Price (IDR),Payment Method,Paid At,Refunded (IDR),Rating,Rating Note\n";
+  const dataRows = rows.map((r) => [
+    csvField(r.id),
+    csvField(formatDate(r.createdAt)),
+    csvField(r.siteName),
+    csvField(r.slot),
+    csvField(r.crewName),
+    csvField(r.status),
+    r.price,
+    csvField(r.paymentMethod),
+    csvField(r.paidAt ? formatDate(r.paidAt) : null),
+    r.refundedAmount,
+    csvField(r.rating != null ? String(r.rating) : null),
+    csvField(r.ratingNote),
+  ].join(",")).join("\n");
+  const totalRow = `"TOTAL",,,,,,${totalPrice},,,,${totalRefunded},,`;
+  const csv = header + dataRows + "\n" + totalRow;
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ─── Photo Lightbox ───────────────────────────────────────────────────────────
@@ -763,11 +822,12 @@ export default function ReportJobsPage() {
     });
   }
 
-  function handleExportCurrent() {
-    downloadExcel(jobRows, `park-n-shine-jobs-page${page}`);
+  function handleExportCurrent(format: "excel" | "csv") {
+    const fn = format === "csv" ? downloadCSV : downloadExcel;
+    fn(jobRows, `park-n-shine-jobs-page${page}`);
   }
 
-  async function handleExportAll() {
+  async function handleExportAll(format: "excel" | "csv") {
     setIsExporting(true);
     try {
       const params = new URLSearchParams();
@@ -782,7 +842,8 @@ export default function ReportJobsPage() {
       params.set("page", "1");
       params.set("limit", String(jobTotal || 10000));
       const res = await api.get<ReportBookingsResponse>(`/v1/admin/reports/bookings?${params}`);
-      downloadExcel(res.data.rows, `park-n-shine-jobs-all`);
+      const fn = format === "csv" ? downloadCSV : downloadExcel;
+      fn(res.data.rows, `park-n-shine-jobs-all`);
     } finally {
       setIsExporting(false);
     }
@@ -957,7 +1018,7 @@ export default function ReportJobsPage() {
 
   return (
     <div className='space-y-6'>
-      <div className='flex flex-wrap items-center justify-between gap-3'>
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4'>
         <div>
           <h1 className='text-xl font-bold text-foreground'>
             {t("reports.title")}
@@ -1284,36 +1345,88 @@ export default function ReportJobsPage() {
         </div>
       )}
 
+      {/* Amount summary */}
+      {jobRows.length > 0 && (() => {
+        const pageRevenue = jobRows.reduce((sum, r) =>
+          sum + (r.refundedAmount > 0 || r.status === "CANCELLED" || r.status === "EXPIRED" ? 0 : r.price), 0);
+        const pageRefunded = jobRows.reduce((sum, r) => sum + r.refundedAmount, 0);
+        const pageNet = pageRevenue - pageRefunded;
+        return (
+          <div className='flex flex-wrap items-center gap-4 rounded-xl border border-border bg-muted/30 px-4 py-3'>
+            <div className='flex items-center gap-3'>
+              <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>Revenue</span>
+              <span className='font-mono text-sm font-semibold text-foreground'>{formatRupiah(pageRevenue)}</span>
+            </div>
+            <div className='h-4 w-px bg-border' />
+            <div className='flex items-center gap-3'>
+              <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>Refunded</span>
+              <span className='font-mono text-sm font-semibold text-red-600 dark:text-red-400'>{pageRefunded > 0 ? `-${formatRupiah(pageRefunded)}` : formatRupiah(0)}</span>
+            </div>
+            <div className='h-4 w-px bg-border' />
+            <div className='flex items-center gap-3'>
+              <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>Net</span>
+              <span className='font-mono text-sm font-bold text-foreground'>{formatRupiah(pageNet)}</span>
+            </div>
+            <span className='ml-auto text-[10px] text-muted-foreground/60'>halaman ini</span>
+          </div>
+        );
+      })()}
+
       {/* Export toolbar */}
       <div className='flex items-center justify-between gap-3'>
         <span className='text-sm text-muted-foreground'>
           <span className='font-semibold text-foreground'>{jobTotal}</span> results
         </span>
         <div className='flex items-center gap-2'>
-          <Button
-            variant='outline'
-            size='sm'
-            disabled={isLoading || jobRows.length === 0}
-            onClick={handleExportCurrent}
-            className='gap-1.5 text-xs'
-          >
-            <FileDown className='h-3.5 w-3.5' />
-            Export Current View
-          </Button>
-          <Button
-            variant='outline'
-            size='sm'
-            disabled={isLoading || jobTotal === 0 || isExporting}
-            onClick={handleExportAll}
-            className='gap-1.5 text-xs'
-          >
-            {isExporting ? (
-              <span className='h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground' />
-            ) : (
-              <FileDown className='h-3.5 w-3.5' />
-            )}
-            Export All ({jobTotal})
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='outline'
+                size='sm'
+                disabled={isLoading || jobRows.length === 0}
+                className='gap-1.5 text-xs'
+              >
+                <FileDown className='h-3.5 w-3.5' />
+                Export Current View
+                <ChevronDown className='h-3 w-3' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem onClick={() => handleExportCurrent("excel")}>
+                Excel (.xlsx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExportCurrent("csv")}>
+                CSV (.csv)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='outline'
+                size='sm'
+                disabled={isLoading || jobTotal === 0 || isExporting}
+                className='gap-1.5 text-xs'
+              >
+                {isExporting ? (
+                  <span className='h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground' />
+                ) : (
+                  <FileDown className='h-3.5 w-3.5' />
+                )}
+                Export All ({jobTotal})
+                <ChevronDown className='h-3 w-3' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem onClick={() => handleExportAll("excel")}>
+                Excel (.xlsx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExportAll("csv")}>
+                CSV (.csv)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

@@ -248,7 +248,7 @@ function WalkInCaptureContent() {
           ocrValue={plateText}
           onOcrChange={setPlateText}
           ocrLabel={t("booking.capture.plateOcrLabel")}
-          ocrHint={t("booking.capture.ocrHint")}
+          ocrHint={t("booking.capture.plateOcrHint")}
           ocrPlaceholder={t("booking.capture.platePlaceholder")}
         />
 
@@ -264,7 +264,7 @@ function WalkInCaptureContent() {
           ocrValue={slotText}
           onOcrChange={setSlotText}
           ocrLabel={t("booking.capture.slotOcrLabel")}
-          ocrHint={t("booking.capture.ocrHint")}
+          ocrHint={t("booking.capture.slotOcrHint")}
           ocrPlaceholder={t("booking.capture.slotPlaceholder")}
         />
 

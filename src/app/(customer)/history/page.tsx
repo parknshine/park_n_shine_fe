@@ -25,18 +25,18 @@ function statusKind(s: string): StatusKind {
   return "pending";
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  DRAFT: "Draft",
-  PENDING: "Menunggu Bayar",
-  CONFIRMED: "Terkonfirmasi",
-  IN_PROGRESS: "Sedang Cuci",
-  READY: "Selesai",
-  CLOSED: "Selesai",
-  CANCELLED: "Dibatalkan",
-  EXPIRED: "Kadaluarsa",
-  NEEDS_HELP: "Butuh Bantuan",
-  STALE: "Kadaluarsa",
-  REFUNDED: "Direfund",
+const STATUS_I18N_KEY: Record<string, string> = {
+  DRAFT: "draft",
+  PENDING: "pending",
+  CONFIRMED: "confirmed",
+  IN_PROGRESS: "in_progress",
+  READY: "ready",
+  CLOSED: "closed",
+  CANCELLED: "cancelled",
+  EXPIRED: "expired",
+  NEEDS_HELP: "needs_help",
+  STALE: "stale",
+  REFUNDED: "refunded",
 };
 
 const KIND_STYLE: Record<StatusKind, { color: string; bg: string }> = {
@@ -159,7 +159,7 @@ export default function HistoryPage() {
           className='rounded-full'
           onClick={() => router.push("/book/capture")}
         >
-          Mulai Cuci Pertama
+          {t("history.startFirstWash")}
         </Button>
       </div>
     );
@@ -188,7 +188,7 @@ export default function HistoryPage() {
             className='mb-4 font-extrabold'
             style={{ fontSize: 25, letterSpacing: "-0.02em", color: "#273034" }}
           >
-            My History
+            {t("history.title")}
           </h1>
         </div>
 
@@ -214,7 +214,7 @@ export default function HistoryPage() {
                 className='font-semibold mt-0.5'
                 style={{ fontSize: 11.5, color: "#5a666d" }}
               >
-                Total riwayat
+                {t("history.totalRecords")}
               </div>
             </div>
             <div
@@ -235,7 +235,7 @@ export default function HistoryPage() {
                 className='font-semibold mt-0.5'
                 style={{ fontSize: 11.5, color: "#5a666d" }}
               >
-                Total belanja
+                {t("history.totalSpent")}
               </div>
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function HistoryPage() {
                   className='text-sm font-semibold'
                   style={{ color: "#9aa6ad" }}
                 >
-                  Belum ada data
+                  {t("history.noData")}
                 </p>
               </div>
             ) : (
@@ -297,7 +297,7 @@ export default function HistoryPage() {
                           className='w-1.5 h-1.5 rounded-full shrink-0'
                           style={{ background: st.color }}
                         />
-                        {STATUS_LABEL[eff] ?? eff}
+                        {t(`history.status.${STATUS_I18N_KEY[eff] ?? eff.toLowerCase()}`)}
                       </span>
                     </div>
 
