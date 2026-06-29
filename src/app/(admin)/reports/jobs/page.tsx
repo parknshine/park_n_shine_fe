@@ -66,6 +66,7 @@ import type {
 import type { ReportBookingFilters, ReportBookingsResponse } from "@/features/admin/hooks/use-admin-report-bookings";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
+import { useUIStore } from "@/store/ui-store";
 
 const BEFORE_TYPES = new Set([
   "BEFORE_FRONT",
@@ -756,6 +757,7 @@ function ReportTabs() {
 export default function ReportJobsPage() {
   const { sites: allSites } = useSiteSelection();
   const { t } = useTranslation("admin");
+  const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -909,9 +911,15 @@ export default function ReportJobsPage() {
       accessorKey: "id",
       header: "Booking ID",
       cell: ({ row }) => (
-        <span className='font-mono text-xs text-muted-foreground'>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setDrawerBookingId(row.original.id);
+          }}
+          className='font-mono text-xs text-blue-600 underline-offset-2 hover:underline'
+        >
           {row.original.id}
-        </span>
+        </button>
       ),
     },
     {

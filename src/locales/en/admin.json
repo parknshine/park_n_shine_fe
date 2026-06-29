@@ -23,7 +23,9 @@
     "loading": "Loading queue...",
     "emptyQueue": "No bookings at the moment.",
     "escalationsTitle": "Escalations — {{count}} booking needs attention",
-    "escalationsTitlePlural": "Escalations — {{count}} bookings need attention"
+    "escalationsTitlePlural": "Escalations — {{count}} bookings need attention",
+    "seeAll": "See All",
+    "moreBookings": "+{{count}} more"
   },
   "audit": {
     "title": "Audit Trail",

@@ -187,13 +187,20 @@ export function BookingDetailDrawer({
                 {booking.statusHistory.length > 0 ? (
                   <ol className="space-y-2">
                     {booking.statusHistory.map((entry, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm">
-                        <StatusBadge tone={BOOKING_STATUS_TONES[entry.status] ?? "neutral"}>
-                          {entry.status}
-                        </StatusBadge>
-                        <span className="text-muted-foreground">
-                          {new Date(entry.changedAt).toLocaleString("id-ID")}
-                        </span>
+                      <li key={i} className="flex flex-col gap-1 text-sm">
+                        <div className="flex items-center gap-3">
+                          <StatusBadge tone={BOOKING_STATUS_TONES[entry.status] ?? "neutral"}>
+                            {entry.status}
+                          </StatusBadge>
+                          <span className="text-muted-foreground">
+                            {new Date(entry.changedAt).toLocaleString("id-ID")}
+                          </span>
+                        </div>
+                        {entry.reason && (
+                          <p className="ml-1 text-xs text-muted-foreground italic">
+                            {entry.reason}
+                          </p>
+                        )}
                       </li>
                     ))}
                   </ol>
@@ -342,7 +349,7 @@ export function BookingDetailDrawer({
                     <Button
                       variant="destructive"
                       size="sm"
-                      disabled={["DRAFT", "PENDING", "CANCELLED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status)}
+                      disabled={["DRAFT", "PENDING", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status)}
                       onClick={() => setActiveModal("refund")}
                     >
                       {t("drawer.refund")}
@@ -401,6 +408,7 @@ export function BookingDetailDrawer({
           <RefundModal
             open={activeModal === "refund"}
             bookingId={booking.id}
+            bookingStatus={booking.status}
             priceAmount={booking.priceAmount ?? 0}
             onClose={() => setActiveModal(null)}
             onSuccess={() => { setActiveModal(null); onActionSuccess(); }}

@@ -27,6 +27,7 @@ export function useBookingActions(bookingId: string) {
       void queryClient.refetchQueries({ queryKey: queryKeys.admin.booking(bookingId) });
       void queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
       void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "report-bookings"] });
       void queryClient.invalidateQueries({ queryKey: ["customer", "booking", bookingId] });
     },
   });

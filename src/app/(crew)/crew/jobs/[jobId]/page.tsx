@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowRight, ChevronLeft, HelpCircle, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,12 @@ export function CrewJobDetailPage() {
   const { t } = useTranslation("crew");
 
   const [helpModalOpen, setHelpModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (job?.status === "CANCELLED" || job?.status === "EXPIRED") {
+      router.replace("/crew/home?noResume=true");
+    }
+  }, [job?.status, router]);
 
   function goBackToQueue() {
     // Keep the active job cached so home can offer to resume it; noResume only

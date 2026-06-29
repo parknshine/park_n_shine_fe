@@ -23,7 +23,9 @@
     "loading": "Memuat queue...",
     "emptyQueue": "Tidak ada booking saat ini.",
     "escalationsTitle": "Eskalasi — {{count}} booking butuh perhatian",
-    "escalationsTitlePlural": "Eskalasi — {{count}} booking butuh perhatian"
+    "escalationsTitlePlural": "Eskalasi — {{count}} booking butuh perhatian",
+    "seeAll": "Lihat Semua",
+    "moreBookings": "+{{count}} lainnya"
   },
   "audit": {
     "title": "Audit Trail",

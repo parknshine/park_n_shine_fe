@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useBookingActions } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
 
@@ -32,6 +33,7 @@ const REFUND_REASONS: Array<{ value: string; labelKey: string }> = [
 interface RefundModalProps {
   open: boolean;
   bookingId: string;
+  bookingStatus: string;
   priceAmount: number;
   onClose: () => void;
   onSuccess: () => void;
@@ -40,10 +42,12 @@ interface RefundModalProps {
 export function RefundModal({
   open,
   bookingId,
+  bookingStatus,
   priceAmount,
   onClose,
   onSuccess,
 }: Readonly<RefundModalProps>) {
+  const isClosed = bookingStatus === "CLOSED";
   const [reasonCode, setReasonCode] = useState("");
   const { refund, isSubmitting } = useBookingActions(bookingId);
   const { t } = useTranslation("admin");
@@ -73,18 +77,27 @@ export function RefundModal({
 
           <div className="space-y-1.5">
             <Label>{t("refundModal.reasonLabel")}</Label>
-            <Select value={reasonCode} onValueChange={setReasonCode}>
-              <SelectTrigger>
-                <SelectValue placeholder={t("refundModal.reasonPlaceholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                {REFUND_REASONS.map((r) => (
-                  <SelectItem key={r.value} value={r.value}>
-                    {t(`refundModal.reasons.${r.labelKey}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isClosed ? (
+              <Textarea
+                value={reasonCode}
+                onChange={(e) => setReasonCode(e.target.value)}
+                placeholder={t("refundModal.reasonPlaceholder")}
+                rows={3}
+              />
+            ) : (
+              <Select value={reasonCode} onValueChange={setReasonCode}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t("refundModal.reasonPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {REFUND_REASONS.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>
+                      {t(`refundModal.reasons.${r.labelKey}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
 
