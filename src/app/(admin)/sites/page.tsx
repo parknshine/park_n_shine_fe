@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronRight, PauseCircle, PlayCircle, MapPin, QrCode, Printer } from "lucide-react";
+import {
+  Plus,
+  ChevronRight,
+  PauseCircle,
+  PlayCircle,
+  MapPin,
+  QrCode,
+  Printer,
+  Building2,
+} from "lucide-react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +27,8 @@ import { LocationPickerModal } from "@/features/admin/components/location-picker
 
 function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
   const { t } = useTranslation("admin");
-  const url = globalThis.window === undefined ? "" : globalThis.window.location.origin;
+  const url =
+    globalThis.window === undefined ? "" : globalThis.window.location.origin;
 
   function handlePrint() {
     const svgEl = globalThis.document.getElementById("generic-site-qr");
@@ -49,30 +59,41 @@ function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
 
     const blob = new Blob([html], { type: "text/html" });
     const blobUrl = URL.createObjectURL(blob);
-    const win = globalThis.window.open(blobUrl, "_blank", "width=400,height=500");
+    const win = globalThis.window.open(
+      blobUrl,
+      "_blank",
+      "width=400,height=500",
+    );
     win?.addEventListener("unload", () => URL.revokeObjectURL(blobUrl));
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-sm rounded-lg border border-border bg-background p-6 shadow-lg space-y-5">
-        <div className="space-y-1">
-          <h2 className="text-base font-semibold text-foreground">{t("sitesPage.genericQrModal.title")}</h2>
-          <p className="text-xs text-muted-foreground">
+    <div className='fixed inset-0 z-40 flex items-center justify-center bg-black/40'>
+      <div className='w-full max-w-sm rounded-lg border border-border bg-background p-6 shadow-lg space-y-5'>
+        <div className='space-y-1'>
+          <h2 className='text-base font-semibold text-foreground'>
+            {t("sitesPage.genericQrModal.title")}
+          </h2>
+          <p className='text-xs text-muted-foreground'>
             {t("sitesPage.genericQrModal.description")}
           </p>
         </div>
 
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/30 p-6">
-          <QRCode id="generic-site-qr" value={url} size={180} />
-          <p className="text-xs text-muted-foreground break-all text-center">{url}</p>
+        <div className='flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/30 p-6'>
+          <QRCode id='generic-site-qr' value={url} size={180} />
+          <p className='text-xs text-muted-foreground break-all text-center'>
+            {url}
+          </p>
         </div>
 
-        <div className="flex gap-2">
-          <Button onClick={handlePrint} className="flex-1 gap-2">
-            <Printer className="h-4 w-4" /> {t("sitesPage.genericQrModal.printQr")}
+        <div className='flex gap-2'>
+          <Button onClick={handlePrint} className='flex-1 gap-2'>
+            <Printer className='h-4 w-4' />{" "}
+            {t("sitesPage.genericQrModal.printQr")}
           </Button>
-          <Button variant="outline" onClick={onClose}>{t("sitesPage.genericQrModal.close")}</Button>
+          <Button variant='outline' onClick={onClose}>
+            {t("sitesPage.genericQrModal.close")}
+          </Button>
         </div>
       </div>
     </div>
@@ -92,11 +113,11 @@ function CreateSiteModal({
   onClose,
   onCreate,
   isCreating,
-}: {
+}: Readonly<{
   onClose: () => void;
   onCreate: (payload: CreateSitePayload) => Promise<unknown>;
   isCreating: boolean;
-}) {
+}>) {
   const { t } = useTranslation("admin");
   const [form, setForm] = useState<CreateFormState>({
     name: "",
@@ -129,22 +150,30 @@ function CreateSiteModal({
     <>
       <div className='fixed inset-0 z-40 flex items-center justify-center bg-black/40'>
         <div className='w-full max-w-md rounded-lg bg-background border border-border p-6 shadow-lg space-y-4'>
-          <h2 className='text-base font-semibold text-foreground'>{t("sitesPage.create.title")}</h2>
+          <h2 className='text-base font-semibold text-foreground'>
+            {t("sitesPage.create.title")}
+          </h2>
           <form onSubmit={handleSubmit} className='space-y-3'>
             <div className='space-y-1'>
-              <Label htmlFor='site-name'>{t("sitesPage.create.nameLabel")}</Label>
+              <Label htmlFor='site-name'>
+                {t("sitesPage.create.nameLabel")}
+              </Label>
               <Input
                 id='site-name'
                 value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, name: e.target.value }))
+                }
                 required
               />
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='site-address'>{t("sitesPage.create.addressLabel")}</Label>
-              <div className="relative">
+              <Label htmlFor='site-address'>
+                {t("sitesPage.create.addressLabel")}
+              </Label>
+              <div className='relative'>
                 <Input
-                  id="site-address"
+                  id='site-address'
                   value={form.address}
                   onChange={(e) =>
                     setForm((f) => ({
@@ -155,25 +184,27 @@ function CreateSiteModal({
                     }))
                   }
                   required
-                  className="pr-10"
+                  className='pr-10'
                 />
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => setPickerOpen(true)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
-                  aria-label="Pick from map"
+                  className='absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground'
+                  aria-label='Pick from map'
                 >
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className='h-4 w-4' />
                 </button>
               </div>
               {form.lat !== null && form.lng !== null && (
-                <p className="text-xs text-muted-foreground">
+                <p className='text-xs text-muted-foreground'>
                   {form.lat.toFixed(5)}, {form.lng.toFixed(5)}
                 </p>
               )}
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='site-timezone'>{t("sitesPage.create.timezoneLabel")}</Label>
+              <Label htmlFor='site-timezone'>
+                {t("sitesPage.create.timezoneLabel")}
+              </Label>
               <Input
                 id='site-timezone'
                 value={form.timezone}
@@ -183,7 +214,9 @@ function CreateSiteModal({
               />
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='site-cutoff'>{t("sitesPage.create.cutoffLabel")}</Label>
+              <Label htmlFor='site-cutoff'>
+                {t("sitesPage.create.cutoffLabel")}
+              </Label>
               <Input
                 id='site-cutoff'
                 placeholder='22:00'
@@ -195,7 +228,9 @@ function CreateSiteModal({
             </div>
             <div className='flex gap-2 pt-2'>
               <Button type='submit' disabled={isCreating}>
-                {isCreating ? t("sitesPage.create.creating") : t("sitesPage.create.create")}
+                {isCreating
+                  ? t("sitesPage.create.creating")
+                  : t("sitesPage.create.create")}
               </Button>
               <Button type='button' variant='outline' onClick={onClose}>
                 {t("sitesPage.create.cancel")}
@@ -244,7 +279,10 @@ function EditSiteModal({
 }: Readonly<{
   site: AdminSiteDetail;
   onClose: () => void;
-  onUpdate: (args: { siteId: string; payload: UpdateSitePayload }) => Promise<unknown>;
+  onUpdate: (args: {
+    siteId: string;
+    payload: UpdateSitePayload;
+  }) => Promise<unknown>;
   isUpdating: boolean;
 }>) {
   const { t } = useTranslation("admin");
@@ -282,22 +320,30 @@ function EditSiteModal({
     <>
       <div className='fixed inset-0 z-40 flex items-center justify-center bg-black/40'>
         <div className='w-full max-w-md rounded-lg bg-background border border-border p-6 shadow-lg space-y-4'>
-          <h2 className='text-base font-semibold text-foreground'>{t("sitesPage.editModal.title")}</h2>
+          <h2 className='text-base font-semibold text-foreground'>
+            {t("sitesPage.editModal.title")}
+          </h2>
           <form onSubmit={handleSubmit} className='space-y-3'>
             <div className='space-y-1'>
-              <Label htmlFor='edit-site-name'>{t("sitesPage.editModal.nameLabel")}</Label>
+              <Label htmlFor='edit-site-name'>
+                {t("sitesPage.editModal.nameLabel")}
+              </Label>
               <Input
                 id='edit-site-name'
                 value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, name: e.target.value }))
+                }
                 required
               />
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='edit-site-address'>{t("sitesPage.editModal.addressLabel")}</Label>
-              <div className="relative">
+              <Label htmlFor='edit-site-address'>
+                {t("sitesPage.editModal.addressLabel")}
+              </Label>
+              <div className='relative'>
                 <Input
-                  id="edit-site-address"
+                  id='edit-site-address'
                   value={form.address}
                   onChange={(e) =>
                     setForm((f) => ({
@@ -308,25 +354,27 @@ function EditSiteModal({
                     }))
                   }
                   required
-                  className="pr-10"
+                  className='pr-10'
                 />
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => setPickerOpen(true)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
-                  aria-label="Pick from map"
+                  className='absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground'
+                  aria-label='Pick from map'
                 >
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className='h-4 w-4' />
                 </button>
               </div>
               {form.lat !== null && form.lng !== null && (
-                <p className="text-xs text-muted-foreground">
+                <p className='text-xs text-muted-foreground'>
                   {form.lat.toFixed(5)}, {form.lng.toFixed(5)}
                 </p>
               )}
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='edit-site-timezone'>{t("sitesPage.editModal.timezoneLabel")}</Label>
+              <Label htmlFor='edit-site-timezone'>
+                {t("sitesPage.editModal.timezoneLabel")}
+              </Label>
               <Input
                 id='edit-site-timezone'
                 value={form.timezone}
@@ -336,7 +384,9 @@ function EditSiteModal({
               />
             </div>
             <div className='space-y-1'>
-              <Label htmlFor='edit-site-cutoff'>{t("sitesPage.editModal.cutoffLabel")}</Label>
+              <Label htmlFor='edit-site-cutoff'>
+                {t("sitesPage.editModal.cutoffLabel")}
+              </Label>
               <Input
                 id='edit-site-cutoff'
                 placeholder='22:00'
@@ -348,7 +398,9 @@ function EditSiteModal({
             </div>
             <div className='flex gap-2 pt-2'>
               <Button type='submit' disabled={isUpdating}>
-                {isUpdating ? t("sitesPage.editModal.saving") : t("sitesPage.editModal.save")}
+                {isUpdating
+                  ? t("sitesPage.editModal.saving")
+                  : t("sitesPage.editModal.save")}
               </Button>
               <Button type='button' variant='outline' onClick={onClose}>
                 {t("sitesPage.editModal.cancel")}
@@ -382,7 +434,8 @@ function EditSiteModal({
 export default function SitesPage() {
   const { t } = useTranslation("admin");
   const router = useRouter();
-  const { sites, isLoading, create, isCreating, update, isUpdating } = useAdminSites();
+  const { sites, isLoading, create, isCreating, update, isUpdating } =
+    useAdminSites();
   const [showCreate, setShowCreate] = useState(false);
   const [showGenericQr, setShowGenericQr] = useState(false);
   const [editSite, setEditSite] = useState<AdminSiteDetail | null>(null);
@@ -403,52 +456,69 @@ export default function SitesPage() {
             {t("sitesPage.subtitle")}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setShowGenericQr(true)}>
+        <div className='flex items-center gap-2'>
+          <Button
+            size='sm'
+            variant='outline'
+            onClick={() => setShowGenericQr(true)}
+          >
             <QrCode className='mr-2 h-4 w-4' /> {t("sitesPage.genericQr")}
           </Button>
-          <Button onClick={() => setShowCreate(true)}>
+          <Button size='sm' onClick={() => setShowCreate(true)}>
             <Plus className='mr-2 h-4 w-4' /> {t("sitesPage.newSite")}
           </Button>
         </div>
       </div>
 
-      {isLoading ? (
-        <p className='text-sm text-muted-foreground'>{t("sitesPage.loading")}</p>
-      ) : sites.length === 0 ? (
+      {isLoading && (
+        <p className='text-sm text-muted-foreground'>
+          {t("sitesPage.loading")}
+        </p>
+      )}
+
+      {!isLoading && sites.length === 0 && (
         <div className='flex h-40 items-center justify-center rounded-lg border border-dashed border-border'>
           <p className='text-sm text-muted-foreground'>
             {t("sitesPage.empty")}
           </p>
         </div>
-      ) : (
-        <div className='space-y-2'>
+      )}
+
+      {!isLoading && sites.length > 0 && (
+        <div className='space-y-3'>
           {sites.map((site) => (
             <div
               key={site.id}
-              className='flex items-center justify-between rounded-lg border border-border bg-background p-4'
+              className='flex items-center gap-4 rounded-xl border border-border bg-[#FBFDFE] px-5 py-10 shadow'
             >
-              <div className='space-y-0.5'>
-                <p className='text-sm font-medium text-foreground'>
+              <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50'>
+                <Building2 className='h-5 w-5 text-blue-400' />
+              </div>
+              <div className='min-w-0 flex-1'>
+                <p className='text-sm font-semibold text-foreground'>
                   {site.name}
                 </p>
-                <p className='text-xs text-muted-foreground'>{site.address}</p>
+                <p className='text-xs text-muted-foreground leading-snug mt-0.5'>
+                  {site.address}
+                </p>
               </div>
-              <div className='flex items-center gap-3'>
+              <div className='flex items-center gap-3 shrink-0'>
                 {site.intakePaused ? (
-                  <span className='flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive'>
-                    <PauseCircle className='h-3 w-3' /> {t("sitesPage.status.paused")}
+                  <span className='flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive'>
+                    <PauseCircle className='h-3 w-3' />{" "}
+                    {t("sitesPage.status.paused")}
                   </span>
                 ) : (
-                  <span className='flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-xs text-green-600'>
-                    <PlayCircle className='h-3 w-3' /> {t("sitesPage.status.active")}
+                  <span className='flex items-center gap-1.5 rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-600'>
+                    <PlayCircle className='h-3 w-3' />{" "}
+                    {t("sitesPage.status.active")}
                   </span>
                 )}
                 {confirmPauseId === site.id ? (
-                  <div className="flex items-center gap-1">
+                  <div className='flex items-center gap-1'>
                     <Button
-                      variant="destructive"
-                      size="sm"
+                      variant='destructive'
+                      size='sm'
                       disabled={isUpdating}
                       onClick={async () => {
                         await handleToggleIntake(site.id, site.intakePaused);
@@ -458,21 +528,17 @@ export default function SitesPage() {
                       Yakin
                     </Button>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant='ghost'
+                      size='sm'
                       onClick={() => setConfirmPauseId(null)}
                     >
                       Batal
                     </Button>
                   </div>
                 ) : (
-                  <Button
-                    variant={site.intakePaused ? "outline" : "ghost"}
-                    size="sm"
-                    className={site.intakePaused
-                      ? "text-green-600 border-green-600 hover:bg-green-50"
-                      : "text-destructive hover:bg-destructive/10"
-                    }
+                  <button
+                    type='button'
+                    className={`text-xs font-medium ${site.intakePaused ? "text-green-600 hover:text-green-700" : "text-destructive hover:text-destructive/80"}`}
                     onClick={() => {
                       if (site.intakePaused) {
                         void handleToggleIntake(site.id, site.intakePaused);
@@ -482,21 +548,23 @@ export default function SitesPage() {
                     }}
                   >
                     {site.intakePaused ? "Aktifkan" : "Nonaktifkan"}
-                  </Button>
+                  </button>
                 )}
-                <Button
-                  variant='ghost'
-                  size='sm'
+                <button
+                  type='button'
+                  className='text-xs font-medium text-foreground hover:text-muted-foreground'
                   onClick={() => setEditSite(site)}
                 >
                   {t("sitesPage.actions.edit")}
-                </Button>
+                </button>
                 <Button
                   variant='outline'
                   size='sm'
+                  className='text-xs'
                   onClick={() => router.push(`/sites/${site.id}`)}
                 >
-                  {t("sitesPage.actions.manageQr")} <ChevronRight className='ml-1 h-3 w-3' />
+                  {t("sitesPage.actions.manageQr")}{" "}
+                  <ChevronRight className='ml-1 h-3 w-3' />
                 </Button>
               </div>
             </div>

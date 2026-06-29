@@ -11,7 +11,7 @@ function DropdownMenuContent({
   className,
   sideOffset = 4,
   ...props
-}: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>) {
+}: Readonly<React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>>) {
   return (
     <DropdownMenuPortal>
       <DropdownMenuPrimitive.Content
@@ -33,7 +33,7 @@ function DropdownMenuContent({
 function DropdownMenuItem({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item>) {
+}: Readonly<React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item>>) {
   return (
     <DropdownMenuPrimitive.Item
       className={cn(
@@ -50,7 +50,7 @@ function DropdownMenuItem({
 function DropdownMenuSeparator({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>) {
+}: Readonly<React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>>) {
   return (
     <DropdownMenuPrimitive.Separator
       className={cn("-mx-1 my-1 h-px bg-border", className)}
