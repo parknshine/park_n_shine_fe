@@ -47,5 +47,75 @@
       "messagePlaceholder": "Ceritakan bagaimana kami bisa membantu...",
       "send": "Kirim Pesan"
     }
+  },
+  "support": {
+    "title": "Apa yang bisa kami bantu?",
+    "subtitle": "Temukan jawaban atas pertanyaan umum di bawah, atau hubungi tim kami langsung.",
+    "backHome": "Kembali ke Beranda",
+    "quickLinks": {
+      "bookWash": "Pesan Cuci",
+      "contactUs": "Hubungi Kami",
+      "privacyPolicy": "Kebijakan Privasi",
+      "terms": "Syarat & Ketentuan"
+    },
+    "faqTitle": "Pertanyaan yang Sering Diajukan",
+    "faqs": [
+      {
+        "question": "Bagaimana cara kerja Park & Shine?",
+        "answer": "Pesan cuci mobil waterless melalui aplikasi kami dengan memilih lokasi parkir dan kendaraan Anda. Kru kami akan menemukan mobil Anda, melakukan pencucian, dan memberi tahu Anda saat selesai — semua sementara Anda berbelanja atau bekerja."
+      },
+      {
+        "question": "Apakah cuci waterless aman untuk mobil saya?",
+        "answer": "Ya. Formula cuci waterless kami dirancang khusus untuk melumasi dan mengangkat kotoran dengan aman tanpa menggores cat. Digunakan oleh detailer profesional di seluruh dunia dan aman untuk semua jenis lapisan cat mobil."
+      },
+      {
+        "question": "Berapa lama waktu pencucian?",
+        "answer": "Cuci mobil waterless standar biasanya memakan waktu 20–40 menit tergantung ukuran kendaraan dan tingkat kekotoran. Anda dapat memantau progresnya secara real time melalui aplikasi."
+      },
+      {
+        "question": "Bagaimana jika saya tidak puas dengan hasilnya?",
+        "answer": "Hubungi kami dalam 24 jam setelah layanan selesai. Tim kami akan meninjau kasus Anda dan mengatur cuci ulang atau pengembalian dana yang sesuai."
+      },
+      {
+        "question": "Apakah saya bisa membatalkan pesanan?",
+        "answer": "Ya, Anda dapat membatalkan sebelum kru ditugaskan dan mendapatkan pengembalian dana penuh. Setelah layanan dimulai, pembatalan tidak tersedia."
+      },
+      {
+        "question": "Lokasi parkir mana saja yang tersedia?",
+        "answer": "Kami saat ini beroperasi di mal-mal pilihan dan area parkir komersial di Jakarta. Cek aplikasi untuk daftar lengkap lokasi yang didukung — kami terus berkembang."
+      },
+      {
+        "question": "Apakah saya perlu hadir saat pencucian?",
+        "answer": "Tidak. Cukup pesan, parkir mobil Anda, dan lanjutkan aktivitas Anda. Anda akan menerima notifikasi saat kru mulai bekerja dan saat pencucian selesai."
+      },
+      {
+        "question": "Bagaimana cara memantau status pencucian?",
+        "answer": "Setelah memesan, Anda dapat melihat pembaruan status real time di aplikasi — mulai dari penugasan kru hingga setiap tahap pencucian sampai selesai."
+      }
+    ],
+    "cta": {
+      "title": "Masih butuh bantuan?",
+      "subtitle": "Tim dukungan kami tersedia Senin–Sabtu, 08.00–20.00 WIB.",
+      "emailBtn": "Email Dukungan",
+      "contactBtn": "Hubungi Kami"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Kebijakan Privasi",
+    "lastUpdated": "Terakhir diperbarui: Mei 2026",
+    "backHome": "Kembali ke Beranda",
+    "tocLabel": "Di halaman ini",
+    "sections": [
+      { "id": "section-1", "label": "1. Data yang Kami Kumpulkan" },
+      { "id": "section-2", "label": "2. Tujuan Penggunaan Data" },
+      { "id": "section-3", "label": "3. Pembagian Data" },
+      { "id": "section-4", "label": "4. Penyimpanan Data" },
+      { "id": "section-5", "label": "5. Keamanan Data" },
+      { "id": "section-6", "label": "6. Cookies dan Teknologi Serupa" },
+      { "id": "section-7", "label": "7. Hak Anda" },
+      { "id": "section-8", "label": "8. Penggunaan Data Anonim" },
+      { "id": "section-9", "label": "9. Perubahan Kebijakan Privasi" },
+      { "id": "section-10", "label": "10. Hubungi Kami" }
+    ]
   }
 }

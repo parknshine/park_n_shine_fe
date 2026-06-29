@@ -47,5 +47,75 @@
       "messagePlaceholder": "Tell us how we can help...",
       "send": "Send Message"
     }
+  },
+  "support": {
+    "title": "How can we help?",
+    "subtitle": "Find answers to common questions below, or reach out to our team directly.",
+    "backHome": "Back to Home",
+    "quickLinks": {
+      "bookWash": "Book a Wash",
+      "contactUs": "Contact Us",
+      "privacyPolicy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "faqTitle": "Frequently Asked Questions",
+    "faqs": [
+      {
+        "question": "How does Park & Shine work?",
+        "answer": "Book a waterless car wash through our app by selecting your parking location and vehicle. Our crew will find your car, perform the wash, and notify you when it's done — all while you shop or work."
+      },
+      {
+        "question": "Is waterless washing safe for my car?",
+        "answer": "Yes. Our waterless wash formula is specially designed to lubricate and lift dirt safely without scratching the paint. It is used by professional detailers worldwide and is safe for all car finishes."
+      },
+      {
+        "question": "How long does the wash take?",
+        "answer": "A standard waterless car wash typically takes 20–40 minutes depending on your vehicle size and level of dirt. You can track the progress in real time through the app."
+      },
+      {
+        "question": "What if I'm not satisfied with the result?",
+        "answer": "Contact us within 24 hours of service completion. Our team will review your case and arrange a re-wash or refund as appropriate."
+      },
+      {
+        "question": "Can I cancel my booking?",
+        "answer": "Yes, you can cancel before a crew member is assigned and receive a full refund. Once service has started, cancellations are not available."
+      },
+      {
+        "question": "Which parking locations are supported?",
+        "answer": "We currently operate at selected malls and commercial parking areas in Jakarta. Check the app for the full list of supported locations — we're expanding regularly."
+      },
+      {
+        "question": "Do I need to be present during the wash?",
+        "answer": "No. Simply book, park your car, and go about your day. You'll receive a notification when the crew starts and when the wash is complete."
+      },
+      {
+        "question": "How do I track my wash status?",
+        "answer": "After booking, you can view real-time status updates in the app — from crew assignment through each wash stage to completion."
+      }
+    ],
+    "cta": {
+      "title": "Still need help?",
+      "subtitle": "Our support team is available Monday–Saturday, 08:00–20:00 WIB.",
+      "emailBtn": "Email Support",
+      "contactBtn": "Contact Us"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: May 2026",
+    "backHome": "Back to Home",
+    "tocLabel": "On this page",
+    "sections": [
+      { "id": "section-1", "label": "1. Information We Collect" },
+      { "id": "section-2", "label": "2. Purpose of Data Processing" },
+      { "id": "section-3", "label": "3. Data Sharing" },
+      { "id": "section-4", "label": "4. Data Retention" },
+      { "id": "section-5", "label": "5. Data Security" },
+      { "id": "section-6", "label": "6. Cookies and Similar Technologies" },
+      { "id": "section-7", "label": "7. Your Rights" },
+      { "id": "section-8", "label": "8. Use of Anonymized Data" },
+      { "id": "section-9", "label": "9. Changes to This Privacy Policy" },
+      { "id": "section-10", "label": "10. Contact Us" }
+    ]
   }
 }

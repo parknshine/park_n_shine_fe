@@ -51,7 +51,9 @@ export function PayButton({
 
   useEffect(() => {
     if (!error) return;
-    toast.error(error === "payment_confirm_failed" ? labels.errorFallback : error);
+    toast.error(
+      error === "payment_confirm_failed" ? labels.errorFallback : error,
+    );
   }, [error, labels.errorFallback]);
 
   function handlePay() {
@@ -60,7 +62,9 @@ export function PayButton({
       plateText,
       slotText,
       ...(phone ? { phone } : {}),
-      ...(locationLat != null && locationLng != null ? { locationLat, locationLng } : {}),
+      ...(locationLat != null && locationLng != null
+        ? { locationLat, locationLng }
+        : {}),
       ...(locationName ? { locationName } : {}),
       ...(siteId ? { siteId } : {}),
     };
@@ -76,7 +80,9 @@ export function PayButton({
         { plate: plateText, slot: slotText, ...(phone ? { phone } : {}) },
         { headers: { "X-Booking-Token": signedToken } },
       );
-      globalThis.location.assign(`/booking/${bookingId}/status?token=${signedToken}`);
+      globalThis.location.assign(
+        `/booking/${bookingId}/status?token=${signedToken}`,
+      );
     } catch {
       toast.error("Simulasi pembayaran gagal");
       setIsSimulating(false);
@@ -84,20 +90,20 @@ export function PayButton({
   }
 
   return (
-    <div className="space-y-3">
-      <p className="text-xs text-muted-foreground">
-        {t("booking.confirm.disclaimer")}
+    <div className='space-y-3'>
+      <p className='text-xs text-muted-foreground'>
+        <i> {t("booking.confirm.disclaimer")}</i>
       </p>
 
       <Button
-        size="lg"
-        className="w-full rounded-full"
+        size='lg'
+        className='w-full rounded-full'
         disabled={!canSubmit || isSubmitting}
         onClick={handlePay}
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className='mr-2 h-4 w-4 animate-spin' />
             {labels.processing}
           </>
         ) : (
@@ -107,15 +113,15 @@ export function PayButton({
 
       {process.env.NODE_ENV !== "production" && (
         <button
-          type="button"
+          type='button'
           disabled={isSimulating}
           onClick={handleSimulatePay}
-          className="flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
+          className='flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-amber-400 bg-amber-50 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400'
         >
           {isSimulating ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className='h-4 w-4 animate-spin' />
           ) : (
-            <Zap className="h-4 w-4" />
+            <Zap className='h-4 w-4' />
           )}
           {isSimulating ? "Memproses..." : "⚡ Simulasi Bayar (Dev Only)"}
         </button>
