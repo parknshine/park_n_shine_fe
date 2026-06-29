@@ -25,6 +25,7 @@ interface StatusHeroProps {
   status: BookingStatus;
   plate?: string | null;
   slot?: string | null;
+  isRefunded?: boolean;
 }
 
 const STATUS_LABEL_KEYS: Record<BookingStatus, string> = {
@@ -66,7 +67,7 @@ function StatusIcon({ status }: Readonly<{ status: BookingStatus }>) {
   return <Car className={cn(base, "text-muted-foreground")} />;
 }
 
-export function StatusHero({ status, plate, slot }: StatusHeroProps) {
+export function StatusHero({ status, plate, slot, isRefunded = false }: Readonly<StatusHeroProps>) {
   const { t } = useTranslation("customer");
 
   // DRAFT / STALE are internal states — render a neutral loading indicator
@@ -99,12 +100,18 @@ export function StatusHero({ status, plate, slot }: StatusHeroProps) {
           !isReady && !isActive && "bg-muted",
         )}
       >
-        <StatusIcon status={status} />
+        <StatusIcon status={isRefunded ? BOOKING_STATUSES.PAID : status} />
       </div>
 
-      <StatusBadge tone={BOOKING_STATUS_TONES[status]}>
-        {t(STATUS_LABEL_KEYS[status])}
-      </StatusBadge>
+      {isRefunded ? (
+        <StatusBadge tone="info">
+          {t("history.status.refunded", { defaultValue: "Direfund" })}
+        </StatusBadge>
+      ) : (
+        <StatusBadge tone={BOOKING_STATUS_TONES[status]}>
+          {t(STATUS_LABEL_KEYS[status])}
+        </StatusBadge>
+      )}
 
       {(plate || slot) && (
         <div className='flex justify-center gap-4 text-sm text-muted-foreground'>

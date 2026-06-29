@@ -83,6 +83,7 @@ export interface CustomerBooking {
   startedAt: string | null;
   completedSteps: number;
   hasRated: boolean;
+  refundedAmount?: number;
 }
 
 export interface CreateBookingPayload {

@@ -113,6 +113,7 @@ export default function BookingStatusPage() {
   const isPaid = booking.status === BOOKING_STATUSES.PAID;
   const isReady = booking.status === BOOKING_STATUSES.READY;
   const isCancelled = booking.status === BOOKING_STATUSES.CANCELLED;
+  const isRefunded = isCancelled && (booking.refundedAmount ?? 0) > 0;
   const isNeedsHelp = booking.status === BOOKING_STATUSES.NEEDS_HELP;
   const isInProgress = booking.status === BOOKING_STATUSES.IN_PROGRESS;
 
@@ -131,6 +132,7 @@ export default function BookingStatusPage() {
         status={booking.status}
         plate={booking.plateText}
         slot={booking.slotText}
+        isRefunded={isRefunded}
       />
 
       {!isTerminal &&
@@ -241,9 +243,11 @@ export default function BookingStatusPage() {
       )}
 
       {isCancelled && (
-        <div className='rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center space-y-3'>
+        <div className={`rounded-2xl border p-6 text-center space-y-3 ${isRefunded ? "border-sky-200 bg-sky-50 dark:border-sky-900 dark:bg-sky-950" : "border-destructive/30 bg-destructive/5"}`}>
           <p className='text-sm text-muted-foreground'>
-            {t("status.cancelledMessage")}
+            {isRefunded
+              ? t("status.refundedMessage", { defaultValue: "Pembayaran kamu telah direfund." })
+              : t("status.cancelledMessage")}
           </p>
           {cancellationReason && (
             <p className='text-xs text-muted-foreground'>

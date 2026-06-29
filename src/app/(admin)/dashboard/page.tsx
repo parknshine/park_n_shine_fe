@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Building2, ArrowLeft } from "lucide-react";
+import { Building2, ArrowLeft, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AdminQueueGroup,
@@ -33,6 +33,7 @@ function DashboardSiteCard({ site, onBookingClick }: DashboardSiteCardProps) {
   const { t } = useTranslation("admin");
   const router = useRouter();
 
+  const escalationIds = new Set(site.escalations.map((e) => e.id));
   const allBookings: AdminQueueBooking[] = [
     ...site.escalations,
     ...site.groups.flatMap((g) => g.bookings),
@@ -72,26 +73,34 @@ function DashboardSiteCard({ site, onBookingClick }: DashboardSiteCardProps) {
           </div>
         ) : (
           <div className="divide-y divide-border">
-            {preview.map((booking, i) => (
-              <button
-                key={booking.id}
-                type="button"
-                onClick={() => onBookingClick(booking)}
-                className="grid w-full grid-cols-[1.5rem_1fr_auto_auto] items-center gap-2 px-2 py-2 text-left text-sm hover:bg-muted/50 transition-colors rounded"
-              >
-                <span className="text-xs text-muted-foreground font-mono">{i + 1}</span>
-                <div className="min-w-0">
-                  <p className="font-semibold text-foreground truncate">{booking.plateText ?? booking.id}</p>
-                  <p className="text-xs text-muted-foreground truncate">{booking.slotText}</p>
-                </div>
-                <p className="text-xs text-muted-foreground shrink-0">
-                  {booking.crewName ?? t("queueGroup.unassigned")}
-                </p>
-                <p className="text-xs font-mono text-muted-foreground shrink-0">
-                  {formatElapsedShort(booking.elapsedSeconds, t)}
-                </p>
-              </button>
-            ))}
+            {preview.map((booking, i) => {
+              const isEscalated = escalationIds.has(booking.id);
+              return (
+                <button
+                  key={booking.id}
+                  type="button"
+                  onClick={() => onBookingClick(booking)}
+                  className="grid w-full grid-cols-[1.5rem_1fr_auto_auto] items-center gap-2 px-2 py-2 text-left text-sm hover:bg-muted/50 transition-colors rounded"
+                >
+                  <span className="text-xs text-muted-foreground font-mono">{i + 1}</span>
+                  <div className="min-w-0 flex items-center gap-1.5">
+                    {isEscalated && (
+                      <AlertTriangle className="h-3 w-3 shrink-0 text-red-500" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground truncate">{booking.plateText ?? booking.id}</p>
+                      <p className="text-xs text-muted-foreground truncate">{booking.slotText}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground shrink-0">
+                    {booking.crewName ?? t("queueGroup.unassigned")}
+                  </p>
+                  <p className="text-xs font-mono text-muted-foreground shrink-0">
+                    {formatElapsedShort(booking.elapsedSeconds, t)}
+                  </p>
+                </button>
+              );
+            })}
             {remaining > 0 && (
               <p className="px-2 py-1.5 text-xs text-muted-foreground text-center">
                 {t("dashboard.moreBookings", { count: remaining })}
