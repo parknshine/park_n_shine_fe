@@ -71,7 +71,7 @@ interface BookingStatusTimelineProps {
 export function BookingStatusTimeline({
   status,
   statusHistory = [],
-}: BookingStatusTimelineProps) {
+}: Readonly<BookingStatusTimelineProps>) {
   const { t } = useTranslation("customer");
 
   const currentStep = STATUS_STEP[status] ?? 0;
@@ -115,7 +115,6 @@ export function BookingStatusTimeline({
   if (!timestampMap.has("IN_PROGRESS") && timestampMap.has("LOCATED")) {
     timestampMap.set("IN_PROGRESS", timestampMap.get("LOCATED")!);
   }
-
   return (
     <ol aria-label='Booking progress'>
       {STEPS.map((step, index) => {

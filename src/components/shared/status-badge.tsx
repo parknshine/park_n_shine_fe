@@ -29,7 +29,7 @@ export function StatusBadge({
   children,
   className,
   tone = "neutral",
-}: StatusBadgeProps) {
+}: Readonly<StatusBadgeProps>) {
   return (
     <span
       className={cn(

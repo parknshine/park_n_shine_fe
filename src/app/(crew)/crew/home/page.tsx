@@ -251,6 +251,28 @@ export function CrewHomePage() {
 
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-44px)] max-w-md flex-col px-4 pb-8 pt-6">
+      {/* "Penugasan Baru!" banner — shown when jobs are available and crew has no active job */}
+      {hasJob && !job && (
+        <div className="mb-4 rounded-2xl border border-sky-200 bg-linear-to-r from-white to-sky-50 p-4 dark:border-sky-800 dark:from-card dark:to-sky-950/30">
+          <div className="flex items-center gap-3">
+            <div className="relative shrink-0">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <Car className="h-6 w-6 text-primary" />
+              </div>
+              {count > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-extrabold text-white">
+                  {count}
+                </span>
+              )}
+            </div>
+            <div>
+              <p className="font-bold text-destructive">Penugasan Baru!</p>
+              <p className="text-sm text-muted-foreground">Tersedia dan siap diambil sekarang.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Monthly stats widget */}
       {statsQuery.data && (
         <div className="mb-4 overflow-hidden rounded-2xl border border-border bg-card">
@@ -336,28 +358,6 @@ export function CrewHomePage() {
               {t("home.notifButton")}
             </Button>
           )}
-        </div>
-      )}
-
-      {/* "Penugasan Baru!" banner — shown when jobs are available and crew has no active job */}
-      {hasJob && !job && (
-        <div className="mb-4 rounded-2xl border border-sky-200 bg-linear-to-r from-white to-sky-50 p-4 dark:border-sky-800 dark:from-card dark:to-sky-950/30">
-          <div className="flex items-center gap-3">
-            <div className="relative shrink-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                <Car className="h-6 w-6 text-primary" />
-              </div>
-              {count > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-extrabold text-white">
-                  {count}
-                </span>
-              )}
-            </div>
-            <div>
-              <p className="font-bold text-destructive">Penugasan Baru!</p>
-              <p className="text-sm text-muted-foreground">Tersedia dan siap diambil sekarang.</p>
-            </div>
-          </div>
         </div>
       )}
 

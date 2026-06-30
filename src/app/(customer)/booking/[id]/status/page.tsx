@@ -185,8 +185,6 @@ export default function BookingStatusPage() {
       ) : (
         <StatusHero
           status={booking.status}
-          plate={booking.plateText}
-          slot={booking.slotText}
           isRefunded={isRefunded}
         />
       )}
@@ -210,7 +208,7 @@ export default function BookingStatusPage() {
       {(isPending || isPaid) && !showCancelConfirm && (
         <button
           onClick={() => setShowCancelConfirm(true)}
-          className='w-full rounded-xl border border-destructive/40 py-3 text-sm text-destructive transition-colors hover:bg-destructive/5'
+          className='w-full rounded-xl border border-destructive bg-white py-3 text-sm font-medium text-destructive transition-colors hover:bg-destructive/5 dark:bg-card'
         >
           {t("status.cancelBooking", { defaultValue: "Cancel Booking" })}
         </button>
@@ -258,7 +256,7 @@ export default function BookingStatusPage() {
       )}
 
       {isReady && (
-        <div className='rounded-2xl bg-primary/10 p-6 text-center space-y-4'>
+        <div className='rounded-2xl border border-[#D4E0E7] bg-white p-6 text-center space-y-4 dark:border-border dark:bg-card'>
           <p className='text-lg font-semibold text-primary'>
             {t("status.carReady")}
           </p>
@@ -460,7 +458,7 @@ export default function BookingStatusPage() {
         />
       )}
 
-      <div className='rounded-2xl border border-border px-4 py-5'>
+      <div className='rounded-2xl border border-border bg-white px-4 py-5 dark:bg-card'>
         <p className='mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
           {t("status.historyTitle", { defaultValue: "Booking Progress" })}
         </p>
