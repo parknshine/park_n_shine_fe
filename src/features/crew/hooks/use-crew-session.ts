@@ -30,9 +30,13 @@ export function useCrewSession() {
     },
     mutationKey: mutationKeys.crew.login(),
     onSuccess: (data) => {
-      localStorage.setItem("crew-token", data.token);
       store.setCrewSession(data.crewId, data.crewName, data.siteId);
       queryClient.setQueryData(queryKeys.crew.session(), data);
+      try {
+        localStorage.setItem("crew-token", data.token);
+      } catch {
+        // localStorage unavailable (e.g. private browsing quota) — auth still works via cookie
+      }
     },
   });
 

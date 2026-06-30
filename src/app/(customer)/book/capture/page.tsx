@@ -11,19 +11,22 @@ import api from "@/lib/axios";
 import { AppShell, OfflineBanner } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
+import { PhotoGuidelinesPanel } from "@/features/customer/components/photo-guidelines-panel";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { usePhotoUpload, usePublicSettings, usePublicSites } from "@/features/customer/hooks";
-import { isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
+import { getDialCodeOptions, isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
 import type { CustomerBooking } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -37,6 +40,8 @@ export default function WalkInCapturePage() {
 }
 
 const WALKIN_FLOW_KEY = "walkin";
+
+const DIAL_CODE_OPTIONS = getDialCodeOptions();
 
 function isSitePastCutoff(cutoffTime: string | null): boolean {
   if (!cutoffTime) return false;
@@ -77,6 +82,9 @@ function WalkInCaptureContent() {
   const [slotText, setSlotText] = useState(savedSession?.slotText ?? "");
   const [location, setLocation] = useState(savedSession?.location ?? siteIdParam ?? "");
   const [phone, setPhone] = useState(savedSession?.phone ?? "");
+  const [countryCode, setCountryCode] = useState("ID");
+  const selectedDialOption = DIAL_CODE_OPTIONS.find((d) => d.countryCode === countryCode);
+  const dialCode = selectedDialOption?.dialCode ?? "+62";
   const [useProfilePhone, setUseProfilePhone] = useState(
     !savedSession && !!profilePhone,
   );
@@ -141,7 +149,12 @@ function WalkInCaptureContent() {
     if (text) startTransition(() => setSlotText(text));
   }, [slotUpload.media?.ocrText]);
 
-  const effectivePhone = useProfilePhone ? (profilePhone ?? "") : phone;
+  let effectivePhone = "";
+  if (useProfilePhone) {
+    effectivePhone = profilePhone ?? "";
+  } else if (phone) {
+    effectivePhone = `${dialCode}${phone}`;
+  }
 
   const canContinue =
     !!bookingId &&
@@ -156,6 +169,9 @@ function WalkInCaptureContent() {
     if (!bookingId || !signedToken) return;
     const plate = plateText.trim().toUpperCase();
     const slot = slotText.trim().toUpperCase();
+    const phoneForSave = useProfilePhone
+      ? normalizePhone(profilePhone ?? "")
+      : normalizePhone(`${dialCode}${phone}`);
     saveCapture({
       flowKey: WALKIN_FLOW_KEY,
       bookingId,
@@ -163,7 +179,7 @@ function WalkInCaptureContent() {
       plateText: plate,
       slotText: slot,
       location,
-      phone: normalizePhone(effectivePhone),
+      phone: phoneForSave,
       plateState: { progress: plateUpload.progress, status: plateUpload.status, error: plateUpload.error, media: plateUpload.media },
       slotState: { progress: slotUpload.progress, status: slotUpload.status, error: slotUpload.error, media: slotUpload.media },
     });
@@ -176,7 +192,7 @@ function WalkInCaptureContent() {
       loc: selectedSite?.name ?? loc ?? "",
       addr: selectedSite?.address ?? "",
       siteId: selectedSite?.id ?? "",
-      phone: normalizePhone(effectivePhone),
+      phone: phoneForSave,
       plate,
       slot,
     });
@@ -250,6 +266,22 @@ function WalkInCaptureContent() {
           ocrLabel={t("booking.capture.plateOcrLabel")}
           ocrHint={t("booking.capture.plateOcrHint")}
           ocrPlaceholder={t("booking.capture.platePlaceholder")}
+          guidelines={
+            <PhotoGuidelinesPanel
+              goodSrc="/images/guidelines/plate-good.png"
+              avoidExamples={[
+                { src: "/images/guidelines/plate-good.png", label: t("booking.capture.guidelines.avoidBlurry"), blur: true },
+                { src: "/images/guidelines/plate-angled.png", label: t("booking.capture.guidelines.avoidAngled") },
+                { src: "/images/guidelines/plate-dark.png", label: t("booking.capture.guidelines.avoidDark") },
+              ]}
+              checklistItems={[
+                t("booking.capture.guidelines.plateChecklist_0"),
+                t("booking.capture.guidelines.plateChecklist_1"),
+                t("booking.capture.guidelines.plateChecklist_2"),
+                t("booking.capture.guidelines.plateChecklist_3"),
+              ]}
+            />
+          }
         />
 
         {/* Slot photo + OCR */}
@@ -266,6 +298,22 @@ function WalkInCaptureContent() {
           ocrLabel={t("booking.capture.slotOcrLabel")}
           ocrHint={t("booking.capture.slotOcrHint")}
           ocrPlaceholder={t("booking.capture.slotPlaceholder")}
+          guidelines={
+            <PhotoGuidelinesPanel
+              goodSrc="/images/guidelines/slot-good.png"
+              avoidExamples={[
+                { src: "/images/guidelines/slot-good.png", label: t("booking.capture.guidelines.avoidBlurry"), blur: true },
+                { src: "/images/guidelines/slot-angled.png", label: t("booking.capture.guidelines.avoidAngled") },
+                { src: "/images/guidelines/slot-dark.png", label: t("booking.capture.guidelines.avoidDark") },
+              ]}
+              checklistItems={[
+                t("booking.capture.guidelines.slotChecklist_0"),
+                t("booking.capture.guidelines.slotChecklist_1"),
+                t("booking.capture.guidelines.slotChecklist_2"),
+                t("booking.capture.guidelines.slotChecklist_3"),
+              ]}
+            />
+          }
         />
 
         {/* Location — selectable (no QR) */}
@@ -325,17 +373,49 @@ function WalkInCaptureContent() {
               </span>
             </label>
           )}
-          <Input
-            id="phone"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={useProfilePhone ? (profilePhone ?? "") : phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-            placeholder={t("booking.capture.phonePlaceholder")}
-            className="h-10 rounded-lg border-border bg-[#eff8fe]"
-            readOnly={useProfilePhone}
-          />
+          <div className="flex h-10 overflow-hidden rounded-lg border border-border bg-[#eff8fe]">
+            <Select
+              value={countryCode}
+              onValueChange={setCountryCode}
+              disabled={useProfilePhone}
+            >
+              <SelectTrigger className="h-full w-24 rounded-none border-0 border-r border-border bg-transparent px-2 shadow-none focus:ring-0">
+                <span className="text-sm font-medium text-foreground">
+                  {selectedDialOption?.flag} {dialCode}
+                </span>
+              </SelectTrigger>
+              <SelectContent className="w-64">
+                <SelectGroup>
+                  <SelectLabel>Pilihan Utama</SelectLabel>
+                  {DIAL_CODE_OPTIONS.filter((d) => d.isPriority).map((d) => (
+                    <SelectItem key={d.countryCode} value={d.countryCode}>
+                      {d.flag} {d.dialCode} — {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>Semua Negara</SelectLabel>
+                  {DIAL_CODE_OPTIONS.filter((d) => !d.isPriority).map((d) => (
+                    <SelectItem key={d.countryCode} value={d.countryCode}>
+                      {d.flag} {d.dialCode} — {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <input
+              id="phone"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={useProfilePhone ? (profilePhone ?? "") : phone}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+              placeholder={t("booking.capture.phonePlaceholder")}
+              className="h-full flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none"
+              readOnly={useProfilePhone}
+            />
+          </div>
           {loyaltyEnabled && (
             <p className="text-xs text-muted-foreground">
               Nomor HP akan digunakan untuk program loyalti Park N Shine
@@ -349,7 +429,7 @@ function WalkInCaptureContent() {
         {/* Continue */}
         <Button
           size="lg"
-          className="w-full"
+          className="w-full rounded-full border-0 bg-linear-to-b from-[#1db1f1] to-[#006289] font-extrabold text-[#eff8fe] shadow-[0_24px_30px_rgba(29,177,241,0.16)] hover:opacity-90"
           disabled={!canContinue}
           suffix={<ArrowRight className="h-4 w-4" />}
           onClick={handleContinue}

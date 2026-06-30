@@ -47,6 +47,7 @@ export function useBookingStatus({
         completedSteps?: number;
         hasRated?: boolean;
         refundedAmount?: number;
+        media?: { id: string; kind: string; url: string; ocrText?: string | null }[];
         timeline?: { status: CustomerBooking["status"]; timestamp: string; reason?: string | null }[];
       }>(`/v1/bookings/${bookingId}`, {
         headers: { "X-Booking-Token": signedToken },
@@ -64,7 +65,12 @@ export function useBookingStatus({
         priceAmount: d.price,
         paymentMethod: d.paymentMethod ?? null,
         paymentInstructions: d.paymentInstructions ?? null,
-        media: [],
+        media: (d.media ?? []).map((m) => ({
+          id: m.id,
+          kind: m.kind as import("@/types/media").MediaKind,
+          url: m.url,
+          ocrText: m.ocrText ?? null,
+        })),
         startedAt: d.startedAt ?? null,
         completedSteps: d.completedSteps ?? 0,
         hasRated: d.hasRated ?? false,

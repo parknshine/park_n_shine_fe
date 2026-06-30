@@ -718,6 +718,23 @@ img {
   animation: scan-line 1.5s ease-in-out infinite;
 }
 
+/* ─── Confetti fall animation (booking CLOSED hero) ────────────────────────── */
+@keyframes confetti-fall {
+  0%   { translate: 0 -10px; opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 0.7; }
+  100% { translate: 0 55px; opacity: 0; }
+}
+
+.confetti-fall   { animation: confetti-fall ease-in forwards; }
+.confetti-fall-1 { animation-duration: 2.0s; animation-delay: 0.00s; }
+.confetti-fall-2 { animation-duration: 1.8s; animation-delay: 0.18s; }
+.confetti-fall-3 { animation-duration: 2.3s; animation-delay: 0.08s; }
+.confetti-fall-4 { animation-duration: 1.9s; animation-delay: 0.28s; }
+.confetti-fall-5 { animation-duration: 2.1s; animation-delay: 0.12s; }
+.confetti-fall-6 { animation-duration: 1.7s; animation-delay: 0.35s; }
+.confetti-fall-7 { animation-duration: 2.4s; animation-delay: 0.05s; }
+
 /* ─── Testimonial slide-in animation ────────────────────────────────────────── */
 @keyframes testimonial-slide-in {
   from { opacity: 0; transform: translateY(10px); }

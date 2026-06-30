@@ -169,18 +169,18 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
         />
       )}
       <header className="fixed inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-14 max-w-md items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+        <div className="mx-auto flex h-16 max-w-md items-center justify-between px-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
               <Image
                 src="/icons/icon.svg"
                 alt="Park & Shine"
-                width={20}
-                height={20}
+                width={24}
+                height={24}
                 className="shrink-0"
               />
             </div>
-            <span className="text-sm font-semibold text-foreground">
+            <span className="text-base font-semibold text-foreground">
               Park & Shine
             </span>
           </div>
@@ -197,7 +197,7 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
 
             <div
               title={session.crewName}
-              className="ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground"
+              className="ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
             >
               {initials}
             </div>
@@ -207,15 +207,15 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
               size="sm"
               onClick={handleLogout}
               aria-label="Logout"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+              className="h-9 w-9 p-0 text-muted-foreground hover:text-destructive"
             >
-              <LogOut className="h-3.5 w-3.5" />
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="pt-14">
+      <div className="pt-16">
         <AppShell surface="crew">{children}</AppShell>
       </div>
     </>

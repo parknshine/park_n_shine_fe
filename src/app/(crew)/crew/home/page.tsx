@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, Bell, BellOff, BriefcaseBusiness, CheckCircle2, Clock, Inbox, Loader2, Star, Wallet } from "lucide-react";
+import { ArrowRight, Bell, BellOff, BriefcaseBusiness, Car, Clock, Inbox, Loader2, Star, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useJobQueue, useNextJob, useCrewMonthlyStats } from "@/features/crew/hooks";
@@ -211,52 +211,32 @@ export function CrewHomePage() {
       );
     }
 
-    const jobCountLabel = count === 1
-      ? t("home.jobWaiting_one", { count, defaultValue: `${count} job waiting` })
-      : t("home.jobWaiting_other", { count, defaultValue: `${count} jobs waiting` });
-
     return (
-      <div className="w-full space-y-4">
-        {hasJob && (
-          <div className="flex items-center justify-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-              </span>
-              {jobCountLabel}
-            </span>
-          </div>
-        )}
-
-        <div className="relative w-full">
-          {!claimBusy && hasJob && (
-            <span
-              className="absolute inset-0 -z-10 animate-pulse rounded-xl bg-primary/20"
-              aria-hidden="true"
-            />
+      <div className="w-full space-y-3">
+        <Button
+          size="lg"
+          variant="default"
+          className={cn(
+            "h-16 w-full rounded-xl text-base font-extrabold tracking-wide shadow-[0_24px_30px_rgba(29,177,241,0.16)]",
+            "bg-linear-to-b from-[#1db1f1] to-[#006289] hover:from-[#19a0d8] hover:to-[#005070]",
+            claimBusy && "opacity-80",
           )}
-          <Button
-            size="lg"
-            variant="default"
-            className={cn(
-              "h-16 w-full rounded-xl text-base font-bold tracking-wide",
-              claimBusy && "opacity-80"
-            )}
-            disabled={claimBusy}
-            onClick={openPreviewModal}
-            aria-label={t("home.claimAriaLabel")}
-          >
-            {claimBusy ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                {t("home.searching")}
-              </>
-            ) : (
-              t("home.claimButton")
-            )}
-          </Button>
-        </div>
+          disabled={claimBusy}
+          onClick={openPreviewModal}
+          aria-label={t("home.claimAriaLabel")}
+        >
+          {claimBusy ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              {t("home.searching")}
+            </>
+          ) : (
+            <>
+              {t("home.claimButton")}
+              <ArrowRight className="h-5 w-5" />
+            </>
+          )}
+        </Button>
 
         {!claimBusy && (
           <p className="text-center text-xs text-muted-foreground">
@@ -270,83 +250,88 @@ export function CrewHomePage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-[calc(100dvh-44px)] max-w-md flex-col px-4 pb-8 pt-10">
+    <main className="mx-auto flex min-h-[calc(100dvh-44px)] max-w-md flex-col px-4 pb-8 pt-6">
       {/* Monthly stats widget */}
       {statsQuery.data && (
-        <div className="mb-6 rounded-xl border border-border bg-card px-4 py-4">
-          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col items-center">
+        <div className="mb-4 overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
+              <Car className="h-4 w-4 text-primary" />
+            </div>
+            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              {new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
+            </span>
+          </div>
+          <div className="grid grid-cols-3 divide-x divide-border pt-5 pb-7">
+            <div className="flex flex-col items-center gap-2 px-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <Star className="h-5 w-5 text-primary" />
+              </div>
               <span className="text-lg font-bold">
                 {statsQuery.data.avgRating === null ? "—" : statsQuery.data.avgRating.toFixed(1)}
               </span>
-              <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                <Star className="h-3 w-3" /> Rating
-              </span>
+              <span className="text-xs text-muted-foreground">Rating</span>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-lg font-bold">{statsQuery.data.jobsCompleted}</span>
-              <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                <CheckCircle2 className="h-3 w-3" /> Job Selesai
-              </span>
-            </div>
-            <div className="col-span-2 flex flex-col items-center">
-              <span className="text-lg font-bold">
+            <div className="flex flex-col items-center gap-2 px-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                <Wallet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <span className="text-base font-bold">
                 Rp {statsQuery.data.tips.amount.toLocaleString("id-ID")}
               </span>
-              <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                <Wallet className="h-3 w-3" /> Tip ({statsQuery.data.tips.count})
-              </span>
+              <span className="text-xs text-muted-foreground">Tip ({statsQuery.data.tips.count})</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 px-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <BriefcaseBusiness className="h-5 w-5 text-primary" />
+              </div>
+              <span className="text-lg font-bold">{statsQuery.data.jobsCompleted}</span>
+              <span className="text-xs text-muted-foreground">Job Selesai</span>
             </div>
           </div>
         </div>
       )}
 
       {pushEnabled && permission !== "unsupported" && (
-        <div className={cn(
-          "mb-4 rounded-xl border p-4",
-          permission === "granted" && "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30",
-          permission === "denied" && "border-destructive/20 bg-destructive/5",
-          permission === "default" && "border-primary/20 bg-primary/5",
-        )}>
-          <div className="flex items-start gap-3">
-            <div className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-              permission === "granted" && "bg-emerald-100 dark:bg-emerald-900/50",
-              permission === "denied" && "bg-destructive/10",
-              permission === "default" && "bg-primary/10",
-            )}>
-              {permission === "granted" && <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
-              {permission === "denied" && <BellOff className="h-4 w-4 text-destructive" />}
-              {permission === "default" && <Bell className="h-4 w-4 text-primary" />}
+        <div className="mb-4 rounded-2xl border border-border bg-card p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+              {permission === "denied" ? (
+                <BellOff className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <Bell className="h-5 w-5 text-primary" />
+              )}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className={cn(
-                "text-sm font-semibold",
-                permission === "granted" && "text-emerald-700 dark:text-emerald-300",
-                permission === "denied" && "text-destructive",
-                permission === "default" && "text-foreground",
-              )}>
-                {permission === "granted" && t("home.notifGranted")}
-                {permission === "denied" && t("home.notifDenied")}
-                {permission === "default" && t("home.notifTitle")}
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-foreground">
+                {permission === "granted" ? t("home.notifGranted") : t("home.notifTitle")}
               </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 {permission === "granted" && t("home.notifGrantedDescription")}
                 {permission === "denied" && t("home.notifDeniedDescription")}
                 {permission === "default" && t("home.notifDescription")}
               </p>
             </div>
-          </div>
-          {(permission === "default" || permission === "denied") && (
-            <Button
-              size="sm"
-              variant={permission === "denied" ? "outline" : "default"}
-              className="mt-3 w-full"
-              onClick={subscribePush}
+            <button
+              onClick={permission !== "granted" && permission !== "denied" ? subscribePush : undefined}
+              disabled={permission === "denied"}
+              aria-label={t("home.notifButton")}
+              className={cn(
+                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none",
+                permission === "granted" ? "bg-primary" : "bg-muted",
+                permission === "denied" && "cursor-not-allowed opacity-50",
+              )}
             >
+              <span
+                className={cn(
+                  "inline-block h-4 w-4 rounded-full bg-white shadow transition-transform",
+                  permission === "granted" ? "translate-x-6" : "translate-x-1",
+                )}
+              />
+            </button>
+          </div>
+          {permission === "default" && (
+            <Button size="sm" className="mt-3 w-full" onClick={subscribePush}>
               <Bell className="h-4 w-4" />
               {t("home.notifButton")}
             </Button>
@@ -354,17 +339,42 @@ export function CrewHomePage() {
         </div>
       )}
 
-      <div className="mb-8 flex items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <BriefcaseBusiness className="h-5 w-5" />
-        </span>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            {t("home.queueLabel")}
-          </p>
-          <h1 className="text-lg font-bold leading-tight text-foreground">
-            {t("home.readyTitle")}
-          </h1>
+      {/* "Penugasan Baru!" banner — shown when jobs are available and crew has no active job */}
+      {hasJob && !job && (
+        <div className="mb-4 rounded-2xl border border-sky-200 bg-linear-to-r from-white to-sky-50 p-4 dark:border-sky-800 dark:from-card dark:to-sky-950/30">
+          <div className="flex items-center gap-3">
+            <div className="relative shrink-0">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <Car className="h-6 w-6 text-primary" />
+              </div>
+              {count > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-extrabold text-white">
+                  {count}
+                </span>
+              )}
+            </div>
+            <div>
+              <p className="font-bold text-destructive">Penugasan Baru!</p>
+              <p className="text-sm text-muted-foreground">Tersedia dan siap diambil sekarang.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Queue header card */}
+      <div className="mb-4 rounded-2xl border border-border bg-card p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+            <BriefcaseBusiness className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              {t("home.queueLabel")}
+            </p>
+            <h1 className="text-base font-bold leading-tight text-foreground">
+              {t("home.readyTitle")}
+            </h1>
+          </div>
         </div>
       </div>
 

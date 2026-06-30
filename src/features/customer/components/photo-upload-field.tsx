@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import {
   Camera,
   CheckCircle,
@@ -42,6 +43,8 @@ interface PhotoUploadFieldProps {
   ocrPlaceholder?: string;
   /** When true, shows a download button after a successful upload. */
   showDownload?: boolean;
+  /** Content shown as photo-taking guidelines in the idle state */
+  guidelines?: ReactNode;
 }
 
 export function PhotoUploadField({
@@ -59,6 +62,7 @@ export function PhotoUploadField({
   ocrHint,
   ocrPlaceholder,
   showDownload,
+  guidelines,
 }: Readonly<PhotoUploadFieldProps>) {
   const { t } = useTranslation("customer");
   const defaults = {
@@ -167,29 +171,32 @@ export function PhotoUploadField({
 
       {/* ── Empty state ─────────────────────────── */}
       {!hasPhoto && (
-        <div className='flex gap-2'>
-          <Button
-            asChild
-            size='sm'
-            variant='outline'
-            className='flex-1 rounded-full'
-          >
-            <label htmlFor={`${id}-camera`} className='cursor-pointer gap-1.5'>
-              <Camera className='h-4 w-4 shrink-0' />
-              {L.upload}
-            </label>
-          </Button>
-          <Button
-            asChild
-            size='sm'
-            variant='outline'
-            className='flex-1 rounded-full'
-          >
-            <label htmlFor={`${id}-gallery`} className='cursor-pointer gap-1.5'>
-              <ImageIcon className='h-4 w-4 shrink-0' />
-              {L.gallery}
-            </label>
-          </Button>
+        <div className='space-y-3'>
+          {guidelines}
+          <div className='flex gap-2'>
+            <Button
+              asChild
+              size='sm'
+              variant='outline'
+              className='flex-1 rounded-full'
+            >
+              <label htmlFor={`${id}-camera`} className='cursor-pointer gap-1.5'>
+                <Camera className='h-4 w-4 shrink-0' />
+                {L.upload}
+              </label>
+            </Button>
+            <Button
+              asChild
+              size='sm'
+              variant='outline'
+              className='flex-1 rounded-full'
+            >
+              <label htmlFor={`${id}-gallery`} className='cursor-pointer gap-1.5'>
+                <ImageIcon className='h-4 w-4 shrink-0' />
+                {L.gallery}
+              </label>
+            </Button>
+          </div>
         </div>
       )}
 
