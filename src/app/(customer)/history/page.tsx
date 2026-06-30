@@ -7,6 +7,7 @@ import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import { useCustomerBookings } from "@/features/customer/hooks/use-customer-bookings";
 import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
+import { shortId } from "@/lib/utils";
 
 type StatusKind = "ok" | "fail" | "refunded" | "pending";
 
@@ -62,9 +63,6 @@ function fmtDate(d: string) {
   });
 }
 
-function shortId(id: string): string {
-  return `#${id.slice(0, 8).toUpperCase()}-${id.slice(8, 12).toUpperCase()}-${id.slice(12, 16).toUpperCase()}`;
-}
 
 function DropletSVG({ color }: Readonly<{ color: string }>) {
   return (

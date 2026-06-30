@@ -5,6 +5,7 @@ import type { AuditEntry } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 import { formatAuditDetail, formatAuditAction } from "@/features/admin/utils/format-audit-detail";
 import { DataTable } from "@/components/ui/data-table";
+import { shortId } from "@/lib/utils";
 
 interface AuditLogTableProps {
   entries: AuditEntry[];
@@ -43,7 +44,7 @@ export function AuditLogTable({
       accessorKey: "bookingId",
       header: t("auditTable.columns.bookingId"),
       cell: ({ row }) => (
-        <span className="font-mono text-xs">{row.original.bookingId}</span>
+        <span className="font-mono text-xs">{shortId(row.original.bookingId)}</span>
       ),
     },
     {

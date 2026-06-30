@@ -65,7 +65,7 @@ import type {
 } from "@/features/admin/types";
 import type { ReportBookingFilters, ReportBookingsResponse } from "@/features/admin/hooks/use-admin-report-bookings";
 import { useTranslation } from "@/i18n";
-import { cn } from "@/lib/utils";
+import { cn, shortId } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
 
 const BEFORE_TYPES = new Set([
@@ -507,8 +507,8 @@ function JobDetailModal({
                   <Hash className='h-3.5 w-3.5 shrink-0' />
                   Booking ID
                 </span>
-                <span className='break-all text-right font-mono text-xs font-medium'>
-                  {row.id}
+                <span className='text-right font-mono text-xs font-medium'>
+                  {shortId(row.id)}
                 </span>
               </div>
               <div className='flex items-center justify-between px-4 py-3'>
@@ -918,7 +918,7 @@ export default function ReportJobsPage() {
           }}
           className='font-mono text-xs text-blue-600 underline-offset-2 hover:underline'
         >
-          {row.original.id}
+          {shortId(row.original.id)}
         </button>
       ),
     },
