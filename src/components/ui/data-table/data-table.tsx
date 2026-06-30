@@ -87,16 +87,16 @@ export function DataTable<TData>({
         toolbar={toolbar}
       />
 
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-x-auto rounded-2xl bg-card shadow-(--shadow)">
         <table className="w-full text-sm">
-          <thead className="border-b border-border bg-muted/50">
+          <thead className="bg-(--surface-low)">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
                     className={cn(
-                      "px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap",
+                      "px-4 py-3 text-left font-medium text-foreground whitespace-nowrap",
                       alignClass(header.column.columnDef.meta?.align)
                     )}
                   >

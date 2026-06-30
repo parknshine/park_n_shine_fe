@@ -5,8 +5,8 @@ import { toast } from "react-hot-toast";
 import { UserPlus, Pencil, ToggleLeft, ToggleRight, Phone, Trash2 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -171,6 +171,20 @@ function EditCrewModal({
   );
 }
 
+function CrewAvatar({ name }: Readonly<{ name: string }>) {
+  const initials = name
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+  return (
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-(--surface-low) text-sm font-bold text-primary">
+      {initials}
+    </div>
+  );
+}
+
 function CrewRowActions({
   crew,
   onEdit,
@@ -186,26 +200,28 @@ function CrewRowActions({
 }>) {
   return (
     <div className="flex justify-end gap-2">
-      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => onEdit(crew)}>
+      <button
+        type="button"
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-(--surface-low) text-primary transition-opacity hover:opacity-70"
+        onClick={() => onEdit(crew)}
+      >
         <Pencil className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-8 w-8 p-0"
+      </button>
+      <button
+        type="button"
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-(--surface-low) text-primary transition-opacity hover:opacity-70"
         onClick={() => onToggle(crew)}
       >
-        {crew.active ? <ToggleRight className="h-4 w-4 text-primary" /> : <ToggleLeft className="h-4 w-4" />}
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+        {crew.active ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
+      </button>
+      <button
+        type="button"
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-destructive/5 text-destructive transition-opacity hover:opacity-70 disabled:opacity-40"
         onClick={() => onDelete(crew.id, crew.name)}
         disabled={isDeleting}
       >
         <Trash2 className="h-4 w-4" />
-      </Button>
+      </button>
     </div>
   );
 }
@@ -236,7 +252,10 @@ export default function CrewPage() {
       accessorKey: "name",
       header: t("crewPage.table.name"),
       cell: ({ row }) => (
-        <span className="font-medium">{row.original.name}</span>
+        <div className="flex items-center gap-3">
+          <CrewAvatar name={row.original.name} />
+          <span className="font-semibold">{row.original.name}</span>
+        </div>
       ),
     },
     {
@@ -262,11 +281,21 @@ export default function CrewPage() {
     {
       accessorKey: "active",
       header: t("crewPage.table.status"),
-      cell: ({ row }) => (
-        <Badge variant={row.original.active ? "default" : "secondary"}>
-          {row.original.active ? t("crewPage.status.active") : t("crewPage.status.inactive")}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const active = row.original.active;
+        return (
+          <span
+            className={cn(
+              "inline-flex items-center rounded-full border px-3 py-0.5 text-xs font-semibold",
+              active
+                ? "border-primary/20 bg-primary/5 text-primary"
+                : "border-border bg-muted text-muted-foreground"
+            )}
+          >
+            {active ? t("crewPage.status.active") : t("crewPage.status.inactive")}
+          </span>
+        );
+      },
     },
     {
       id: "actions",
