@@ -17,6 +17,7 @@ import { RefundModal } from "./refund-modal";
 import { useTranslation } from "@/i18n";
 import { useAuthStore } from "@/store/auth-store";
 import { formatAuditDetail, formatAuditAction } from "@/features/admin/utils/format-audit-detail";
+import { bookingRef } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface BookingDetailDrawerProps {
@@ -120,7 +121,7 @@ export function BookingDetailDrawer({
             {booking && (
               <>
                 <span className="font-semibold text-foreground">
-                  {booking.plateText ?? booking.id}
+                  {booking.plateText ?? bookingRef(booking.reference, booking.id)}
                 </span>
                 <StatusBadge tone={BOOKING_STATUS_TONES[booking.status] ?? "neutral"}>
                   {booking.status}

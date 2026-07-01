@@ -6,6 +6,7 @@ import { queryKeys } from "@/lib/query-keys";
 
 export interface CustomerBookingSummary {
   id: string;
+  reference: string | null;
   plate: string | null;
   status: string;
   price: number;

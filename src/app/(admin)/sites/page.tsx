@@ -104,6 +104,7 @@ interface CreateFormState {
   name: string;
   address: string;
   timezone: string;
+  code: string | null;
   cutoffTime: string | null;
   lat: number | null;
   lng: number | null;
@@ -123,6 +124,7 @@ function CreateSiteModal({
     name: "",
     address: "",
     timezone: "Asia/Jakarta",
+    code: null,
     cutoffTime: null,
     lat: null,
     lng: null,
@@ -136,6 +138,7 @@ function CreateSiteModal({
         name: form.name,
         address: form.address,
         timezone: form.timezone,
+        code: form.code,
         cutoffTime: form.cutoffTime,
         lat: form.lat,
         lng: form.lng,
@@ -214,6 +217,24 @@ function CreateSiteModal({
               />
             </div>
             <div className='space-y-1'>
+              <Label htmlFor='site-code'>
+                {t("sitesPage.create.codeLabel")}
+              </Label>
+              <Input
+                id='site-code'
+                placeholder='01'
+                inputMode='numeric'
+                maxLength={2}
+                value={form.code ?? ""}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    code: e.target.value.replace(/\D/g, "").slice(0, 2) || null,
+                  }))
+                }
+              />
+            </div>
+            <div className='space-y-1'>
               <Label htmlFor='site-cutoff'>
                 {t("sitesPage.create.cutoffLabel")}
               </Label>
@@ -266,6 +287,7 @@ interface EditFormState {
   name: string;
   address: string;
   timezone: string;
+  code: string | null;
   cutoffTime: string | null;
   lat: number | null;
   lng: number | null;
@@ -290,6 +312,7 @@ function EditSiteModal({
     name: site.name,
     address: site.address,
     timezone: site.timezone,
+    code: site.code,
     cutoffTime: site.cutoffTime,
     lat: site.lat ?? null,
     lng: site.lng ?? null,
@@ -305,6 +328,7 @@ function EditSiteModal({
           name: form.name,
           address: form.address,
           timezone: form.timezone,
+          code: form.code,
           cutoffTime: form.cutoffTime,
           lat: form.lat,
           lng: form.lng,
@@ -380,6 +404,24 @@ function EditSiteModal({
                 value={form.timezone}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, timezone: e.target.value }))
+                }
+              />
+            </div>
+            <div className='space-y-1'>
+              <Label htmlFor='edit-site-code'>
+                {t("sitesPage.editModal.codeLabel")}
+              </Label>
+              <Input
+                id='edit-site-code'
+                placeholder='01'
+                inputMode='numeric'
+                maxLength={2}
+                value={form.code ?? ""}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    code: e.target.value.replace(/\D/g, "").slice(0, 2) || null,
+                  }))
                 }
               />
             </div>
@@ -495,9 +537,16 @@ export default function SitesPage() {
                 <Building2 className='h-5 w-5 text-blue-400' />
               </div>
               <div className='min-w-0 flex-1'>
-                <p className='text-sm font-semibold text-foreground'>
-                  {site.name}
-                </p>
+                <div className='flex items-center gap-2'>
+                  <p className='text-sm font-semibold text-foreground'>
+                    {site.name}
+                  </p>
+                  {site.code && (
+                    <span className='rounded bg-blue-50 px-1.5 py-0.5 text-[11px] font-mono font-medium text-blue-600'>
+                      #PS-{site.code}
+                    </span>
+                  )}
+                </div>
                 <p className='text-xs text-muted-foreground leading-snug mt-0.5'>
                   {site.address}
                 </p>

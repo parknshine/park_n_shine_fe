@@ -7,7 +7,7 @@ import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import { useCustomerBookings } from "@/features/customer/hooks/use-customer-bookings";
 import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
-import { shortId } from "@/lib/utils";
+import { bookingRef } from "@/lib/utils";
 
 type StatusKind = "ok" | "fail" | "refunded" | "pending";
 
@@ -285,7 +285,7 @@ export default function HistoryPage() {
                           letterSpacing: "0.02em",
                         }}
                       >
-                        {shortId(booking.id)}
+                        {bookingRef(booking.reference, booking.id)}
                       </span>
                       <span
                         className='shrink-0 inline-flex items-center gap-1.5 text-[11px] font-bold px-[11px] py-[5px] rounded-full'

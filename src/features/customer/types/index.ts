@@ -66,6 +66,7 @@ export type PaymentInstructions =
 
 export interface CustomerBooking {
   id: string;
+  reference?: string | null;
   signedToken: string;
   status: BookingStatus;
   siteName: string;

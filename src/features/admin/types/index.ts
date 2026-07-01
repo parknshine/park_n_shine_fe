@@ -70,6 +70,7 @@ export interface ReportCrewPerformance {
 export interface AuditEntry {
   id: string;
   bookingId: string;
+  reference: string | null;
   plateText: string | null;
   action: "refund" | "status_override" | "reassign" | "extend_time" | "crew.job_rejected" | "approve_time_extension" | "reject_time_extension";
   detail: string;
@@ -108,6 +109,7 @@ export interface ReportBookingDuration {
 
 export interface ReportBookingRow {
   id: string;
+  reference: string | null;
   createdAt: string;
   siteName: string | null;
   slot: string | null;
@@ -162,6 +164,7 @@ export interface AdminSiteDetail {
   address: string;
   timezone: string;
   intakePaused: boolean;
+  code: string | null;
   cutoffTime: string | null;
   lat?: number | null;
   lng?: number | null;
@@ -181,6 +184,7 @@ export interface CreateSitePayload {
   name: string;
   address: string;
   timezone: string;
+  code?: string | null;
   cutoffTime?: string | null;
   lat?: number | null;
   lng?: number | null;
@@ -190,6 +194,7 @@ export interface UpdateSitePayload {
   name?: string;
   address?: string;
   timezone?: string;
+  code?: string | null;
   cutoffTime?: string | null;
   intakePaused?: boolean;
   lat?: number | null;

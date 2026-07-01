@@ -13,7 +13,7 @@ import {
 import { useAdminAllSitesQueue } from "@/features/admin/hooks";
 import type { AdminQueueBooking, AdminSiteQueue } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
-import { shortId } from "@/lib/utils";
+import { bookingRef } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
 
 const PREVIEW_LIMIT = 3;
@@ -107,7 +107,7 @@ function DashboardSiteCard({
                     )}
                     <div className='min-w-0'>
                       <p className='font-semibold text-foreground truncate'>
-                        {booking.plateText ?? shortId(booking.id)}
+                        {booking.plateText ?? bookingRef(booking.reference, booking.id)}
                       </p>
                       <p className='text-xs text-muted-foreground truncate'>
                         {booking.slotText}

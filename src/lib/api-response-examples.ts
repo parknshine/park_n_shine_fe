@@ -670,6 +670,7 @@ export const adminSuccessExamples = {
         {
           id: "audit_01",
           bookingId: "book_01HXZ6Q2K8F8G4V2K7YQJ9Z1A4",
+          reference: "#PS-01-202606001",
           plateText: "B 1234 ABC",
           action: "reassign",
           detail:
@@ -708,6 +709,7 @@ export const adminSuccessExamples = {
         {
           id: "audit_02",
           bookingId: "book_01HXZ6Q2K8F8G4V2K7YQJ9Z1A4",
+          reference: "#PS-01-202606001",
           plateText: "B 1234 ABC",
           action: "refund",
           detail: "Refund penuh Rp75.000. Alasan: Mobil tidak bisa dicuci.",
@@ -745,6 +747,7 @@ export const adminSuccessExamples = {
         {
           id: "audit_03",
           bookingId: "book_01HXZ6Q2K8F8G4V2K7YQJ9Z1A4",
+          reference: "#PS-01-202606001",
           plateText: "B 1234 ABC",
           action: "status_override",
           detail:
