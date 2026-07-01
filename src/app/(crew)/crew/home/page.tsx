@@ -352,12 +352,12 @@ export function CrewHomePage() {
               />
             </button>
           </div>
-          {permission === "default" && (
+          {/* {permission === "default" && (
             <Button size="sm" className="mt-3 w-full" onClick={subscribePush}>
               <Bell className="h-4 w-4" />
               {t("home.notifButton")}
             </Button>
-          )}
+          )} */}
         </div>
       )}
 

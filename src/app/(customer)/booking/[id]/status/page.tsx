@@ -76,7 +76,10 @@ export default function BookingStatusPage() {
   const { cancel, isPending: isCancelling } = useCancelBooking({
     bookingId,
     signedToken: token ?? "",
-    onSuccess: () => { setShowCancelConfirm(false); void refresh(); },
+    onSuccess: () => {
+      setShowCancelConfirm(false);
+      void refresh();
+    },
   });
 
   if (!token) {
@@ -121,7 +124,8 @@ export default function BookingStatusPage() {
   const plateMedia = booking.media.find((m) => m.kind === "plate");
   const slotMedia = booking.media.find((m) => m.kind === "slot");
 
-  const paidAt = booking.statusHistory.find((e) => e.status === "PAID")?.changedAt ?? null;
+  const paidAt =
+    booking.statusHistory.find((e) => e.status === "PAID")?.changedAt ?? null;
 
   const PAYMENT_METHOD_LABELS: Record<string, string> = {
     gopay: "GoPay",
@@ -136,23 +140,35 @@ export default function BookingStatusPage() {
     mandiri_bill: "Mandiri Bill",
   };
   const paymentMethodLabel = booking.paymentMethod
-    ? (PAYMENT_METHOD_LABELS[booking.paymentMethod.toLowerCase()] ?? booking.paymentMethod)
+    ? (PAYMENT_METHOD_LABELS[booking.paymentMethod.toLowerCase()] ??
+      booking.paymentMethod)
     : null;
 
   const formatRupiah = (amount: number) =>
-    new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(amount);
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(amount);
 
   const formatPaidAt = (iso: string) => {
     const d = new Date(iso);
-    const time = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-    const date = d.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+    const time = d.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const date = d.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
     return `${time}, ${date}`;
   };
 
-  const cancellationReason = booking.statusHistory.find(
-    (e) => e.status === "CANCELLED"
-  )?.reason ?? null;
-  const startedAt = booking.startedAt ?? (isInProgress ? new Date().toISOString() : null);
+  const cancellationReason =
+    booking.statusHistory.find((e) => e.status === "CANCELLED")?.reason ?? null;
+  const startedAt =
+    booking.startedAt ?? (isInProgress ? new Date().toISOString() : null);
 
   const waUrl = whatsappNumber
     ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(t("status.whatsAppMessage", { bookingId }))}`
@@ -177,16 +193,17 @@ export default function BookingStatusPage() {
           <div className='space-y-1'>
             <h2 className='text-xl font-bold tracking-tight text-foreground'>
               {t("status.closedHeadingPrefix")}{" "}
-              <span className='text-primary'>{t("status.closedHeadingSuffix")}</span>
+              <span className='text-primary'>
+                {t("status.closedHeadingSuffix")}
+              </span>
             </h2>
-            <p className='text-sm text-muted-foreground'>{t("status.thankYou")}</p>
+            <p className='text-sm text-muted-foreground'>
+              {t("status.thankYou")}
+            </p>
           </div>
         </div>
       ) : (
-        <StatusHero
-          status={booking.status}
-          isRefunded={isRefunded}
-        />
+        <StatusHero status={booking.status} isRefunded={isRefunded} />
       )}
 
       {!isTerminal &&
@@ -217,12 +234,18 @@ export default function BookingStatusPage() {
       {showCancelConfirm && (
         <div className='rounded-2xl border border-destructive/30 bg-destructive/5 p-5 space-y-3 text-center'>
           <p className='text-sm font-medium text-foreground'>
-            {t("status.cancelConfirmTitle", { defaultValue: "Cancel this booking?" })}
+            {t("status.cancelConfirmTitle", {
+              defaultValue: "Cancel this booking?",
+            })}
           </p>
           <p className='text-xs text-muted-foreground'>
             {isPaid
-              ? t("status.cancelConfirmPaid", { defaultValue: "Your payment will be refunded." })
-              : t("status.cancelConfirmPending", { defaultValue: "Your booking will be cancelled." })}
+              ? t("status.cancelConfirmPaid", {
+                  defaultValue: "Your payment will be refunded.",
+                })
+              : t("status.cancelConfirmPending", {
+                  defaultValue: "Your booking will be cancelled.",
+                })}
           </p>
           <div className='flex gap-2 justify-center'>
             <button
@@ -292,32 +315,50 @@ export default function BookingStatusPage() {
               <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10'>
                 <Check className='h-5 w-5 text-primary' strokeWidth={2.5} />
               </div>
-              <span className='font-bold text-primary'>{t("status.paymentSuccess")}</span>
+              <span className='font-bold text-primary'>
+                {t("status.paymentSuccess")}
+              </span>
             </div>
             <ChevronUp
               className='h-5 w-5 text-muted-foreground transition-transform duration-200'
-              style={{ transform: paymentDetailOpen ? undefined : "rotate(180deg)" }}
+              style={{
+                transform: paymentDetailOpen ? undefined : "rotate(180deg)",
+              }}
             />
           </button>
 
           {paymentDetailOpen && (
             <div className='border-t border-sky-100 px-5 pb-5 pt-4 dark:border-sky-900'>
-              <p className='mb-3 font-bold text-foreground'>{t("status.paymentDetail")} :</p>
+              <p className='mb-3 font-bold text-foreground'>
+                {t("status.paymentDetail")} :
+              </p>
               <div className='space-y-3 text-sm'>
                 {paidAt && (
                   <div className='flex items-center justify-between'>
-                    <span className='text-muted-foreground'>{t("status.orderTime")} :</span>
-                    <span className='font-medium text-foreground'>{formatPaidAt(paidAt)}</span>
+                    <span className='text-muted-foreground'>
+                      {t("status.orderTime")} :
+                    </span>
+                    <span className='font-medium text-foreground'>
+                      {formatPaidAt(paidAt)}
+                    </span>
                   </div>
                 )}
                 <div className='flex items-center justify-between'>
-                  <span className='text-muted-foreground'>{t("status.paymentMethodLabel")} :</span>
-                  <span className='font-medium text-foreground'>{paymentMethodLabel}</span>
+                  <span className='text-muted-foreground'>
+                    {t("status.paymentMethodLabel")} :
+                  </span>
+                  <span className='font-medium text-foreground'>
+                    {paymentMethodLabel}
+                  </span>
                 </div>
                 {booking.priceAmount != null && (
                   <div className='flex items-center justify-between'>
-                    <span className='text-muted-foreground'>{t("status.amountLabel")} :</span>
-                    <span className='font-semibold text-foreground'>{formatRupiah(booking.priceAmount)}</span>
+                    <span className='text-muted-foreground'>
+                      {t("status.amountLabel")} :
+                    </span>
+                    <span className='font-semibold text-foreground'>
+                      {formatRupiah(booking.priceAmount)}
+                    </span>
                   </div>
                 )}
               </div>
@@ -334,8 +375,12 @@ export default function BookingStatusPage() {
               <Car className='h-7 w-7 text-primary' />
             </div>
             <div>
-              <p className='font-bold text-foreground'>{t("status.vehicleInfoTitle")}</p>
-              <p className='text-sm text-muted-foreground'>{t("status.vehicleInfoSubtitle")}</p>
+              <p className='font-bold text-foreground'>
+                {t("status.vehicleInfoTitle")}
+              </p>
+              <p className='text-sm text-muted-foreground'>
+                {t("status.vehicleInfoSubtitle")}
+              </p>
             </div>
           </div>
 
@@ -344,9 +389,13 @@ export default function BookingStatusPage() {
           <div className='flex p-5'>
             <div className='flex flex-1 flex-col gap-3 pr-4'>
               <div>
-                <p className='font-bold text-foreground'>{t("status.plateLabel")}</p>
+                <p className='font-bold text-foreground'>
+                  {t("status.plateLabel")}
+                </p>
                 {plateMedia?.ocrText && (
-                  <p className='text-sm text-muted-foreground'>{plateMedia.ocrText}</p>
+                  <p className='text-sm text-muted-foreground'>
+                    {plateMedia.ocrText}
+                  </p>
                 )}
               </div>
               {booking.plateText && (
@@ -379,11 +428,17 @@ export default function BookingStatusPage() {
           <div className='flex p-5'>
             <div className='flex flex-1 flex-col gap-3 pr-4'>
               <div>
-                <p className='font-bold text-foreground'>{t("status.slotLabel")}</p>
-                <p className='text-sm text-muted-foreground'>{t("status.vehiclePosition")}</p>
+                <p className='font-bold text-foreground'>
+                  {t("status.slotLabel")}
+                </p>
+                <p className='text-sm text-muted-foreground'>
+                  {t("status.vehiclePosition")}
+                </p>
               </div>
               {booking.slotText && (
-                <p className='text-4xl font-black text-foreground'>{booking.slotText}</p>
+                <p className='text-4xl font-black text-foreground'>
+                  {booking.slotText}
+                </p>
               )}
             </div>
             {slotMedia && (
@@ -411,8 +466,12 @@ export default function BookingStatusPage() {
             </div>
             <div className='flex min-w-0 flex-col gap-3'>
               <div>
-                <p className='font-bold text-foreground'>{t("status.allDoneTitle")}</p>
-                <p className='mt-1 text-sm leading-relaxed text-muted-foreground'>{t("status.allDoneDesc")}</p>
+                <p className='font-bold text-foreground'>
+                  {t("status.allDoneTitle")}
+                </p>
+                <p className='mt-1 text-sm leading-relaxed text-muted-foreground'>
+                  {t("status.allDoneDesc")}
+                </p>
               </div>
               {!booking.hasRated && (
                 <Link
@@ -429,23 +488,22 @@ export default function BookingStatusPage() {
       )}
 
       {isCancelled && (
-        <div className={`rounded-2xl border p-6 text-center space-y-3 ${isRefunded ? "border-sky-200 bg-sky-50 dark:border-sky-900 dark:bg-sky-950" : "border-destructive/30 bg-destructive/5"}`}>
+        <div
+          className={`rounded-2xl border p-6 text-center space-y-3 ${isRefunded ? "border-sky-200 bg-sky-50 dark:border-sky-900 dark:bg-sky-950" : "border-destructive/30 bg-destructive/5"}`}
+        >
           <p className='text-sm text-muted-foreground'>
             {isRefunded
-              ? t("status.refundedMessage", { defaultValue: "Pembayaran kamu telah direfund." })
+              ? t("status.refundedMessage", {
+                  defaultValue: "Pembayaran kamu telah direfund.",
+                })
               : t("status.cancelledMessage")}
           </p>
           {cancellationReason && (
             <p className='text-xs text-muted-foreground'>
-              {t("status.cancellationReason")}: <span className='font-medium'>{cancellationReason}</span>
+              {t("status.cancellationReason")}:{" "}
+              <span className='font-medium'>{cancellationReason}</span>
             </p>
           )}
-          <Link
-            href={`/booking/${bookingId}/rate?token=${token}`}
-            className='inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground! transition-opacity hover:opacity-90'
-          >
-            {t("status.leaveFeedback")}
-          </Link>
         </div>
       )}
 

@@ -64,6 +64,7 @@ import type {
   ReportPhotoAsset,
 } from "@/features/admin/types";
 import type { ReportBookingFilters, ReportBookingsResponse } from "@/features/admin/hooks/use-admin-report-bookings";
+import { bookingRevenue } from "@/features/admin/utils/booking-revenue";
 import { useTranslation } from "@/i18n";
 import { bookingRef, cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
@@ -132,6 +133,12 @@ function formatDate(iso: string): string {
   });
 }
 
+// Display status derives REFUNDED purely from refundedAmount > 0, matching the
+// on-screen table/detail badges so exports stay consistent with the UI.
+function displayStatus(row: { status: string; refundedAmount: number }): string {
+  return row.refundedAmount > 0 ? "REFUNDED" : row.status;
+}
+
 function rowsToSheetData(rows: import("@/features/admin/types").ReportBookingRow[]) {
   return rows.map((r) => ({
     "Booking ID": r.id,
@@ -139,7 +146,7 @@ function rowsToSheetData(rows: import("@/features/admin/types").ReportBookingRow
     "Site": r.siteName ?? "—",
     "Slot": r.slot ?? "—",
     "Crew": r.crewName ?? "—",
-    "Status": r.status,
+    "Status": displayStatus(r),
     "Price (IDR)": r.price,
     "Payment Method": r.paymentMethod ?? "—",
     "Paid At": r.paidAt ? formatDate(r.paidAt) : "—",
@@ -151,7 +158,7 @@ function rowsToSheetData(rows: import("@/features/admin/types").ReportBookingRow
 
 function computeTotals(rows: import("@/features/admin/types").ReportBookingRow[]) {
   return {
-    totalPrice: rows.reduce((sum, r) => sum + (r.refundedAmount > 0 || r.status === "CANCELLED" || r.status === "EXPIRED" ? 0 : r.price), 0),
+    totalPrice: rows.reduce((sum, r) => sum + bookingRevenue(r), 0),
     totalRefunded: rows.reduce((sum, r) => sum + r.refundedAmount, 0),
   };
 }
@@ -192,7 +199,7 @@ function downloadCSV(rows: import("@/features/admin/types").ReportBookingRow[], 
     csvField(r.siteName),
     csvField(r.slot),
     csvField(r.crewName),
-    csvField(r.status),
+    csvField(displayStatus(r)),
     r.price,
     csvField(r.paymentMethod),
     csvField(r.paidAt ? formatDate(r.paidAt) : null),
@@ -464,7 +471,7 @@ function JobDetailModal({
   );
   const viewable = [...before, ...after, ...other];
 
-  const effStatus = row.status === "CANCELLED" && row.refundedAmount > 0 ? "REFUNDED" : row.status;
+  const effStatus = row.refundedAmount > 0 ? "REFUNDED" : row.status;
   const statusStyle = STATUS_STYLES[effStatus] ?? "bg-muted text-muted-foreground";
 
   return (
@@ -812,7 +819,12 @@ export default function ReportJobsPage() {
     setAppliedFilters({
       crewId: selectedCrewId || undefined,
       statuses: statusFilter && statusFilter !== "REFUNDED" ? [statusFilter] : undefined,
-      refunded: statusFilter === "REFUNDED" ? true : undefined,
+      refunded:
+        statusFilter === "REFUNDED"
+          ? true
+          : statusFilter === "CANCELLED"
+            ? false
+            : undefined,
       hasRating:
         hasRatingFilter === "true"
           ? true
@@ -838,6 +850,7 @@ export default function ReportJobsPage() {
       if (appliedTo) params.set("to", appliedTo);
       if (appliedFilters.crewId) params.set("crewId", appliedFilters.crewId);
       if (appliedFilters.statuses?.length) params.set("statuses", appliedFilters.statuses.join(","));
+      if (appliedFilters.refunded !== undefined) params.set("refunded", String(appliedFilters.refunded));
       if (appliedFilters.hasRating !== undefined) params.set("hasRating", String(appliedFilters.hasRating));
       if (appliedFilters.hasPhotos !== undefined) params.set("hasPhotos", String(appliedFilters.hasPhotos));
       if (appliedFilters.search) params.set("search", appliedFilters.search);
@@ -960,7 +973,7 @@ export default function ReportJobsPage() {
       accessorKey: "status",
       header: t("reports.jobDetail.status"),
       cell: ({ row }) => {
-        const eff = row.original.status === "CANCELLED" && row.original.refundedAmount > 0 ? "REFUNDED" : row.original.status;
+        const eff = row.original.refundedAmount > 0 ? "REFUNDED" : row.original.status;
         const style = STATUS_STYLES[eff] ?? "bg-muted text-muted-foreground";
         return (
           <span
@@ -1355,8 +1368,7 @@ export default function ReportJobsPage() {
 
       {/* Amount summary */}
       {jobRows.length > 0 && (() => {
-        const pageRevenue = jobRows.reduce((sum, r) =>
-          sum + (r.refundedAmount > 0 || r.status === "CANCELLED" || r.status === "EXPIRED" ? 0 : r.price), 0);
+        const pageRevenue = jobRows.reduce((sum, r) => sum + bookingRevenue(r), 0);
         const pageRefunded = jobRows.reduce((sum, r) => sum + r.refundedAmount, 0);
         const pageNet = pageRevenue - pageRefunded;
         return (

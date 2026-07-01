@@ -51,7 +51,7 @@ export function ContentAccordion({ items }: { readonly items: readonly Accordion
             >
               <div className="overflow-hidden">
                 <div
-                  className="pb-5 text-[#3d3d3d] text-base leading-6.5 flex flex-col gap-3"
+                  className="pb-5 text-[#3d3d3d] text-base leading-6.5 flex flex-col gap-3 text-justify"
                   style={{ fontFamily: "var(--font-inter), sans-serif" }}
                 >
                   {item.content}

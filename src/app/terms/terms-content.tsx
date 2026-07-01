@@ -151,7 +151,7 @@ export function TermsContent() {
       </section>
 
       <main className="flex-1 max-w-200 mx-auto w-full px-4 md:px-12 py-12 md:py-16">
-        <div className="text-[#3d3d3d] text-base leading-6.5 flex flex-col gap-3 mb-8" style={{ fontFamily: inter }}>
+        <div className="text-[#3d3d3d] text-base leading-6.5 flex flex-col gap-3 mb-8 text-justify" style={{ fontFamily: inter }}>
           <p>Kami berterima kasih atas kepercayaan Anda terhadap layanan Park and Shine. Mohon meluangkan waktu untuk membaca seluruh Syarat dan Ketentuan Penggunaan layanan Park and Shine ini.</p>
           <p>Dengan melakukan pemesanan dan pembayaran layanan Park and Shine melalui website, QR Code, atau media lain yang disediakan oleh Park and Shine, Anda dianggap telah membaca, memahami, dan menyetujui Ketentuan Penggunaan ini. Apabila Anda tidak menyetujui sebagian atau seluruh ketentuan yang tercantum di dalamnya, mohon untuk tidak melanjutkan penggunaan layanan Park and Shine.</p>
         </div>

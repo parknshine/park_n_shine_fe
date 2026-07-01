@@ -61,36 +61,64 @@
     "faqTitle": "Pertanyaan yang Sering Diajukan",
     "faqs": [
       {
-        "question": "Bagaimana cara kerja Park & Shine?",
-        "answer": "Pesan cuci mobil waterless melalui aplikasi kami dengan memilih lokasi parkir dan kendaraan Anda. Kru kami akan menemukan mobil Anda, melakukan pencucian, dan memberi tahu Anda saat selesai — semua sementara Anda berbelanja atau bekerja."
+        "question": "Bagaimana cara memesan layanan Park & Shine?",
+        "answer": "Cukup scan QR Code yang tersedia di area parkir, masukkan nomor plat kendaraan, ambil foto kendaraan dan pilar parkir, lalu lakukan pembayaran. Setelah itu, tim kami akan menemukan kendaraan Anda dan mulai membersihkannya."
+      },
+      {
+        "question": "Apakah saya harus menunggu selama mobil dicuci?",
+        "answer": "Tidak. Anda dapat melanjutkan aktivitas seperti berbelanja, makan, atau menonton di mall. Kami akan membersihkan kendaraan Anda selama mobil tetap terparkir."
+      },
+      {
+        "question": "Apakah saya perlu menyerahkan kunci mobil?",
+        "answer": "Tidak. Anda tidak perlu menyerahkan kunci kendaraan. Seluruh proses dilakukan saat kendaraan tetap terparkir di lokasi yang sudah anda pilih."
+      },
+      {
+        "question": "Berapa lama proses pencuciannya?",
+        "answer": "Rata-rata proses pengerjaan memakan waktu sekitar 30 menit, tergantung ukuran dan kondisi kendaraan."
       },
       {
         "question": "Apakah cuci waterless aman untuk mobil saya?",
-        "answer": "Ya. Formula cuci waterless kami dirancang khusus untuk melumasi dan mengangkat kotoran dengan aman tanpa menggores cat. Digunakan oleh detailer profesional di seluruh dunia dan aman untuk semua jenis lapisan cat mobil."
+        "answer": "Ya. Kami menggunakan produk waterless berkualitas tinggi dan microfiber premium yang aman untuk berbagai jenis cat kendaraan. Produk kami membantu mengangkat kotoran dengan aman sekaligus memberikan perlindungan dan kilau pada permukaan cat. Namun, untuk kendaraan dengan nilai tinggi atau yang menggunakan cat khusus yang memerlukan perawatan khusus, layanan akan dilakukan setelah melalui pertimbangan dan pemeriksaan oleh tim kami."
       },
       {
-        "question": "Berapa lama waktu pencucian?",
-        "answer": "Cuci mobil waterless standar biasanya memakan waktu 20–40 menit tergantung ukuran kendaraan dan tingkat kekotoran. Anda dapat memantau progresnya secara real time melalui aplikasi."
+        "question": "Apa keunggulan Park & Shine dibanding cuci mobil biasa?",
+        "answer": "Park & Shine memberikan pengalaman mencuci mobil yang lebih praktis tanpa mengganggu aktivitas Anda. Selain bersih, kendaraan juga mendapatkan kilau premium, efek hydrophobic (water beading), serta aroma Jasmine Tea yang segar."
       },
       {
-        "question": "Bagaimana jika saya tidak puas dengan hasilnya?",
-        "answer": "Hubungi kami dalam 24 jam setelah layanan selesai. Tim kami akan meninjau kasus Anda dan mengatur cuci ulang atau pengembalian dana yang sesuai."
+        "question": "Apakah kendaraan saya akan dipindahkan?",
+        "answer": "Tidak. Kendaraan Anda akan tetap berada di lokasi parkir yang sama selama proses pembersihan berlangsung."
+      },
+      {
+        "question": "Bagaimana saya mengetahui layanan sudah selesai?",
+        "answer": "Setelah proses pembersihan selesai, Anda akan menerima notifikasi melalui Web aplikasi atau WhatsApp dan kendaraan siap digunakan kembali."
+      },
+      {
+        "question": "Bagaimana jika saya tidak puas dengan hasil layanan?",
+        "answer": "Apabila terdapat kendala terhadap hasil layanan, silakan hubungi tim kami maksimal 1 × 24 jam setelah layanan selesai. Kami akan melakukan peninjauan dan memberikan solusi terbaik."
       },
       {
         "question": "Apakah saya bisa membatalkan pesanan?",
-        "answer": "Ya, Anda dapat membatalkan sebelum kru ditugaskan dan mendapatkan pengembalian dana penuh. Setelah layanan dimulai, pembatalan tidak tersedia."
+        "answer": "Ya. Pesanan dapat dibatalkan selama tim kami belum memulai mengerjakan kendaraan Anda. Jika proses pembersihan sudah dimulai, pesanan tidak dapat dibatalkan."
       },
       {
-        "question": "Lokasi parkir mana saja yang tersedia?",
-        "answer": "Kami saat ini beroperasi di mal-mal pilihan dan area parkir komersial di Jakarta. Cek aplikasi untuk daftar lengkap lokasi yang didukung — kami terus berkembang."
+        "question": "Apakah semua jenis mobil bisa menggunakan layanan ini?",
+        "answer": "Ya. Park & Shine melayani berbagai jenis kendaraan penumpang, mulai dari city car, sedan, hatchback, MPV, hingga SUV. Namun, beberapa jenis kendaraan dengan akses atau dimensi khusus, seperti kendaraan yang menggunakan roof rail, aksesori tambahan, atau modifikasi tertentu, mungkin memerlukan penyesuaian atau pertimbangan sebelum layanan dilakukan."
       },
       {
-        "question": "Apakah saya perlu hadir saat pencucian?",
-        "answer": "Tidak. Cukup pesan, parkir mobil Anda, dan lanjutkan aktivitas Anda. Anda akan menerima notifikasi saat kru mulai bekerja dan saat pencucian selesai."
+        "question": "Di mana Park & Shine tersedia?",
+        "answer": "Saat ini Park & Shine tersedia di lokasi partner tertentu. Daftar lokasi dapat dilihat melalui aplikasi dan akan terus bertambah seiring pengembangan layanan kami."
       },
       {
-        "question": "Bagaimana cara memantau status pencucian?",
-        "answer": "Setelah memesan, Anda dapat melihat pembaruan status real time di aplikasi — mulai dari penugasan kru hingga setiap tahap pencucian sampai selesai."
+        "question": "Apakah saya bisa memesan lebih dari satu kendaraan?",
+        "answer": "Bisa. Anda dapat melakukan pemesanan untuk lebih dari satu kendaraan, selama data setiap kendaraan diisi dengan benar. Namun, satu akun hanya dapat memiliki satu pesanan aktif dalam satu waktu. Setelah pesanan pertama selesai, Anda dapat membuat pesanan untuk kendaraan berikutnya."
+      },
+      {
+        "question": "Bagaimana jika saya salah memasukkan nomor plat atau lokasi parkir?",
+        "answer": "Silakan segera hubungi tim kami sebelum proses pembersihan dimulai agar data kendaraan dapat diperbarui."
+      },
+      {
+        "question": "Mengapa Park & Shine menggunakan teknologi waterless?",
+        "answer": "Teknologi waterless memungkinkan kendaraan dibersihkan dengan lebih efisien tanpa penggunaan air dalam jumlah besar. Selain lebih ramah lingkungan, hasilnya tetap bersih, aman untuk cat kendaraan, dan memberikan kilau yang tahan lebih lama."
       }
     ],
     "cta": {

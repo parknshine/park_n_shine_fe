@@ -57,7 +57,7 @@ export function FaqAccordion({ items }: FaqAccordionProps) {
             >
               <div className="overflow-hidden">
                 <p
-                  className="px-6 pb-5 text-[#3d3d3d] text-base leading-6.5"
+                  className="px-6 pb-5 text-[#3d3d3d] text-base leading-6.5 text-justify"
                   style={{ fontFamily: "var(--font-inter), sans-serif", fontWeight: 400 }}
                 >
                   {answer}

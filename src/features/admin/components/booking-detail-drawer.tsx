@@ -17,6 +17,7 @@ import { RefundModal } from "./refund-modal";
 import { useTranslation } from "@/i18n";
 import { useAuthStore } from "@/store/auth-store";
 import { formatAuditDetail, formatAuditAction } from "@/features/admin/utils/format-audit-detail";
+import { isBookingLocked } from "@/features/admin/utils/is-booking-locked";
 import { bookingRef } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -123,9 +124,14 @@ export function BookingDetailDrawer({
                 <span className="font-semibold text-foreground">
                   {booking.plateText ?? bookingRef(booking.reference, booking.id)}
                 </span>
-                <StatusBadge tone={BOOKING_STATUS_TONES[booking.status] ?? "neutral"}>
-                  {booking.status}
-                </StatusBadge>
+                {(() => {
+                  const isRefunded = (booking.refundedAmount ?? 0) > 0;
+                  const effStatus = isRefunded ? "REFUNDED" : booking.status;
+                  const tone = isRefunded
+                    ? "info"
+                    : BOOKING_STATUS_TONES[booking.status] ?? "neutral";
+                  return <StatusBadge tone={tone}>{effStatus}</StatusBadge>;
+                })()}
               </>
             )}
           </div>
@@ -253,7 +259,7 @@ export function BookingDetailDrawer({
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={["CLOSED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status)}
+                    disabled={["CLOSED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status) || isBookingLocked(booking)}
                     onClick={() => setActiveModal("override")}
                   >
                     {t("drawer.overrideStatus")}
@@ -350,7 +356,7 @@ export function BookingDetailDrawer({
                     <Button
                       variant="destructive"
                       size="sm"
-                      disabled={["DRAFT", "PENDING", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status)}
+                      disabled={["DRAFT", "PENDING", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status) || isBookingLocked(booking)}
                       onClick={() => setActiveModal("refund")}
                     >
                       {t("drawer.refund")}

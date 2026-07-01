@@ -61,36 +61,64 @@
     "faqTitle": "Frequently Asked Questions",
     "faqs": [
       {
-        "question": "How does Park & Shine work?",
-        "answer": "Book a waterless car wash through our app by selecting your parking location and vehicle. Our crew will find your car, perform the wash, and notify you when it's done — all while you shop or work."
+        "question": "How do I book a Park & Shine service?",
+        "answer": "Simply scan the QR Code located in the parking area, enter your vehicle's license plate number, take a photo of your vehicle and the parking pillar, then complete your payment. Our team will locate your vehicle and begin the cleaning process."
       },
       {
-        "question": "Is waterless washing safe for my car?",
-        "answer": "Yes. Our waterless wash formula is specially designed to lubricate and lift dirt safely without scratching the paint. It is used by professional detailers worldwide and is safe for all car finishes."
+        "question": "Do I need to wait while my car is being cleaned?",
+        "answer": "No. You can continue shopping, dining, or enjoying your time at the mall while we clean your vehicle. Your car will remain parked throughout the entire service."
       },
       {
-        "question": "How long does the wash take?",
-        "answer": "A standard waterless car wash typically takes 20–40 minutes depending on your vehicle size and level of dirt. You can track the progress in real time through the app."
+        "question": "Do I need to hand over my car keys?",
+        "answer": "No. There is no need to hand over your car keys. Your vehicle will remain parked in the location you selected, and the entire service is performed without moving it."
       },
       {
-        "question": "What if I'm not satisfied with the result?",
-        "answer": "Contact us within 24 hours of service completion. Our team will review your case and arrange a re-wash or refund as appropriate."
+        "question": "How long does the cleaning take?",
+        "answer": "The service typically takes around 30 minutes, depending on the size and condition of your vehicle."
+      },
+      {
+        "question": "Is waterless car washing safe for my vehicle?",
+        "answer": "Yes. We use high-quality waterless cleaning products and premium microfiber towels that are safe for a wide range of automotive paint finishes. Our products safely lift dirt while providing protection and a deep glossy finish. However, vehicles with exceptionally high value or those featuring special paint finishes that require unique care may be subject to additional assessment before the service is performed."
+      },
+      {
+        "question": "What makes Park & Shine different from a regular car wash?",
+        "answer": "Park & Shine lets you have your car cleaned without interrupting your daily activities. In addition to a spotless finish, your vehicle receives a premium shine, a hydrophobic water-beading effect, and a refreshing Jasmine Tea fragrance."
+      },
+      {
+        "question": "Will my vehicle be moved during the service?",
+        "answer": "No. Your vehicle will remain in the same parking space throughout the cleaning process."
+      },
+      {
+        "question": "How will I know when the service is complete?",
+        "answer": "Once the cleaning is finished, you will receive a notification through our web app or WhatsApp, letting you know that your vehicle is ready."
+      },
+      {
+        "question": "What if I am not satisfied with the service?",
+        "answer": "If you experience any issues with the service, please contact us within 24 hours after completion. Our team will review your case and provide the most appropriate solution."
       },
       {
         "question": "Can I cancel my booking?",
-        "answer": "Yes, you can cancel before a crew member is assigned and receive a full refund. Once service has started, cancellations are not available."
+        "answer": "Yes. You may cancel your booking as long as our team has not started working on your vehicle. Once the cleaning process has begun, cancellations are no longer available."
       },
       {
-        "question": "Which parking locations are supported?",
-        "answer": "We currently operate at selected malls and commercial parking areas in Jakarta. Check the app for the full list of supported locations — we're expanding regularly."
+        "question": "Can all types of vehicles use this service?",
+        "answer": "Yes. Park & Shine serves most passenger vehicles, including city cars, sedans, hatchbacks, MPVs, and SUVs. However, vehicles with special features or dimensions, such as roof rails, additional accessories, or certain modifications, may require additional assessment before the service can be provided."
       },
       {
-        "question": "Do I need to be present during the wash?",
-        "answer": "No. Simply book, park your car, and go about your day. You'll receive a notification when the crew starts and when the wash is complete."
+        "question": "Where is Park & Shine available?",
+        "answer": "Park & Shine is currently available at selected partner locations. You can view the latest available locations through our app, and we will continue expanding our service network."
       },
       {
-        "question": "How do I track my wash status?",
-        "answer": "After booking, you can view real-time status updates in the app — from crew assignment through each wash stage to completion."
+        "question": "Can I book more than one vehicle?",
+        "answer": "Yes. You may book multiple vehicles, provided that the information for each vehicle is entered correctly. However, each account can only have one active booking at a time. Once your current booking is completed, you may place another booking for a different vehicle."
+      },
+      {
+        "question": "What should I do if I entered the wrong license plate number or parking location?",
+        "answer": "Please contact our team as soon as possible before the cleaning process begins so we can update your booking information."
+      },
+      {
+        "question": "Why does Park & Shine use waterless cleaning technology?",
+        "answer": "Waterless cleaning technology allows us to clean vehicles efficiently while using little to no water. It is more environmentally friendly, safe for your vehicle's paint, and leaves a long-lasting glossy finish."
       }
     ],
     "cta": {
