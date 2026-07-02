@@ -55,5 +55,6 @@ export function useAdminReportBookings(
     bookings: query.data?.rows ?? [],
     total: query.data?.total ?? 0,
     isLoading: query.isLoading,
+    refetch: query.refetch,
   };
 }

@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, X, Calendar, Building2, SlidersHorizontal } from "lucide-react";
+import { Search, X, Calendar, Building2, SlidersHorizontal, RefreshCw } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { Input } from "@/components/ui/input";
@@ -78,7 +78,7 @@ export default function TipsReportPage() {
 
   const { sites } = useSiteSelection();
 
-  const { tipList, isLoading: isTipListLoading } = useAdminTipList(
+  const { tipList, isLoading: isTipListLoading, refetch: refetchTipList } = useAdminTipList(
     period,
     page,
     pageSize,
@@ -86,7 +86,7 @@ export default function TipsReportPage() {
     selectedSiteId,
   );
 
-  const { crewSummary, isLoading: isCrewSummaryLoading } = useAdminTipCrewSummary(period, selectedSiteId);
+  const { crewSummary, isLoading: isCrewSummaryLoading, refetch: refetchCrewSummary } = useAdminTipCrewSummary(period, selectedSiteId);
 
   const STATUS_STYLES: Record<AdminTipRow["status"], string> = {
     PAID: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
@@ -301,7 +301,17 @@ export default function TipsReportPage() {
                 </div>
               </div>
 
-              <div className='flex items-center justify-end px-4 py-3'>
+              <div className='flex items-center justify-end gap-2 px-4 py-3'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  disabled={isTipListLoading || isCrewSummaryLoading}
+                  onClick={() => { refetchTipList(); refetchCrewSummary(); }}
+                  title='Refresh'
+                  className='gap-1.5 text-xs'
+                >
+                  <RefreshCw className={cn("h-3.5 w-3.5", (isTipListLoading || isCrewSummaryLoading) && "animate-spin")} />
+                </Button>
                 <button
                   type='button'
                   onClick={applySearch}

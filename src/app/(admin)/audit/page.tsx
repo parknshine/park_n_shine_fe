@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Calendar, SlidersHorizontal, Users, ArrowRight, X, Building2, Search } from "lucide-react";
+import { Calendar, SlidersHorizontal, Users, ArrowRight, X, Building2, Search, RefreshCw } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -57,7 +57,7 @@ export default function AuditPage() {
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
 
   const { actors } = useAuditActors(appliedSiteId);
-  const { entries, totalCount, isLoading, isFetching } = useAuditLog(appliedSiteId, {
+  const { entries, totalCount, isLoading, isFetching, refetch } = useAuditLog(appliedSiteId, {
     action: appliedAction,
     actor: appliedActorId || undefined,
     from: appliedFrom || undefined,
@@ -289,7 +289,10 @@ export default function AuditPage() {
           </div>
         </div>
 
-        <div className='flex justify-end border-t border-border px-4 py-3'>
+        <div className='flex justify-end gap-2 border-t border-border px-4 py-3'>
+          <Button variant='outline' disabled={isFetching} onClick={() => refetch()} title='Refresh' className='gap-1.5'>
+            <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
+          </Button>
           <Button onClick={handleApply} disabled={isFetching}>
             {t("audit.applyFilter")}
           </Button>

@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Building2, ArrowLeft, AlertTriangle } from "lucide-react";
+import { Building2, ArrowLeft, AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AdminQueueGroup,
@@ -160,6 +160,7 @@ interface DashboardSiteViewProps {
   onBookingClick: (booking: AdminQueueBooking) => void;
   onClose: () => void;
   onActionSuccess: () => void;
+  onRefresh: () => void;
 }
 
 function DashboardSiteView({
@@ -168,26 +169,32 @@ function DashboardSiteView({
   onBookingClick,
   onClose,
   onActionSuccess,
+  onRefresh,
 }: DashboardSiteViewProps) {
   const { t } = useTranslation("admin");
   const router = useRouter();
 
   return (
     <div className='space-y-6'>
-      <div className='flex items-center gap-3'>
-        <Button
-          variant='ghost'
-          size='sm'
-          onClick={() => router.push("/dashboard")}
-        >
-          <ArrowLeft className='h-4 w-4' />
-        </Button>
-        <div>
-          <h1 className='text-xl font-bold text-foreground'>{site.siteName}</h1>
-          <p className='text-sm text-muted-foreground'>
-            {t("dashboard.subtitle")}
-          </p>
+      <div className='flex items-center justify-between gap-3'>
+        <div className='flex items-center gap-3'>
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={() => router.push("/dashboard")}
+          >
+            <ArrowLeft className='h-4 w-4' />
+          </Button>
+          <div>
+            <h1 className='text-xl font-bold text-foreground'>{site.siteName}</h1>
+            <p className='text-sm text-muted-foreground'>
+              {t("dashboard.subtitle")}
+            </p>
+          </div>
         </div>
+        <Button variant='outline' size='sm' onClick={() => onRefresh()} title='Refresh' className='gap-1.5 shrink-0'>
+          <RefreshCw className='h-3.5 w-3.5' />
+        </Button>
       </div>
 
       {site.escalations.length > 0 && (
@@ -301,6 +308,7 @@ function DashboardContent() {
           onBookingClick={setClickedBooking}
           onClose={() => setClickedBooking(null)}
           onActionSuccess={handleActionSuccess}
+          onRefresh={() => refresh()}
         />
       );
     }
@@ -310,13 +318,18 @@ function DashboardContent() {
   // Card grid overview
   return (
     <div className='space-y-6'>
-      <div>
-        <h1 className='text-xl font-bold text-foreground'>
-          {t("dashboard.title")}
-        </h1>
-        <p className='text-sm text-muted-foreground'>
-          {t("dashboard.subtitle")}
-        </p>
+      <div className='flex items-start justify-between gap-3'>
+        <div>
+          <h1 className='text-xl font-bold text-foreground'>
+            {t("dashboard.title")}
+          </h1>
+          <p className='text-sm text-muted-foreground'>
+            {t("dashboard.subtitle")}
+          </p>
+        </div>
+        <Button variant='outline' size='sm' onClick={() => refresh()} title='Refresh' className='gap-1.5 shrink-0'>
+          <RefreshCw className='h-3.5 w-3.5' />
+        </Button>
       </div>
       <DashboardGridView
         sites={queueSites}

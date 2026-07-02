@@ -494,7 +494,7 @@ export default function BookingStatusPage() {
           <p className='text-sm text-muted-foreground'>
             {isRefunded
               ? t("status.refundedMessage", {
-                  defaultValue: "Pembayaran kamu telah direfund.",
+                  defaultValue: "Pesanan kamu telah dibatalkan. Pembayaran kamu telah direfund.",
                 })
               : t("status.cancelledMessage")}
           </p>
@@ -516,15 +516,17 @@ export default function BookingStatusPage() {
         />
       )}
 
-      <div className='rounded-2xl border border-border bg-white px-4 py-5 dark:bg-card'>
-        <p className='mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
-          {t("status.historyTitle", { defaultValue: "Booking Progress" })}
-        </p>
-        <BookingStatusTimeline
-          status={booking.status}
-          statusHistory={booking.statusHistory}
-        />
-      </div>
+      {!isCancelled && booking.status !== BOOKING_STATUSES.EXPIRED && (
+        <div className='rounded-2xl border border-border bg-white px-4 py-5 dark:bg-card'>
+          <p className='mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
+            {t("status.historyTitle", { defaultValue: "Booking Progress" })}
+          </p>
+          <BookingStatusTimeline
+            status={booking.status}
+            statusHistory={booking.statusHistory}
+          />
+        </div>
+      )}
     </div>
   );
 }

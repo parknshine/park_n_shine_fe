@@ -25,9 +25,9 @@ export function useBookingActions(bookingId: string) {
     mutationKey: mutationKeys.admin.refund(bookingId),
     onSuccess: () => {
       void queryClient.refetchQueries({ queryKey: queryKeys.admin.booking(bookingId) });
-      void queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
-      void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
-      void queryClient.invalidateQueries({ queryKey: ["admin", "report-bookings"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "audit-log"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "report"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "report-bookings"] });
       void queryClient.invalidateQueries({ queryKey: ["customer", "booking", bookingId] });
     },
   });
@@ -44,8 +44,9 @@ export function useBookingActions(bookingId: string) {
     mutationKey: mutationKeys.admin.overrideStatus(bookingId),
     onSuccess: () => {
       void queryClient.refetchQueries({ queryKey: queryKeys.admin.booking(bookingId) });
-      void queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
-      void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "audit-log"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "report"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "report-bookings"] });
       void queryClient.invalidateQueries({ queryKey: ["customer", "booking", bookingId] });
     },
   });
@@ -62,8 +63,9 @@ export function useBookingActions(bookingId: string) {
     mutationKey: mutationKeys.admin.reassign(bookingId),
     onSuccess: () => {
       void queryClient.refetchQueries({ queryKey: queryKeys.admin.booking(bookingId) });
-      void queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
-      void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "audit-log"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "report"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "report-bookings"] });
       void queryClient.invalidateQueries({ queryKey: ["customer", "booking", bookingId] });
     },
   });

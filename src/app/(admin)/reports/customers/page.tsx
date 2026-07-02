@@ -13,6 +13,7 @@ import {
   X,
   Check,
   Hash,
+  RefreshCw,
 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -157,7 +158,7 @@ export default function CustomersReportPage() {
 
   const minWashNum = appliedMinWash ? Number.parseInt(appliedMinWash, 10) : undefined;
 
-  const { customers, pagination, isLoading } = useAdminLoyaltyCustomers({
+  const { customers, pagination, isLoading, refetch } = useAdminLoyaltyCustomers({
     search: appliedSearch || undefined,
     type: appliedType || undefined,
     from: appliedFrom || undefined,
@@ -406,7 +407,10 @@ export default function CustomersReportPage() {
           </div>
 
           {/* Row 3: Apply button */}
-          <div className="flex items-center justify-end px-4 py-3">
+          <div className="flex items-center justify-end gap-2 px-4 py-3">
+            <Button variant="outline" size="sm" disabled={isLoading} onClick={() => refetch()} title="Refresh" className="gap-1.5 text-xs">
+              <RefreshCw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
+            </Button>
             <Button onClick={handleApply} disabled={isLoading} className="gap-2 px-5">
               {isLoading ? (
                 <span className="flex items-center gap-2">

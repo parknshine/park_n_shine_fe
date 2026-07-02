@@ -27,6 +27,8 @@ import {
   Undo2,
   FileDown,
   ChevronDown,
+  RefreshCw,
+  Banknote,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -63,7 +65,10 @@ import type {
   ReportBookingRow,
   ReportPhotoAsset,
 } from "@/features/admin/types";
-import type { ReportBookingFilters, ReportBookingsResponse } from "@/features/admin/hooks/use-admin-report-bookings";
+import type {
+  ReportBookingFilters,
+  ReportBookingsResponse,
+} from "@/features/admin/hooks/use-admin-report-bookings";
 import { bookingRevenue } from "@/features/admin/utils/booking-revenue";
 import { useTranslation } from "@/i18n";
 import { bookingRef, cn } from "@/lib/utils";
@@ -135,49 +140,74 @@ function formatDate(iso: string): string {
 
 // Display status derives REFUNDED purely from refundedAmount > 0, matching the
 // on-screen table/detail badges so exports stay consistent with the UI.
-function displayStatus(row: { status: string; refundedAmount: number }): string {
+function displayStatus(row: {
+  status: string;
+  refundedAmount: number;
+}): string {
   return row.refundedAmount > 0 ? "REFUNDED" : row.status;
 }
 
-function rowsToSheetData(rows: import("@/features/admin/types").ReportBookingRow[]) {
+type LedgerRow = ReportBookingRow & { _ledgerType?: "PAID" | "REFUND" };
+
+function expandLedgerRows(rows: ReportBookingRow[]): LedgerRow[] {
+  const result: LedgerRow[] = [];
+  for (const row of rows) {
+    if (row.refundedAmount > 0) {
+      result.push({ ...row, _ledgerType: "PAID" });
+      result.push({ ...row, _ledgerType: "REFUND" });
+    } else {
+      result.push(row as LedgerRow);
+    }
+  }
+  return result;
+}
+
+function rowsToSheetData(
+  rows: import("@/features/admin/types").ReportBookingRow[],
+) {
   return rows.map((r) => ({
     "Booking ID": r.id,
-    "Date": formatDate(r.createdAt),
-    "Site": r.siteName ?? "—",
-    "Slot": r.slot ?? "—",
-    "Crew": r.crewName ?? "—",
-    "Status": displayStatus(r),
+    Date: formatDate(r.createdAt),
+    Site: r.siteName ?? "—",
+    Slot: r.slot ?? "—",
+    Crew: r.crewName ?? "—",
+    Status: displayStatus(r),
     "Price (IDR)": r.price,
     "Payment Method": r.paymentMethod ?? "—",
     "Paid At": r.paidAt ? formatDate(r.paidAt) : "—",
     "Refunded (IDR)": r.refundedAmount,
-    "Rating": r.rating ?? "—",
+    Rating: r.rating ?? "—",
     "Rating Note": r.ratingNote ?? "—",
   }));
 }
 
-function computeTotals(rows: import("@/features/admin/types").ReportBookingRow[]) {
+function computeTotals(
+  rows: import("@/features/admin/types").ReportBookingRow[],
+) {
   return {
     totalPrice: rows.reduce((sum, r) => sum + bookingRevenue(r), 0),
     totalRefunded: rows.reduce((sum, r) => sum + r.refundedAmount, 0),
   };
 }
 
-function downloadExcel(rows: import("@/features/admin/types").ReportBookingRow[], filename: string) {
+function downloadExcel(
+  rows: import("@/features/admin/types").ReportBookingRow[],
+  filename: string,
+) {
   const data = rowsToSheetData(rows);
   const { totalPrice, totalRefunded } = computeTotals(rows);
   data.push({
     "Booking ID": "TOTAL",
-    "Date": "",
-    "Site": "",
-    "Slot": "",
-    "Crew": "",
-    "Status": "",
+    Date: "",
+    Site: "",
+    Slot: "",
+    Crew: "",
+    Status: "",
     "Price (IDR)": totalPrice,
     "Payment Method": "",
     "Paid At": "",
     "Refunded (IDR)": totalRefunded,
-    "Rating": "",
+    Rating: "",
     "Rating Note": "",
   });
   const ws = XLSX.utils.json_to_sheet(data);
@@ -186,27 +216,35 @@ function downloadExcel(rows: import("@/features/admin/types").ReportBookingRow[]
   XLSX.writeFile(wb, `${filename}.xlsx`);
 }
 
-function downloadCSV(rows: import("@/features/admin/types").ReportBookingRow[], filename: string) {
+function downloadCSV(
+  rows: import("@/features/admin/types").ReportBookingRow[],
+  filename: string,
+) {
   function csvField(val: string | number | null | undefined): string {
     if (val === null || val === undefined || val === "—") return "";
     return `"${String(val).replace(/"/g, '""')}"`;
   }
   const { totalPrice, totalRefunded } = computeTotals(rows);
-  const header = "Booking ID,Date,Site,Slot,Crew,Status,Price (IDR),Payment Method,Paid At,Refunded (IDR),Rating,Rating Note\n";
-  const dataRows = rows.map((r) => [
-    csvField(r.id),
-    csvField(formatDate(r.createdAt)),
-    csvField(r.siteName),
-    csvField(r.slot),
-    csvField(r.crewName),
-    csvField(displayStatus(r)),
-    r.price,
-    csvField(r.paymentMethod),
-    csvField(r.paidAt ? formatDate(r.paidAt) : null),
-    r.refundedAmount,
-    csvField(r.rating != null ? String(r.rating) : null),
-    csvField(r.ratingNote),
-  ].join(",")).join("\n");
+  const header =
+    "Booking ID,Date,Site,Slot,Crew,Status,Price (IDR),Payment Method,Paid At,Refunded (IDR),Rating,Rating Note\n";
+  const dataRows = rows
+    .map((r) =>
+      [
+        csvField(r.id),
+        csvField(formatDate(r.createdAt)),
+        csvField(r.siteName),
+        csvField(r.slot),
+        csvField(r.crewName),
+        csvField(displayStatus(r)),
+        r.price,
+        csvField(r.paymentMethod),
+        csvField(r.paidAt ? formatDate(r.paidAt) : null),
+        r.refundedAmount,
+        csvField(r.rating != null ? String(r.rating) : null),
+        csvField(r.ratingNote),
+      ].join(","),
+    )
+    .join("\n");
   const totalRow = `"TOTAL",,,,,,${totalPrice},,,,${totalRefunded},,`;
   const csv = header + dataRows + "\n" + totalRow;
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -453,7 +491,9 @@ function JobDetailModal({
         reasonCode: "admin_manual",
       }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["admin", "report-bookings"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["admin", "report-bookings"],
+      });
       void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
       setConfirmRefund(false);
     },
@@ -472,7 +512,8 @@ function JobDetailModal({
   const viewable = [...before, ...after, ...other];
 
   const effStatus = row.refundedAmount > 0 ? "REFUNDED" : row.status;
-  const statusStyle = STATUS_STYLES[effStatus] ?? "bg-muted text-muted-foreground";
+  const statusStyle =
+    STATUS_STYLES[effStatus] ?? "bg-muted text-muted-foreground";
 
   return (
     <>
@@ -556,12 +597,14 @@ function JobDetailModal({
 
             {/* Refund */}
             {(canRefund || isRefunded) && (
-              <div className={cn(
-                "rounded-lg border px-4 py-3",
-                isRefunded
-                  ? "border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950/20"
-                  : "border-border bg-muted/30",
-              )}>
+              <div
+                className={cn(
+                  "rounded-lg border px-4 py-3",
+                  isRefunded
+                    ? "border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950/20"
+                    : "border-border bg-muted/30",
+                )}
+              >
                 {isRefunded ? (
                   <div className='flex items-center gap-2'>
                     <Undo2 className='h-3.5 w-3.5 text-red-500' />
@@ -572,8 +615,11 @@ function JobDetailModal({
                 ) : confirmRefund ? (
                   <div className='space-y-2'>
                     <p className='text-xs text-muted-foreground'>
-                      Refund <span className='font-semibold text-foreground'>{formatRupiah(row.price)}</span> ke customer
-                      {row.paymentMethod && <span className='ml-1'>via <span className='font-medium'>{row.paymentMethod}</span></span>}.
+                      Refund{" "}
+                      <span className='font-semibold text-foreground'>
+                        {formatRupiah(row.price)}
+                      </span>{" "}
+                      ke customer
                     </p>
                     <div className='flex gap-2'>
                       <Button
@@ -583,7 +629,9 @@ function JobDetailModal({
                         onClick={() => refundMutation.mutate(row.id)}
                         className='h-7 text-xs'
                       >
-                        {refundMutation.isPending ? "Processing..." : "Ya, tandai refund"}
+                        {refundMutation.isPending
+                          ? "Processing..."
+                          : "Ya, tandai refund"}
                       </Button>
                       <Button
                         size='sm'
@@ -595,7 +643,9 @@ function JobDetailModal({
                       </Button>
                     </div>
                     {refundMutation.isError && (
-                      <p className='text-xs text-destructive'>Gagal. Coba lagi.</p>
+                      <p className='text-xs text-destructive'>
+                        Gagal. Coba lagi.
+                      </p>
                     )}
                   </div>
                 ) : (
@@ -800,6 +850,7 @@ export default function ReportJobsPage() {
     bookings: jobRows,
     total: jobTotal,
     isLoading,
+    refetch,
   } = useAdminReportBookings(
     effectiveSiteId,
     appliedFrom,
@@ -818,7 +869,10 @@ export default function ReportJobsPage() {
     );
     setAppliedFilters({
       crewId: selectedCrewId || undefined,
-      statuses: statusFilter && statusFilter !== "REFUNDED" ? [statusFilter] : undefined,
+      statuses:
+        statusFilter && statusFilter !== "REFUNDED"
+          ? [statusFilter]
+          : undefined,
       refunded:
         statusFilter === "REFUNDED"
           ? true
@@ -849,14 +903,20 @@ export default function ReportJobsPage() {
       if (appliedFrom) params.set("from", appliedFrom);
       if (appliedTo) params.set("to", appliedTo);
       if (appliedFilters.crewId) params.set("crewId", appliedFilters.crewId);
-      if (appliedFilters.statuses?.length) params.set("statuses", appliedFilters.statuses.join(","));
-      if (appliedFilters.refunded !== undefined) params.set("refunded", String(appliedFilters.refunded));
-      if (appliedFilters.hasRating !== undefined) params.set("hasRating", String(appliedFilters.hasRating));
-      if (appliedFilters.hasPhotos !== undefined) params.set("hasPhotos", String(appliedFilters.hasPhotos));
+      if (appliedFilters.statuses?.length)
+        params.set("statuses", appliedFilters.statuses.join(","));
+      if (appliedFilters.refunded !== undefined)
+        params.set("refunded", String(appliedFilters.refunded));
+      if (appliedFilters.hasRating !== undefined)
+        params.set("hasRating", String(appliedFilters.hasRating));
+      if (appliedFilters.hasPhotos !== undefined)
+        params.set("hasPhotos", String(appliedFilters.hasPhotos));
       if (appliedFilters.search) params.set("search", appliedFilters.search);
       params.set("page", "1");
       params.set("limit", String(jobTotal || 10000));
-      const res = await api.get<ReportBookingsResponse>(`/v1/admin/reports/bookings?${params}`);
+      const res = await api.get<ReportBookingsResponse>(
+        `/v1/admin/reports/bookings?${params}`,
+      );
       const fn = format === "csv" ? downloadCSV : downloadExcel;
       fn(res.data.rows, `park-n-shine-jobs-all`);
     } finally {
@@ -919,7 +979,9 @@ export default function ReportJobsPage() {
     ? allSites.find((s) => s.id === appliedSiteId)?.name
     : null;
 
-  const columns: ColumnDef<ReportBookingRow>[] = [
+  const displayRows = expandLedgerRows(jobRows);
+
+  const columns: ColumnDef<LedgerRow>[] = [
     {
       accessorKey: "id",
       header: "Booking ID",
@@ -973,16 +1035,36 @@ export default function ReportJobsPage() {
       accessorKey: "status",
       header: t("reports.jobDetail.status"),
       cell: ({ row }) => {
-        const eff = row.original.refundedAmount > 0 ? "REFUNDED" : row.original.status;
+        const { _ledgerType, refundedAmount, status, paidAt } = row.original;
+        if (_ledgerType === "PAID") {
+          return (
+            <span className='inline-flex items-center gap-1 text-[11px] text-muted-foreground/60 italic'>
+              <Banknote className='h-3 w-3 shrink-0' />
+              paid
+            </span>
+          );
+        }
+        const eff =
+          _ledgerType === "REFUND"
+            ? "REFUNDED"
+            : refundedAmount > 0
+              ? "REFUNDED"
+              : status;
         const style = STATUS_STYLES[eff] ?? "bg-muted text-muted-foreground";
+        const isPaidUnrefunded = !_ledgerType && status === "CANCELLED" && !!paidAt && refundedAmount === 0;
         return (
-          <span
-            className={cn(
-              "rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase",
-              style,
+          <span className='inline-flex items-center gap-1.5'>
+            <span
+              className={cn(
+                "rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase",
+                style,
+              )}
+            >
+              {eff}
+            </span>
+            {isPaidUnrefunded && (
+              <span title='Sudah dibayar, belum direfund'><Banknote className='h-3.5 w-3.5 text-amber-500' /></span>
             )}
-          >
-            {eff}
           </span>
         );
       },
@@ -992,16 +1074,38 @@ export default function ReportJobsPage() {
       header: t("reports.jobDetail.price"),
       meta: { align: "right" },
       cell: ({ row }) => {
-        const { status, price, refundedAmount } = row.original;
-        if (status === "EXPIRED") return <span className='font-mono text-xs text-muted-foreground'>—</span>;
+        const { status, price, refundedAmount, _ledgerType } = row.original;
+        if (_ledgerType === "PAID")
+          return (
+            <span className='font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400'>
+              {formatRupiah(price)}
+            </span>
+          );
+        if (_ledgerType === "REFUND")
+          return (
+            <span className='inline-flex items-center gap-1 font-mono text-xs font-semibold text-red-600 dark:text-red-400'>
+              <Undo2 className='h-3 w-3' />-{formatRupiah(refundedAmount)}
+            </span>
+          );
+        if (status === "EXPIRED")
+          return (
+            <span className='font-mono text-xs text-muted-foreground'>—</span>
+          );
         if (refundedAmount > 0)
           return (
             <span className='inline-flex items-center gap-1 font-mono text-xs font-semibold text-red-600 dark:text-red-400'>
-              <Undo2 className='h-3 w-3' />
-              -{formatRupiah(refundedAmount)}
+              <Undo2 className='h-3 w-3' />-{formatRupiah(refundedAmount)}
             </span>
           );
-        if (status === "CANCELLED") return <span className='font-mono text-xs text-muted-foreground'>—</span>;
+        if (status === "CANCELLED") {
+          return row.original.paidAt ? (
+            <span className='font-mono text-xs font-medium text-amber-600 dark:text-amber-400'>
+              {formatRupiah(price)}
+            </span>
+          ) : (
+            <span className='font-mono text-xs text-muted-foreground'>—</span>
+          );
+        }
         return <span className='font-mono text-xs'>{formatRupiah(price)}</span>;
       },
     },
@@ -1367,37 +1471,73 @@ export default function ReportJobsPage() {
       )}
 
       {/* Amount summary */}
-      {jobRows.length > 0 && (() => {
-        const pageRevenue = jobRows.reduce((sum, r) => sum + bookingRevenue(r), 0);
-        const pageRefunded = jobRows.reduce((sum, r) => sum + r.refundedAmount, 0);
-        const pageNet = pageRevenue - pageRefunded;
-        return (
-          <div className='flex flex-wrap items-center gap-4 rounded-xl border border-border bg-muted/30 px-4 py-3'>
-            <div className='flex items-center gap-3'>
-              <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>Revenue</span>
-              <span className='font-mono text-sm font-semibold text-foreground'>{formatRupiah(pageRevenue)}</span>
+      {jobRows.length > 0 &&
+        (() => {
+          const pageRevenue = jobRows.reduce(
+            (sum, r) => sum + bookingRevenue(r),
+            0,
+          );
+          const pageRefunded = jobRows.reduce(
+            (sum, r) => sum + r.refundedAmount,
+            0,
+          );
+          const pageNet = pageRevenue - pageRefunded;
+          return (
+            <div className='flex flex-wrap items-center gap-4 rounded-xl border border-border bg-muted/30 px-4 py-3'>
+              <div className='flex items-center gap-3'>
+                <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                  Revenue
+                </span>
+                <span className='font-mono text-sm font-semibold text-foreground'>
+                  {formatRupiah(pageRevenue)}
+                </span>
+              </div>
+              <div className='h-4 w-px bg-border' />
+              <div className='flex items-center gap-3'>
+                <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                  Refunded
+                </span>
+                <span className='font-mono text-sm font-semibold text-red-600 dark:text-red-400'>
+                  {pageRefunded > 0
+                    ? `-${formatRupiah(pageRefunded)}`
+                    : formatRupiah(0)}
+                </span>
+              </div>
+              <div className='h-4 w-px bg-border' />
+              <div className='flex items-center gap-3'>
+                <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                  Net
+                </span>
+                <span className='font-mono text-sm font-bold text-foreground'>
+                  {formatRupiah(pageNet)}
+                </span>
+              </div>
+              <span className='ml-auto text-[10px] text-muted-foreground/60'>
+                halaman ini
+              </span>
             </div>
-            <div className='h-4 w-px bg-border' />
-            <div className='flex items-center gap-3'>
-              <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>Refunded</span>
-              <span className='font-mono text-sm font-semibold text-red-600 dark:text-red-400'>{pageRefunded > 0 ? `-${formatRupiah(pageRefunded)}` : formatRupiah(0)}</span>
-            </div>
-            <div className='h-4 w-px bg-border' />
-            <div className='flex items-center gap-3'>
-              <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>Net</span>
-              <span className='font-mono text-sm font-bold text-foreground'>{formatRupiah(pageNet)}</span>
-            </div>
-            <span className='ml-auto text-[10px] text-muted-foreground/60'>halaman ini</span>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       {/* Export toolbar */}
       <div className='flex items-center justify-between gap-3'>
         <span className='text-sm text-muted-foreground'>
-          <span className='font-semibold text-foreground'>{jobTotal}</span> results
+          <span className='font-semibold text-foreground'>{jobTotal}</span>{" "}
+          results
         </span>
         <div className='flex items-center gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            disabled={isLoading}
+            onClick={() => void refetch()}
+            className='gap-1.5 text-xs'
+            title='Refresh table'
+          >
+            <RefreshCw
+              className={cn("h-3.5 w-3.5", isLoading && "animate-spin")}
+            />
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -1453,7 +1593,14 @@ export default function ReportJobsPage() {
       {/* Data table */}
       <DataTable
         columns={columns}
-        data={jobRows}
+        data={displayRows}
+        rowClassName={(row) => {
+          if (row._ledgerType === "PAID")
+            return "bg-emerald-50/60 dark:bg-emerald-950/20";
+          if (row._ledgerType === "REFUND")
+            return "bg-red-50/60 dark:bg-red-950/20";
+          return undefined;
+        }}
         isLoading={isLoading}
         emptyMessage={t("reports.jobDetail.noData")}
         totalCount={jobTotal}

@@ -4,7 +4,7 @@ import { queryKeys, mutationKeys } from "@/lib/query-keys";
 import type { CrewSummaryResponse, DisbursementEvent, TipListResponse } from "@/features/admin/types/tip";
 
 export function useAdminTipCrewSummary(period: string, siteId = "") {
-  const { data, isLoading, error } = useQuery({
+  const query = useQuery({
     queryKey: queryKeys.admin.tipCrewSummary(period, siteId),
     queryFn: async () => {
       const params = new URLSearchParams({ period });
@@ -15,7 +15,7 @@ export function useAdminTipCrewSummary(period: string, siteId = "") {
     enabled: !!period,
   });
 
-  return { crewSummary: data ?? null, isLoading, error };
+  return { crewSummary: query.data ?? null, isLoading: query.isLoading, refetch: query.refetch, error: query.error };
 }
 
 export function useAdminTipList(
@@ -25,7 +25,7 @@ export function useAdminTipList(
   search: string,
   siteId: string
 ) {
-  const { data, isLoading, error } = useQuery({
+  const query = useQuery({
     queryKey: queryKeys.admin.tipList(period, page, pageSize, search, siteId),
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -41,7 +41,7 @@ export function useAdminTipList(
     enabled: !!period,
   });
 
-  return { tipList: data ?? null, isLoading, error };
+  return { tipList: query.data ?? null, isLoading: query.isLoading, refetch: query.refetch, error: query.error };
 }
 
 export function useAdminDisbursements() {

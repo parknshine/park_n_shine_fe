@@ -53,6 +53,7 @@ export function useAuditLog(siteId: string, filters: AuditLogFilters = {}) {
     totalCount: query.data?.totalCount ?? 0,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
+    refetch: query.refetch,
     error,
   };
 }

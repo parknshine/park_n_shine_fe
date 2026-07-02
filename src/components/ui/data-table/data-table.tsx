@@ -45,6 +45,7 @@ interface DataTableProps<TData> {
   onPageSizeChange?: (size: number) => void;
   // row interaction
   onRowClick?: (row: TData) => void;
+  rowClassName?: (row: TData) => string | undefined;
 }
 
 export function DataTable<TData>({
@@ -62,6 +63,7 @@ export function DataTable<TData>({
   pageSizeOptions,
   onPageSizeChange,
   onRowClick,
+  rowClassName,
 }: Readonly<DataTableProps<TData>>) {
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -142,7 +144,8 @@ export function DataTable<TData>({
                   onClick={() => onRowClick?.(row.original)}
                   className={cn(
                     "hover:bg-muted/30",
-                    onRowClick && "cursor-pointer"
+                    onRowClick && "cursor-pointer",
+                    rowClassName?.(row.original)
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (

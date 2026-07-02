@@ -36,7 +36,7 @@ interface CustomerListResponse {
 }
 
 export function useAdminLoyaltyCustomers(params?: CustomerFilterParams) {
-  const { data, isLoading, error } = useQuery({
+  const query = useQuery({
     queryKey: queryKeys.admin.loyaltyCustomers(params),
     placeholderData: keepPreviousData,
     queryFn: async () => {
@@ -60,10 +60,11 @@ export function useAdminLoyaltyCustomers(params?: CustomerFilterParams) {
   });
 
   return {
-    customers: data?.customers ?? [],
-    pagination: data?.pagination,
-    isLoading,
-    error,
+    customers: query.data?.customers ?? [],
+    pagination: query.data?.pagination,
+    isLoading: query.isLoading,
+    refetch: query.refetch,
+    error: query.error,
   };
 }
 

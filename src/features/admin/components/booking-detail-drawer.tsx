@@ -356,7 +356,10 @@ export function BookingDetailDrawer({
                     <Button
                       variant="destructive"
                       size="sm"
-                      disabled={["DRAFT", "PENDING", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status) || isBookingLocked(booking)}
+                      disabled={
+                        !["CLOSED", "CANCELLED"].includes(booking.status) ||
+                        (booking.refundedAmount ?? 0) > 0
+                      }
                       onClick={() => setActiveModal("refund")}
                     >
                       {t("drawer.refund")}

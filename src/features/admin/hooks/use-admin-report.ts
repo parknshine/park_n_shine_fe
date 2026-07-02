@@ -29,6 +29,7 @@ export function useAdminReport(siteId: string | undefined, from: string, to: str
   return {
     report: query.data ?? null,
     isLoading: query.isLoading,
+    refetch: query.refetch,
     error,
   };
 }
