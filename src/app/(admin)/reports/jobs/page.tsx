@@ -1010,7 +1010,7 @@ export default function ReportJobsPage() {
       id: "location",
       header: t("reports.jobDetail.slot"),
       cell: ({ row }) => (
-        <div className='min-w-[80px]'>
+        <div className='min-w-20'>
           <span className='font-mono text-xs font-medium'>
             {row.original.slot ?? (
               <span className='text-muted-foreground'>—</span>
