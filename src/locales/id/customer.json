@@ -309,7 +309,9 @@
     "paymentDetail": "Detail Pembayaran",
     "orderTime": "Waktu Pemesanan",
     "paymentMethodLabel": "Metode Pembayaran",
-    "amountLabel": "Jumlah"
+    "amountLabel": "Jumlah",
+    "enableNotifications": "Aktifkan notifikasi saat kendaraanmu siap",
+    "notifDenied": "Notifikasi diblokir. Buka pengaturan browser lalu izinkan notifikasi, kemudian muat ulang halaman."
   },
   "rate": {
     "title": "Bagaimana pengalamanmu?",

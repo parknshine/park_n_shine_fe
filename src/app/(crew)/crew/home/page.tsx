@@ -334,7 +334,7 @@ export function CrewHomePage() {
                 {permission === "default" && t("home.notifDescription")}
               </p>
             </div>
-            <button
+            {/* <button
               onClick={permission !== "granted" && permission !== "denied" ? subscribePush : undefined}
               disabled={permission === "denied"}
               aria-label={t("home.notifButton")}
@@ -350,7 +350,7 @@ export function CrewHomePage() {
                   permission === "granted" ? "translate-x-6" : "translate-x-1",
                 )}
               />
-            </button>
+            </button> */}
           </div>
           {/* {permission === "default" && (
             <Button size="sm" className="mt-3 w-full" onClick={subscribePush}>

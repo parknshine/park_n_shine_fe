@@ -309,7 +309,9 @@
     "paymentDetail": "Payment Details",
     "orderTime": "Order Time",
     "paymentMethodLabel": "Payment Method",
-    "amountLabel": "Amount"
+    "amountLabel": "Amount",
+    "enableNotifications": "Enable notifications when your car is ready",
+    "notifDenied": "Notifications blocked. Open browser settings and enable notifications, then reload the page."
   },
   "rate": {
     "title": "How was your experience?",

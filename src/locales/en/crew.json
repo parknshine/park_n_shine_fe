@@ -34,7 +34,7 @@
     "notifGranted": "Notifications enabled",
     "notifGrantedDescription": "You'll be notified when new jobs arrive",
     "notifDenied": "Notifications blocked",
-    "notifDeniedDescription": "Enable notifications in your browser settings to receive job alerts",
+    "notifDeniedDescription": "Notifications blocked. Open browser settings and enable notifications, then reload the page.",
     "jobTakenByOther": "No jobs available at the moment."
   },
   "job": {

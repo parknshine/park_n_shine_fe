@@ -207,17 +207,23 @@ export default function BookingStatusPage() {
       )}
 
       {!isTerminal &&
-        permission === "default" &&
+        (permission === "default" || permission === "denied") &&
         process.env.NEXT_PUBLIC_PUSH_ENABLED === "true" && (
           <button
-            onClick={() => void subscribePush()}
-            className='flex w-full items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground transition-colors hover:bg-muted'
+            onClick={permission === "default" ? () => { subscribePush().catch(() => undefined); } : undefined}
+            disabled={permission === "denied"}
+            className='flex w-full items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60'
           >
             <Bell className='h-4 w-4 shrink-0 text-primary' />
-            <span>
-              {t("status.enableNotifications", {
-                defaultValue: "Enable notifications when your car is ready",
-              })}
+            <span className='min-w-0 flex-1'>
+              <span className='block font-medium'>
+                {t("status.enableNotifications")}
+              </span>
+              {permission === "denied" && (
+                <span className='block text-xs text-muted-foreground'>
+                  {t("status.notifDenied")}
+                </span>
+              )}
             </span>
           </button>
         )}

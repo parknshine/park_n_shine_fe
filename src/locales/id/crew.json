@@ -34,7 +34,7 @@
     "notifGranted": "Notifikasi aktif",
     "notifGrantedDescription": "Kamu akan diberitahu saat job baru tersedia",
     "notifDenied": "Notifikasi diblokir",
-    "notifDeniedDescription": "Aktifkan notifikasi di pengaturan browser untuk menerima pemberitahuan job",
+    "notifDeniedDescription": "Notifikasi diblokir. Buka pengaturan browser lalu izinkan notifikasi, kemudian muat ulang halaman.",
     "jobTakenByOther": "Job kosong, tidak ada job tersedia saat ini."
   },
   "job": {
