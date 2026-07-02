@@ -138,7 +138,7 @@ export function StatusHero({ status, isRefunded = false }: Readonly<StatusHeroPr
       )}
 
       {isRefunded ? (
-        <StatusBadge tone='info'>
+        <StatusBadge tone='warning'>
           {t("history.status.refunded", { defaultValue: "Direfund" })}
         </StatusBadge>
       ) : (

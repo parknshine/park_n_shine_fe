@@ -43,7 +43,7 @@ const STATUS_I18N_KEY: Record<string, string> = {
 const KIND_STYLE: Record<StatusKind, { color: string; bg: string }> = {
   ok: { color: "#1f8a5b", bg: "#e7f5ee" },
   fail: { color: "#ef4444", bg: "#fdeaea" },
-  refunded: { color: "#0077a8", bg: "#e0f2fb" },
+  refunded: { color: "#c2410c", bg: "#fff1ec" },
   pending: { color: "#a07c00", bg: "#fff3d6" },
 };
 
@@ -83,7 +83,7 @@ function DropletSVG({ color }: Readonly<{ color: string }>) {
 
 function amountDisplay(price: number, kind: StatusKind, refundedAmount?: number): { text: string; color: string } {
   if (kind === "ok") return { text: `+${fmtPrice(price)}`, color: "#1f8a5b" };
-  if (kind === "refunded") return { text: `↩ ${fmtPrice(refundedAmount ?? price)}`, color: "#0077a8" };
+  if (kind === "refunded") return { text: `↩ ${fmtPrice(refundedAmount ?? price)}`, color: "#c2410c" };
   if (kind === "fail") return { text: "—", color: "#9aa6ad" };
   return { text: fmtPrice(price), color: "#273034" };
 }

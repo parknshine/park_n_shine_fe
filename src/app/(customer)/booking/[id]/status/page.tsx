@@ -489,7 +489,7 @@ export default function BookingStatusPage() {
 
       {isCancelled && (
         <div
-          className={`rounded-2xl border p-6 text-center space-y-3 ${isRefunded ? "border-sky-200 bg-sky-50 dark:border-sky-900 dark:bg-sky-950" : "border-destructive/30 bg-destructive/5"}`}
+          className={`rounded-2xl border p-6 text-center space-y-3 ${isRefunded ? "border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950" : "border-destructive/30 bg-destructive/5"}`}
         >
           <p className='text-sm text-muted-foreground'>
             {isRefunded
