@@ -28,8 +28,8 @@ export const metadata: Metadata = {
     title: "Park & Shine",
   },
   icons: {
-    icon: "/icons/icon.svg",
-    apple: "/icons/icon.svg",
+    icon: "/parknshinelogo.svg",
+    apple: "/parknshinelogo.svg",
   },
 };
 

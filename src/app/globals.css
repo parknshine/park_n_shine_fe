@@ -251,8 +251,8 @@ img {
   display: inline-flex;
   padding: 0.45rem 0.85rem;
   border-radius: 999px;
-  background: var(--secondary);
-  color: var(--secondary-ink);
+  background: #149ad3;
+  color: #fff;
   font-size: 0.74rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -265,12 +265,12 @@ img {
   font-weight: 800;
   line-height: 0.95;
   letter-spacing: -0.05em;
-  color: var(--primary);
+  color: var(--foreground);
 }
 
 .hero h1 span {
   display: block;
-  color: var(--tertiary);
+  color: var(--primary-bright);
 }
 
 .hero p {
@@ -346,8 +346,8 @@ img {
 
 /* ─── Process / Comic grid ──────────────────────────────────────────────────── */
 .process-wrap {
-  background: var(--surface-low);
-  padding: 5rem 0;
+  background: linear-gradient(to bottom, #fff 0%, #fff 65%, #18a4f1 100%);
+  padding: 5rem 0 6rem;
   overflow: hidden;
 }
 
@@ -403,12 +403,12 @@ img {
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: linear-gradient(180deg, #ffe37a, var(--secondary));
-  color: var(--secondary-ink);
+  background: linear-gradient(180deg, #19a7f5, #0770a8);
+  color: #fff;
   font-weight: 800;
   font-size: 1rem;
   box-shadow:
-    0 10px 18px rgba(253, 211, 77, 0.28),
+    0 10px 18px rgba(29, 177, 241, 0.28),
     0 0 0 8px rgba(255, 255, 255, 0.95);
   z-index: 3;
 }
@@ -538,6 +538,42 @@ img {
   background: var(--primary-bright);
 }
 
+/* ─── Plans / Pricing Promo ─────────────────────────────────────────────────── */
+.plans-section-promo {
+  background: linear-gradient(180deg, #18a4f1 0%, #0975ae 100%);
+  padding: 3.5rem 0;
+}
+
+.plans-promo-inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3rem;
+  align-items: center;
+}
+
+.plans-promo-subtitle {
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1.65;
+  color: #fff;
+  max-width: 28rem;
+  margin: 0 0 1.25rem;
+}
+
+.plans-promo-title {
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  margin: 0;
+}
+
+.plans-promo-card {
+  width: min(31rem, 100%);
+  flex-shrink: 0;
+}
+
 /* ─── Tracker ───────────────────────────────────────────────────────────────── */
 .tracker-section {
   padding-bottom: 5rem;
@@ -636,6 +672,18 @@ img {
 .bubble-idle {
   background: var(--surface-high);
   color: #7a888f;
+}
+
+.bubble-step-icon {
+  width: 55%;
+  height: 55%;
+  object-fit: contain;
+  display: block;
+}
+
+.bubble-done .bubble-step-icon,
+.bubble-active .bubble-step-icon {
+  filter: brightness(0) invert(1);
 }
 
 .bubble-line {
@@ -754,6 +802,16 @@ img {
 
   .raised {
     margin-top: 0;
+  }
+
+  .plans-promo-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .plans-promo-card {
+    width: 100%;
+    max-width: 31rem;
+    margin: 0 auto;
   }
 }
 

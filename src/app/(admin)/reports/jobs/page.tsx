@@ -1051,7 +1051,7 @@ export default function ReportJobsPage() {
               ? "REFUNDED"
               : status;
         const style = STATUS_STYLES[eff] ?? "bg-muted text-muted-foreground";
-        const isPaidUnrefunded = !_ledgerType && status === "CANCELLED" && !!paidAt && refundedAmount === 0;
+        const isPaidUnrefunded = !_ledgerType && (status === "CANCELLED" || status === "EXPIRED") && !!paidAt && refundedAmount === 0;
         return (
           <span className='inline-flex items-center gap-1.5'>
             <span
@@ -1087,10 +1087,15 @@ export default function ReportJobsPage() {
               <Undo2 className='h-3 w-3' />-{formatRupiah(refundedAmount)}
             </span>
           );
-        if (status === "EXPIRED")
-          return (
+        if (status === "EXPIRED") {
+          return row.original.paidAt ? (
+            <span className='font-mono text-xs font-medium text-amber-600 dark:text-amber-400'>
+              {formatRupiah(price)}
+            </span>
+          ) : (
             <span className='font-mono text-xs text-muted-foreground'>—</span>
           );
+        }
         if (refundedAmount > 0)
           return (
             <span className='inline-flex items-center gap-1 font-mono text-xs font-semibold text-red-600 dark:text-red-400'>

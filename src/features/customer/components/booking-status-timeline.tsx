@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clock, Loader2 } from "lucide-react";
+import { Check, Clock, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation, i18n } from "@/i18n";
 import type {
@@ -66,34 +66,69 @@ const STATUS_STEP: Record<BookingStatus, number> = {
 interface BookingStatusTimelineProps {
   status: BookingStatus;
   statusHistory?: BookingStatusEvent[];
+  isRefunded?: boolean;
+}
+
+function formatTimestamp(iso: string): string {
+  const locale = i18n.language === "en" ? "en-GB" : "id-ID";
+  const d = new Date(iso);
+  const date = new Intl.DateTimeFormat(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(d);
+  const time = new Intl.DateTimeFormat(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(d);
+  return `${date} • ${time}`;
+}
+
+function stepConnectorClass(isDone: boolean, isTerminalNonClosed: boolean): string {
+  if (isDone) return "bg-green-600";
+  if (isTerminalNonClosed) return "bg-[#f8e5e0]";
+  return "bg-muted";
+}
+
+function stepDotClass(
+  isDone: boolean,
+  isActive: boolean,
+  isTerminalNonClosed: boolean,
+): string {
+  if (isDone) return "border-green-600 bg-green-600 text-white";
+  if (isActive) return "border-primary bg-primary/10 text-primary";
+  if (isTerminalNonClosed) return "border-[#f8e5e0] bg-white text-muted-foreground/50";
+  return "border-muted bg-background text-muted-foreground";
+}
+
+function terminalDescKey(status: BookingStatus, isRefunded: boolean): string {
+  if (status === "EXPIRED") return "status.expiredMessage";
+  if (isRefunded) return "status.refundedMessage";
+  return "status.cancelledMessage";
+}
+
+function terminalLabelKey(
+  status: BookingStatus,
+  isRefunded: boolean,
+): string {
+  if (status === "EXPIRED") return "booking.stepper.expired.label";
+  if (isRefunded) return "booking.stepper.cancelled_refunded.label";
+  return "booking.stepper.cancelled.label";
 }
 
 export function BookingStatusTimeline({
   status,
   statusHistory = [],
+  isRefunded = false,
 }: Readonly<BookingStatusTimelineProps>) {
   const { t } = useTranslation("customer");
 
   const currentStep = STATUS_STEP[status] ?? 0;
   const isTerminal =
     status === "EXPIRED" || status === "CANCELLED" || status === "CLOSED";
-
-  function formatTimestamp(iso: string): string {
-    const locale = i18n.language === "en" ? "en-GB" : "id-ID";
-    const d = new Date(iso);
-    const date = new Intl.DateTimeFormat(locale, {
-      weekday: "long",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).format(d);
-    const time = new Intl.DateTimeFormat(locale, {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).format(d);
-    return `${date} • ${time}`;
-  }
+  const isTerminalNonClosed = status === "CANCELLED" || status === "EXPIRED";
 
   // Build timestamp map from history: status → formatted time
   const timestampMap = new Map<BookingStatus, string>();
@@ -115,8 +150,48 @@ export function BookingStatusTimeline({
   if (!timestampMap.has("IN_PROGRESS") && timestampMap.has("LOCATED")) {
     timestampMap.set("IN_PROGRESS", timestampMap.get("LOCATED")!);
   }
+
+  const terminalIsDestructive = !isRefunded;
+  const terminalDotClass = terminalIsDestructive
+    ? "border-destructive bg-destructive/10 text-destructive"
+    : "border-[#f7481f] bg-[#fff0ed] text-[#f7481f]";
+  const terminalTextClass = terminalIsDestructive ? "text-destructive" : "text-[#f7481f]";
+
   return (
     <ol aria-label='Booking progress'>
+      {/* Terminal step for CANCELLED / EXPIRED — shown at top */}
+      {isTerminalNonClosed && (
+        <li className='flex gap-3'>
+          <div className='flex flex-col items-center'>
+            <div
+              className={cn(
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                terminalDotClass,
+              )}
+            >
+              <X className='h-4 w-4' aria-hidden />
+            </div>
+            <div
+              className='my-1 w-0.5 flex-1 bg-muted'
+              style={{ minHeight: 20 }}
+            />
+          </div>
+          <div className='pb-5 pt-0.5 min-w-0'>
+            <p
+              className={cn(
+                "text-sm font-semibold leading-tight",
+                terminalTextClass,
+              )}
+            >
+              {t(terminalLabelKey(status, isRefunded))}
+            </p>
+            <p className='mt-0.5 text-xs text-muted-foreground'>
+              {t(terminalDescKey(status, isRefunded))}
+            </p>
+          </div>
+        </li>
+      )}
+
       {STEPS.map((step, index) => {
         const stepIndex = index + 1;
         const isDone =
@@ -134,10 +209,7 @@ export function BookingStatusTimeline({
               <div
                 className={cn(
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                  isDone && "border-green-600 bg-green-600 text-white",
-                  isActive && "border-primary bg-primary/10 text-primary",
-                  isFuture &&
-                    "border-muted bg-background text-muted-foreground",
+                  stepDotClass(isDone, isActive, isTerminalNonClosed),
                 )}
               >
                 {isDone ? (
@@ -152,7 +224,7 @@ export function BookingStatusTimeline({
                 <div
                   className={cn(
                     "my-1 w-0.5 flex-1",
-                    isDone ? "bg-green-600" : "bg-muted",
+                    stepConnectorClass(isDone, isTerminalNonClosed),
                   )}
                   style={{ minHeight: 20 }}
                 />

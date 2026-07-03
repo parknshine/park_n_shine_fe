@@ -171,18 +171,14 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
       <header className="fixed inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-md items-center justify-between px-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
-              <Image
-                src="/icons/icon.svg"
-                alt="Park & Shine"
-                width={24}
-                height={24}
-                className="shrink-0"
-              />
-            </div>
-            <span className="text-base font-semibold text-foreground">
-              Park & Shine
-            </span>
+            <Image
+              src="/parknshinelogo.svg"
+              alt="Park & Shine"
+              width={120}
+              height={32}
+              className="shrink-0"
+              style={{ width: "auto", height: "32px" }}
+            />
           </div>
 
           <div className="flex items-center gap-1">

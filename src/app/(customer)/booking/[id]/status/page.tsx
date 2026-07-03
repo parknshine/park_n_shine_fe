@@ -120,6 +120,18 @@ export default function BookingStatusPage() {
   const isRefunded = isCancelled && (booking.refundedAmount ?? 0) > 0;
   const isNeedsHelp = booking.status === BOOKING_STATUSES.NEEDS_HELP;
   const isInProgress = booking.status === BOOKING_STATUSES.IN_PROGRESS;
+  const isExpired = booking.status === BOOKING_STATUSES.EXPIRED;
+  const isTerminalNonClosed = isCancelled || isExpired;
+
+  let historyCardBorder = "border-border bg-white dark:bg-card";
+  if (isRefunded) historyCardBorder = "border-[#F9CEC4] bg-[#FFFBFA] dark:border-orange-900 dark:bg-orange-950";
+  else if (isTerminalNonClosed) historyCardBorder = "border-destructive/30 bg-destructive/5 dark:border-destructive/40 dark:bg-destructive/10";
+
+  let historyDividerColor = "bg-border";
+  if (isRefunded) historyDividerColor = "bg-[#F9CEC4]";
+  else if (isTerminalNonClosed) historyDividerColor = "bg-destructive/20";
+
+  const historyTitleColor = isTerminalNonClosed ? "text-destructive" : "text-foreground";
 
   const plateMedia = booking.media.find((m) => m.kind === "plate");
   const slotMedia = booking.media.find((m) => m.kind === "slot");
@@ -493,23 +505,14 @@ export default function BookingStatusPage() {
         </div>
       )}
 
-      {isCancelled && (
+      {isCancelled && cancellationReason && (
         <div
-          className={`rounded-2xl border p-6 text-center space-y-3 ${isRefunded ? "border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950" : "border-destructive/30 bg-destructive/5"}`}
+          className={`rounded-2xl border px-5 py-4 text-center ${isRefunded ? "border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950" : "border-destructive/30 bg-destructive/5"}`}
         >
-          <p className='text-sm text-muted-foreground'>
-            {isRefunded
-              ? t("status.refundedMessage", {
-                  defaultValue: "Pesanan kamu telah dibatalkan. Pembayaran kamu telah direfund.",
-                })
-              : t("status.cancelledMessage")}
+          <p className='text-xs text-muted-foreground'>
+            {t("status.cancellationReason")}:{" "}
+            <span className='font-medium'>{cancellationReason}</span>
           </p>
-          {cancellationReason && (
-            <p className='text-xs text-muted-foreground'>
-              {t("status.cancellationReason")}:{" "}
-              <span className='font-medium'>{cancellationReason}</span>
-            </p>
-          )}
         </div>
       )}
 
@@ -522,17 +525,21 @@ export default function BookingStatusPage() {
         />
       )}
 
-      {!isCancelled && booking.status !== BOOKING_STATUSES.EXPIRED && (
-        <div className='rounded-2xl border border-border bg-white px-4 py-5 dark:bg-card'>
-          <p className='mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
-            {t("status.historyTitle", { defaultValue: "Booking Progress" })}
-          </p>
-          <BookingStatusTimeline
+      <div
+        className={`overflow-hidden rounded-2xl border ${historyCardBorder}`}
+      >
+        <p className={`px-5 py-4 text-base font-bold ${historyTitleColor}`}>
+          {t("status.historyTitle")}
+        </p>
+        <div className={`h-px ${historyDividerColor}`} />
+        <div className='px-5 py-5'>
+          <BookingStatusTimeline 
             status={booking.status}
             statusHistory={booking.statusHistory}
+            isRefunded={isRefunded}
           />
         </div>
-      )}
+      </div>
     </div>
   );
 }

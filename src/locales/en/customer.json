@@ -140,6 +140,15 @@
       "closed": {
         "label": "Completed",
         "desc": "Thank you for using Park & Shine"
+      },
+      "cancelled": {
+        "label": "Booking Cancelled"
+      },
+      "cancelled_refunded": {
+        "label": "Booking Cancelled & Refunded"
+      },
+      "expired": {
+        "label": "Booking Expired"
       }
     },
     "step": "Step {{current}} of {{total}}",
@@ -287,6 +296,8 @@
     "contactWhatsApp": "Contact via WhatsApp",
     "closed": "This booking has been completed.",
     "cancelledMessage": "Your booking has been cancelled. We're sorry for the inconvenience.",
+    "refundedMessage": "Your booking has been cancelled. Your payment is being processed for refund.",
+    "expiredMessage": "Your booking has expired because payment was not completed in time.",
     "cancellationReason": "Reason",
     "leaveFeedback": "Leave Feedback",
     "historyTitle": "Status History",

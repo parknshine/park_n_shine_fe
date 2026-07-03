@@ -27,6 +27,7 @@ interface UIState {
   locale: "id" | "en";
   timeExtNotifications: TimeExtNotification[];
   drawerBookingId: string | null;
+  sidebarCollapsed: boolean;
 }
 
 interface UIActions {
@@ -39,6 +40,7 @@ interface UIActions {
   addTimeExtNotification: (n: TimeExtNotification) => void;
   removeTimeExtNotification: (bookingId: string) => void;
   setDrawerBookingId: (bookingId: string | null) => void;
+  toggleSidebarCollapsed: () => void;
 }
 
 export const useUIStore = create<UIState & UIActions>()(
@@ -50,6 +52,7 @@ export const useUIStore = create<UIState & UIActions>()(
       locale: "id",
       timeExtNotifications: [],
       drawerBookingId: null,
+      sidebarCollapsed: false,
 
       addToast: (toast) =>
         set((state) => {
@@ -100,12 +103,18 @@ export const useUIStore = create<UIState & UIActions>()(
         set((state) => {
           state.drawerBookingId = bookingId;
         }),
+
+      toggleSidebarCollapsed: () =>
+        set((state) => {
+          state.sidebarCollapsed = !state.sidebarCollapsed;
+        }),
     })),
     {
       name: "ui",
       partialize: (state) => ({
         sites: state.sites,
         locale: state.locale,
+        sidebarCollapsed: state.sidebarCollapsed,
       }),
       skipHydration: true,
     }

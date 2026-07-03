@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, LogOut, Timer } from "lucide-react";
+import { Bell, LogOut, Menu, Timer } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
 import { useAdminAuth, useAdminEscalations } from "@/features/admin/hooks";
@@ -32,6 +32,7 @@ export function AdminNavbar() {
 
   const timeExtNotifications = useUIStore((s) => s.timeExtNotifications);
   const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
+  const toggleSidebarCollapsed = useUIStore((s) => s.toggleSidebarCollapsed);
 
   const { escalations } = useAdminEscalations();
   const escalationCount = escalations.length;
@@ -55,9 +56,19 @@ export function AdminNavbar() {
   const avatarLetter = email.charAt(0).toUpperCase();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-6">
-      {/* Left: current page title */}
-      <h1 className="text-base font-semibold text-foreground">{pageTitle}</h1>
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-4">
+      {/* Left: hamburger + page title */}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={toggleSidebarCollapsed}
+          className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="h-4 w-4" />
+        </button>
+        <h1 className="text-base font-semibold text-foreground">{pageTitle}</h1>
+      </div>
 
       {/* Right: escalations + language + user + logout */}
       <div className="flex items-center gap-2">

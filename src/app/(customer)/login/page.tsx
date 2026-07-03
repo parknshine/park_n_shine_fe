@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -20,21 +21,15 @@ const INPUT_CLASS =
 
 function BrandLogo() {
   return (
-    <div className='mb-12 mt-12 flex items-center gap-2.5'>
-      <div className='flex h-9 w-9 items-center justify-center rounded-[11px] bg-[linear-gradient(135deg,#006289,#1db1f1)] shadow-[0_8px_18px_rgba(0,98,137,0.28)]'>
-        <svg
-          width='19'
-          height='19'
-          viewBox='0 0 24 24'
-          fill='#fff'
-          aria-hidden='true'
-        >
-          <path d='M12 2l2 6.5L20.5 10 14 12l-2 6.5L10 12 3.5 10 10 8.5 12 2z' />
-        </svg>
-      </div>
-      <span className='text-[17px] font-extrabold tracking-[-0.02em] text-foreground'>
-        Park &amp; Shine
-      </span>
+    <div className='mb-12 mt-12 flex items-center justify-center'>
+      <Image
+        src='/parknshinelogo.svg'
+        width={160}
+        height={48}
+        alt='Park & Shine'
+        priority
+        style={{ width: 'auto', height: '48px' }}
+      />
     </div>
   );
 }

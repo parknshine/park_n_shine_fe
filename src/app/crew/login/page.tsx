@@ -61,17 +61,14 @@ export function CrewLoginPage() {
       <div className="w-full max-w-sm">
         {/* ── Logo & wordmark ── */}
         <div className="mb-10 flex flex-col items-center gap-3">
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-xl bg-primary"
-          >
-            <Image
-              src="/icons/icon.svg"
-              width={48}
-              height={48}
-              alt="Park & Shine logo"
-              priority
-            />
-          </div>
+          <Image
+            src="/parknshinelogo.svg"
+            width={160}
+            height={48}
+            alt="Park & Shine logo"
+            priority
+            style={{ width: "auto", height: "48px" }}
+          />
           <div className="text-center">
             <p
               className="text-xs font-semibold uppercase tracking-[0.12em] text-primary"

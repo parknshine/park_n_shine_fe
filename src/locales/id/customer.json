@@ -140,6 +140,15 @@
       "closed": {
         "label": "Selesai",
         "desc": "Terima kasih telah menggunakan Park & Shine"
+      },
+      "cancelled": {
+        "label": "Pesanan Dibatalkan"
+      },
+      "cancelled_refunded": {
+        "label": "Pesanan Dibatalkan & Dana Dikembalikan"
+      },
+      "expired": {
+        "label": "Pesanan Kadaluarsa"
       }
     },
     "step": "Langkah {{current}} dari {{total}}",
@@ -286,7 +295,9 @@
     "needsHelp": "Tim kami sedang menghubungi supervisor untuk membantu. Silakan hubungi kami jika butuh bantuan segera.",
     "contactWhatsApp": "Hubungi via WhatsApp",
     "closed": "Booking ini telah selesai.",
-    "cancelledMessage": "Booking kamu telah dibatalkan. Kami mohon maaf atas ketidaknyamanan ini.",
+    "cancelledMessage": "Pesanan kamu telah dibatalkan. Kami mohon maaf atas ketidaknyamanan ini.",
+    "refundedMessage": "Pesanan kamu telah dibatalkan. Dana pembayaran kamu sedang diproses untuk dikembalikan.",
+    "expiredMessage": "Pesanan kamu telah kadaluarsa karena pembayaran tidak diselesaikan dalam batas waktu.",
     "cancellationReason": "Alasan",
     "leaveFeedback": "Berikan Masukan",
     "historyTitle": "Riwayat Status",

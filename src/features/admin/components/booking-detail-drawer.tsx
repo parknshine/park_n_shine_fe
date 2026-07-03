@@ -357,7 +357,10 @@ export function BookingDetailDrawer({
                       variant="destructive"
                       size="sm"
                       disabled={
-                        !["CLOSED", "CANCELLED"].includes(booking.status) ||
+                        !(
+                          ["CLOSED", "CANCELLED"].includes(booking.status) ||
+                          (booking.status === "EXPIRED" && booking.statusHistory.some((e) => e.status === "PAID"))
+                        ) ||
                         (booking.refundedAmount ?? 0) > 0
                       }
                       onClick={() => setActiveModal("refund")}

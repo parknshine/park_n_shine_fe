@@ -8,7 +8,7 @@ import { useUIStore } from "@/store/ui-store";
 import { usePublicTestimonials } from "@/features/customer/hooks";
 import { BookNowModal } from "@/features/customer/components/book-now-modal";
 
-const imgParkShineLogo = "/park_n_shine_logo.jpeg.png";
+const imgParkShineLogo = "/parknshinelogo.svg";
 const imgScanningQrCode = "/park-shine-panel-1.jpeg";
 const imgPhotographingCarPlate = "/park-shine-panel-2.jpeg";
 const imgStaffWashingCar = "/park-shine-panel-3.jpeg";
@@ -242,6 +242,10 @@ export default function Home() {
         <section className='process-wrap' id='process'>
           <div className='shell'>
             <div className='section-heading centered'>
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" className="mx-auto mb-3">
+                <path d="M24 6L26.8 20.2L41 24L26.8 27.8L24 42L21.2 27.8L7 24L21.2 20.2L24 6Z" fill="#006289" fillOpacity="0.15"/>
+                <path d="M24 10L26.2 21.2L37 24L26.2 26.8L24 38L21.8 26.8L11 24L21.8 21.2L24 10Z" fill="#006289"/>
+              </svg>
               <h2>{t("landingPage.howItWorks.title")}</h2>
             </div>
 
@@ -268,14 +272,13 @@ export default function Home() {
         </section>
 
         {/* ── Pricing ───────────────────────────────────────────── */}
-        <section className='shell plans-section' id='pricing'>
-          <div className='section-heading centered'>
-            <h2>{t("landingPage.pricing.title")}</h2>
-            <p>{t("landingPage.pricing.subtitle")}</p>
-          </div>
-
-          <div className='plans-grid'>
-            <article className='plan-card'>
+        <section className='plans-section-promo' id='pricing'>
+          <div className='shell plans-promo-inner'>
+            <div>
+              <p className='plans-promo-subtitle'>{t("landingPage.pricing.subtitle")}</p>
+              <h2 className='plans-promo-title'>{t("landingPage.pricing.title")}</h2>
+            </div>
+            <article className='plan-card plans-promo-card'>
               <h3>{t("landingPage.pricing.serviceLabel")}</h3>
               <p className='price'>Rp50.000</p>
               <p>{t("landingPage.pricing.description")}</p>
@@ -289,7 +292,7 @@ export default function Home() {
         </section>
 
         {/* ── Track Your Wash ───────────────────────────────────── */}
-        <section className='shell tracker-section'>
+        <section className='shell tracker-section pt-12'>
           <div className='tracker-card'>
             <div className='tracker-copy'>
               <h2>{t("landingPage.track.title")}</h2>
@@ -306,7 +309,10 @@ export default function Home() {
                 const stepCls = `progress-step ${current ? "progress-step-active" : done ? "progress-step-done" : "progress-step-upcoming"}`;
                 const elements = [
                   <div key={`step-${i}`} className={stepCls}>
-                    <div className={bubbleCls}>{i + 1}</div>
+                    <div className={bubbleCls}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`/icons/step${i + 1}.svg`} alt="" width={22} height={22} className="bubble-step-icon" />
+                    </div>
                     <span>{t(`landingPage.track.step${i + 1}`)}</span>
                   </div>,
                 ];
