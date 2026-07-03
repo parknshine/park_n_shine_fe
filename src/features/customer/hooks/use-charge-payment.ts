@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { isAxiosError } from "axios";
 import { queryKeys } from "@/lib/query-keys";
-import type { PaymentInstructions } from "@/features/customer/types";
+import type { CustomerBooking, PaymentInstructions } from "@/features/customer/types";
 
 export function useChargePayment(bookingId: string, signedToken: string) {
   const queryClient = useQueryClient();
@@ -18,7 +18,14 @@ export function useChargePayment(bookingId: string, signedToken: string) {
       );
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (paymentInstructions, variables) => {
+      // Seed the cache synchronously so the /pay page (same query key) sees
+      // paymentInstructions immediately on mount, instead of racing the async
+      // refetch from invalidateQueries and briefly bouncing back here.
+      queryClient.setQueryData<CustomerBooking | undefined>(
+        queryKeys.customer.booking(bookingId),
+        (old) => (old ? { ...old, paymentMethod: variables.paymentMethod, paymentInstructions } : old),
+      );
       queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId),
       });

@@ -17,6 +17,8 @@ import { useTranslation } from "@/i18n";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
+const ALL_PERIODS = "all";
+
 function toCurrentMonth(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -69,7 +71,7 @@ function ReportTabs() {
 
 export default function TipsReportPage() {
   const { t } = useTranslation("admin");
-  const [period, setPeriod] = useState(toCurrentMonth);
+  const [period, setPeriod] = useState(ALL_PERIODS);
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
@@ -77,6 +79,7 @@ export default function TipsReportPage() {
   const [pageSize, setPageSize] = useState(25);
 
   const { sites } = useSiteSelection();
+  const isAllPeriods = period === ALL_PERIODS;
 
   const { tipList, isLoading: isTipListLoading, refetch: refetchTipList } = useAdminTipList(
     period,
@@ -247,13 +250,28 @@ export default function TipsReportPage() {
                       Periode
                     </span>
                   </div>
-                  <input
-                    type='month'
-                    value={period}
-                    max={toCurrentMonth()}
-                    onChange={(e) => { setPeriod(e.target.value); setPage(1); }}
-                    className='h-8 w-full rounded-lg border border-border bg-background px-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-ring'
-                  />
+                  <div className='flex items-center gap-1.5'>
+                    <input
+                      type='month'
+                      value={isAllPeriods ? toCurrentMonth() : period}
+                      max={toCurrentMonth()}
+                      disabled={isAllPeriods}
+                      onChange={(e) => { setPeriod(e.target.value); setPage(1); }}
+                      className='h-8 min-w-0 flex-1 rounded-lg border border-border bg-background px-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => { setPeriod(isAllPeriods ? toCurrentMonth() : ALL_PERIODS); setPage(1); }}
+                      className={cn(
+                        "h-8 shrink-0 rounded-lg border px-2.5 text-xs font-medium transition-colors",
+                        isAllPeriods
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {t("reports.tips.filter.allPeriods")}
+                    </button>
+                  </div>
                 </div>
 
                 <div className='space-y-2 px-4 py-3'>

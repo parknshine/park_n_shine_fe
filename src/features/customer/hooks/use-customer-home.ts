@@ -17,6 +17,6 @@ export function useCustomerHome(enabled = true) {
     },
     enabled,
     staleTime: 0,
-    refetchOnMount: true,
+    refetchOnMount: "always",
   });
 }

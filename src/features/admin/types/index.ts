@@ -85,6 +85,9 @@ export interface AdminReport {
     total: number;
     byStatus: Record<string, number>;
   };
+  payments: {
+    byStatus: Record<string, number>;
+  };
   revenue: {
     totalGross: number;
     totalPaid: number;
@@ -119,6 +122,7 @@ export interface ReportBookingRow {
   paidAt: string | null;
   refundedAmount: number;
   paymentMethod: string | null;
+  paymentStatus: string;
   rating: number | null;
   ratingNote: string | null;
   duration: ReportBookingDuration;

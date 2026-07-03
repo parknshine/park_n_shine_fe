@@ -1,7 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios-admin";
 import { queryKeys, mutationKeys } from "@/lib/query-keys";
-import type { CrewSummaryResponse, DisbursementEvent, TipListResponse } from "@/features/admin/types/tip";
+import type {
+  CrewSummaryResponse,
+  DisbursementEvent,
+  TipListResponse,
+  PendingSummaryResponse,
+} from "@/features/admin/types/tip";
 
 export function useAdminTipCrewSummary(period: string, siteId = "") {
   const query = useQuery({
@@ -44,6 +49,18 @@ export function useAdminTipList(
   return { tipList: query.data ?? null, isLoading: query.isLoading, refetch: query.refetch, error: query.error };
 }
 
+export function useAdminPendingSummary() {
+  const query = useQuery({
+    queryKey: queryKeys.admin.tipPendingSummary(),
+    queryFn: async () => {
+      const res = await api.get<PendingSummaryResponse>("/v1/admin/tips/pending-summary");
+      return res.data;
+    },
+  });
+
+  return { pendingSummary: query.data?.periods ?? [], isLoading: query.isLoading };
+}
+
 export function useAdminDisbursements() {
   const { data, isLoading, error } = useQuery({
     queryKey: queryKeys.admin.disbursements(),
@@ -79,6 +96,9 @@ export function useCreateDisbursement() {
       });
       void queryClient.invalidateQueries({
         queryKey: queryKeys.admin.disbursements(),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.tipPendingSummary(),
       });
     },
   });

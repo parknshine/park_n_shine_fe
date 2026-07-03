@@ -61,6 +61,7 @@
     "noData": "No data for this date range.",
     "totalRow": "Total",
     "statusBreakdown": "Bookings by Status",
+    "paymentStatusBreakdown": "Bookings by Payment Status",
     "crewPerformance": "Crew Performance",
     "columns": {
       "status": "Status",
@@ -144,7 +145,8 @@
       "filter": {
         "allMalls": "All Malls",
         "searchPlaceholder": "Booking ID or crew name...",
-        "search": "Search"
+        "search": "Search",
+        "allPeriods": "All Periods"
       },
       "columns": {
         "bookingId": "Booking ID",
@@ -189,6 +191,14 @@
         "cancel": "Cancel",
         "confirm": "Confirm",
         "processing": "Processing..."
+      },
+      "pendingByPeriod": {
+        "title": "Pending by Period",
+        "empty": "No pending tips.",
+        "crewCountUnit": "crew",
+        "viewButton": "View",
+        "current": "Current month",
+        "selectPeriodHint": "Select a specific period to create a disbursement"
       }
     },
     "tipCard": {

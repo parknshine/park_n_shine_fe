@@ -20,6 +20,7 @@ export function usePublicSites() {
       return res.data;
     },
     staleTime: 5 * 60 * 1000,
+    refetchOnMount: "always",
   });
 
   return {

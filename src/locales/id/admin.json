@@ -61,6 +61,7 @@
     "noData": "Tidak ada data untuk rentang ini.",
     "totalRow": "Total",
     "statusBreakdown": "Booking per Status",
+    "paymentStatusBreakdown": "Booking per Status Pembayaran",
     "crewPerformance": "Performa Crew",
     "columns": {
       "status": "Status",
@@ -144,7 +145,8 @@
       "filter": {
         "allMalls": "Semua Mall",
         "searchPlaceholder": "Booking ID atau nama crew...",
-        "search": "Cari"
+        "search": "Cari",
+        "allPeriods": "Semua Periode"
       },
       "columns": {
         "bookingId": "Booking ID",
@@ -189,6 +191,14 @@
         "cancel": "Batal",
         "confirm": "Konfirmasi",
         "processing": "Memproses..."
+      },
+      "pendingByPeriod": {
+        "title": "Pending per Periode",
+        "empty": "Tidak ada tip pending.",
+        "crewCountUnit": "orang",
+        "viewButton": "Lihat",
+        "current": "Bulan ini",
+        "selectPeriodHint": "Pilih periode tertentu untuk membuat disbursement"
       }
     },
     "tipCard": {

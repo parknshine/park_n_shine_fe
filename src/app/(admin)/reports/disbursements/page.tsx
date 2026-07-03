@@ -20,10 +20,13 @@ import {
   useAdminTipCrewSummary,
   useAdminDisbursements,
   useCreateDisbursement,
+  useAdminPendingSummary,
 } from "@/features/admin/hooks/use-admin-tips";
 import type { DisbursementEvent } from "@/features/admin/types/tip";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
+
+const ALL_PERIODS = "all";
 
 function toCurrentMonth(): string {
   const now = new Date();
@@ -32,6 +35,13 @@ function toCurrentMonth(): string {
 
 function formatRupiah(amount: number): string {
   return `Rp ${amount.toLocaleString("id-ID")}`;
+}
+
+function formatPeriodLabel(period: string): string {
+  return new Date(`${period}-01T00:00:00`).toLocaleDateString("id-ID", {
+    month: "long",
+    year: "numeric",
+  });
 }
 
 function formatDate(iso: string): string {
@@ -148,13 +158,15 @@ function ConfirmDisbursementModal({
 
 export default function DisbursementsPage() {
   const { t } = useTranslation("admin");
-  const [period, setPeriod] = useState(toCurrentMonth);
+  const [period, setPeriod] = useState(ALL_PERIODS);
   const [showConfirm, setShowConfirm] = useState(false);
   const [exportingId, setExportingId] = useState<string | null>(null);
 
   const { crewSummary, isLoading: isSummaryLoading } = useAdminTipCrewSummary(period);
   const { disbursements, isLoading: isDisbLoading } = useAdminDisbursements();
   const { mutate: createDisbursement, isPending: isCreating } = useCreateDisbursement();
+  const { pendingSummary } = useAdminPendingSummary();
+  const isAllPeriods = period === ALL_PERIODS;
 
   const totalPending = crewSummary
     ? crewSummary.crews.reduce((sum, c) => sum + c.pendingDisbursement, 0)
@@ -262,21 +274,72 @@ export default function DisbursementsPage() {
 
       <ReportTabs />
 
+      {/* Pending by period */}
+      {pendingSummary.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold text-foreground">
+            {t("reports.disbursements.pendingByPeriod.title")}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {pendingSummary.map((item) => (
+              <button
+                key={item.period}
+                onClick={() => setPeriod(item.period)}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition-colors",
+                  item.period === period
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-muted/30 hover:bg-muted/50",
+                )}
+              >
+                <span className="font-medium text-foreground">
+                  {formatPeriodLabel(item.period)}
+                  {item.period === toCurrentMonth() && (
+                    <span className="ml-1 text-muted-foreground">
+                      ({t("reports.disbursements.pendingByPeriod.current")})
+                    </span>
+                  )}
+                </span>
+                <span className="font-mono text-muted-foreground">{formatRupiah(item.totalPending)}</span>
+                <span className="text-muted-foreground">
+                  · {item.crewCount} {t("reports.disbursements.confirmModal.crewCountUnit")}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Period + action */}
       <div className="flex flex-wrap items-end justify-between gap-3 rounded-lg border border-border bg-muted/30 px-4 py-4">
         <div className="space-y-1">
           <Label htmlFor="disb-period">{t("reports.disbursements.period")}</Label>
-          <input
-            id="disb-period"
-            type="month"
-            value={period}
-            max={toCurrentMonth()}
-            onChange={(e) => setPeriod(e.target.value)}
-            className={cn(
-              "h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground",
-              "focus:outline-none focus:ring-2 focus:ring-ring",
-            )}
-          />
+          <div className="flex items-center gap-1.5">
+            <input
+              id="disb-period"
+              type="month"
+              value={isAllPeriods ? toCurrentMonth() : period}
+              max={toCurrentMonth()}
+              disabled={isAllPeriods}
+              onChange={(e) => setPeriod(e.target.value)}
+              className={cn(
+                "h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground",
+                "focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50",
+              )}
+            />
+            <button
+              type="button"
+              onClick={() => setPeriod(isAllPeriods ? toCurrentMonth() : ALL_PERIODS)}
+              className={cn(
+                "h-9 shrink-0 rounded-lg border px-3 text-sm font-medium transition-colors",
+                isAllPeriods
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t("reports.tips.filter.allPeriods")}
+            </button>
+          </div>
         </div>
         <div className="flex flex-col items-end gap-1">
           <p className="text-xs text-muted-foreground">
@@ -286,7 +349,8 @@ export default function DisbursementsPage() {
             </span>
           </p>
           <Button
-            disabled={!hasPending || isSummaryLoading}
+            disabled={!hasPending || isSummaryLoading || isAllPeriods}
+            title={isAllPeriods ? t("reports.disbursements.pendingByPeriod.selectPeriodHint") : undefined}
             onClick={() => setShowConfirm(true)}
           >
             {t("reports.disbursements.createButton")}

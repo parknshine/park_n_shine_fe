@@ -9,6 +9,7 @@ export interface ReportBookingFilters {
   crewId?: string;
   statuses?: string[];
   refunded?: boolean;
+  needsRefund?: boolean;
   hasRating?: boolean;
   hasPhotos?: boolean;
   search?: string;
@@ -41,6 +42,7 @@ export function useAdminReportBookings(
       if (filters?.crewId) params.set("crewId", filters.crewId);
       if (filters?.statuses?.length) params.set("statuses", filters.statuses.join(","));
       if (filters?.refunded !== undefined) params.set("refunded", String(filters.refunded));
+      if (filters?.needsRefund !== undefined) params.set("needsRefund", String(filters.needsRefund));
       if (filters?.hasRating !== undefined) params.set("hasRating", String(filters.hasRating));
       if (filters?.hasPhotos !== undefined) params.set("hasPhotos", String(filters.hasPhotos));
       if (filters?.search) params.set("search", filters.search);

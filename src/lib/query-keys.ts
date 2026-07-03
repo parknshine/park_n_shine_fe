@@ -20,6 +20,7 @@ export const queryKeys = {
     tipList: (period: string, page: number, pageSize: number, search: string, siteId: string) =>
       ["admin", "tips", "list", period, page, pageSize, search, siteId] as const,
     disbursements: () => ["admin", "disbursements"] as const,
+    tipPendingSummary: () => ["admin", "tips", "pending-summary"] as const,
     loyaltyCustomers: (params?: object) => ["admin", "loyalty", "customers", params ?? {}] as const,
     chatConversations: () => ["admin", "chat", "conversations"] as const,
     chatMessages: (conversationId: string) =>

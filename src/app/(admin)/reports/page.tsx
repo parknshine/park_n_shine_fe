@@ -111,6 +111,10 @@ export default function ReportsPage() {
   const hasFilter = activeFilterCount > 0;
 
   const statusEntries = useMemo(() => Object.entries(report?.bookings.byStatus ?? {}), [report?.bookings.byStatus]);
+  const paymentStatusEntries = useMemo(
+    () => Object.entries(report?.payments.byStatus ?? {}),
+    [report?.payments.byStatus],
+  );
 
   const statusColumns = useMemo<ColumnDef<[string, number]>[]>(
     () => [
@@ -504,6 +508,16 @@ export default function ReportsPage() {
                 <span>{report.bookings.total}</span>
               </div>
             )}
+          </div>
+
+          {/* Bookings by payment status */}
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-foreground">{t("reports.paymentStatusBreakdown")}</h2>
+            <DataTable
+              columns={statusColumns}
+              data={paymentStatusEntries}
+              emptyMessage={t("reports.noData")}
+            />
           </div>
 
           {/* Crew performance */}

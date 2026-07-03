@@ -45,3 +45,14 @@ export interface TipListResponse {
   page: number;
   limit: number;
 }
+
+export interface PendingPeriodSummary {
+  period: string;
+  totalPending: number;
+  tipCount: number;
+  crewCount: number;
+}
+
+export interface PendingSummaryResponse {
+  periods: PendingPeriodSummary[];
+}

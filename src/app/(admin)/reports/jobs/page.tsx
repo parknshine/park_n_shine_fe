@@ -112,6 +112,15 @@ const STATUS_STYLES: Record<string, string> = {
   PAID: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
 };
 
+const PAYMENT_STATUS_STYLES: Record<string, string> = {
+  PENDING: "bg-muted text-muted-foreground",
+  PAID: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
+  PARTIAL_REFUND:
+    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
+  REFUNDED: "bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400",
+  FAILED: "bg-red-200 text-red-800 dark:bg-red-950/60 dark:text-red-300",
+};
+
 function toISODate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
@@ -138,15 +147,6 @@ function formatDate(iso: string): string {
   });
 }
 
-// Display status derives REFUNDED purely from refundedAmount > 0, matching the
-// on-screen table/detail badges so exports stay consistent with the UI.
-function displayStatus(row: {
-  status: string;
-  refundedAmount: number;
-}): string {
-  return row.refundedAmount > 0 ? "REFUNDED" : row.status;
-}
-
 type LedgerRow = ReportBookingRow & { _ledgerType?: "PAID" | "REFUND" };
 
 function expandLedgerRows(rows: ReportBookingRow[]): LedgerRow[] {
@@ -171,7 +171,8 @@ function rowsToSheetData(
     Site: r.siteName ?? "—",
     Slot: r.slot ?? "—",
     Crew: r.crewName ?? "—",
-    Status: displayStatus(r),
+    Status: r.status,
+    "Payment Status": r.paymentStatus,
     "Price (IDR)": r.price,
     "Payment Method": r.paymentMethod ?? "—",
     "Paid At": r.paidAt ? formatDate(r.paidAt) : "—",
@@ -203,6 +204,7 @@ function downloadExcel(
     Slot: "",
     Crew: "",
     Status: "",
+    "Payment Status": "",
     "Price (IDR)": totalPrice,
     "Payment Method": "",
     "Paid At": "",
@@ -226,7 +228,7 @@ function downloadCSV(
   }
   const { totalPrice, totalRefunded } = computeTotals(rows);
   const header =
-    "Booking ID,Date,Site,Slot,Crew,Status,Price (IDR),Payment Method,Paid At,Refunded (IDR),Rating,Rating Note\n";
+    "Booking ID,Date,Site,Slot,Crew,Status,Payment Status,Price (IDR),Payment Method,Paid At,Refunded (IDR),Rating,Rating Note\n";
   const dataRows = rows
     .map((r) =>
       [
@@ -235,7 +237,8 @@ function downloadCSV(
         csvField(r.siteName),
         csvField(r.slot),
         csvField(r.crewName),
-        csvField(displayStatus(r)),
+        csvField(r.status),
+        csvField(r.paymentStatus),
         r.price,
         csvField(r.paymentMethod),
         csvField(r.paidAt ? formatDate(r.paidAt) : null),
@@ -245,7 +248,7 @@ function downloadCSV(
       ].join(","),
     )
     .join("\n");
-  const totalRow = `"TOTAL",,,,,,${totalPrice},,,,${totalRefunded},,`;
+  const totalRow = `"TOTAL",,,,,,,${totalPrice},,,${totalRefunded},,`;
   const csv = header + dataRows + "\n" + totalRow;
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
@@ -824,6 +827,9 @@ export default function ReportJobsPage() {
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedCrewId, setSelectedCrewId] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<
+    "" | "true" | "false" | "needs_refund"
+  >("");
   const [hasRatingFilter, setHasRatingFilter] = useState<"" | "true" | "false">(
     "",
   );
@@ -869,16 +875,14 @@ export default function ReportJobsPage() {
     );
     setAppliedFilters({
       crewId: selectedCrewId || undefined,
-      statuses:
-        statusFilter && statusFilter !== "REFUNDED"
-          ? [statusFilter]
-          : undefined,
+      statuses: statusFilter ? [statusFilter] : undefined,
       refunded:
-        statusFilter === "REFUNDED"
+        paymentStatusFilter === "true"
           ? true
-          : statusFilter === "CANCELLED"
+          : paymentStatusFilter === "false"
             ? false
             : undefined,
+      needsRefund: paymentStatusFilter === "needs_refund" ? true : undefined,
       hasRating:
         hasRatingFilter === "true"
           ? true
@@ -907,6 +911,8 @@ export default function ReportJobsPage() {
         params.set("statuses", appliedFilters.statuses.join(","));
       if (appliedFilters.refunded !== undefined)
         params.set("refunded", String(appliedFilters.refunded));
+      if (appliedFilters.needsRefund !== undefined)
+        params.set("needsRefund", String(appliedFilters.needsRefund));
       if (appliedFilters.hasRating !== undefined)
         params.set("hasRating", String(appliedFilters.hasRating));
       if (appliedFilters.hasPhotos !== undefined)
@@ -934,6 +940,7 @@ export default function ReportJobsPage() {
     setAppliedSiteId(undefined);
     setSelectedCrewId("");
     setStatusFilter("");
+    setPaymentStatusFilter("");
     setHasRatingFilter("");
     setHasPhotosFilter(false);
     setSearchInput("");
@@ -946,6 +953,8 @@ export default function ReportJobsPage() {
     appliedTo !== "" ||
     !!appliedFilters.crewId ||
     !!appliedFilters.statuses?.length ||
+    appliedFilters.refunded !== undefined ||
+    appliedFilters.needsRefund !== undefined ||
     appliedFilters.hasRating !== undefined ||
     appliedFilters.hasPhotos ||
     !!appliedFilters.search;
@@ -969,6 +978,7 @@ export default function ReportJobsPage() {
     from || to,
     selectedCrewId,
     statusFilter !== "",
+    paymentStatusFilter !== "",
     hasRatingFilter !== "",
     hasPhotosFilter,
     searchInput.trim() !== "",
@@ -979,7 +989,15 @@ export default function ReportJobsPage() {
     ? allSites.find((s) => s.id === appliedSiteId)?.name
     : null;
 
-  const displayRows = expandLedgerRows(jobRows);
+  // Payment Status filter narrows which half of a refunded booking's ledger
+  // split to show: "Refunded" keeps only the money-out (REFUND) row, "Paid"
+  // keeps only the money-in (PAID) row — the booking itself still matches
+  // either way, so both filters see the same underlying set of bookings.
+  const displayRows = expandLedgerRows(jobRows).filter((row) => {
+    if (appliedFilters.refunded === true) return row._ledgerType !== "PAID";
+    if (appliedFilters.refunded === false) return row._ledgerType !== "REFUND";
+    return true;
+  });
 
   const columns: ColumnDef<LedgerRow>[] = [
     {
@@ -1033,25 +1051,15 @@ export default function ReportJobsPage() {
     },
     {
       accessorKey: "status",
-      header: t("reports.jobDetail.status"),
+      header: "Job Status",
       cell: ({ row }) => {
-        const { _ledgerType, refundedAmount, status, paidAt } = row.original;
-        if (_ledgerType === "PAID") {
-          return (
-            <span className='inline-flex items-center gap-1 text-[11px] text-muted-foreground/60 italic'>
-              <Banknote className='h-3 w-3 shrink-0' />
-              paid
-            </span>
-          );
-        }
-        const eff =
-          _ledgerType === "REFUND"
-            ? "REFUNDED"
-            : refundedAmount > 0
-              ? "REFUNDED"
-              : status;
-        const style = STATUS_STYLES[eff] ?? "bg-muted text-muted-foreground";
-        const isPaidUnrefunded = !_ledgerType && (status === "CANCELLED" || status === "EXPIRED") && !!paidAt && refundedAmount === 0;
+        const { status, paidAt, refundedAmount, _ledgerType } = row.original;
+        const style = STATUS_STYLES[status] ?? "bg-muted text-muted-foreground";
+        const isPaidUnrefunded =
+          !_ledgerType &&
+          (status === "CANCELLED" || status === "EXPIRED") &&
+          !!paidAt &&
+          refundedAmount === 0;
         return (
           <span className='inline-flex items-center gap-1.5'>
             <span
@@ -1060,11 +1068,33 @@ export default function ReportJobsPage() {
                 style,
               )}
             >
-              {eff}
+              {status}
             </span>
             {isPaidUnrefunded && (
-              <span title='Sudah dibayar, belum direfund'><Banknote className='h-3.5 w-3.5 text-amber-500' /></span>
+              <span title='Sudah dibayar, belum direfund'>
+                <Banknote className='h-3.5 w-3.5 text-amber-500' />
+              </span>
             )}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "paymentStatus",
+      header: "Payment Status",
+      cell: ({ row }) => {
+        const { paymentStatus, _ledgerType } = row.original;
+        const eff = _ledgerType === "PAID" ? "PAID" : paymentStatus;
+        const style =
+          PAYMENT_STATUS_STYLES[eff] ?? "bg-muted text-muted-foreground";
+        return (
+          <span
+            className={cn(
+              "rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase",
+              style,
+            )}
+          >
+            {eff}
           </span>
         );
       },
@@ -1186,7 +1216,7 @@ export default function ReportJobsPage() {
         </div>
 
         <div className='divide-y divide-border'>
-          <div className='grid grid-cols-1 divide-y sm:grid-cols-2 lg:grid-cols-4 sm:divide-x sm:divide-y-0 divide-border'>
+          <div className='grid grid-cols-1 divide-y sm:grid-cols-2 lg:grid-cols-5 sm:divide-x sm:divide-y-0 divide-border'>
             <div className='space-y-2 px-4 py-3'>
               <div className='flex items-center gap-1.5'>
                 <Calendar className='h-3 w-3 text-muted-foreground' />
@@ -1316,7 +1346,40 @@ export default function ReportJobsPage() {
                   <SelectItem value='CLOSED'>Closed</SelectItem>
                   <SelectItem value='CANCELLED'>Canceled</SelectItem>
                   <SelectItem value='EXPIRED'>Expired</SelectItem>
-                  <SelectItem value='REFUNDED'>Refunded</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className='space-y-2 px-4 py-3'>
+              <div className='flex items-center gap-1.5'>
+                <Banknote className='h-3 w-3 text-muted-foreground' />
+                <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                  Payment Status
+                </span>
+              </div>
+              <Select
+                value={paymentStatusFilter || "__all__"}
+                onValueChange={(v) =>
+                  setPaymentStatusFilter(
+                    v === "__all__"
+                      ? ""
+                      : (v as "true" | "false" | "needs_refund"),
+                  )
+                }
+              >
+                <SelectTrigger
+                  className={cn(
+                    "h-8 w-full text-xs",
+                    paymentStatusFilter ? "border-primary/40 font-medium" : "",
+                  )}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='__all__'>All Payment Status</SelectItem>
+                  <SelectItem value='false'>Paid</SelectItem>
+                  <SelectItem value='needs_refund'>Perlu Refund</SelectItem>
+                  <SelectItem value='true'>Refunded</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1447,6 +1510,24 @@ export default function ReportJobsPage() {
             <span className='inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'>
               <Users className='h-2.5 w-2.5' />
               {selectedCrewName ?? appliedFilters.crewId}
+            </span>
+          )}
+          {appliedFilters.refunded === true && (
+            <span className='inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'>
+              <Banknote className='h-2.5 w-2.5' />
+              Refunded
+            </span>
+          )}
+          {appliedFilters.refunded === false && (
+            <span className='inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'>
+              <Banknote className='h-2.5 w-2.5' />
+              Paid
+            </span>
+          )}
+          {appliedFilters.needsRefund === true && (
+            <span className='inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'>
+              <Banknote className='h-2.5 w-2.5' />
+              Perlu Refund
             </span>
           )}
           {appliedFilters.hasRating === true && (
