@@ -6,11 +6,10 @@ import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AUTH_INPUT_CLASS } from "@/components/shared";
 import { useCustomerAuth } from "@/features/customer/hooks";
+import { getAuthErrorKey } from "@/features/customer/auth-errors";
 import { useTranslation } from "@/i18n";
-
-const INPUT_CLASS =
-  "h-[52px] rounded-[14px] border-[1.5px] border-[rgba(111,120,125,0.18)] bg-white/70 text-[15px] focus:border-[#1db1f1] focus:ring-[rgba(29,177,241,0.14)]";
 
 function ForgotPasswordForm() {
   const { t } = useTranslation("customer");
@@ -24,8 +23,7 @@ function ForgotPasswordForm() {
       await sendPasswordReset(email);
       setSent(true);
     } catch (err) {
-      const key = err instanceof Error ? err.message : "auth.errors.generic";
-      toast.error(t(key));
+      toast.error(t(getAuthErrorKey(err)));
     }
   }
 
@@ -57,7 +55,7 @@ function ForgotPasswordForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete='email'
-                className={INPUT_CLASS}
+                className={AUTH_INPUT_CLASS}
               />
             </div>
 

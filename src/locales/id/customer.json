@@ -418,6 +418,8 @@
     "resetPasswordSuccess": "Password berhasil diubah. Silakan masuk.",
     "resetPasswordInvalidLink": "Link reset ini tidak valid atau sudah kadaluarsa.",
     "resetPasswordRequestNew": "Kirim ulang email reset",
+    "showPassword": "Tampilkan kata sandi",
+    "hidePassword": "Sembunyikan kata sandi",
     "verifyEmailTitle": "Verifikasi Email",
     "verifyEmailVerifying": "Memverifikasi email kamu...",
     "verifyEmailSuccess": "Email kamu berhasil diverifikasi.",

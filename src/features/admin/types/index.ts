@@ -292,3 +292,30 @@ export interface UpdateTestimonialPayload {
   featured?: boolean;
   order?: number;
 }
+
+// ── WhatsApp Chat ────────────────────────────────────────────────────────────
+
+export interface ChatConversation {
+  id: string;
+  phone: string;
+  customerId: string | null;
+  lastMessagePreview: string | null;
+  lastMessageAt: string | null;
+  unreadCount: number;
+  windowOpen: boolean;
+}
+
+export type MessageDirection = "INBOUND" | "OUTBOUND";
+export type MessageStatus = "SENT" | "FAILED" | "RECEIVED";
+
+export interface ChatMessage {
+  id: string;
+  conversationId: string;
+  direction: MessageDirection;
+  type: string;
+  body: string;
+  status: MessageStatus;
+  providerMessageId: string | null;
+  errorCode: string | null;
+  createdAt: string;
+}

@@ -9,3 +9,8 @@ export { MarketingHeader } from "./marketing-header";
 export { MarketingFooter } from "./marketing-footer";
 export { TableOfContents } from "./table-of-contents";
 export { ContentAccordion } from "./content-accordion";
+export {
+  PasswordInput,
+  AUTH_INPUT_CLASS,
+  type PasswordInputProps,
+} from "./password-input";

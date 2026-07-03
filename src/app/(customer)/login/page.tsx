@@ -5,19 +5,17 @@ import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AUTH_INPUT_CLASS, PasswordInput } from "@/components/shared";
 import { useCustomerAuth } from "@/features/customer/hooks";
+import { getAuthErrorKey } from "@/features/customer/auth-errors";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import { useTranslation } from "@/i18n";
 import customerApi from "@/lib/axios-customer";
 import { queryKeys } from "@/lib/query-keys";
-
-const INPUT_CLASS =
-  "h-[52px] rounded-[14px] border-[1.5px] border-[rgba(111,120,125,0.18)] bg-white/70 text-[15px] focus:border-[#1db1f1] focus:ring-[rgba(29,177,241,0.14)]";
 
 function BrandLogo() {
   return (
@@ -85,7 +83,6 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const [showPw, setShowPw] = useState(false);
 
   const isRegister = mode === "register";
 
@@ -106,8 +103,7 @@ function LoginForm() {
         router.replace(redirectTo);
       })
       .catch((err) => {
-        const key = err instanceof Error ? err.message : "auth.errors.generic";
-        toast.error(t(key));
+        toast.error(t(getAuthErrorKey(err)));
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -124,7 +120,7 @@ function LoginForm() {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       if (isRegister) {
@@ -146,8 +142,7 @@ function LoginForm() {
       await claimBookingIfNeeded();
       router.replace(redirectTo);
     } catch (err) {
-      const key = err instanceof Error ? err.message : "auth.errors.generic";
-      toast.error(t(key));
+      toast.error(t(getAuthErrorKey(err)));
     }
   }
 
@@ -160,8 +155,7 @@ function LoginForm() {
       await claimBookingIfNeeded();
       router.replace(redirectTo);
     } catch (err) {
-      const key = err instanceof Error ? err.message : "auth.errors.generic";
-      toast.error(t(key));
+      toast.error(t(getAuthErrorKey(err)));
     }
   }
 
@@ -189,43 +183,20 @@ function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete='email'
-              className={INPUT_CLASS}
+              className={AUTH_INPUT_CLASS}
             />
           </div>
 
           {/* Password */}
-          <div className='flex flex-col gap-2'>
-            <Label htmlFor='password' className='text-[13px] font-bold'>
-              {t("auth.passwordLabel")}
-            </Label>
-            <div className='relative'>
-              <Input
-                id='password'
-                type={showPw ? "text" : "password"}
-                placeholder='••••••••'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                autoComplete={isRegister ? "new-password" : "current-password"}
-                className={`${INPUT_CLASS} pr-12`}
-              />
-              <button
-                type='button'
-                aria-label={
-                  showPw ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
-                }
-                onClick={() => setShowPw((s) => !s)}
-                className='absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/5'
-              >
-                {showPw ? (
-                  <EyeOff className='h-5 w-5' strokeWidth={1.8} />
-                ) : (
-                  <Eye className='h-5 w-5' strokeWidth={1.8} />
-                )}
-              </button>
-            </div>
-          </div>
+          <PasswordInput
+            id='password'
+            label={t("auth.passwordLabel")}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
+            autoComplete={isRegister ? "new-password" : "current-password"}
+          />
 
           {/* Forgot password — sign-in mode only */}
           {!isRegister && (
@@ -253,7 +224,7 @@ function LoginForm() {
                 onChange={(e) => setPhone(e.target.value)}
                 required
                 autoComplete='tel'
-                className={INPUT_CLASS}
+                className={AUTH_INPUT_CLASS}
               />
             </div>
           )}

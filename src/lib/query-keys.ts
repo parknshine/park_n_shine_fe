@@ -21,6 +21,9 @@ export const queryKeys = {
       ["admin", "tips", "list", period, page, pageSize, search, siteId] as const,
     disbursements: () => ["admin", "disbursements"] as const,
     loyaltyCustomers: (params?: object) => ["admin", "loyalty", "customers", params ?? {}] as const,
+    chatConversations: () => ["admin", "chat", "conversations"] as const,
+    chatMessages: (conversationId: string) =>
+      ["admin", "chat", "conversations", conversationId, "messages"] as const,
   },
   crew: {
     session: () => ["crew", "session"] as const,

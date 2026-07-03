@@ -418,6 +418,8 @@
     "resetPasswordSuccess": "Password updated. Please sign in.",
     "resetPasswordInvalidLink": "This reset link is invalid or has expired.",
     "resetPasswordRequestNew": "Send a new reset email",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "verifyEmailTitle": "Verify Email",
     "verifyEmailVerifying": "Verifying your email...",
     "verifyEmailSuccess": "Your email has been verified successfully.",

@@ -10,3 +10,6 @@ export { RefundModal } from "./refund-modal";
 export { StatusOverrideModal } from "./status-override-modal";
 export { TimeExtensionToast } from "./time-extension-toast";
 export { SiteSelector } from "./site-selector";
+export { ConversationList } from "./chat/ConversationList";
+export { MessageThread } from "./chat/MessageThread";
+export { MessageComposer } from "./chat/MessageComposer";

@@ -40,6 +40,14 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
         });
         void queryClient.invalidateQueries({ queryKey: queryKeys.admin.booking(event.bookingId as string) });
       }
+      if (event.type === "chat_message") {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.admin.chatConversations() });
+        if (typeof event.conversationId === "string") {
+          void queryClient.invalidateQueries({
+            queryKey: queryKeys.admin.chatMessages(event.conversationId),
+          });
+        }
+      }
     },
   });
 

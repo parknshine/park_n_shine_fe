@@ -4,16 +4,14 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
-import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/shared";
 import { useCustomerAuth } from "@/features/customer/hooks";
+import {
+  getAuthErrorKey,
+  isInvalidActionCodeError,
+} from "@/features/customer/auth-errors";
 import { useTranslation } from "@/i18n";
-import { cn } from "@/lib/utils";
-
-const INPUT_CLASS =
-  "h-[52px] rounded-[14px] border-[1.5px] border-[rgba(111,120,125,0.18)] bg-white/70 text-[15px] focus:border-[#1db1f1] focus:ring-[rgba(29,177,241,0.14)]";
 
 function ResetPasswordForm() {
   const { t } = useTranslation("customer");
@@ -25,8 +23,6 @@ function ResetPasswordForm() {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPw, setShowPw] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [mismatch, setMismatch] = useState(false);
   const [invalidLink, setInvalidLink] = useState(false);
 
@@ -36,26 +32,26 @@ function ResetPasswordForm() {
     }
   }, [oobCode, router]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // Guarded here (not via `oobCode!`) so the invariant is obvious at the
+    // call site rather than depending on the early return below.
+    if (!oobCode) return;
+
     if (newPassword !== confirmPassword) {
       setMismatch(true);
       return;
     }
     setMismatch(false);
     try {
-      await resetPassword({ oobCode: oobCode!, newPassword });
+      await resetPassword({ oobCode, newPassword });
       toast.success(t("auth.resetPasswordSuccess"));
       router.replace("/login");
     } catch (err) {
-      const key = err instanceof Error ? err.message : "auth.errors.generic";
-      if (
-        key === "auth.errors.invalidActionCode" ||
-        key === "auth.errors.expiredActionCode"
-      ) {
+      if (isInvalidActionCodeError(err)) {
         setInvalidLink(true);
       } else {
-        toast.error(t(key));
+        toast.error(t(getAuthErrorKey(err)));
       }
     }
   }
@@ -64,110 +60,71 @@ function ResetPasswordForm() {
 
   if (invalidLink) {
     return (
-      <main className='flex min-h-dvh flex-col bg-background px-7'>
-        <div className='flex flex-1 flex-col mt-12'>
-          <h1 className='mb-2 text-[28px] font-extrabold leading-[1.18] tracking-[-0.02em] text-foreground'>
+      <main className="flex min-h-dvh flex-col bg-background px-7">
+        <div className="flex flex-1 flex-col mt-12">
+          <h1 className="mb-2 text-[28px] font-extrabold leading-[1.18] tracking-[-0.02em] text-foreground">
             {t("auth.resetPasswordTitle")}
           </h1>
-          <div className='rounded-[14px] bg-red-50 border border-red-200 px-5 py-4 text-[15px] text-red-800 mb-6'>
+          <div className="rounded-[14px] bg-red-50 border border-red-200 px-5 py-4 text-[15px] text-red-800 mb-6">
             {t("auth.resetPasswordInvalidLink")}
           </div>
           <Link
-            href='/forgot-password'
-            className='text-center font-bold text-primary hover:underline text-[14px]'
+            href="/forgot-password"
+            className="text-center font-bold text-primary hover:underline text-[14px]"
           >
             {t("auth.resetPasswordRequestNew")}
           </Link>
-          <div className='min-h-6 flex-1' />
+          <div className="min-h-6 flex-1" />
         </div>
       </main>
     );
   }
 
   return (
-    <main className='flex min-h-dvh flex-col bg-background px-7'>
-      <div className='flex flex-1 flex-col mt-12'>
-        <h1 className='mb-2 text-[28px] font-extrabold leading-[1.18] tracking-[-0.02em] text-foreground'>
+    <main className="flex min-h-dvh flex-col bg-background px-7">
+      <div className="flex flex-1 flex-col mt-12">
+        <h1 className="mb-2 text-[28px] font-extrabold leading-[1.18] tracking-[-0.02em] text-foreground">
           {t("auth.resetPasswordTitle")}
         </h1>
-        <p className='mb-7.5 text-[15px] leading-[1.55] text-muted-foreground'>
+        <p className="mb-7.5 text-[15px] leading-[1.55] text-muted-foreground">
           {t("auth.resetPasswordSubtitle")}
         </p>
 
-        <form onSubmit={handleSubmit} className='flex flex-col gap-4.5'>
-          {/* New password */}
-          <div className='flex flex-col gap-2'>
-            <Label htmlFor='new-password' className='text-[13px] font-bold'>
-              {t("auth.resetPasswordNewPassword")}
-            </Label>
-            <div className='relative'>
-              <Input
-                id='new-password'
-                type={showPw ? "text" : "password"}
-                placeholder='••••••••'
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                minLength={6}
-                autoComplete='new-password'
-                className={cn(INPUT_CLASS, "pr-12")}
-              />
-              <button
-                type='button'
-                aria-label={showPw ? "Sembunyikan password" : "Tampilkan password"}
-                onClick={() => setShowPw((s) => !s)}
-                className='absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/5'
-              >
-                {showPw ? (
-                  <EyeOff className='h-5 w-5' strokeWidth={1.8} />
-                ) : (
-                  <Eye className='h-5 w-5' strokeWidth={1.8} />
-                )}
-              </button>
-            </div>
-          </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4.5">
+          <PasswordInput
+            id="new-password"
+            label={t("auth.resetPasswordNewPassword")}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+            minLength={6}
+            autoComplete="new-password"
+          />
 
-          {/* Confirm password */}
-          <div className='flex flex-col gap-2'>
-            <Label htmlFor='confirm-password' className='text-[13px] font-bold'>
-              {t("auth.resetPasswordConfirm")}
-            </Label>
-            <div className='relative'>
-              <Input
-                id='confirm-password'
-                type={showConfirm ? "text" : "password"}
-                placeholder='••••••••'
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                minLength={6}
-                autoComplete='new-password'
-                className={cn(INPUT_CLASS, "pr-12", mismatch && "border-red-400")}
-              />
-              <button
-                type='button'
-                aria-label={showConfirm ? "Sembunyikan password" : "Tampilkan password"}
-                onClick={() => setShowConfirm((s) => !s)}
-                className='absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/5'
-              >
-                {showConfirm ? (
-                  <EyeOff className='h-5 w-5' strokeWidth={1.8} />
-                ) : (
-                  <Eye className='h-5 w-5' strokeWidth={1.8} />
-                )}
-              </button>
-            </div>
-            {mismatch && (
-              <p className='text-[13px] text-red-500'>
-                {t("auth.resetPasswordPasswordMismatch")}
-              </p>
-            )}
-          </div>
+          <PasswordInput
+            id="confirm-password"
+            label={t("auth.resetPasswordConfirm")}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            minLength={6}
+            autoComplete="new-password"
+            invalid={mismatch}
+            errorDescribedBy={mismatch ? "confirm-password-error" : undefined}
+          />
+          {mismatch && (
+            <p
+              id="confirm-password-error"
+              className="text-[13px] text-red-500"
+            >
+              {t("auth.resetPasswordPasswordMismatch")}
+            </p>
+          )}
 
           <Button
-            type='submit'
-            size='lg'
-            className='mt-1.5 w-full font-bold'
+            type="submit"
+            size="lg"
+            className="mt-1.5 w-full font-bold"
             disabled={isSubmitting || !newPassword || !confirmPassword}
           >
             {isSubmitting
@@ -176,7 +133,7 @@ function ResetPasswordForm() {
           </Button>
         </form>
 
-        <div className='min-h-6 flex-1' />
+        <div className="min-h-6 flex-1" />
       </div>
     </main>
   );

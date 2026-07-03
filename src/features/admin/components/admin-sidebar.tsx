@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   BarChart2,
+  Inbox,
   LayoutGrid,
   Mail,
   MessageSquare,
@@ -33,6 +34,7 @@ const BASE_NAV_ITEMS = [
   { href: "/crew-members", key: "sidebar.crew", icon: Users },
   { href: "/testimonials", key: "sidebar.testimonials", icon: MessageSquare },
   { href: "/email", key: "sidebar.email", icon: Mail },
+  { href: "/inbox", key: "sidebar.inbox", icon: Inbox },
   { href: "/settings", key: "sidebar.settings", icon: Settings },
 ];
 
