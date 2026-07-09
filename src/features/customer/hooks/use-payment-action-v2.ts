@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { API_ERROR_CODES } from "@/lib/api-error";
@@ -22,6 +23,7 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
   // ConfirmBookingPayloadV2 didefinisikan di atas, bukan dari types/index.ts
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const mutation = useMutation({
     meta: { persist: false },
@@ -46,7 +48,7 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
       const code = (err as { code?: string }).code;
       if (code === API_ERROR_CODES.BOOKING_ALREADY_CONFIRMED) {
         // Booking already PENDING — go straight to payment method selection
-        window.location.assign(`/booking/${bookingId}/payment-method?token=${signedToken}`);
+        router.replace(`/booking/${bookingId}/payment-method?token=${signedToken}`);
         return;
       }
       setHasSubmitted(false);
@@ -55,7 +57,9 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId),
       });
-      window.location.assign(`/booking/${bookingId}/payment-method?token=${signedToken}`);
+      // Client-side nav: satu navigasi saja, tanpa full reload yang balapan
+      // dengan efek redirect status PENDING di halaman konfirmasi.
+      router.replace(`/booking/${bookingId}/payment-method?token=${signedToken}`);
     },
   });
 

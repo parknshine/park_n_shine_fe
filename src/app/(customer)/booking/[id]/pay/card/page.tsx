@@ -148,8 +148,9 @@ function CardPayContent() {
       });
 
       setTokenizing(false);
-      // Midtrans redirects here after the 3DS challenge completes.
-      const callbackUrl = `${globalThis.location.origin}/booking/card-callback?bookingId=${bookingId}`;
+      // Midtrans POSTs here after the 3DS challenge completes (route handler,
+      // which 303-redirects to the client callback page).
+      const callbackUrl = `${globalThis.location.origin}/booking/card-callback/complete?bookingId=${bookingId}`;
       chargeCard(
         {
           tokenId: result.tokenId,
@@ -161,7 +162,13 @@ function CardPayContent() {
               router.replace(`/booking/${bookingId}/status?token=${token}`);
             } else if (r.redirectUrl) {
               sessionStorage.setItem(`card_payment_token_${bookingId}`, token ?? "");
-              globalThis.location.href = r.redirectUrl;
+              // Mirror MidtransNew3ds.redirect: `callback_type=form` switches the 3DS
+              // result page from js_event (iframe postMessage) to a form POST redirect
+              // back to `callback_url`. Without it "Tap to Continue" goes nowhere.
+              const url = new URL(r.redirectUrl);
+              url.searchParams.set("callback_type", "form");
+              url.searchParams.set("callback_url", callbackUrl);
+              globalThis.location.href = url.toString();
             }
           },
         },

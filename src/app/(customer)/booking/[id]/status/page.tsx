@@ -249,7 +249,7 @@ export default function BookingStatusPage() {
         </button>
       )}
 
-      {showCancelConfirm && (
+      {(isPending || isPaid) && showCancelConfirm && (
         <div className='rounded-2xl border border-destructive/30 bg-destructive/5 p-5 space-y-3 text-center'>
           <p className='text-sm font-medium text-foreground'>
             {t("status.cancelConfirmTitle", {

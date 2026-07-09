@@ -10,12 +10,19 @@ interface BookingLocationCardProps {
   phone?: string;
 }
 
+// ponytail: hides phone numbers left as just a country code (e.g. "62", "0")
+function isDialingCodeOnly(phone: string): boolean {
+  const digits = phone.replace(/\D/g, "");
+  return digits === "" || digits === "0" || digits === "62";
+}
+
 export function BookingLocationCard({
   locationName,
   locationAddress,
   phone,
 }: BookingLocationCardProps) {
   const { t } = useTranslation("customer");
+  const showPhone = phone && !isDialingCodeOnly(phone);
 
   return (
     <Card>
@@ -35,7 +42,7 @@ export function BookingLocationCard({
           </div>
         </div>
 
-        {phone && (
+        {showPhone && (
           <div className="flex items-center gap-3">
             <Phone className="h-5 w-5 shrink-0 text-primary" />
             <div>
