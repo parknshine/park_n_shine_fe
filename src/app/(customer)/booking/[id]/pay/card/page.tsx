@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Lock, CreditCard, AlertCircle } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
@@ -8,144 +8,45 @@ import { useChargeCard } from "@/features/customer/hooks/use-charge-card";
 import { BookingExpiredModal } from "@/features/customer/components/booking-expired-modal";
 import { AppShell } from "@/components/shared";
 
-// ─── Xendit.js tokenization ───────────────────────────────────────────────────
+// ─── Midtrans Core API tokenization ────────────────────────────────────────────
+// Tokenize via GET /v2/token (client-side, client key only — no server key exposed).
+// 3DS, if required, happens after the backend charge call via a full-page redirect
+// to the `redirectUrl` it returns (handled in handleSubmit's onSuccess below).
 
-const XENDIT_PUBLIC_KEY = process.env.NEXT_PUBLIC_XENDIT_PUBLIC_KEY ?? "";
-
-interface XenditCardToken {
-  id: string;
-  status?: string;
-  authentication_id?: string;
-  payer_authentication_url?: string;
-  failure_reason?: string;
-}
-
-interface XenditInstance {
-  setPublishableKey(key: string): void;
-  card: {
-    createToken(
-      params: {
-        card_number: string;
-        card_exp_month: string;
-        card_exp_year: string;
-        card_cvn: string;
-        amount?: number;
-        card_holder_first_name?: string;
-        card_holder_last_name?: string;
-        card_holder_phone_number?: string;
-        is_multiple_use: boolean;
-        should_authenticate: boolean;
-      },
-      callback: (err: { message?: string } | null, token: XenditCardToken) => void,
-    ): void;
-  };
-}
+const MIDTRANS_CLIENT_KEY = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "";
+const MIDTRANS_API_BASE = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true"
+  ? "https://api.midtrans.com"
+  : "https://api.sandbox.midtrans.com";
 
 interface TokenizeResult {
   tokenId: string;
-  authenticationId?: string;
 }
 
-function tokenizeCardXendit(
-  params: {
-    cardNumber: string;
-    expMonth: string;
-    expYear: string;
-    cvn: string;
-    amount: number;
-    cardHolderName: string;
-    phone?: string | null;
-  },
-  opts: {
-    onAuthUrl: (url: string | null) => void;
-    registerCancel: (cancel: () => void) => void;
-  },
-): Promise<TokenizeResult> {
-  return new Promise((resolve, reject) => {
-    const Xendit = (globalThis as { Xendit?: XenditInstance }).Xendit;
-    if (!Xendit) {
-      reject(new Error("Xendit.js belum dimuat — refresh halaman dan coba lagi"));
-      return;
-    }
-
-    const nameParts = params.cardHolderName.trim().split(/\s+/);
-    const firstName = nameParts[0] ?? params.cardHolderName;
-    const lastName = nameParts.slice(1).join(" ") || undefined;
-
-    let settled = false;
-    let savedToken: TokenizeResult | null = null;
-
-    function settle(result: TokenizeResult | null, error?: Error) {
-      if (settled) return;
-      settled = true;
-      window.removeEventListener("message", onAuthMessage);
-      opts.onAuthUrl(null);
-      if (error) reject(error);
-      else resolve(result!);
-    }
-
-    // Fallback to Xendit.js's own VERIFIED callback: the 3DS page posts a JSON
-    // message {id, status} to its parent frame when authentication completes.
-    const XENDIT_3DS_ORIGIN = "https://redirect.xendit.co";
-    function onAuthMessage(event: MessageEvent) {
-      if (event.origin !== XENDIT_3DS_ORIGIN) return;
-      if (typeof event.data !== "string" || !savedToken?.authenticationId) return;
-      try {
-        const data = JSON.parse(event.data) as { id?: string; status?: string };
-        if (!data.id || data.id !== savedToken.authenticationId) return;
-        if (data.status === "VERIFIED") settle(savedToken);
-        else if (data.status === "FAILED") settle(null, new Error("Autentikasi 3DS gagal. Silakan coba lagi atau gunakan kartu lain."));
-      } catch {
-        // not a Xendit auth message — ignore
-      }
-    }
-
-    opts.registerCancel(() => settle(null, new Error("Verifikasi 3DS dibatalkan.")));
-
-    Xendit.card.createToken(
-      {
-        card_number: params.cardNumber,
-        card_exp_month: params.expMonth,
-        card_exp_year: params.expYear,
-        card_cvn: params.cvn,
-        amount: params.amount,
-        card_holder_first_name: firstName,
-        ...(lastName ? { card_holder_last_name: lastName } : {}),
-        ...(params.phone ? { card_holder_phone_number: params.phone } : {}),
-        is_multiple_use: false,
-        should_authenticate: true,
-      },
-      (err, token) => {
-        if (err) {
-          settle(null, new Error(err.message ?? "Tokenisasi kartu gagal"));
-          return;
-        }
-
-        if (token.status === "IN_REVIEW") {
-          // Xendit.js v1 detects 3DS completion via a postMessage that the
-          // redirect.xendit.co page sends to its PARENT frame. The auth URL must
-          // therefore render in an in-page iframe — in a popup, window.parent is
-          // the popup itself and the completion message never reaches this page.
-          if (!token.payer_authentication_url) {
-            settle(null, new Error("URL verifikasi 3DS tidak tersedia. Silakan coba lagi."));
-            return;
-          }
-          savedToken = { tokenId: token.id, authenticationId: token.authentication_id };
-          window.addEventListener("message", onAuthMessage);
-          opts.onAuthUrl(token.payer_authentication_url);
-          return; // this same callback fires again with VERIFIED/FAILED
-        }
-
-        if (token.status === "FAILED") {
-          settle(null, new Error(token.failure_reason ?? "Autentikasi 3DS gagal. Silakan coba lagi atau gunakan kartu lain."));
-          return;
-        }
-
-        // VERIFIED (3DS done) or frictionless flow without challenge
-        settle({ tokenId: token.id, authenticationId: token.authentication_id });
-      },
-    );
+async function tokenizeCardMidtrans(params: {
+  cardNumber: string;
+  expMonth: string;
+  expYear: string;
+  cvn: string;
+  amount: number;
+}): Promise<TokenizeResult> {
+  if (!MIDTRANS_CLIENT_KEY) {
+    throw new Error("Midtrans client key belum dikonfigurasi");
+  }
+  const query = new URLSearchParams({
+    client_key: MIDTRANS_CLIENT_KEY,
+    card_number: params.cardNumber,
+    card_exp_month: params.expMonth,
+    card_exp_year: params.expYear,
+    card_cvv: params.cvn,
+    gross_amount: String(params.amount),
+    secure: "true",
   });
+  const res = await fetch(`${MIDTRANS_API_BASE}/v2/token?${query.toString()}`);
+  const data = await res.json() as { status_code?: string; status_message?: string; token_id?: string };
+  if (data.status_code !== "200" || !data.token_id) {
+    throw new Error(data.status_message ?? "Tokenisasi kartu gagal");
+  }
+  return { tokenId: data.token_id };
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -167,12 +68,6 @@ function detectBrand(number: string): "visa" | "mastercard" | "jcb" | "amex" | n
   if (n.startsWith("35")) return "jcb";
   if (n.startsWith("34") || n.startsWith("37")) return "amex";
   return null;
-}
-
-function toE164(phone: string | null | undefined): string | undefined {
-  if (!phone) return undefined;
-  if (phone.startsWith("+")) return phone;
-  return `+62${phone.replace(/^0/, "")}`;
 }
 
 function formatIDR(amount: number): string {
@@ -223,22 +118,6 @@ function CardPayContent() {
   const phone = phoneOverride ?? booking?.phone ?? "";
   const [tokenizing, setTokenizing] = useState(false);
   const [tokenError, setTokenError] = useState<string | null>(null);
-  const [authUrl, setAuthUrl] = useState<string | null>(null);
-  const cancelAuthRef = useRef<(() => void) | null>(null);
-  const xenditReadyRef = useRef(false);
-
-  useEffect(() => {
-    if (!XENDIT_PUBLIC_KEY) return;
-    const script = document.createElement("script");
-    script.src = "https://js.xendit.co/v1/xendit.min.js";
-    script.async = true;
-    script.onload = () => {
-      (globalThis as { Xendit?: { setPublishableKey: (k: string) => void } }).Xendit?.setPublishableKey(XENDIT_PUBLIC_KEY);
-      xenditReadyRef.current = true;
-    };
-    document.head.appendChild(script);
-    return () => { if (document.head.contains(script)) script.remove(); };
-  }, []);
 
   const brand = detectBrand(cardNumber);
   const isBusy = tokenizing || isCharging;
@@ -263,29 +142,21 @@ function CardPayContent() {
     }
 
     try {
-      const result = await tokenizeCardXendit(
-        {
-          cardNumber: rawNumber,
-          expMonth: mm,
-          expYear: `20${yy}`,
-          cvn: cvv,
-          amount: booking?.priceAmount ?? 0,
-          cardHolderName: cardName,
-          phone: toE164(phone || null),
-        },
-        {
-          onAuthUrl: setAuthUrl,
-          registerCancel: (cancel) => { cancelAuthRef.current = cancel; },
-        },
-      );
+      const result = await tokenizeCardMidtrans({
+        cardNumber: rawNumber,
+        expMonth: mm,
+        expYear: `20${yy}`,
+        cvn: cvv,
+        amount: booking?.priceAmount ?? 0,
+      });
 
       setTokenizing(false);
+      // Midtrans redirects here after the 3DS challenge completes.
       const callbackUrl = `${globalThis.location.origin}/booking/card-callback?bookingId=${bookingId}`;
       chargeCard(
         {
           tokenId: result.tokenId,
           callbackUrl,
-          ...(result.authenticationId ? { authenticationId: result.authenticationId } : {}),
         },
         {
           onSuccess: (r) => {
@@ -307,26 +178,6 @@ function CardPayContent() {
   return (
     <>
       <BookingExpiredModal open={booking?.status === "EXPIRED"} />
-      {/* 3DS verification — must be an in-page iframe so redirect.xendit.co can
-          postMessage the result to this window (its parent frame) */}
-      {authUrl && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4'>
-          <div className='w-full max-w-md overflow-hidden rounded-2xl bg-card shadow-xl'>
-            <iframe
-              src={authUrl}
-              title='Verifikasi 3D Secure'
-              className='h-[480px] w-full border-0 bg-white'
-            />
-            <button
-              type='button'
-              onClick={() => cancelAuthRef.current?.()}
-              className='w-full border-t border-border py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground'
-            >
-              Batalkan
-            </button>
-          </div>
-        </div>
-      )}
       <AppShell surface='customer' className='pb-32'>
         <div className='space-y-6'>
           <div>
@@ -339,7 +190,7 @@ function CardPayContent() {
               Detail Kartu
             </h1>
             <p className='mt-1 text-sm text-muted-foreground'>
-              Data kartu diproses langsung oleh Xendit — aman dan terenkripsi
+              Data kartu diproses langsung oleh Midtrans — aman dan terenkripsi
             </p>
           </div>
 
