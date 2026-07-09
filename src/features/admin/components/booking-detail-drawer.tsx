@@ -251,7 +251,7 @@ export function BookingDetailDrawer({
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={["READY", "CLOSED", "CANCELLED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status)}
+                    disabled={["PENDING", "READY", "CLOSED", "CANCELLED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status)}
                     onClick={() => setActiveModal("reassign")}
                   >
                     {t("drawer.reassignCrew")}
@@ -259,7 +259,7 @@ export function BookingDetailDrawer({
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={["CLOSED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status) || isBookingLocked(booking)}
+                    disabled={["PENDING", "CLOSED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status) || isBookingLocked(booking)}
                     onClick={() => setActiveModal("override")}
                   >
                     {t("drawer.overrideStatus")}

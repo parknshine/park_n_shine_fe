@@ -13,8 +13,5 @@ export function bookingRevenue(booking: {
   refundedAmount?: number;
 }): number {
   if ((booking.refundedAmount ?? 0) > 0) return booking.price;
-  if (booking.status === "CANCELLED" || booking.status === "EXPIRED") {
-    return booking.paidAt ? booking.price : 0;
-  }
-  return booking.price;
+  return booking.paidAt ? booking.price : 0;
 }

@@ -113,9 +113,6 @@ function CardPayContent() {
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [phoneOverride, setPhoneOverride] = useState<string | undefined>(undefined);
-  const phone = phoneOverride ?? booking?.phone ?? "";
   const [tokenizing, setTokenizing] = useState(false);
   const [tokenError, setTokenError] = useState<string | null>(null);
 
@@ -206,11 +203,7 @@ function CardPayContent() {
             <p className='mt-4 font-mono text-xl tracking-widest'>
               {cardNumber || "•••• •••• •••• ••••"}
             </p>
-            <div className='mt-3 flex items-end justify-between'>
-              <div>
-                <p className='text-[10px] uppercase opacity-60'>Nama Pemegang</p>
-                <p className='text-sm font-semibold uppercase'>{cardName || "NAMA LENGKAP"}</p>
-              </div>
+            <div className='mt-3 flex items-end justify-end'>
               <div className='text-right'>
                 <p className='text-[10px] uppercase opacity-60'>Berlaku Hingga</p>
                 <p className='text-sm font-semibold'>{expiry || "MM / YY"}</p>
@@ -241,37 +234,6 @@ function CardPayContent() {
                 placeholder='1234 5678 9012 3456'
                 required
                 className='w-full rounded-xl border border-border bg-card px-4 py-3 font-mono text-base tracking-widest text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/40'
-              />
-            </div>
-
-            <div className='space-y-1.5'>
-              <label htmlFor='card-name' className='text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
-                Nama Pemegang Kartu
-              </label>
-              <input
-                id='card-name'
-                type='text'
-                value={cardName}
-                onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                placeholder='NAMA SESUAI KARTU'
-                required
-                className='w-full rounded-xl border border-border bg-card px-4 py-3 font-medium uppercase text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/40'
-              />
-            </div>
-
-            <div className='space-y-1.5'>
-              <label htmlFor='card-phone' className='text-xs font-semibold uppercase tracking-widest text-muted-foreground'>
-                Nomor HP
-              </label>
-              <input
-                id='card-phone'
-                type='tel'
-                inputMode='tel'
-                value={phone}
-                onChange={(e) => setPhoneOverride(e.target.value.replace(/[^\d+]/g, ""))}
-                placeholder='08xxxxxxxxxx'
-                required
-                className='w-full rounded-xl border border-border bg-card px-4 py-3 font-mono text-base text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/40'
               />
             </div>
 
