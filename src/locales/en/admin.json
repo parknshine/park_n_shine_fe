@@ -614,6 +614,19 @@
       "createFailed": "Failed to create shift. Please try again."
     }
   },
+  "profilePage": {
+    "title": "My Profile",
+    "changePassword": {
+      "title": "Change Password",
+      "description": "Choose a strong password you don't use elsewhere.",
+      "currentLabel": "Current Password",
+      "newLabel": "New Password",
+      "reloginHint": "After changing your password you will be logged out and must sign in again.",
+      "submit": "Change Password",
+      "submitting": "Changing...",
+      "success": "Password changed. Please sign in again."
+    }
+  },
   "usersPage": {
     "title": "Admin Users",
     "addAdmin": "Add Admin",
@@ -635,6 +648,21 @@
       "admin": "Admin",
       "superAdmin": "Super Admin"
     },
+    "password": {
+      "minLength": "At least 8 characters",
+      "lowercase": "At least one lowercase letter",
+      "uppercase": "At least one uppercase letter",
+      "number": "At least one number"
+    },
+    "menuAccess": {
+      "title": "Menu Access",
+      "full": "Full access",
+      "readonly": "Read only",
+      "hidden": "Hidden",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
     "add": {
       "title": "Add Admin User",
       "nameLabel": "Name",
@@ -650,6 +678,7 @@
       "nameLabel": "Name",
       "emailLabel": "Email",
       "roleLabel": "Role",
+      "newPasswordLabel": "New Password (leave blank to keep unchanged)",
       "saving": "Saving...",
       "save": "Save",
       "cancel": "Cancel"

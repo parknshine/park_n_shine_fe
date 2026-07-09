@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ApiContractError, normalizeApiError } from "@/lib/api-error";
 import { useAuthStore } from "@/store/auth-store";
+import { accessForPath } from "@/lib/menu-access";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
@@ -34,8 +35,23 @@ async function refreshAdminToken(): Promise<void> {
 
 // ── Request interceptor — cookie sent automatically ──────────────────────────
 
+const WRITE_METHODS = new Set(["post", "put", "patch", "delete"]);
+
 adminApi.interceptors.request.use(
-  (config) => config,
+  (config) => {
+    // ponytail: readonly enforced client-side at this single choke point (per design decision)
+    if (
+      typeof window !== "undefined" &&
+      WRITE_METHODS.has((config.method ?? "get").toLowerCase()) &&
+      !config.url?.includes("/v1/admin/sessions")
+    ) {
+      const { role, menuAccess } = useAuthStore.getState();
+      if (accessForPath(window.location.pathname, role, menuAccess) !== "write") {
+        return Promise.reject(new Error("You have read-only access to this menu"));
+      }
+    }
+    return config;
+  },
   (error) => Promise.reject(error)
 );
 

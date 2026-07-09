@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Bell, LogOut, Menu, Timer } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
@@ -17,6 +18,7 @@ const PAGE_TITLE_KEYS: Record<string, string> = {
   "/reports": "reports.title",
   "/audit": "audit.title",
   "/settings": "settings.title",
+  "/profile": "profilePage.title",
 };
 
 export function AdminNavbar() {
@@ -221,14 +223,17 @@ export function AdminNavbar() {
         <div className="h-5 w-px bg-border" />
 
         {/* User profile */}
-        <div className="flex items-center gap-2">
+        <Link
+          href="/profile"
+          className="flex items-center gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-muted"
+        >
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
             {avatarLetter}
           </div>
           <span className="hidden max-w-35 truncate text-xs text-muted-foreground sm:block">
             {email}
           </span>
-        </div>
+        </Link>
 
         {/* Logout */}
         <Button

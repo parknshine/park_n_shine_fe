@@ -614,6 +614,19 @@
       "createFailed": "Gagal membuat shift. Silakan coba lagi."
     }
   },
+  "profilePage": {
+    "title": "Profil Saya",
+    "changePassword": {
+      "title": "Ubah Password",
+      "description": "Gunakan password kuat yang tidak dipakai di tempat lain.",
+      "currentLabel": "Password Saat Ini",
+      "newLabel": "Password Baru",
+      "reloginHint": "Setelah password diubah kamu akan keluar dan harus login ulang.",
+      "submit": "Ubah Password",
+      "submitting": "Mengubah...",
+      "success": "Password berhasil diubah. Silakan login ulang."
+    }
+  },
   "usersPage": {
     "title": "Admin Users",
     "addAdmin": "Add Admin",
@@ -635,6 +648,21 @@
       "admin": "Admin",
       "superAdmin": "Super Admin"
     },
+    "password": {
+      "minLength": "Minimal 8 karakter",
+      "lowercase": "Minimal satu huruf kecil",
+      "uppercase": "Minimal satu huruf besar",
+      "number": "Minimal satu angka"
+    },
+    "menuAccess": {
+      "title": "Akses Menu",
+      "full": "Akses penuh",
+      "readonly": "Hanya lihat",
+      "hidden": "Disembunyikan",
+      "save": "Simpan",
+      "saving": "Menyimpan...",
+      "cancel": "Batal"
+    },
     "add": {
       "title": "Add Admin User",
       "nameLabel": "Name",
@@ -650,6 +678,7 @@
       "nameLabel": "Name",
       "emailLabel": "Email",
       "roleLabel": "Role",
+      "newPasswordLabel": "Password Baru (kosongkan jika tidak diubah)",
       "saving": "Saving...",
       "save": "Save",
       "cancel": "Cancel"

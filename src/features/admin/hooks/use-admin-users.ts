@@ -2,12 +2,14 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios-admin";
+import type { MenuAccessMap } from "@/lib/menu-access";
 
 export interface AdminUser {
   id: string;
   email: string;
   name: string;
   role: "super_admin" | "admin";
+  menuAccess: MenuAccessMap | null;
   active: boolean;
   createdAt: string;
   updatedAt: string;
@@ -18,12 +20,14 @@ interface CreateAdminUserPayload {
   name: string;
   password: string;
   role: "super_admin" | "admin";
+  menuAccess?: MenuAccessMap;
 }
 
 interface UpdateAdminUserPayload {
   name?: string;
   email?: string;
   role?: "super_admin" | "admin";
+  menuAccess?: MenuAccessMap;
 }
 
 const USERS_KEY = ["admin", "users"] as const;

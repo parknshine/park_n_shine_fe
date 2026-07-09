@@ -6,6 +6,7 @@ import api from "@/lib/axios-admin";
 import { mutationKeys } from "@/lib/query-keys";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
+import type { MenuAccessMap } from "@/lib/menu-access";
 
 interface AdminLoginPayload {
   email: string;
@@ -19,6 +20,7 @@ interface AdminLoginResponse {
   email: string;
   name: string;
   role: "super_admin" | "admin";
+  menuAccess: MenuAccessMap | null;
   sites: Array<{ id: string; name: string }>;
 }
 
@@ -41,6 +43,7 @@ export function useAdminAuth() {
         { id: data.id, email: data.email, name: data.name, role: data.role },
         data.token,
         data.role,
+        data.menuAccess,
       );
       setSites(data.sites);
       router.replace("/dashboard");

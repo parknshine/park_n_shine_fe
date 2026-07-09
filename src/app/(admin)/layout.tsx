@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { ADMIN_MENUS, accessForPath } from "@/lib/menu-access";
 import type { ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { AdminSidebar, AdminNavbar, BookingDetailDrawer } from "@/features/admin/components";
@@ -20,12 +21,23 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
   const removeTimeExtNotification = useUIStore((s) => s.removeTimeExtNotification);
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const role = useAuthStore((s) => s.role);
+  const menuAccess = useAuthStore((s) => s.menuAccess);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace("/admin/login");
+      return;
     }
-  }, [router, isAuthenticated]);
+    // Menu hidden for this user — bounce to the first menu they can see
+    if (accessForPath(pathname, role, menuAccess) === "none") {
+      const firstAllowed = ADMIN_MENUS.find(
+        (m) => accessForPath(m.href, role, menuAccess) !== "none",
+      );
+      router.replace(firstAllowed?.href ?? "/admin/login");
+    }
+  }, [router, isAuthenticated, pathname, role, menuAccess]);
 
   // Always fetch fresh sites on every admin page so sidebar stays in sync
   useAdminSites();

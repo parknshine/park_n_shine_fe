@@ -7,7 +7,6 @@ import {
   BarChart2,
   Inbox,
   LayoutGrid,
-  Mail,
   MessageSquare,
   QrCode,
   ScrollText,
@@ -16,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ADMIN_MENUS, accessForPath } from "@/lib/menu-access";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
 import { useTranslation } from "@/i18n";
@@ -26,17 +26,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const BASE_NAV_ITEMS = [
-  { href: "/dashboard", key: "sidebar.dashboard", icon: LayoutGrid },
-  { href: "/sites", key: "sidebar.sitesQr", icon: QrCode },
-  { href: "/reports", key: "sidebar.reports", icon: BarChart2 },
-  { href: "/audit", key: "sidebar.auditTrail", icon: ScrollText },
-  { href: "/crew-members", key: "sidebar.crew", icon: Users },
-  { href: "/testimonials", key: "sidebar.testimonials", icon: MessageSquare },
-  { href: "/email", key: "sidebar.email", icon: Mail },
-  { href: "/inbox", key: "sidebar.inbox", icon: Inbox },
-  { href: "/settings", key: "sidebar.settings", icon: Settings },
-];
+const MENU_ICONS: Record<string, typeof LayoutGrid> = {
+  "/dashboard": LayoutGrid,
+  "/sites": QrCode,
+  "/reports": BarChart2,
+  "/audit": ScrollText,
+  "/crew-members": Users,
+  "/testimonials": MessageSquare,
+  "/inbox": Inbox,
+  "/settings": Settings,
+};
+
+const BASE_NAV_ITEMS = ADMIN_MENUS.map((m) => ({
+  ...m,
+  icon: MENU_ICONS[m.href] ?? LayoutGrid,
+}));
 
 const SUPER_ADMIN_NAV_ITEMS = [
   { href: "/users", key: "sidebar.adminUsers", icon: Shield },
@@ -45,11 +49,14 @@ const SUPER_ADMIN_NAV_ITEMS = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const role = useAuthStore((s) => s.role);
+  const menuAccess = useAuthStore((s) => s.menuAccess);
   const { t } = useTranslation("admin");
   const collapsed = useUIStore((s) => s.sidebarCollapsed);
 
   const navItems = [
-    ...BASE_NAV_ITEMS,
+    ...BASE_NAV_ITEMS.filter(
+      ({ href }) => accessForPath(href, role, menuAccess) !== "none",
+    ),
     ...(role === "super_admin" ? SUPER_ADMIN_NAV_ITEMS : []),
   ];
 

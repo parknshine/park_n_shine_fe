@@ -24,12 +24,61 @@ import {
   useResetAdminPassword,
   type AdminUser,
 } from "@/features/admin/hooks/use-admin-users";
+import { ADMIN_MENUS, type MenuAccessMap, type MenuAccessLevel } from "@/lib/menu-access";
+import {
+  PasswordField,
+  PasswordRules,
+  isPasswordValid,
+} from "@/features/admin/components/password-field";
 
 type ModalState =
   | { type: "create" }
   | { type: "edit"; user: AdminUser }
   | { type: "reset"; user: AdminUser }
   | null;
+
+function MenuAccessEditor({
+  value,
+  onChange,
+}: Readonly<{
+  value: MenuAccessMap;
+  onChange: (value: MenuAccessMap) => void;
+}>) {
+  const { t } = useTranslation("admin");
+  return (
+    <div className='space-y-1'>
+      <Label>{t("usersPage.menuAccess.title")}</Label>
+      <div className='max-h-48 space-y-2 overflow-y-auto rounded-md border border-border p-3'>
+        {ADMIN_MENUS.map(({ href, key }) => (
+          <div key={href} className='flex items-center justify-between gap-3'>
+            <span className='text-sm'>{t(key)}</span>
+            <Select
+              value={value[href] ?? "write"}
+              onValueChange={(v) =>
+                onChange({ ...value, [href]: v as MenuAccessLevel })
+              }
+            >
+              <SelectTrigger className='w-36'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='write'>
+                  {t("usersPage.menuAccess.full")}
+                </SelectItem>
+                <SelectItem value='read'>
+                  {t("usersPage.menuAccess.readonly")}
+                </SelectItem>
+                <SelectItem value='none'>
+                  {t("usersPage.menuAccess.hidden")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function UserRowActions({
   user,
@@ -80,11 +129,18 @@ export default function AdminUsersPage() {
     email: "",
     password: "",
     role: "admin" as "super_admin" | "admin",
+    menuAccess: {} as MenuAccessMap,
   });
   const [newPassword, setNewPassword] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
+
+  function toMessage(err: unknown): string {
+    return err instanceof Error ? err.message : String(err);
+  }
 
   function openCreate() {
-    setForm({ name: "", email: "", password: "", role: "admin" });
+    setForm({ name: "", email: "", password: "", role: "admin", menuAccess: {} });
+    setFormError(null);
     setModal({ type: "create" });
   }
 
@@ -94,12 +150,15 @@ export default function AdminUsersPage() {
       email: user.email,
       password: "",
       role: user.role,
+      menuAccess: user.menuAccess ?? {},
     });
+    setFormError(null);
     setModal({ type: "edit", user });
   }
 
   function openReset(user: AdminUser) {
     setNewPassword("");
+    setFormError(null);
     setModal({ type: "reset", user });
   }
 
@@ -111,10 +170,11 @@ export default function AdminUsersPage() {
         email: form.email,
         password: form.password,
         role: form.role,
+        ...(form.role === "admin" ? { menuAccess: form.menuAccess } : {}),
       });
       setModal(null);
-    } catch {
-      // error surfaced by mutation/toast layer; keep modal open
+    } catch (err) {
+      setFormError(toMessage(err));
     }
   }
 
@@ -127,10 +187,17 @@ export default function AdminUsersPage() {
         name: form.name,
         email: form.email,
         role: form.role,
+        ...(form.role === "admin" ? { menuAccess: form.menuAccess } : {}),
       });
+      if (form.password) {
+        await resetPassword.mutateAsync({
+          id: modal.user.id,
+          newPassword: form.password,
+        });
+      }
       setModal(null);
-    } catch {
-      // error surfaced by mutation/toast layer; keep modal open
+    } catch (err) {
+      setFormError(toMessage(err));
     }
   }
 
@@ -140,8 +207,8 @@ export default function AdminUsersPage() {
     try {
       await resetPassword.mutateAsync({ id: modal.user.id, newPassword });
       setModal(null);
-    } catch {
-      // error surfaced by mutation/toast layer; keep modal open
+    } catch (err) {
+      setFormError(toMessage(err));
     }
   }
 
@@ -264,15 +331,12 @@ export default function AdminUsersPage() {
                 <Label htmlFor='create-password'>
                   {t("usersPage.add.passwordLabel")}
                 </Label>
-                <Input
+                <PasswordField
                   id='create-password'
-                  type='password'
                   value={form.password}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, password: e.target.value }))
-                  }
-                  required
+                  onChange={(v) => setForm((f) => ({ ...f, password: v }))}
                 />
+                <PasswordRules password={form.password} />
               </div>
               <div className='space-y-1'>
                 <Label htmlFor='create-role'>
@@ -300,8 +364,20 @@ export default function AdminUsersPage() {
                   </SelectContent>
                 </Select>
               </div>
+              {form.role === "admin" && (
+                <MenuAccessEditor
+                  value={form.menuAccess}
+                  onChange={(menuAccess) => setForm((f) => ({ ...f, menuAccess }))}
+                />
+              )}
+              {formError && (
+                <p className='text-sm text-destructive'>{formError}</p>
+              )}
               <div className='flex gap-2 pt-2'>
-                <Button type='submit' disabled={createUser.isPending}>
+                <Button
+                  type='submit'
+                  disabled={createUser.isPending || !isPasswordValid(form.password)}
+                >
                   {createUser.isPending
                     ? t("usersPage.add.creating")
                     : t("usersPage.add.create")}
@@ -380,9 +456,37 @@ export default function AdminUsersPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className='space-y-1'>
+                <Label htmlFor='edit-password'>
+                  {t("usersPage.edit.newPasswordLabel")}
+                </Label>
+                <PasswordField
+                  id='edit-password'
+                  value={form.password}
+                  onChange={(v) => setForm((f) => ({ ...f, password: v }))}
+                  required={false}
+                />
+                <PasswordRules password={form.password} />
+              </div>
+              {form.role === "admin" && (
+                <MenuAccessEditor
+                  value={form.menuAccess}
+                  onChange={(menuAccess) => setForm((f) => ({ ...f, menuAccess }))}
+                />
+              )}
+              {formError && (
+                <p className='text-sm text-destructive'>{formError}</p>
+              )}
               <div className='flex gap-2 pt-2'>
-                <Button type='submit' disabled={updateUser.isPending}>
-                  {updateUser.isPending
+                <Button
+                  type='submit'
+                  disabled={
+                    updateUser.isPending ||
+                    resetPassword.isPending ||
+                    (form.password !== "" && !isPasswordValid(form.password))
+                  }
+                >
+                  {updateUser.isPending || resetPassword.isPending
                     ? t("usersPage.edit.saving")
                     : t("usersPage.edit.save")}
                 </Button>
@@ -411,18 +515,20 @@ export default function AdminUsersPage() {
                 <Label htmlFor='reset-password'>
                   {t("usersPage.resetPassword.passwordLabel")}
                 </Label>
-                <Input
+                <PasswordField
                   id='reset-password'
-                  type='password'
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
+                  onChange={setNewPassword}
                 />
+                <PasswordRules password={newPassword} />
               </div>
+              {formError && (
+                <p className='text-sm text-destructive'>{formError}</p>
+              )}
               <div className='flex gap-2 pt-2'>
                 <Button
                   type='submit'
-                  disabled={resetPassword.isPending || newPassword.length < 8}
+                  disabled={resetPassword.isPending || !isPasswordValid(newPassword)}
                 >
                   {resetPassword.isPending
                     ? t("usersPage.resetPassword.resetting")
