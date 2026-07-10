@@ -2,6 +2,14 @@ import axios from "axios";
 import { ApiContractError, normalizeApiError } from "@/lib/api-error";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
 
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    // Caller wants to handle an invalid session itself (e.g. show a modal)
+    // instead of the interceptor hard-redirecting to /login.
+    skipAuthRedirect?: boolean;
+  }
+}
+
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 // Authenticated customer-account endpoints (/v1/me, /v1/me/bookings, …).
@@ -97,7 +105,10 @@ customerApi.interceptors.response.use(
         useCustomerAuthStore.getState().clearCustomer();
         const { auth } = await import("@/lib/firebase");
         await auth.signOut().catch(() => {});
-        if (window.location.pathname !== "/login") {
+        if (
+          !originalRequest.skipAuthRedirect &&
+          window.location.pathname !== "/login"
+        ) {
           window.location.href = "/login";
         }
         return Promise.reject(normalizedError);

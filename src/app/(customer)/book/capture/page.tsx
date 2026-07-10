@@ -14,6 +14,8 @@ import { PhotoUploadField } from "@/features/customer/components/photo-upload-fi
 import { PhotoGuidelinesPanel } from "@/features/customer/components/photo-guidelines-panel";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { usePhotoUpload, usePublicSettings, usePublicSites } from "@/features/customer/hooks";
+import { useSessionGuard } from "@/features/customer/hooks/use-session-guard";
+import { SessionInvalidModal } from "@/features/customer/components/session-invalid-modal";
 import { getDialCodeOptions, isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
 import type { CustomerBooking } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
@@ -90,6 +92,7 @@ function WalkInCaptureContent() {
   );
 
   const hasCreatedRef = useRef(false);
+  const { sessionInvalid, ensureValidSession } = useSessionGuard();
 
   const createMutation = useMutation({
     meta: { persist: false },
@@ -109,7 +112,9 @@ function WalkInCaptureContent() {
     if (hasSession) return; // Restored session — skip creating new booking
     if (!hasCreatedRef.current) {
       hasCreatedRef.current = true;
-      createMutation.mutate();
+      ensureValidSession().then((valid) => {
+        if (valid) createMutation.mutate();
+      });
     }
     return () => {
       hasCreatedRef.current = false;
@@ -205,14 +210,17 @@ function WalkInCaptureContent() {
 
   if (createMutation.isPending || (!bookingId && !createMutation.isError)) {
     return (
-      <AppShell surface="customer">
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground" suppressHydrationWarning>
-            {t("state.preparing", { ns: "common" })}
-          </p>
-        </div>
-      </AppShell>
+      <>
+        <SessionInvalidModal open={sessionInvalid} />
+        <AppShell surface="customer">
+          <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground" suppressHydrationWarning>
+              {t("state.preparing", { ns: "common" })}
+            </p>
+          </div>
+        </AppShell>
+      </>
     );
   }
 

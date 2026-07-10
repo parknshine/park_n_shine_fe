@@ -202,6 +202,11 @@
         "slotChecklist_3": "No blur or obstruction"
       }
     },
+    "sessionInvalid": {
+      "title": "Login Session Expired",
+      "message": "Your login session is no longer valid. Please log in again to continue booking.",
+      "cta": "Log In Now"
+    },
     "confirm": {
       "title": "Confirmation",
       "subtitle": "Review your booking details before paying.",
