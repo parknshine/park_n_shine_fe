@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   Trash2,
   SlidersHorizontal,
@@ -41,16 +39,10 @@ import {
 } from "@/features/admin/hooks/use-admin-loyalty";
 import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
+import { ReportTabs } from "@/features/admin/components";
+import { formatDate } from "@/features/admin/utils/reports/format";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50];
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 function maskPhone(phone: string | null | undefined): string {
   if (!phone) return "—";
@@ -70,36 +62,6 @@ function CustomerTypeBadge({ type }: { type: "registered" | "guest" }) {
     <span className="inline-flex items-center rounded-full border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-500">
       Guest
     </span>
-  );
-}
-
-function ReportTabs() {
-  const pathname = usePathname();
-  const { t } = useTranslation("admin");
-  const tabs = [
-    { label: t("reports.tabs.summary"), href: "/reports" },
-    { label: t("reports.tabs.jobs"), href: "/reports/jobs" },
-    { label: "Tips", href: "/reports/tips" },
-    { label: "Disbursements", href: "/reports/disbursements" },
-    { label: "Customers", href: "/reports/customers" },
-  ];
-  return (
-    <div className="flex gap-1 border-b border-border">
-      {tabs.map((tab) => (
-        <Link
-          key={tab.href}
-          href={tab.href}
-          className={cn(
-            "px-4 py-2 text-sm font-medium transition-colors",
-            pathname === tab.href
-              ? "border-b-2 border-primary text-foreground"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          {tab.label}
-        </Link>
-      ))}
-    </div>
   );
 }
 

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Download } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
@@ -25,63 +23,18 @@ import {
 import type { DisbursementEvent } from "@/features/admin/types/tip";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
+import { ReportTabs } from "@/features/admin/components";
+import {
+  formatRupiah,
+  formatPeriodLabel,
+  currentPeriod as toCurrentMonth,
+  formatDate as formatDateShared,
+} from "@/features/admin/utils/reports/format";
 
 const ALL_PERIODS = "all";
 
-function toCurrentMonth(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-}
-
-function formatRupiah(amount: number): string {
-  return `Rp ${amount.toLocaleString("id-ID")}`;
-}
-
-function formatPeriodLabel(period: string): string {
-  return new Date(`${period}-01T00:00:00`).toLocaleDateString("id-ID", {
-    month: "long",
-    year: "numeric",
-  });
-}
-
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function ReportTabs() {
-  const pathname = usePathname();
-  const { t } = useTranslation("admin");
-  const tabs = [
-    { label: t("reports.tabs.summary"),      href: "/reports" },
-    { label: t("reports.tabs.jobs"),          href: "/reports/jobs" },
-    { label: t("reports.tabs.tips"),          href: "/reports/tips" },
-    { label: t("reports.tabs.disbursements"), href: "/reports/disbursements" },
-    { label: "Customers",                     href: "/reports/customers" },
-  ];
-  return (
-    <div className="flex gap-1 border-b border-border overflow-x-auto">
-      {tabs.map((tab) => (
-        <Link
-          key={tab.href}
-          href={tab.href}
-          className={cn(
-            "whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors",
-            pathname === tab.href
-              ? "border-b-2 border-primary text-foreground"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          {tab.label}
-        </Link>
-      ))}
-    </div>
-  );
+  return formatDateShared(iso, { withTime: true });
 }
 
 function ConfirmDisbursementModal({

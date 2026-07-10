@@ -13,3 +13,4 @@ export { SiteSelector } from "./site-selector";
 export { ConversationList } from "./chat/ConversationList";
 export { MessageThread } from "./chat/MessageThread";
 export { MessageComposer } from "./chat/MessageComposer";
+export { ReportTabs } from "./reports/report-tabs";

@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Search, X, Calendar, Building2, SlidersHorizontal, RefreshCw } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table/data-table";
@@ -11,62 +10,21 @@ import { Button } from "@/components/ui/button";
 import { useAdminTipList, useAdminTipCrewSummary } from "@/features/admin/hooks/use-admin-tips";
 import { useSiteSelection } from "@/features/admin/hooks";
 import type { AdminTipRow } from "@/features/admin/types/tip";
-import { SiteSelector } from "@/features/admin/components";
+import { SiteSelector, ReportTabs } from "@/features/admin/components";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
+import {
+  formatRupiah,
+  currentPeriod as toCurrentMonth,
+  formatDate as formatDateShared,
+} from "@/features/admin/utils/reports/format";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 const ALL_PERIODS = "all";
 
-function toCurrentMonth(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-}
-
-function formatRupiah(amount: number): string {
-  return `Rp ${amount.toLocaleString("id-ID")}`;
-}
-
 function formatDate(iso: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function ReportTabs() {
-  const pathname = usePathname();
-  const { t } = useTranslation("admin");
-  const tabs = [
-    { label: t("reports.tabs.summary"), href: "/reports" },
-    { label: t("reports.tabs.jobs"), href: "/reports/jobs" },
-    { label: t("reports.tabs.tips"), href: "/reports/tips" },
-    { label: t("reports.tabs.disbursements"), href: "/reports/disbursements" },
-    { label: "Customers", href: "/reports/customers" },
-  ];
-  return (
-    <div className='flex gap-1 border-b border-border overflow-x-auto'>
-      {tabs.map((tab) => (
-        <Link
-          key={tab.href}
-          href={tab.href}
-          className={cn(
-            "whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors",
-            pathname === tab.href
-              ? "border-b-2 border-primary text-foreground"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          {tab.label}
-        </Link>
-      ))}
-    </div>
-  );
+  return formatDateShared(iso, { withTime: true });
 }
 
 export default function TipsReportPage() {
