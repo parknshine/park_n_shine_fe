@@ -4,8 +4,15 @@
 function forward(request: Request): Response {
   const url = new URL(request.url);
   const bookingId = url.searchParams.get("bookingId") ?? "";
-  const target = new URL(`/booking/card-callback?bookingId=${encodeURIComponent(bookingId)}`, url);
-  return Response.redirect(target, 303);
+  // Relative Location: behind a proxy request.url's host is the internal
+  // listener (e.g. 0.0.0.0:3000), so an absolute redirect would leave the
+  // public domain. The browser resolves this against the public origin.
+  return new Response(null, {
+    status: 303,
+    headers: {
+      Location: `/booking/card-callback?bookingId=${encodeURIComponent(bookingId)}`,
+    },
+  });
 }
 
 export { forward as GET, forward as POST };
