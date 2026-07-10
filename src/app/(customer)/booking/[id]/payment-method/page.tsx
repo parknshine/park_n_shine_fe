@@ -49,10 +49,6 @@ function PaymentMethodContent() {
 
   function handleSelect(code: string) {
     if (isCharging) return;
-    if (code === "CREDIT_CARD") {
-      router.push(`/booking/${bookingId}/pay/card?token=${token}`);
-      return;
-    }
     setLoadingMethod(code);
     charge(
       { paymentMethod: code },
