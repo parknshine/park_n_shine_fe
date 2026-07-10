@@ -153,8 +153,8 @@ function expandLedgerRows(rows: ReportBookingRow[]): LedgerRow[] {
   const result: LedgerRow[] = [];
   for (const row of rows) {
     if (row.refundedAmount > 0) {
-      result.push({ ...row, _ledgerType: "PAID" });
       result.push({ ...row, _ledgerType: "REFUND" });
+      result.push({ ...row, _ledgerType: "PAID" });
     } else {
       result.push(row as LedgerRow);
     }

@@ -177,8 +177,6 @@ export default function BookingStatusPage() {
     return `${time}, ${date}`;
   };
 
-  const cancellationReason =
-    booking.statusHistory.find((e) => e.status === "CANCELLED")?.reason ?? null;
   const startedAt =
     booking.startedAt ?? (isInProgress ? new Date().toISOString() : null);
 
@@ -502,17 +500,6 @@ export default function BookingStatusPage() {
               )}
             </div>
           </div>
-        </div>
-      )}
-
-      {isCancelled && cancellationReason && (
-        <div
-          className={`rounded-2xl border px-5 py-4 text-center ${isRefunded ? "border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950" : "border-destructive/30 bg-destructive/5"}`}
-        >
-          <p className='text-xs text-muted-foreground'>
-            {t("status.cancellationReason")}:{" "}
-            <span className='font-medium'>{cancellationReason}</span>
-          </p>
         </div>
       )}
 
