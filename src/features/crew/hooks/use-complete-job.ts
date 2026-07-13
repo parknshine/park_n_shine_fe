@@ -19,6 +19,8 @@ export function useCompleteJob(jobId: string) {
       queryClient.removeQueries({ queryKey: queryKeys.crew.nextJob() });
       // Immediately refresh queue count so home page reflects the completed job
       void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
+      // Refresh monthly stats so home page's rating/tip/job-selesai tiles aren't stale
+      void queryClient.invalidateQueries({ queryKey: queryKeys.crew.monthlyStats() });
     },
   });
 
