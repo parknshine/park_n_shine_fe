@@ -32,11 +32,6 @@ export function useCrewSession() {
     onSuccess: (data) => {
       store.setCrewSession(data.crewId, data.crewName, data.siteId);
       queryClient.setQueryData(queryKeys.crew.session(), data);
-      try {
-        localStorage.setItem("crew-token", data.token);
-      } catch {
-        // localStorage unavailable (e.g. private browsing quota) — auth still works via cookie
-      }
     },
   });
 
@@ -45,7 +40,6 @@ export function useCrewSession() {
   }
 
   function clearSession() {
-    localStorage.removeItem("crew-token");
     store.clearCrewSession();
     queryClient.removeQueries({ queryKey: ["crew"] });
     api.delete("/v1/crew/sessions/current").catch(() => {});

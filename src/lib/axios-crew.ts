@@ -25,54 +25,16 @@ function processQueue(error: unknown) {
   failedQueue = [];
 }
 
-function getStoredToken(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return localStorage.getItem("crew-token");
-  } catch {
-    return null;
-  }
-}
-
 async function refreshCrewToken(): Promise<void> {
-  // Primary auth is the Bearer token from localStorage — cross-site cookies are
-  // blocked by browsers (e.g. Chrome incognito third-party cookie blocking), so
-  // we cannot rely on the httpOnly cookie alone. Cookie is still sent as a fallback.
-  const token = getStoredToken();
-  const response = await axios.post<{ data?: { token?: string } }>(
+  // Auth is the httpOnly crew-token cookie — parknshine.net, crew.parknshine.net,
+  // and api.parknshine.net share the same registrable domain, so the cookie is
+  // first-party (SameSite=None; Secure; Domain=.parknshine.net).
+  await axios.post(
     `${baseURL}/v1/crew/sessions/refresh`,
     {},
-    {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      withCredentials: true,
-    }
+    { headers: { "Content-Type": "application/json" }, withCredentials: true }
   );
-  // Refresh uses raw axios (no unwrap interceptor), so read the enveloped token.
-  const newToken = response.data?.data?.token;
-  if (newToken && typeof window !== "undefined") {
-    try {
-      localStorage.setItem("crew-token", newToken);
-    } catch {
-      // localStorage unavailable — refreshed request still carries the old header this cycle
-    }
-  }
 }
-
-// ── Request interceptor — attach Bearer token, cookie sent as fallback ────────
-
-crewApi.interceptors.request.use(
-  (config) => {
-    const token = getStoredToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 // ── Response interceptor — unwrap envelope + auto-refresh on 401 ─────────────
 

@@ -6,7 +6,7 @@ interface SubscribeOptions {
   /** "booking" channel: pass bookingId + signedToken */
   bookingId?: string;
   bookingToken?: string;
-  /** "crew" channel: no extra params needed, uses crew JWT from localStorage */
+  /** "crew" channel: no extra params needed, uses the crew-token cookie */
   type: "booking" | "crew";
 }
 
@@ -78,13 +78,10 @@ export function usePushNotification({ type, bookingId, bookingToken }: Subscribe
           body: JSON.stringify({ endpoint, keys, bookingId, token: bookingToken }),
         });
       } else {
-        const crewToken = localStorage.getItem("crew-token") ?? "";
         await fetch(`${API_URL}/v1/crew/push/subscribe`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${crewToken}`,
-          },
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ endpoint, keys }),
         });
       }
