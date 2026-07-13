@@ -162,7 +162,7 @@ export async function proxy(req: NextRequest): Promise<NextResponse> {
   // Redirect to this subdomain's default path (stay on current subdomain)
   const url = req.nextUrl.clone();
   url.pathname = surface.defaultPath;
-  return NextResponse.redirect(url);
+  return NextResponse.redirect(url)
 }
 
 export const config = {

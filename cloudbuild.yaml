@@ -15,7 +15,7 @@ substitutions:
   _REPO: park-n-shine
   _SERVICE: park-n-shine
   _IMAGE: app
-  _NEXT_PUBLIC_API_URL: https://park-n-shine-api-784584743016.asia-southeast1.run.app
+  _NEXT_PUBLIC_API_URL: https://api.parknshine.net
   _NEXT_PUBLIC_MIDTRANS_CLIENT_KEY: ""
   _NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION: "true"
   _NEXT_PUBLIC_SENTRY_DSN: ""
