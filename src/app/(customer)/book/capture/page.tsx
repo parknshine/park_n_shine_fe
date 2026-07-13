@@ -276,11 +276,11 @@ function WalkInCaptureContent() {
           ocrPlaceholder={t("booking.capture.platePlaceholder")}
           guidelines={
             <PhotoGuidelinesPanel
-              goodSrc="/images/guidelines/plate-good.png"
+              goodSrc="/images/guidelines/plate-good.webp"
               avoidExamples={[
-                { src: "/images/guidelines/plate-good.png", label: t("booking.capture.guidelines.avoidBlurry"), blur: true },
-                { src: "/images/guidelines/plate-angled.png", label: t("booking.capture.guidelines.avoidAngled") },
-                { src: "/images/guidelines/plate-dark.png", label: t("booking.capture.guidelines.avoidDark") },
+                { src: "/images/guidelines/plate-good.webp", label: t("booking.capture.guidelines.avoidBlurry"), blur: true },
+                { src: "/images/guidelines/plate-angled.webp", label: t("booking.capture.guidelines.avoidAngled") },
+                { src: "/images/guidelines/plate-dark.webp", label: t("booking.capture.guidelines.avoidDark") },
               ]}
               checklistItems={[
                 t("booking.capture.guidelines.plateChecklist_0"),
@@ -308,11 +308,11 @@ function WalkInCaptureContent() {
           ocrPlaceholder={t("booking.capture.slotPlaceholder")}
           guidelines={
             <PhotoGuidelinesPanel
-              goodSrc="/images/guidelines/slot-good.png"
+              goodSrc="/images/guidelines/slot-good.webp"
               avoidExamples={[
-                { src: "/images/guidelines/slot-good.png", label: t("booking.capture.guidelines.avoidBlurry"), blur: true },
-                { src: "/images/guidelines/slot-angled.png", label: t("booking.capture.guidelines.avoidAngled") },
-                { src: "/images/guidelines/slot-dark.png", label: t("booking.capture.guidelines.avoidDark") },
+                { src: "/images/guidelines/slot-good.webp", label: t("booking.capture.guidelines.avoidBlurry"), blur: true },
+                { src: "/images/guidelines/slot-angled.webp", label: t("booking.capture.guidelines.avoidAngled") },
+                { src: "/images/guidelines/slot-dark.webp", label: t("booking.capture.guidelines.avoidDark") },
               ]}
               checklistItems={[
                 t("booking.capture.guidelines.slotChecklist_0"),

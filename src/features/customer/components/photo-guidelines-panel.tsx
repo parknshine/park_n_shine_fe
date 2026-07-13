@@ -46,6 +46,7 @@ export function PhotoGuidelinesPanel({
               src={goodSrc}
               alt='Good example'
               fill
+              sizes='150px'
               className='object-cover'
             />
           </div>
@@ -72,6 +73,7 @@ export function PhotoGuidelinesPanel({
                     src={ex.src}
                     alt={ex.label}
                     fill
+                    sizes='100px'
                     className='object-cover'
                   />
                 </div>
