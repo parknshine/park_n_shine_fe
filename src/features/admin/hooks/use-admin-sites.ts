@@ -38,6 +38,7 @@ export function useAdminSites() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.admin.sites() });
+      queryClient.removeQueries({ queryKey: queryKeys.admin.allSitesQueue() });
     },
   });
 
@@ -60,6 +61,7 @@ export function useAdminSites() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.admin.site(siteId),
       });
+      queryClient.removeQueries({ queryKey: queryKeys.admin.allSitesQueue() });
     },
   });
   return {
