@@ -16,6 +16,13 @@ import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useTranslation } from "@/i18n";
 import { useAdminSites } from "@/features/admin/hooks";
 import type {
@@ -482,6 +489,20 @@ export default function SitesPage() {
   const [showGenericQr, setShowGenericQr] = useState(false);
   const [editSite, setEditSite] = useState<AdminSiteDetail | null>(null);
   const [confirmPauseId, setConfirmPauseId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"name" | "code">("name");
+
+  const normalizeCode = (code: string | null) => {
+    if (code == null || code === "") return Infinity;
+    const num = Number(code);
+    return Number.isNaN(num) ? Infinity : num;
+  };
+
+  const sortedSites = [...sites].sort((a, b) => {
+    if (sortBy === "name") {
+      return a.name.localeCompare(b.name);
+    }
+    return normalizeCode(a.code) - normalizeCode(b.code);
+  });
 
   async function handleToggleIntake(siteId: string, currentPaused: boolean) {
     await update({ siteId, payload: { intakePaused: !currentPaused } });
@@ -499,6 +520,18 @@ export default function SitesPage() {
           </p>
         </div>
         <div className='flex items-center gap-2'>
+          <Select
+            value={sortBy}
+            onValueChange={(v) => setSortBy(v as "name" | "code")}
+          >
+            <SelectTrigger className='h-9 w-[170px] text-xs' aria-label='Sort sites'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='name'>{t("sitesPage.sortName")}</SelectItem>
+              <SelectItem value='code'>{t("sitesPage.sortCode")}</SelectItem>
+            </SelectContent>
+          </Select>
           <Button
             size='sm'
             variant='outline'
@@ -528,7 +561,7 @@ export default function SitesPage() {
 
       {!isLoading && sites.length > 0 && (
         <div className='space-y-3'>
-          {sites.map((site) => (
+          {sortedSites.map((site) => (
             <div
               key={site.id}
               className='flex items-center gap-4 rounded-xl border border-border bg-[#FBFDFE] px-5 py-10 shadow'

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { UserPlus, Pencil, ToggleLeft, ToggleRight, Phone, Trash2 } from "lucide-react";
+import { UserPlus, Pencil, ToggleLeft, ToggleRight, Phone } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/i18n";
-import { useAdminCrew, useDeleteCrew } from "@/features/admin/hooks";
+import { useAdminCrew } from "@/features/admin/hooks";
 import type { AdminCrewMember } from "@/features/admin/types";
 
 function CreateCrewModal({
@@ -189,14 +189,10 @@ function CrewRowActions({
   crew,
   onEdit,
   onToggle,
-  onDelete,
-  isDeleting,
 }: Readonly<{
   crew: AdminCrewMember;
   onEdit: (crew: AdminCrewMember) => void;
   onToggle: (crew: AdminCrewMember) => void;
-  onDelete: (id: string, name: string) => void;
-  isDeleting: boolean;
 }>) {
   return (
     <div className="flex justify-end gap-2">
@@ -214,14 +210,6 @@ function CrewRowActions({
       >
         {crew.active ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
       </button>
-      <button
-        type="button"
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-destructive/5 text-destructive transition-opacity hover:opacity-70 disabled:opacity-40"
-        onClick={() => onDelete(crew.id, crew.name)}
-        disabled={isDeleting}
-      >
-        <Trash2 className="h-4 w-4" />
-      </button>
     </div>
   );
 }
@@ -229,23 +217,8 @@ function CrewRowActions({
 export default function CrewPage() {
   const { t } = useTranslation("admin");
   const { crew, isLoading, update } = useAdminCrew();
-  const deleteCrew = useDeleteCrew();
   const [showCreate, setShowCreate] = useState(false);
   const [editing, setEditing] = useState<AdminCrewMember | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  async function handleDelete(id: string, name: string) {
-    if (!confirm(t("crewPage.confirm.delete", { name }))) return;
-    setDeletingId(id);
-    try {
-      await deleteCrew.mutateAsync(id);
-      toast.success(t("crewPage.toast.deleted"));
-    } catch {
-      toast.error(t("crewPage.toast.deleteFailed"));
-    } finally {
-      setDeletingId(null);
-    }
-  }
 
   const columns: ColumnDef<AdminCrewMember>[] = [
     {
@@ -305,8 +278,6 @@ export default function CrewPage() {
           crew={row.original}
           onEdit={setEditing}
           onToggle={(c) => update({ crewId: c.id, payload: { active: !c.active } })}
-          onDelete={handleDelete}
-          isDeleting={deletingId === row.original.id}
         />
       ),
     },

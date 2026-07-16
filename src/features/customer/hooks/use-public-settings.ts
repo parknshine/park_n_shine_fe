@@ -13,10 +13,10 @@ interface PublicSettings {
 }
 
 async function fetchPublicSettings(): Promise<PublicSettings> {
-  const res = await axios.get<PublicSettings>("/v1/settings", {
+  const res = await axios.get<{ data: PublicSettings }>("/v1/settings", {
     baseURL: process.env.NEXT_PUBLIC_API_URL,
   });
-  return res.data;
+  return res.data.data;
 }
 
 export function usePublicSettings() {

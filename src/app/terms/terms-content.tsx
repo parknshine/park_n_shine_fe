@@ -4,8 +4,14 @@ import { MarketingHeader, MarketingFooter, ContentAccordion } from "@/components
 
 const manrope = "var(--font-manrope), sans-serif";
 const inter = "var(--font-inter), sans-serif";
+const WEBSITE_URL = "https://parknshine.net";
+const INSTAGRAM_HANDLE = "@parknshine.id";
+const INSTAGRAM_URL = "https://www.instagram.com/parknshine.id/";
+const FACEBOOK_NAME = "Park And Shine";
+const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61591229494487&locale=id_ID";
 
-const ITEMS = [
+function buildItems(whatsappNumber: string) {
+  return [
   {
     id: "section-1",
     title: "1. Istilah Umum",
@@ -122,16 +128,34 @@ const ITEMS = [
         <p>Apabila Anda memiliki pertanyaan, keluhan, atau membutuhkan bantuan terkait layanan Park and Shine, Anda dapat menghubungi Kami melalui:</p>
         <ul className="list-none pl-0 flex flex-col gap-1">
           <li>Email: <a href="mailto:info@parknshine.net" className="text-[#024ad8] underline">info@parknshine.net</a></li>
-          <li>WhatsApp: Segera Hadir</li>
-          <li>Website: Segera Hadir</li>
+          <li>
+            WhatsApp:{" "}
+            {whatsappNumber ? (
+              <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noreferrer" className="text-[#024ad8] underline">
+                {whatsappNumber}
+              </a>
+            ) : (
+              "Segera Hadir"
+            )}
+          </li>
+          <li>Website: <a href={WEBSITE_URL} target="_blank" rel="noreferrer" className="text-[#024ad8] underline">{WEBSITE_URL}</a></li>
+          <li>Instagram: <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="text-[#024ad8] underline">{INSTAGRAM_HANDLE}</a></li>
+          <li>Facebook: <a href={FACEBOOK_URL} target="_blank" rel="noreferrer" className="text-[#024ad8] underline">{FACEBOOK_NAME}</a></li>
         </ul>
         <p>Seluruh komunikasi antara Anda dan Park and Shine dapat direkam dan disimpan untuk keperluan dokumentasi, peningkatan kualitas layanan, keperluan operasional, kegiatan promosi, serta penyelesaian sengketa apabila diperlukan.</p>
       </>
     ),
   },
-];
+  ];
+}
 
-export function TermsContent() {
+interface TermsContentProps {
+  whatsappNumber: string;
+}
+
+export function TermsContent({ whatsappNumber }: TermsContentProps) {
+  const items = buildItems(whatsappNumber);
+
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <MarketingHeader />
@@ -155,10 +179,10 @@ export function TermsContent() {
           <p>Kami berterima kasih atas kepercayaan Anda terhadap layanan Park and Shine. Mohon meluangkan waktu untuk membaca seluruh Syarat dan Ketentuan Penggunaan layanan Park and Shine ini.</p>
           <p>Dengan melakukan pemesanan dan pembayaran layanan Park and Shine melalui website, QR Code, atau media lain yang disediakan oleh Park and Shine, Anda dianggap telah membaca, memahami, dan menyetujui Ketentuan Penggunaan ini. Apabila Anda tidak menyetujui sebagian atau seluruh ketentuan yang tercantum di dalamnya, mohon untuk tidak melanjutkan penggunaan layanan Park and Shine.</p>
         </div>
-        <ContentAccordion items={ITEMS} />
+        <ContentAccordion items={items} />
       </main>
 
-      <MarketingFooter activePage="terms" />
+      <MarketingFooter activePage="terms" whatsappNumber={whatsappNumber} />
     </div>
   );
 }

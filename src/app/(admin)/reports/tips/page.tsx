@@ -11,7 +11,7 @@ import { useAdminTipList, useAdminTipCrewSummary } from "@/features/admin/hooks/
 import { useSiteSelection } from "@/features/admin/hooks";
 import type { AdminTipRow } from "@/features/admin/types/tip";
 import { SiteSelector, ReportTabs } from "@/features/admin/components";
-import { cn } from "@/lib/utils";
+import { cn, bookingRef } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 import {
   formatRupiah,
@@ -60,7 +60,9 @@ export default function TipsReportPage() {
       accessorKey: "bookingId",
       header: t("reports.tips.columns.bookingId"),
       cell: ({ row }) => (
-        <span className='font-mono text-xs'>{row.original.bookingId}</span>
+        <span className='font-mono text-xs'>
+          {bookingRef(row.original.reference, row.original.bookingId)}
+        </span>
       ),
     },
     {

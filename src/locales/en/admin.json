@@ -20,6 +20,8 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Live queue — updated every 10 seconds",
+    "sortName": "Name (A-Z)",
+    "sortCode": "Code (PS-01...)",
     "loading": "Loading queue...",
     "emptyQueue": "No bookings at the moment.",
     "escalationsTitle": "Escalations — {{count}} booking needs attention",
@@ -496,6 +498,8 @@
     "subtitle": "Manage parking sites and their QR codes",
     "genericQr": "Generic Site QR",
     "newSite": "New Site",
+    "sortName": "Name (A-Z)",
+    "sortCode": "Code (PS-01...)",
     "loading": "Loading...",
     "empty": "No sites yet. Create one to get started.",
     "status": {

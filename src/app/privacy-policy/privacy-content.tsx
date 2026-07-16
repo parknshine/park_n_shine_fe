@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/i18n";
 import { MarketingHeader, MarketingFooter, ContentAccordion } from "@/components/shared";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL, FACEBOOK_NAME, FACEBOOK_URL } from "@/lib/contact-info";
 
 const manrope = "var(--font-manrope), sans-serif";
 const inter = "var(--font-inter), sans-serif";
@@ -44,7 +45,14 @@ const ID = {
     <p>Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu untuk menyesuaikan dengan perkembangan layanan maupun ketentuan hukum yang berlaku. Apabila terdapat perubahan yang bersifat material, Kami akan memberitahukannya melalui email, aplikasi, situs web, atau sarana komunikasi lain yang Kami anggap sesuai. Penggunaan layanan setelah perubahan tersebut berlaku merupakan bentuk pengakuan bahwa Anda telah membaca dan memahami versi terbaru Kebijakan Privasi ini.</p>
   ),
   s10: (
-    <p>Apabila Anda memiliki pertanyaan mengenai Kebijakan Privasi ini atau cara PT Park And Shine mengelola data pribadi, silakan menghubungi Kami melalui Email: <a href="mailto:info@parknshine.net" className="text-[#024ad8] underline">info@parknshine.net</a></p>
+    <>
+      <p>Apabila Anda memiliki pertanyaan mengenai Kebijakan Privasi ini atau cara PT Park And Shine mengelola data pribadi, silakan menghubungi Kami melalui:</p>
+      <ul className="list-none pl-0 flex flex-col gap-1">
+        <li>Email: <a href="mailto:info@parknshine.net" className="text-[#024ad8] underline">info@parknshine.net</a></li>
+        <li>Instagram: <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="text-[#024ad8] underline">{INSTAGRAM_HANDLE}</a></li>
+        <li>Facebook: <a href={FACEBOOK_URL} target="_blank" rel="noreferrer" className="text-[#024ad8] underline">{FACEBOOK_NAME}</a></li>
+      </ul>
+    </>
   ),
 };
 
@@ -86,7 +94,14 @@ const EN = {
     <p>We may update this Privacy Policy from time to time to reflect changes in Our services or applicable legal requirements. If any material changes are made, We will notify users through email, the application, the website, or other communication channels that We consider appropriate. Your continued use of Our services after such changes become effective constitutes acknowledgment that you have read and understood the updated Privacy Policy.</p>
   ),
   s10: (
-    <p>If you have any questions regarding this Privacy Policy or how PT Park And Shine manages personal data, please contact Us at Email: <a href="mailto:info@parknshine.net" className="text-[#024ad8] underline">info@parknshine.net</a></p>
+    <>
+      <p>If you have any questions regarding this Privacy Policy or how PT Park And Shine manages personal data, please contact Us at:</p>
+      <ul className="list-none pl-0 flex flex-col gap-1">
+        <li>Email: <a href="mailto:info@parknshine.net" className="text-[#024ad8] underline">info@parknshine.net</a></li>
+        <li>Instagram: <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="text-[#024ad8] underline">{INSTAGRAM_HANDLE}</a></li>
+        <li>Facebook: <a href={FACEBOOK_URL} target="_blank" rel="noreferrer" className="text-[#024ad8] underline">{FACEBOOK_NAME}</a></li>
+      </ul>
+    </>
   ),
 };
 
@@ -106,12 +121,16 @@ function buildItems(isId: boolean) {
   ];
 }
 
-export function PrivacyContent() {
+interface PrivacyContentProps {
+  whatsappNumber: string;
+}
+
+export function PrivacyContent({ whatsappNumber }: PrivacyContentProps) {
   const { t, i18n } = useTranslation("common");
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      <MarketingHeader showLanguageSwitcher backLabel={t("privacyPolicy.backHome")} />
+      <MarketingHeader showLanguageSwitcher backLabel={t("action.back")} />
 
       <section className="bg-[#f7f7f7] border-b border-[#e8e8e8] py-10 md:py-14">
         <div className="max-w-200 mx-auto px-4 md:px-12">
@@ -131,7 +150,7 @@ export function PrivacyContent() {
         <ContentAccordion items={buildItems(i18n.language === "id")} />
       </main>
 
-      <MarketingFooter activePage="privacy-policy" />
+      <MarketingFooter activePage="privacy-policy" whatsappNumber={whatsappNumber} />
     </div>
   );
 }

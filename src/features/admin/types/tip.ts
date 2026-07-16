@@ -30,6 +30,7 @@ export interface DisbursementEvent {
 export interface AdminTipRow {
   id: string;
   bookingId: string;
+  reference: string | null;
   crewName: string | null;
   siteName: string | null;
   amount: number;

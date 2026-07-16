@@ -27,16 +27,25 @@
   "contact": {
     "title": "Contact Us",
     "subtitle": "Need further assistance? Our support team is available daily from 9:00 AM to 9:00 PM WIB. Reach out through any of the channels below.",
-    "backHome": "Back to Home",
     "email": "Email",
-    "whatsapp": "WhatsApp (No Calls)",
+    "whatsapp": "WhatsApp (Chat/Text Only)",
     "numberTba": "Number TBA",
     "office": "Office",
     "businessHours": "Business Hours",
     "businessHoursValue": "Everyday, 09:00 – 21:00 WIB",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "quickLinksHeading": "Quick Links",
+    "contactHeading": "Contact",
+    "nav": {
+      "privacyPolicy": "Privacy Policy",
+      "terms": "Terms",
+      "support": "Support",
+      "contact": "Contact"
+    },
     "form": {
       "title": "Send us a message",
-      "subtitle": "Fill out the form and our team will get back to you within 1 business day.",
+      "subtitle": "Fill out the form and our team will get back to you within a maximum of 7 business days.",
       "fullName": "Full Name",
       "namePlaceholder": "Your name",
       "emailAddress": "Email Address",
@@ -51,7 +60,6 @@
   "support": {
     "title": "How can we help?",
     "subtitle": "Find answers to common questions below, or reach out to our team directly.",
-    "backHome": "Back to Home",
     "quickLinks": {
       "bookWash": "Book a Wash",
       "contactUs": "Contact Us",
@@ -131,7 +139,6 @@
   "privacyPolicy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: May 2026",
-    "backHome": "Back to Home",
     "tocLabel": "On this page",
     "sections": [
       { "id": "section-1", "label": "1. Information We Collect" },

@@ -17,6 +17,7 @@ import { ActiveBookingCard } from "@/features/customer/components/active-booking
 import type { BookingStatus } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
+import { setMarketingBackOrigin } from "@/lib/marketing-back-origin";
 
 const ACTIVE_STATUSES: BookingStatus[] = [
   "PAID",
@@ -79,7 +80,10 @@ export default function HomePage() {
       icon: HelpCircle,
       tint: "#f1f0fb",
       color: "#514eb6",
-      onClick: () => router.push("/support"),
+      onClick: () => {
+        setMarketingBackOrigin("/home");
+        router.push("/support");
+      },
     },
   ];
 

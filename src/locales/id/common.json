@@ -27,16 +27,25 @@
   "contact": {
     "title": "Hubungi Kami",
     "subtitle": "Butuh bantuan lebih lanjut? Tim dukungan kami tersedia setiap hari dari pukul 09.00 – 21.00 WIB. Hubungi kami melalui salah satu saluran di bawah ini.",
-    "backHome": "Kembali ke Beranda",
     "email": "Email",
-    "whatsapp": "WhatsApp (Tanpa Telepon)",
+    "whatsapp": "WhatsApp (Hanya Melayani Chat/Text)",
     "numberTba": "Nomor Segera Hadir",
     "office": "Kantor",
     "businessHours": "Jam Operasional",
     "businessHoursValue": "Setiap Hari, 09.00 – 21.00 WIB",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "quickLinksHeading": "Tautan",
+    "contactHeading": "Kontak",
+    "nav": {
+      "privacyPolicy": "Kebijakan Privasi",
+      "terms": "Syarat & Ketentuan",
+      "support": "Dukungan",
+      "contact": "Kontak"
+    },
     "form": {
       "title": "Kirim pesan kepada kami",
-      "subtitle": "Isi formulir dan tim kami akan menghubungi Anda dalam 1 hari kerja.",
+      "subtitle": "Isi formulir dan tim kami akan menghubungi Anda maksimal dalam 7 hari kerja.",
       "fullName": "Nama Lengkap",
       "namePlaceholder": "Nama Anda",
       "emailAddress": "Alamat Email",
@@ -51,7 +60,6 @@
   "support": {
     "title": "Apa yang bisa kami bantu?",
     "subtitle": "Temukan jawaban atas pertanyaan umum di bawah, atau hubungi tim kami langsung.",
-    "backHome": "Kembali ke Beranda",
     "quickLinks": {
       "bookWash": "Pesan Cuci",
       "contactUs": "Hubungi Kami",
@@ -131,7 +139,6 @@
   "privacyPolicy": {
     "title": "Kebijakan Privasi",
     "lastUpdated": "Terakhir diperbarui: Mei 2026",
-    "backHome": "Kembali ke Beranda",
     "tocLabel": "Di halaman ini",
     "sections": [
       { "id": "section-1", "label": "1. Data yang Kami Kumpulkan" },

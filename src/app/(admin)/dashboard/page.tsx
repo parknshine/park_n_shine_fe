@@ -6,11 +6,18 @@ import Link from "next/link";
 import { Building2, ArrowLeft, AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AdminQueueGroup,
   EscalationsPanel,
   BookingDetailDrawer,
 } from "@/features/admin/components";
-import { useAdminAllSitesQueue } from "@/features/admin/hooks";
+import { useAdminAllSitesQueue, useAdminSites } from "@/features/admin/hooks";
 import type { AdminQueueBooking, AdminSiteQueue } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 import { bookingRef } from "@/lib/utils";
@@ -245,6 +252,26 @@ function DashboardContent() {
   const router = useRouter();
 
   const { sites: queueSites, isLoading, refresh } = useAdminAllSitesQueue();
+  const { sites: sitesDetail } = useAdminSites();
+  const [sortBy, setSortBy] = useState<"name" | "code">("name");
+
+  function normalizeCode(code: string | null | undefined) {
+    if (code == null || code === "") return Infinity;
+    const num = Number(code);
+    return Number.isNaN(num) ? Infinity : num;
+  }
+
+  const codeBySiteId = new Map(sitesDetail.map((s) => [s.id, s.code]));
+
+  const sortedQueueSites = [...queueSites].sort((a, b) => {
+    if (sortBy === "name") {
+      return a.siteName.localeCompare(b.siteName);
+    }
+    return (
+      normalizeCode(codeBySiteId.get(a.siteId)) -
+      normalizeCode(codeBySiteId.get(b.siteId))
+    );
+  });
 
   const selectedSiteId = searchParams.get("siteId");
   const urlBookingId = searchParams.get("bookingId");
@@ -327,12 +354,26 @@ function DashboardContent() {
             {t("dashboard.subtitle")}
           </p>
         </div>
-        <Button variant='outline' size='sm' onClick={() => refresh()} title='Refresh' className='gap-1.5 shrink-0'>
-          <RefreshCw className='h-3.5 w-3.5' />
-        </Button>
+        <div className='flex items-center gap-2 shrink-0'>
+          <Select
+            value={sortBy}
+            onValueChange={(v) => setSortBy(v as "name" | "code")}
+          >
+            <SelectTrigger className='h-9 w-[170px] text-xs' aria-label='Sort sites'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='name'>{t("dashboard.sortName")}</SelectItem>
+              <SelectItem value='code'>{t("dashboard.sortCode")}</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant='outline' size='sm' onClick={() => refresh()} title='Refresh' className='gap-1.5 shrink-0'>
+            <RefreshCw className='h-3.5 w-3.5' />
+          </Button>
+        </div>
       </div>
       <DashboardGridView
-        sites={queueSites}
+        sites={sortedQueueSites}
         onBookingClick={(booking) => {
           const site = queueSites.find((s) =>
             [...s.escalations, ...s.groups.flatMap((g) => g.bookings)].some(

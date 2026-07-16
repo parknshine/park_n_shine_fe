@@ -20,6 +20,7 @@ import customerApi from "@/lib/axios-customer";
 import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { setMarketingBackOrigin } from "@/lib/marketing-back-origin";
 import type { Customer } from "@/types";
 import { normalizePhone } from "@/features/customer/utils/phone";
 
@@ -156,7 +157,10 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
       tint: "bg-[#f1f0fb]",
       color: "text-[#514eb6]",
       icon: <MessageCircle className='h-4.75 w-4.75' />,
-      onClick: () => router.push("/support"),
+      onClick: () => {
+        setMarketingBackOrigin("/account");
+        router.push("/support");
+      },
     },
   ];
 

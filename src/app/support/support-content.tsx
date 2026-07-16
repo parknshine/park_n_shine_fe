@@ -15,7 +15,11 @@ const quickLinks = [
   { key: "terms" as const, href: "/terms" },
 ];
 
-export function SupportContent() {
+interface SupportContentProps {
+  whatsappNumber: string;
+}
+
+export function SupportContent({ whatsappNumber }: SupportContentProps) {
   const { t } = useTranslation("common");
 
   const faqs = t("support.faqs", { returnObjects: true }) as {
@@ -25,7 +29,7 @@ export function SupportContent() {
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      <MarketingHeader showLanguageSwitcher backLabel={t("support.backHome")} />
+      <MarketingHeader showLanguageSwitcher backLabel={t("action.back")} />
 
       {/* Hero */}
       <section className="bg-[#f7f7f7] border-b border-[#e8e8e8] py-12 md:py-16">
@@ -106,7 +110,7 @@ export function SupportContent() {
         </div>
       </main>
 
-      <MarketingFooter activePage="support" />
+      <MarketingFooter activePage="support" whatsappNumber={whatsappNumber} />
     </div>
   );
 }

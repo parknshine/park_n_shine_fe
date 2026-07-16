@@ -3,38 +3,33 @@
 import { useState } from "react";
 import { useTranslation } from "@/i18n";
 import { MarketingHeader, MarketingFooter } from "@/components/shared";
+import {
+  CONTACT_EMAIL,
+  OFFICE_ADDRESS,
+  INSTAGRAM_HANDLE,
+  INSTAGRAM_URL,
+  FACEBOOK_NAME,
+  FACEBOOK_URL,
+} from "@/lib/contact-info";
+import {
+  EmailIcon,
+  WhatsAppIcon,
+  LocationIcon,
+  ClockIcon,
+  InstagramIcon,
+  FacebookIcon,
+} from "@/components/shared/social-icons";
 
 const manrope = "var(--font-manrope), sans-serif";
 const inter = "var(--font-inter), sans-serif";
 const inputClass =
   "w-full rounded border border-[#e8e8e8] px-4 py-3 text-sm text-[#1a1a1a] outline-none focus:border-[#024ad8] transition-colors placeholder:text-[#9ca3af]";
 
-const EMAIL = "info@parknshine.net";
-const OFFICE_ADDRESS =
-  "Komplek Prima Center I Blok I Nomor 1, Jl. Pool PPD Jl. Pesing Poglar No.2, Kedaung Kali Angke, Cengkareng, Jakarta Barat, 11710";
+interface ContactContentProps {
+  whatsappNumber: string;
+}
 
-const emailIcon = (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-    <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor" />
-  </svg>
-);
-const phoneIcon = (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="currentColor" />
-  </svg>
-);
-const locationIcon = (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" />
-  </svg>
-);
-const clockIcon = (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z" fill="currentColor" />
-  </svg>
-);
-
-export function ContactContent() {
+export function ContactContent({ whatsappNumber }: ContactContentProps) {
   const { t } = useTranslation("common");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,21 +37,28 @@ export function ContactContent() {
   const [message, setMessage] = useState("");
 
   const contactItems = [
-    { icon: emailIcon, label: t("contact.email"), value: EMAIL, href: `mailto:${EMAIL}` },
-    { icon: phoneIcon, label: t("contact.whatsapp"), value: t("contact.numberTba"), href: null },
-    { icon: locationIcon, label: t("contact.office"), value: OFFICE_ADDRESS, href: null },
-    { icon: clockIcon, label: t("contact.businessHours"), value: t("contact.businessHoursValue"), href: null },
+    { icon: <EmailIcon />, label: t("contact.email"), value: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
+    {
+      icon: <WhatsAppIcon />,
+      label: t("contact.whatsapp"),
+      value: whatsappNumber || t("contact.numberTba"),
+      href: whatsappNumber ? `https://wa.me/${whatsappNumber}` : null,
+    },
+    { icon: <LocationIcon />, label: t("contact.office"), value: OFFICE_ADDRESS, href: null },
+    { icon: <ClockIcon />, label: t("contact.businessHours"), value: t("contact.businessHoursValue"), href: null },
+    { icon: <InstagramIcon />, label: t("contact.instagram"), value: INSTAGRAM_HANDLE, href: INSTAGRAM_URL, external: true },
+    { icon: <FacebookIcon />, label: t("contact.facebook"), value: FACEBOOK_NAME, href: FACEBOOK_URL, external: true },
   ];
 
   function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
-    globalThis.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    globalThis.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      <MarketingHeader showLanguageSwitcher backLabel={t("contact.backHome")} />
+      <MarketingHeader showLanguageSwitcher backLabel={t("action.back")} />
 
       {/* Hero */}
       <section className="bg-[#f7f7f7] border-b border-[#e8e8e8] py-12 md:py-16">
@@ -81,7 +83,7 @@ export function ContactContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Contact info */}
           <div className="flex flex-col gap-4">
-            {contactItems.map(({ icon, label, value, href }) => (
+            {contactItems.map(({ icon, label, value, href, external }) => (
               <div
                 key={label}
                 className="rounded-xl border border-[#e8e8e8] p-5 flex gap-4 items-start shadow-[0_2px_8px_rgba(26,26,26,0.06)]"
@@ -99,6 +101,8 @@ export function ContactContent() {
                   {href ? (
                     <a
                       href={href}
+                      target={external ? "_blank" : undefined}
+                      rel={external ? "noreferrer" : undefined}
                       className="text-base text-[#1a1a1a] hover:text-[#024ad8] transition-colors"
                       style={{ fontFamily: inter, fontWeight: 400 }}
                     >
@@ -198,7 +202,7 @@ export function ContactContent() {
         </div>
       </main>
 
-      <MarketingFooter activePage="contact" />
+      <MarketingFooter activePage="contact" whatsappNumber={whatsappNumber} />
     </div>
   );
 }

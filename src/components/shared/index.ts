@@ -7,6 +7,14 @@ export { StatusBadge, type StatusBadgeTone } from "./status-badge";
 export { OfflineBanner } from "./offline-banner";
 export { MarketingHeader } from "./marketing-header";
 export { MarketingFooter } from "./marketing-footer";
+export {
+  EmailIcon,
+  WhatsAppIcon,
+  LocationIcon,
+  ClockIcon,
+  InstagramIcon,
+  FacebookIcon,
+} from "./social-icons";
 export { TableOfContents } from "./table-of-contents";
 export { ContentAccordion } from "./content-accordion";
 export {

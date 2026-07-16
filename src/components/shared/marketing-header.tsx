@@ -1,17 +1,32 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCustomerAuthStore } from "@/store/customer-auth-store";
+import { getMarketingBackOrigin } from "@/lib/marketing-back-origin";
 import { LanguageSwitcher } from "./language-switcher";
 
 interface MarketingHeaderProps {
-  readonly backHref?: string;
   readonly backLabel?: string;
   readonly showLanguageSwitcher?: boolean;
 }
 
 export function MarketingHeader({
-  backHref = "/",
-  backLabel = "Back to Home",
+  backLabel = "Back",
   showLanguageSwitcher = false,
 }: MarketingHeaderProps) {
+  const router = useRouter();
+  const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
+
+  function handleBack() {
+    const origin = getMarketingBackOrigin();
+    if (origin) {
+      router.push(origin);
+      return;
+    }
+    router.push(isAuthenticated ? "/home" : "/");
+  }
+
   return (
     <header
       className="bg-white border-b border-[#e8e8e8] sticky top-0 z-50"
@@ -27,8 +42,9 @@ export function MarketingHeader({
         </Link>
         <div className="flex items-center gap-3">
           {showLanguageSwitcher && <LanguageSwitcher />}
-          <Link
-            href={backHref}
+          <button
+            type="button"
+            onClick={handleBack}
             className="text-[#636363] text-sm flex items-center gap-2 hover:text-[#024ad8] transition-colors"
             style={{ fontFamily: "var(--font-inter), sans-serif", fontWeight: 600 }}
           >
@@ -42,7 +58,7 @@ export function MarketingHeader({
               />
             </svg>
             {backLabel}
-          </Link>
+          </button>
         </div>
       </div>
     </header>

@@ -5,8 +5,9 @@ import { useState, useRef, useEffect } from "react";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
-import { usePublicTestimonials } from "@/features/customer/hooks";
+import { usePublicTestimonials, usePublicSettings } from "@/features/customer/hooks";
 import { BookNowModal } from "@/features/customer/components/book-now-modal";
+import { MarketingFooter } from "@/components/shared";
 
 const imgParkShineLogo = "/parknshinelogo.svg";
 const imgScanningQrCode = "/park-shine-panel-1.jpeg";
@@ -49,6 +50,7 @@ export default function Home() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: testimonials = [] } = usePublicTestimonials();
+  const { whatsappNumber } = usePublicSettings();
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
   const [bookNowOpen, setBookNowOpen] = useState(false);
@@ -447,20 +449,7 @@ export default function Home() {
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────── */}
-      <footer className='footer'>
-        <div className='shell footer-inner'>
-          <div className='footer-brand'>Park &amp; Shine</div>
-          <div className='footer-links'>
-            <a href='/terms'>{t("landingPage.footer.termsOfService")}</a>
-            <a href='/privacy-policy'>
-              {t("landingPage.footer.privacyPolicy")}
-            </a>
-            <a href='/support'>{t("landingPage.footer.support")}</a>
-            <a href='/contact'>{t("landingPage.footer.contactUs")}</a>
-          </div>
-          <p>{t("landingPage.footer.copyright")}</p>
-        </div>
-      </footer>
+      <MarketingFooter whatsappNumber={whatsappNumber} />
 
       {/* ── Mobile dock ────────────────────────────────────────── */}
       <nav className='mobile-dock'>

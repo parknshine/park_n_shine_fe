@@ -20,6 +20,8 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Live queue — diperbarui setiap 10 detik",
+    "sortName": "Name (A-Z)",
+    "sortCode": "Code (PS-01...)",
     "loading": "Memuat queue...",
     "emptyQueue": "Tidak ada booking saat ini.",
     "escalationsTitle": "Eskalasi — {{count}} booking butuh perhatian",
@@ -496,6 +498,8 @@
     "subtitle": "Kelola parking sites dan QR code mereka",
     "genericQr": "Generic Site QR",
     "newSite": "New Site",
+    "sortName": "Name (A-Z)",
+    "sortCode": "Code (PS-01...)",
     "loading": "Loading...",
     "empty": "No sites yet. Create one to get started.",
     "status": {
