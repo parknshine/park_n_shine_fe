@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FileDown, ChevronDown, RefreshCw } from "lucide-react";
@@ -35,7 +35,7 @@ import { JobFiltersPanel } from "@/features/admin/components/reports/jobs/job-fi
 import { JobFilterChips } from "@/features/admin/components/reports/jobs/job-filter-chips";
 import { JobDetailModal } from "@/features/admin/components/reports/jobs/job-detail-modal";
 
-export default function ReportJobsPage() {
+function ReportJobsContent() {
   const { sites: allSites } = useSiteSelection();
   const { t } = useTranslation("admin");
   const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
@@ -461,5 +461,13 @@ export default function ReportJobsPage() {
         t={t}
       />
     </div>
+  );
+}
+
+export default function ReportJobsPage() {
+  return (
+    <Suspense>
+      <ReportJobsContent />
+    </Suspense>
   );
 }
