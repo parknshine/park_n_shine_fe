@@ -52,6 +52,9 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
         });
         void queryClient.invalidateQueries({ queryKey: queryKeys.admin.booking(event.bookingId as string) });
       }
+      if (event.type === "new_job" || event.type === "job_assigned") {
+        void queryClient.invalidateQueries({ queryKey: ["admin", "queue"] });
+      }
       if (event.type === "chat_message") {
         void queryClient.invalidateQueries({ queryKey: queryKeys.admin.chatConversations() });
         if (typeof event.conversationId === "string") {
