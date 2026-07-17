@@ -29,11 +29,13 @@ export function useAdminReportBookings(
   filters?: ReportBookingFilters,
   page = 1,
   pageSize = 25,
+  refetchIntervalMs?: number,
 ) {
   const query = useQuery({
     enabled: true,
     placeholderData: keepPreviousData,
     queryKey: queryKeys.admin.reportBookings(siteId ?? "", from, to, filters, page, pageSize, filters?.search),
+    refetchInterval: refetchIntervalMs,
     queryFn: async () => {
       const params = new URLSearchParams();
       if (siteId) params.set("siteId", siteId);

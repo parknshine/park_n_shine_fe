@@ -398,7 +398,13 @@
     "timeExtTitlePlural": "{{count}} permintaan tambah waktu",
     "noTimeExt": "Tidak ada permintaan",
     "noTimeExtDesc": "Tidak ada crew yang meminta tambah waktu.",
-    "timeExtOpen": "Lihat booking"
+    "timeExtOpen": "Lihat booking",
+    "refundsAriaLabel": "Notifikasi perlu refund",
+    "refundsTitle": "{{count}} booking perlu refund",
+    "refundsTitlePlural": "{{count}} booking perlu refund",
+    "noRefunds": "Tidak ada refund tertunda",
+    "noRefundsDesc": "Semua booking sudah diproses.",
+    "refundsSeeAll": "Lihat semua"
   },
   "auditTable": {
     "empty": "Tidak ada audit entry.",

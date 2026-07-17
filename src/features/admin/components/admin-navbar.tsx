@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, LogOut, Menu, Timer } from "lucide-react";
+import { Bell, LogOut, Menu, Timer, Undo2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
-import { useAdminAuth, useAdminEscalations } from "@/features/admin/hooks";
+import { useAdminAuth, useAdminEscalations, useAdminRefundsNeeded } from "@/features/admin/hooks";
 import { LanguageSwitcher } from "@/components/shared";
 import { StatusBadge } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -29,8 +29,10 @@ export function AdminNavbar() {
   const { t } = useTranslation("admin");
   const [showEscalations, setShowEscalations] = useState(false);
   const [showTimeExt, setShowTimeExt] = useState(false);
+  const [showRefunds, setShowRefunds] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeExtDropdownRef = useRef<HTMLDivElement>(null);
+  const refundsDropdownRef = useRef<HTMLDivElement>(null);
 
   const timeExtNotifications = useUIStore((s) => s.timeExtNotifications);
   const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
@@ -39,6 +41,8 @@ export function AdminNavbar() {
   const { escalations } = useAdminEscalations();
   const escalationCount = escalations.length;
 
+  const { refunds, total: refundsCount } = useAdminRefundsNeeded();
+
   useEffect(() => {
     function handleOutsideClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -46,6 +50,9 @@ export function AdminNavbar() {
       }
       if (timeExtDropdownRef.current && !timeExtDropdownRef.current.contains(e.target as Node)) {
         setShowTimeExt(false);
+      }
+      if (refundsDropdownRef.current && !refundsDropdownRef.current.contains(e.target as Node)) {
+        setShowRefunds(false);
       }
     }
     document.addEventListener("mousedown", handleOutsideClick);
@@ -210,6 +217,97 @@ export function AdminNavbar() {
                 <div className="px-4 py-6 text-center">
                   <p className="text-sm text-muted-foreground">
                     {t("navbar.noEscalationsDesc")}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Refund-needed bell */}
+        <div ref={refundsDropdownRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setShowRefunds((v) => !v)}
+            className="relative rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label={t("navbar.refundsAriaLabel")}
+          >
+            <Undo2 className="h-4 w-4" />
+            {refundsCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                {refundsCount > 9 ? "9+" : refundsCount}
+              </span>
+            )}
+          </button>
+
+          {showRefunds && (
+            <div className="absolute right-0 top-full z-50 mt-1 w-72 rounded-lg border border-border bg-background shadow-lg">
+              <div className="border-b border-border px-4 py-2.5">
+                <p className="text-xs font-semibold text-foreground">
+                  {refundsCount > 0
+                    ? t(
+                        refundsCount === 1
+                          ? "navbar.refundsTitle"
+                          : "navbar.refundsTitlePlural",
+                        { count: refundsCount }
+                      )
+                    : t("navbar.noRefunds")}
+                </p>
+              </div>
+              {refunds.length > 0 ? (
+                <>
+                  <ul className="max-h-64 divide-y divide-border overflow-y-auto">
+                    {refunds.map((row) => (
+                      <li
+                        key={row.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          setShowRefunds(false);
+                          router.push("/reports/jobs?paymentStatus=needs_refund");
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            setShowRefunds(false);
+                            router.push("/reports/jobs?paymentStatus=needs_refund");
+                          }
+                        }}
+                        className="flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/60"
+                      >
+                        <Undo2 className="h-4 w-4 shrink-0 text-blue-500" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-foreground">
+                            {row.reference ?? row.id}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {row.siteName ?? "-"}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setShowRefunds(false);
+                      router.push("/reports/jobs?paymentStatus=needs_refund");
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        setShowRefunds(false);
+                        router.push("/reports/jobs?paymentStatus=needs_refund");
+                      }
+                    }}
+                    className="cursor-pointer border-t border-border px-4 py-2.5 text-center text-xs font-semibold text-primary hover:bg-muted/60"
+                  >
+                    {t("navbar.refundsSeeAll")}
+                  </div>
+                </>
+              ) : (
+                <div className="px-4 py-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    {t("navbar.noRefundsDesc")}
                   </p>
                 </div>
               )}

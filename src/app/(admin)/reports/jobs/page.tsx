@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { FileDown, ChevronDown, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -38,6 +39,8 @@ export default function ReportJobsPage() {
   const { sites: allSites } = useSiteSelection();
   const { t } = useTranslation("admin");
   const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
+  const searchParams = useSearchParams();
+  const initialNeedsRefund = searchParams.get("paymentStatus") === "needs_refund";
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -49,7 +52,7 @@ export default function ReportJobsPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<
     "" | "true" | "false" | "needs_refund"
-  >("");
+  >(initialNeedsRefund ? "needs_refund" : "");
   const [hasRatingFilter, setHasRatingFilter] = useState<"" | "true" | "false">(
     "",
   );
@@ -57,13 +60,21 @@ export default function ReportJobsPage() {
   const [searchInput, setSearchInput] = useState("");
 
   const [appliedFilters, setAppliedFilters] = useState<ReportBookingFilters>(
-    {},
+    initialNeedsRefund ? { needsRefund: true } : {},
   );
   const [appliedSiteId, setAppliedSiteId] = useState<string | undefined>(
     undefined,
   );
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+
+  useEffect(() => {
+    if (searchParams.get("paymentStatus") !== "needs_refund") return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPaymentStatusFilter("needs_refund");
+    setPage(1);
+    setAppliedFilters((prev) => ({ ...prev, needsRefund: true }));
+  }, [searchParams]);
 
   const [detailRow, setDetailRow] = useState<ReportBookingRow | null>(null);
   const [isExporting, setIsExporting] = useState(false);

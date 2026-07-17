@@ -398,7 +398,13 @@
     "timeExtTitlePlural": "{{count}} time extension requests",
     "noTimeExt": "No pending requests",
     "noTimeExtDesc": "No crew has requested more time.",
-    "timeExtOpen": "View booking"
+    "timeExtOpen": "View booking",
+    "refundsAriaLabel": "Refund needed notifications",
+    "refundsTitle": "{{count}} booking needs a refund",
+    "refundsTitlePlural": "{{count}} bookings need a refund",
+    "noRefunds": "No refunds pending",
+    "noRefundsDesc": "All bookings have been processed.",
+    "refundsSeeAll": "See all"
   },
   "auditTable": {
     "empty": "No audit entries.",
