@@ -158,7 +158,7 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
       color: "text-[#514eb6]",
       icon: <MessageCircle className='h-4.75 w-4.75' />,
       onClick: () => {
-        setMarketingBackOrigin("/account");
+        setMarketingBackOrigin("/home");
         router.push("/support");
       },
     },
