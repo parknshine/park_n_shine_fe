@@ -22,6 +22,14 @@ const EVENT_TYPES = ["booking_status_changed", "job_assigned", "new_job", "crew_
 const INITIAL_RECONNECT_DELAY_MS = 1_000;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 
+/** Appends `sinceId` as a query param so a reconnecting client can ask the
+ * server to replay events it missed while disconnected. Pure so it's testable
+ * without an EventSource/DOM environment. */
+export function appendSinceId(url: string, sinceId: string | null): string {
+  if (!sinceId) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}sinceId=${encodeURIComponent(sinceId)}`;
+}
+
 export function useRealtimeEvents({
   url,
   onEvent,
@@ -43,17 +51,19 @@ export function useRealtimeEvents({
     let reconnectTimer: ReturnType<typeof setTimeout>;
     let delay = INITIAL_RECONNECT_DELAY_MS;
     let destroyed = false;
+    let lastEventId: string | null = null;
 
     function connect() {
       if (destroyed) return;
       const currentUrl = typeof url === "function" ? url() : url;
-      es = new EventSource(currentUrl);
+      es = new EventSource(appendSinceId(currentUrl, lastEventId));
 
       es.onopen = () => {
         delay = INITIAL_RECONNECT_DELAY_MS;
       };
 
       const handleMessage = (ev: MessageEvent<string>) => {
+        if (ev.lastEventId) lastEventId = ev.lastEventId;
         if (!ev.data || ev.data === "ping") return;
         try {
           const event = JSON.parse(ev.data) as RealtimeEvent;
