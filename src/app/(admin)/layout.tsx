@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AdminSidebar, AdminNavbar, BookingDetailDrawer } from "@/features/admin/components";
 import { useAdminSites } from "@/features/admin/hooks";
 import { useAdminRealtime } from "@/hooks/use-admin-realtime";
+import { invalidatePaymentQueries } from "@/features/admin/utils/realtime-invalidations";
 import { useUIStore } from "@/store/ui-store";
 import { useAuthStore } from "@/store/auth-store";
 import { queryKeys } from "@/lib/query-keys";
@@ -55,6 +56,7 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
       if (event.type === "new_job" || event.type === "job_assigned") {
         void queryClient.invalidateQueries({ queryKey: ["admin", "queue"] });
       }
+      invalidatePaymentQueries(queryClient, event);
       if (event.type === "chat_message") {
         void queryClient.invalidateQueries({ queryKey: queryKeys.admin.chatConversations() });
         if (typeof event.conversationId === "string") {
