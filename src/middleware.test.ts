@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { SUBDOMAIN_CONFIG, detectSubdomain, isPathAllowed } from "./proxy";
+import { SUBDOMAIN_CONFIG, detectSubdomain, isPathAllowed } from "./middleware";
 
 describe("detectSubdomain", () => {
   test("detects app subdomain", () => {

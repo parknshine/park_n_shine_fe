@@ -58,7 +58,7 @@ export function detectSubdomain(host: string): Subdomain | null {
  */
 export function isPathAllowed(
   path: string,
-  allowedPrefixes: readonly string[]
+  allowedPrefixes: readonly string[],
 ): boolean {
   return allowedPrefixes.some((prefix) => {
     if (prefix === "/") return path === "/";
@@ -82,22 +82,23 @@ async function verifyHs256(token: string, secret: string): Promise<boolean> {
       encoder.encode(secret),
       { name: "HMAC", hash: "SHA-256" },
       false,
-      ["verify"]
+      ["verify"],
     );
 
     const data = encoder.encode(`${headerB64}.${payloadB64}`);
     const sig = Uint8Array.from(
       atob(signatureB64.replace(/-/g, "+").replace(/_/g, "/")),
-      (c) => c.charCodeAt(0)
+      (c) => c.charCodeAt(0),
     );
 
     const valid = await crypto.subtle.verify("HMAC", key, sig, data);
     if (!valid) return false;
 
     const payload = JSON.parse(
-      atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/"))
+      atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/")),
     ) as { exp?: number };
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return false;
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000))
+      return false;
 
     return true;
   } catch {
@@ -107,16 +108,20 @@ async function verifyHs256(token: string, secret: string): Promise<boolean> {
 
 const ADMIN_PROTECTED = /^\/admin(?:\/.*)?$/;
 const CREW_PROTECTED = /^\/crew(?:\/.*)?$/;
-const PUBLIC_PATHS = new Set(["/admin/login", "/admin", "/crew/login", "/crew"]);
+const PUBLIC_PATHS = new Set([
+  "/admin/login",
+  "/admin",
+  "/crew/login",
+  "/crew",
+]);
 
 /**
  * Cookie-based JWT verification for admin and crew routes.
  * Only active when NEXT_PUBLIC_COOKIE_AUTH=true (Phase 6 feature flag).
  */
-async function verifyCookieAuth(req: NextRequest): Promise<NextResponse | null> {
-  // Feature flag — only active when NEXT_PUBLIC_COOKIE_AUTH=true
-  if (process.env.NEXT_PUBLIC_COOKIE_AUTH !== "true") return null;
-
+async function verifyCookieAuth(
+  req: NextRequest,
+): Promise<NextResponse | null> {
   const { pathname } = req.nextUrl;
 
   if (PUBLIC_PATHS.has(pathname)) return null;
@@ -140,7 +145,7 @@ async function verifyCookieAuth(req: NextRequest): Promise<NextResponse | null> 
   return null;
 }
 
-export async function proxy(req: NextRequest): Promise<NextResponse> {
+export async function middleware(req: NextRequest): Promise<NextResponse> {
   // Check cookie-based JWT auth first (Phase 6 feature flag)
   const cookieAuthResponse = await verifyCookieAuth(req);
   if (cookieAuthResponse) return cookieAuthResponse;
@@ -162,7 +167,7 @@ export async function proxy(req: NextRequest): Promise<NextResponse> {
   // Redirect to this subdomain's default path (stay on current subdomain)
   const url = req.nextUrl.clone();
   url.pathname = surface.defaultPath;
-  return NextResponse.redirect(url)
+  return NextResponse.redirect(url);
 }
 
 export const config = {
