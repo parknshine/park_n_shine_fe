@@ -88,6 +88,9 @@ export default defineConfig({
     env: {
       // Backend the frontend should proxy to. Defaults to the local API server.
       NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
+      // Push notification soft-ask prompt is gated behind this flag; enable it
+      // for E2E so e2e/push-prompt.spec.ts can exercise the dialog.
+      NEXT_PUBLIC_PUSH_ENABLED: "true",
     },
   },
 });

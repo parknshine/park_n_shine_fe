@@ -57,6 +57,12 @@
       "send": "Kirim Pesan"
     }
   },
+  "pushPrompt": {
+    "title": "Aktifkan Notifikasi",
+    "description": "Dapatkan update real-time untuk booking dan pekerjaan kamu langsung di perangkat ini.",
+    "enable": "Aktifkan",
+    "later": "Nanti saja"
+  },
   "support": {
     "title": "Apa yang bisa kami bantu?",
     "subtitle": "Temukan jawaban atas pertanyaan umum di bawah, atau hubungi tim kami langsung.",

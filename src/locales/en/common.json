@@ -57,6 +57,12 @@
       "send": "Send Message"
     }
   },
+  "pushPrompt": {
+    "title": "Enable Notifications",
+    "description": "Get real-time updates for your bookings and jobs right on this device.",
+    "enable": "Enable",
+    "later": "Not now"
+  },
   "support": {
     "title": "How can we help?",
     "subtitle": "Find answers to common questions below, or reach out to our team directly.",

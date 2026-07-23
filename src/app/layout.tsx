@@ -6,6 +6,7 @@ import { Toaster } from "@/components/providers/toaster";
 import { PwaProvider } from "@/components/providers/pwa-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { I18nProvider } from "@/components/providers/i18n-provider";
+import { NotificationPermissionPrompt } from "@/components/shared/notification-permission-prompt";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -64,6 +65,7 @@ export default function RootLayout({
               {children}
               <Toaster />
               <PwaProvider />
+              <NotificationPermissionPrompt />
             </QueryProvider>
           </ThemeProvider>
         </I18nProvider>
