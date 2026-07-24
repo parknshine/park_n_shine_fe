@@ -21,6 +21,8 @@ import { isBookingLocked } from "@/features/admin/utils/is-booking-locked";
 import { bookingRef } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
+const PENDING_OVERRIDE_UNLOCK_SECONDS = 2 * 60 * 60; // 2 hours
+
 interface BookingDetailDrawerProps {
   bookingId: string | null;
   onClose: () => void;
@@ -98,6 +100,9 @@ export function BookingDetailDrawer({
   });
 
   if (!bookingId) return null;
+
+  const isPendingTooYoung =
+    booking && booking.status === "PENDING" && booking.elapsedSeconds < PENDING_OVERRIDE_UNLOCK_SECONDS;
 
   return (
     <>
@@ -259,7 +264,11 @@ export function BookingDetailDrawer({
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={["PENDING", "CLOSED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status) || isBookingLocked(booking)}
+                    disabled={
+                      isPendingTooYoung ||
+                      ["CLOSED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status) ||
+                      isBookingLocked(booking)
+                    }
                     onClick={() => setActiveModal("override")}
                   >
                     {t("drawer.overrideStatus")}

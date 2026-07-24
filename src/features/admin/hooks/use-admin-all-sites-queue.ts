@@ -10,7 +10,7 @@ interface UseAdminAllSitesQueueOptions {
 }
 
 export function useAdminAllSitesQueue({
-  pollIntervalMs = 10_000,
+  pollIntervalMs = 3_000,
 }: UseAdminAllSitesQueueOptions = {}) {
   const query = useQuery({
     meta: { persist: true },
