@@ -27,7 +27,8 @@
     "escalationsTitle": "Eskalasi — {{count}} booking butuh perhatian",
     "escalationsTitlePlural": "Eskalasi — {{count}} booking butuh perhatian",
     "seeAll": "Lihat Semua",
-    "moreBookings": "+{{count}} lainnya"
+    "moreBookings": "+{{count}} lainnya",
+    "notifyColumnLabel": "Kirim Notifikasi"
   },
   "audit": {
     "title": "Audit Trail",
@@ -318,6 +319,9 @@
     "price": "Harga",
     "elapsed": "Durasi",
     "estimatedReady": "Est. Selesai",
+    "notifyRequested": "Request Notifikasi",
+    "notifyYes": "Ya",
+    "notifyNo": "Tidak",
     "statusHistory": "Riwayat Status",
     "noStatusHistory": "Belum ada riwayat status",
     "photos": "Foto",

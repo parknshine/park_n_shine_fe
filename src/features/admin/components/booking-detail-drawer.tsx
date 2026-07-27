@@ -188,6 +188,11 @@ export function BookingDetailDrawer({
                       ? new Date(booking.estimatedReadyAt).toLocaleString("id-ID")
                       : "—"}
                   </dd>
+
+                  <dt className="text-muted-foreground">{t("drawer.notifyRequested")}</dt>
+                  <dd className="font-medium text-foreground">
+                    {booking.phone ? t("drawer.notifyYes") : t("drawer.notifyNo")}
+                  </dd>
                 </dl>
               </section>
 
@@ -448,7 +453,7 @@ function DrawerSkeleton() {
       <section>
         <Skeleton className="mb-3 h-3 w-24" />
         <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: 7 }).map((_, i) => (
             <>
               <Skeleton key={`label-${i}`} className="h-4 w-16" />
               <Skeleton key={`value-${i}`} className="h-4 w-32" />

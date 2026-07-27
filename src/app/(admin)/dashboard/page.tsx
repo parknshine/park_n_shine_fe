@@ -103,7 +103,7 @@ function DashboardSiteCard({
                   key={booking.id}
                   type='button'
                   onClick={() => onBookingClick(booking)}
-                  className='grid w-full grid-cols-[1.5rem_1fr_auto_auto] items-center gap-2 px-2 py-2 text-left text-sm hover:bg-muted/50 transition-colors rounded'
+                  className='grid w-full grid-cols-[1.5rem_1fr_auto_auto_auto] items-center gap-2 px-2 py-2 text-left text-sm hover:bg-muted/50 transition-colors rounded'
                 >
                   <span className='text-xs text-muted-foreground font-mono'>
                     {i + 1}
@@ -123,6 +123,10 @@ function DashboardSiteCard({
                   </div>
                   <p className='text-xs text-muted-foreground shrink-0'>
                     {booking.crewName ?? t("queueGroup.unassigned")}
+                  </p>
+                  <p className='text-xs text-muted-foreground shrink-0'>
+                    {t("dashboard.notifyColumnLabel")}:{" "}
+                    {booking.phone ? t("drawer.notifyYes") : t("drawer.notifyNo")}
                   </p>
                   <p className='text-xs font-mono text-muted-foreground shrink-0'>
                     {formatElapsedShort(booking.elapsedSeconds, t)}

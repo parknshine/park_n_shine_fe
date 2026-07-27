@@ -27,7 +27,8 @@
     "escalationsTitle": "Escalations — {{count}} booking needs attention",
     "escalationsTitlePlural": "Escalations — {{count}} bookings need attention",
     "seeAll": "See All",
-    "moreBookings": "+{{count}} more"
+    "moreBookings": "+{{count}} more",
+    "notifyColumnLabel": "Send Notification"
   },
   "audit": {
     "title": "Audit Trail",
@@ -318,6 +319,9 @@
     "price": "Price",
     "elapsed": "Elapsed",
     "estimatedReady": "Est. Ready",
+    "notifyRequested": "Notification Requested",
+    "notifyYes": "Yes",
+    "notifyNo": "No",
     "statusHistory": "Status History",
     "noStatusHistory": "No status history yet",
     "photos": "Photos",
