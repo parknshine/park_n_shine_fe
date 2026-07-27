@@ -76,17 +76,22 @@ export function NotificationPermissionPrompt() {
   if (!crewHydrated || !customerHydrated) return null;
   if (!pushType) return null;
 
-  const handleEnable = () => {
-    void subscribe();
-    setDismissed(true);
-  };
-
-  const handleLater = () => {
+  const persistDismissal = () => {
     try {
       localStorage.setItem(DISMISS_KEY, "true");
     } catch {
       // ignore — private browsing / storage disabled
     }
+  };
+
+  const handleEnable = () => {
+    void subscribe();
+    persistDismissal();
+    setDismissed(true);
+  };
+
+  const handleLater = () => {
+    persistDismissal();
     setDismissed(true);
   };
 
