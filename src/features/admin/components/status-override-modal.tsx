@@ -36,10 +36,15 @@ const ALL_TRANSITIONS: Array<{
   { label: "ASSIGNED → CANCELLED",   fromStatus: "ASSIGNED",   nextStatus: "CANCELLED" },
   { label: "STALE → ASSIGNED",       fromStatus: "STALE",      nextStatus: "ASSIGNED" },
   { label: "STALE → CANCELLED",      fromStatus: "STALE",      nextStatus: "CANCELLED" },
+  { label: "NEEDS_HELP → IN_PROGRESS", fromStatus: "NEEDS_HELP", nextStatus: "IN_PROGRESS" },
   { label: "NEEDS_HELP → STALE",     fromStatus: "NEEDS_HELP", nextStatus: "STALE" },
   { label: "NEEDS_HELP → CANCELLED", fromStatus: "NEEDS_HELP", nextStatus: "CANCELLED" },
   { label: "READY → CLOSED",         fromStatus: "READY",      nextStatus: "CLOSED" },
 ];
+
+export function hasValidStatusOverrideTransitions(status: string): boolean {
+  return ALL_TRANSITIONS.some((tr) => tr.fromStatus === status);
+}
 
 interface StatusOverrideModalProps {
   open: boolean;

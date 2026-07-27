@@ -12,7 +12,7 @@ import { StatusBadge } from "@/components/shared";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
 import type { AdminBookingDetail } from "@/features/admin/types";
 import { ReassignModal } from "./reassign-modal";
-import { StatusOverrideModal } from "./status-override-modal";
+import { StatusOverrideModal, hasValidStatusOverrideTransitions } from "./status-override-modal";
 import { RefundModal } from "./refund-modal";
 import { useTranslation } from "@/i18n";
 import { useAuthStore } from "@/store/auth-store";
@@ -266,7 +266,7 @@ export function BookingDetailDrawer({
                     size="sm"
                     disabled={
                       isPendingTooYoung ||
-                      ["CLOSED", "EXPIRED", "ASSIGNED", "LOCATED", "IN_PROGRESS"].includes(booking.status) ||
+                      !hasValidStatusOverrideTransitions(booking.status) ||
                       isBookingLocked(booking)
                     }
                     onClick={() => setActiveModal("override")}

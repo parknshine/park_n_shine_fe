@@ -87,6 +87,14 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
       if (event.type === "booking_status_changed" && event.status === "STALE") {
         setStaleJobId(event.bookingId as string);
       }
+      if (
+        event.type === "booking_status_changed" &&
+        (event.status === "CANCELLED" || event.status === "EXPIRED") &&
+        event.bookingId
+      ) {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.job(event.bookingId as string) });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.nextJob() });
+      }
       if (event.type === "job_assigned" || event.type === "new_job") {
         void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
         if (event.type === "job_assigned") {
