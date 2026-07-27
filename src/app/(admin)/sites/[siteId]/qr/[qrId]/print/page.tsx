@@ -7,6 +7,8 @@ import api from "@/lib/axios-admin";
 import type { AdminSiteDetail, AdminQrCode } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 
+const CUSTOMER_APP_URL = "https://parknshine.net";
+
 export default function QrPrintPage() {
   const { t } = useTranslation("admin");
   const { siteId, qrId } = useParams<{ siteId: string; qrId: string }>();
@@ -15,8 +17,7 @@ export default function QrPrintPage() {
   const [qr, setQr] = useState<AdminQrCode | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const appUrl =
-    globalThis.window === undefined ? "" : globalThis.window.location.origin;
+  const appUrl = CUSTOMER_APP_URL;
 
   useEffect(() => {
     async function load() {

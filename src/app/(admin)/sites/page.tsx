@@ -32,10 +32,11 @@ import type {
 } from "@/features/admin/types";
 import { LocationPickerModal } from "@/features/admin/components/location-picker-modal";
 
+const CUSTOMER_APP_URL = "https://parknshine.net";
+
 function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
   const { t } = useTranslation("admin");
-  const url =
-    globalThis.window === undefined ? "" : globalThis.window.location.origin;
+  const url = CUSTOMER_APP_URL;
 
   function handlePrint() {
     const svgEl = globalThis.document.getElementById("generic-site-qr");
@@ -44,7 +45,7 @@ function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
     const serializer = new XMLSerializer();
     const svgString = serializer.serializeToString(svgEl);
 
-    const safeUrl = globalThis.window.location.origin;
+    const safeUrl = CUSTOMER_APP_URL;
     const encodedUrl = safeUrl
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
