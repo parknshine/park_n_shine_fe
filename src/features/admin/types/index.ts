@@ -72,7 +72,7 @@ export interface AuditEntry {
   bookingId: string;
   reference: string | null;
   plateText: string | null;
-  action: "refund" | "status_override" | "reassign" | "extend_time" | "crew.job_rejected" | "approve_time_extension" | "reject_time_extension";
+  action: "refund" | "status_override" | "reassign" | "extend_time" | "crew.job_rejected" | "crew.requested_help" | "crew.requested_wait" | "crew.request_time_extension" | "booking.status_changed" | "approve_time_extension" | "reject_time_extension";
   detail: string;
   adminEmail: string;
   createdAt: string;

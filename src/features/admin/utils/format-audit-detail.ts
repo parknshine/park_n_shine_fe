@@ -62,12 +62,25 @@ function parseDetail(action: string, p: Record<string, unknown>, raw: string): s
   if (action === "extend_time") return formatExtendTime(p);
   if (action === "approve_time_extension") return formatApproveTimeExtension(p);
   if (action === "reject_time_extension") return "Request rejected";
+  if (action === "crew.requested_wait") {
+    const minutes = p.minutes as number | undefined;
+    return minutes != null ? `+${minutes} min` : "—";
+  }
+  if (action === "crew.request_time_extension") return "Time extension requested";
+  if (action === "booking.status_changed") {
+    const from = (p.from as string) ?? "—";
+    const to = (p.to as string) ?? "—";
+    return `${from} → ${to}`;
+  }
   return raw;
 }
 
 export function formatAuditAction(action: string): string {
   if (action === "crew.job_rejected") return "Crew Rejected Job";
   if (action === "crew.requested_help") return "Crew Requested Help";
+  if (action === "crew.requested_wait") return "Crew Requested Wait";
+  if (action === "crew.request_time_extension") return "Crew Requested Time Extension";
+  if (action === "booking.status_changed") return "Status Changed";
   if (action === "extend_time") return "Extend Time";
   if (action === "approve_time_extension") return "Approve Time Extension";
   if (action === "reject_time_extension") return "Reject Time Extension";

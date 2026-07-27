@@ -367,8 +367,8 @@ export function BookingDetailDrawer({
                       size="sm"
                       disabled={
                         !(
-                          ["CLOSED", "CANCELLED"].includes(booking.status) ||
-                          (booking.status === "EXPIRED" && booking.statusHistory.some((e) => e.status === "PAID"))
+                          ["CLOSED", "CANCELLED", "EXPIRED"].includes(booking.status) &&
+                          booking.statusHistory.some((e) => e.status === "PAID")
                         ) ||
                         (booking.refundedAmount ?? 0) > 0
                       }
