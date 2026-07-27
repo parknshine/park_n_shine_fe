@@ -221,6 +221,8 @@
     "errorToast": "Gagal mengirim permintaan",
     "waitingBannerTitle": "Menunggu Bantuan",
     "waitingBannerDesc": "Bantuan sudah diminta. Mohon tunggu supervisor.",
+    "contactSupervisorButton": "Hubungi SPV",
+    "whatsAppMessage": "Halo, saya butuh bantuan untuk job plat {{plate}} di slot {{slot}}.",
     "reasons": {
       "VEHICLE_INACCESSIBLE": "Kendaraan tidak bisa diakses",
       "MECHANICAL_ISSUE": "Masalah alat/mesin",

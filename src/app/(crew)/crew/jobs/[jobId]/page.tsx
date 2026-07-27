@@ -6,7 +6,7 @@ import { ArrowRight, ChevronLeft, HelpCircle, Loader2, MapPin } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCrewJob, useEtaExpired } from "@/features/crew/hooks";
+import { useCrewJob, useEtaExpired, useSupervisorContact } from "@/features/crew/hooks";
 import { EtaCountdown, NeedsHelpModal, TimeExtensionControl } from "@/features/crew";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
 import { queryKeys } from "@/lib/query-keys";
@@ -45,6 +45,7 @@ export function CrewJobDetailPage() {
   const queryClient = useQueryClient();
   const { job, isLoading, error } = useCrewJob(jobId);
   const expired = useEtaExpired(job?.etaEndsAt);
+  const { whatsappNumber } = useSupervisorContact();
   const { t } = useTranslation("crew");
 
   const [helpModalOpen, setHelpModalOpen] = useState(false);
@@ -221,6 +222,18 @@ export function CrewJobDetailPage() {
             <p className="text-sm text-amber-700 dark:text-amber-300">
               {t("needsHelp.waitingBannerDesc")}
             </p>
+            {whatsappNumber && (
+              <a
+                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+                  t("needsHelp.whatsAppMessage", { plate: job.plateText, slot: job.slotText })
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex h-9 items-center justify-center rounded-md border border-amber-300 bg-white px-4 text-sm font-medium text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-900"
+              >
+                {t("needsHelp.contactSupervisorButton")}
+              </a>
+            )}
           </div>
         )}
 

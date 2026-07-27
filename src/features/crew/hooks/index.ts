@@ -10,3 +10,4 @@ export { useVerifyPlate } from "./use-verify-plate";
 export { useWashChecklist } from "./use-wash-checklist";
 export { useCrewMonthlyStats } from "./use-crew-monthly-stats";
 export type { CrewMonthlyStats } from "./use-crew-monthly-stats";
+export { useSupervisorContact } from "./use-supervisor-contact";

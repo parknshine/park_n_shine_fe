@@ -33,6 +33,7 @@ export const queryKeys = {
     queue: () => ["crew", "jobs", "queue"] as const,
     waitStatus: () => ["crew", "jobs", "wait-status"] as const,
     monthlyStats: () => ["crew", "monthly-stats"] as const,
+    publicSettings: () => ["crew", "public-settings"] as const,
   },
   customer: {
     booking: (bookingId: string) => ["customer", "booking", bookingId] as const,
