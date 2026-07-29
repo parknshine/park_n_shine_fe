@@ -13,8 +13,8 @@
       "bookNow": "Pesan Sekarang"
     },
     "hero": {
-      "heading": "Mobil Lebih Bersih\nTanpa Perlu\nPergi Jauh.",
-      "description": "Tidak perlu pergi ke tempat cuci mobil. Park & Shine membersihkan mobilmu saat kamu berbelanja, jadi kamu bisa menghabiskan lebih sedikit waktu menunggu dan lebih banyak waktu bersama orang-orang tersayang.",
+      "heading": "Nikmati Waktu Berbelanjamu.\nKami Bersihkan\nKendaraanmu.",
+      "description": "Tak perlu memilih antara mencuci mobil atau berbelanja. Bersama Park and Shine, keduanya dapat dilakukan dalam waktu yang sama. Kami membersihkan kendaraan Anda selama Anda menikmati waktu di pusat perbelanjaan.",
       "viewServices": "Lihat Layanan",
       "findLocations": "Temukan Lokasi",
       "imageAlt": "Keluarga berdiri di samping mobil mereka di area parkir indoor yang terang",
@@ -44,16 +44,16 @@
       "title": "PROMO WAKTU TERBATAS!",
       "subtitle": "Harga terjangkau, ramah lingkungan, mudah digunakan",
       "serviceLabel": "Cuci Tanpa Air",
-      "description": "Cuci kendaraan premium tanpa air yang menjaga mobilmu tetap bersih — sementara kamu berbelanja.",
-      "feature1": "Pembersihan profesional dengan hasil premium",
-      "feature2": "Proses aman, bebas goresan",
-      "feature3": "Bahan pembersih berkualitas tinggi",
-      "feature4": "Perlindungan dan kilap yang kuat",
-      "feature5": "Ramah lingkungan — kurang dari 1L air per cuci vs pencucian biasa yang menggunakan 100L"
+      "description": "Pembersihan eksterior kendaraan menggunakan teknologi waterless yang aman untuk cat. Kendaraan bersih dan mengilap saat Anda sedang berbelanja.",
+      "feature1": "Pembersihan body eksterior kendaraan",
+      "feature2": "Aman untuk seluruh permukaan cat kendaraan",
+      "feature3": "Sudah termasuk Wax / Polish",
+      "feature4": "Proses sekitar 30 menit tanpa perlu mengantre",
+      "feature5": "Lebih hemat air dan ramah lingkungan"
     },
     "track": {
-      "title": "Lacak Pesananmu",
-      "description": "Dari parkir hingga kilap sempurna hanya dalam 30 menit, Park & Shine membuat prosesnya lancar dan mudah diikuti. Sempurna untuk pengemudi yang memesan dari mana saja.",
+      "title": "Progres Layanan Kami",
+      "description": "Nikmati waktu berbelanja Anda. Karena dalam 30 menit, Park and Shine akan membuat kendaraan Anda dalam kondisi bersih dan mengilap.",
       "step1": "Parkir",
       "step2": "Ambil 2 Foto",
       "step3": "Lakukan Pembayaran",

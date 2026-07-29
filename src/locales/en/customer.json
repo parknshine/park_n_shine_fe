@@ -13,8 +13,8 @@
       "bookNow": "Book Now"
     },
     "hero": {
-      "heading": "A Cleaner Car\nWithout The\nExtra Trip.",
-      "description": "Skip the drive to a car wash. Park & Shine cleans your car while you shop, so you can spend less time waiting and more time with the people who matter most.",
+      "heading": "Enjoy Your Shopping.\nWe'll Take Care\nof Your Vehicle.",
+      "description": "There's no need to choose between washing your car or enjoying your shopping. With Park and Shine, you can do both at the same time. While you spend time at the mall, we'll clean your vehicle.",
       "viewServices": "View Services",
       "findLocations": "Find Locations",
       "imageAlt": "Family standing beside their car in a bright indoor parking area",
@@ -44,16 +44,16 @@
       "title": "LIMITED TIME PROMOTION!",
       "subtitle": "Affordable, eco-friendly cleaning made simple",
       "serviceLabel": "Waterless Cleaning",
-      "description": "Premium waterless cleaning that keeps your car spotless — all while you shop.",
-      "feature1": "Professional cleaning with premium finish",
-      "feature2": "Safe, scratch-free process",
-      "feature3": "High quality cleaning chemicals",
-      "feature4": "Strong Protection And Shine",
-      "feature5": "Eco-friendly cleaning using under 1L of water per wash vs existing that uses 100L"
+      "description": "Exterior vehicle cleaning using advanced waterless technology that is safe for your vehicle's paint. Your car will be clean and glossy while you enjoy your shopping.",
+      "feature1": "Exterior body cleaning",
+      "feature2": "Safe for all painted surfaces",
+      "feature3": "Wax / Polish included",
+      "feature4": "Approximately 30-minute service, no waiting required",
+      "feature5": "Water-saving and environmentally friendly"
     },
     "track": {
-      "title": "Track Your Order",
-      "description": "From parking to final shine in only 30 minutes, Park & Shine keeps the experience smooth and easy to follow. Perfect for drivers booking on the go.",
+      "title": "Service Progress",
+      "description": "Enjoy your shopping. In 30 minutes, Park and Shine will have your vehicle clean and shine.",
       "step1": "Park",
       "step2": "Take 2 Pictures",
       "step3": "Make Payment",
