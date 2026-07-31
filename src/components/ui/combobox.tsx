@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 export interface ComboboxOption {
   label: string;
   value: string;
+  disabled?: boolean;
 }
 
 // ─── Props ───────────────────────────────────────────────────────────────────
@@ -90,9 +91,10 @@ function OptionList({
               ? multiValue.includes(opt.value)
               : singleValue === opt.value;
             return (
-              <li key={opt.value} role="option" aria-selected={selected}>
+              <li key={opt.value} role="option" aria-selected={selected} aria-disabled={opt.disabled}>
                 <button
                   type="button"
+                  disabled={opt.disabled}
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() =>
                     multiple ? onMultiToggle(opt.value) : onSingleSelect(opt.value)
@@ -100,7 +102,8 @@ function OptionList({
                   className={cn(
                     "flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
                     "hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
-                    selected && "bg-muted"
+                    selected && "bg-muted",
+                    opt.disabled && "cursor-not-allowed text-muted-foreground hover:bg-transparent"
                   )}
                 >
                   {multiple ? (

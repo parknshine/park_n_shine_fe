@@ -30,8 +30,8 @@ import {
   SelectLabel,
   SelectSeparator,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 
 export default function WalkInCapturePage() {
   return (
@@ -65,7 +65,12 @@ function WalkInCaptureContent() {
   const loc = searchParams.get("loc");
   const siteIdParam = searchParams.get("siteId");
 
-  const { sites, isLoading: isSitesLoading } = usePublicSites();
+  const { sites: unsortedSites, isLoading: isSitesLoading } = usePublicSites();
+  const sites = [...unsortedSites].sort((a, b) => {
+    const aUnavailable = a.intakePaused || isSitePastCutoff(a.cutoffTime);
+    const bUnavailable = b.intakePaused || isSitePastCutoff(b.cutoffTime);
+    return aUnavailable === bUnavailable ? 0 : aUnavailable ? -1 : 1;
+  });
   const { loyaltyEnabled } = usePublicSettings();
 
   const { clear: clearCapture, save: saveCapture } = useBookingCaptureStore();
@@ -329,31 +334,32 @@ function WalkInCaptureContent() {
           <label className="text-sm font-bold text-foreground">
             {t("booking.capture.locationLabel")}
           </label>
-          <Select value={location} onValueChange={setLocation} disabled={isSitesLoading}>
-            <SelectTrigger className="h-10 w-full rounded-lg border-border bg-[#eff8fe]">
-              <SelectValue
-                placeholder={
-                  isSitesLoading
-                    ? t("booking.capture.locationLoading")
-                    : t("booking.capture.locationPlaceholder")
-                }
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {sites.map((site) => {
-                const unavailable = site.intakePaused || isSitePastCutoff(site.cutoffTime);
-                return (
-                  <SelectItem key={site.id} value={site.id} disabled={unavailable}>
-                    <span className={unavailable ? "text-muted-foreground" : undefined}>
-                      {site.name}
-                      {site.intakePaused && " (Sedang tutup)"}
-                      {!site.intakePaused && isSitePastCutoff(site.cutoffTime) && " (Sudah cutoff)"}
-                    </span>
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+          <Combobox
+            options={sites.map((site) => {
+              const unavailable = site.intakePaused || isSitePastCutoff(site.cutoffTime);
+              const statusSuffix = site.intakePaused
+                ? " (Sedang tutup)"
+                : isSitePastCutoff(site.cutoffTime)
+                  ? " (Sudah cutoff)"
+                  : "";
+              return { value: site.id, label: `${site.name}${statusSuffix}`, disabled: unavailable };
+            })}
+            value={location}
+            onChange={setLocation}
+            disabled={isSitesLoading}
+            placeholder={
+              isSitesLoading
+                ? t("booking.capture.locationLoading")
+                : t("booking.capture.locationPlaceholder")
+            }
+            searchPlaceholder={t("booking.capture.locationSearchPlaceholder", {
+              defaultValue: "Cari mall…",
+            })}
+            emptyMessage={t("booking.capture.locationSearchEmpty", {
+              defaultValue: "Mall tidak ditemukan.",
+            })}
+            className="h-10 w-full rounded-lg border-border bg-[#eff8fe]"
+          />
           <p className="text-xs text-muted-foreground">
             {t("booking.capture.locationHelper")}
           </p>

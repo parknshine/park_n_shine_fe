@@ -191,7 +191,9 @@ export function BookingDetailDrawer({
 
                   <dt className="text-muted-foreground">{t("drawer.notifyRequested")}</dt>
                   <dd className="font-medium text-foreground">
-                    {booking.phone ? t("drawer.notifyYes") : t("drawer.notifyNo")}
+                    {booking.phone
+                      ? `${t("drawer.notifyYes")} (${booking.phone})`
+                      : t("drawer.notifyNo")}
                   </dd>
                 </dl>
               </section>
