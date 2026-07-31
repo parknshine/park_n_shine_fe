@@ -6,18 +6,20 @@ import { ArrowRight } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { AppShell, OfflineBanner } from "@/components/shared";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { useBookingStatus, usePhotoUpload, usePublicSettings } from "@/features/customer/hooks";
-import { isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
+import { getDialCodeOptions, isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
 import { useTranslation } from "@/i18n";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
@@ -31,6 +33,8 @@ export default function CapturePage() {
 }
 
 const QR_CAPTURE_FLOW = "qr-capture";
+
+const DIAL_CODE_OPTIONS = getDialCodeOptions();
 
 function CaptureContent() {
   const router = useRouter();
@@ -55,6 +59,9 @@ function CaptureContent() {
   const [slotText, setSlotText] = useState(savedSession?.slotText ?? "");
   const profilePhone = useCustomerAuthStore((s) => s.customer?.phone ?? null);
   const [phone, setPhone] = useState(savedSession?.phone ?? "");
+  const [countryCode, setCountryCode] = useState("ID");
+  const selectedDialOption = DIAL_CODE_OPTIONS.find((d) => d.countryCode === countryCode);
+  const dialCode = selectedDialOption?.dialCode ?? "+62";
   const [useProfilePhone, setUseProfilePhone] = useState(
     !savedSession && !!profilePhone,
   );
@@ -109,7 +116,12 @@ function CaptureContent() {
     if (text) startTransition(() => setSlotText(text));
   }, [slotUpload.media?.ocrText]);
 
-  const effectivePhone = useProfilePhone ? (profilePhone ?? "") : phone;
+  let effectivePhone = "";
+  if (useProfilePhone) {
+    effectivePhone = profilePhone ?? "";
+  } else if (phone) {
+    effectivePhone = `${dialCode}${phone}`;
+  }
 
   const canContinue =
     plateUpload.status === "success" &&
@@ -233,17 +245,49 @@ function CaptureContent() {
               </span>
             </label>
           )}
-          <Input
-            id="phone"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={useProfilePhone ? (profilePhone ?? "") : phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-            placeholder={t("booking.capture.phonePlaceholder")}
-            className="h-10 rounded-lg border-border bg-[#eff8fe]"
-            readOnly={useProfilePhone}
-          />
+          <div className="flex h-10 overflow-hidden rounded-lg border border-border bg-[#eff8fe]">
+            <Select
+              value={countryCode}
+              onValueChange={setCountryCode}
+              disabled={useProfilePhone}
+            >
+              <SelectTrigger className="h-full w-24 rounded-none border-0 border-r border-border bg-transparent px-2 shadow-none focus:ring-0">
+                <span className="text-sm font-medium text-foreground">
+                  {selectedDialOption?.flag} {dialCode}
+                </span>
+              </SelectTrigger>
+              <SelectContent className="w-64">
+                <SelectGroup>
+                  <SelectLabel>Pilihan Utama</SelectLabel>
+                  {DIAL_CODE_OPTIONS.filter((d) => d.isPriority).map((d) => (
+                    <SelectItem key={d.countryCode} value={d.countryCode}>
+                      {d.flag} {d.dialCode} — {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>Semua Negara</SelectLabel>
+                  {DIAL_CODE_OPTIONS.filter((d) => !d.isPriority).map((d) => (
+                    <SelectItem key={d.countryCode} value={d.countryCode}>
+                      {d.flag} {d.dialCode} — {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <input
+              id="phone"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={useProfilePhone ? (profilePhone ?? "") : phone}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+              placeholder={t("booking.capture.phonePlaceholder")}
+              className="h-full flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none"
+              readOnly={useProfilePhone}
+            />
+          </div>
           {loyaltyEnabled && (
             <p className="text-xs text-muted-foreground">
               Nomor HP akan digunakan untuk program loyalti Park N Shine

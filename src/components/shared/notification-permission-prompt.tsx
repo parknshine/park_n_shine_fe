@@ -53,9 +53,12 @@ export function NotificationPermissionPrompt() {
   const bookingsQuery = useCustomerBookings(customerHydrated && customerAuthenticated);
 
   const activeBooking = useMemo(() => {
+    // When the query is disabled (logged out), .data can still hold cache from
+    // a previous session — never let stale bookings drive the prompt.
+    if (!customerAuthenticated) return null;
     const items = bookingsQuery.data?.pages.flatMap((p) => p.items) ?? [];
     return items.find((b) => !TERMINAL_STATUSES.includes(b.status)) ?? null;
-  }, [bookingsQuery.data]);
+  }, [bookingsQuery.data, customerAuthenticated]);
 
   const pushType: "crew" | "booking" | null = crewAuthenticated
     ? "crew"

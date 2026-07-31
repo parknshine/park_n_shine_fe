@@ -30,6 +30,9 @@ export function useCrewSession() {
     },
     mutationKey: mutationKeys.crew.login(),
     onSuccess: (data) => {
+      // Wipe crew-scoped cache from any previous shift BEFORE auth flips, so
+      // stale job/queue snapshots never flash during the login → home transition.
+      queryClient.removeQueries({ queryKey: ["crew"] });
       store.setCrewSession(data.crewId, data.crewName, data.siteId);
       queryClient.setQueryData(queryKeys.crew.session(), data);
     },

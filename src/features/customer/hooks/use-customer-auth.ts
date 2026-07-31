@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
   createUserWithEmailAndPassword,
@@ -64,6 +64,7 @@ function mapFirebaseError(error: unknown): string {
 
 export function useCustomerAuth() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const setCustomer = useCustomerAuthStore((s) => s.setCustomer);
   const clearCustomer = useCustomerAuthStore((s) => s.clearCustomer);
 
@@ -75,10 +76,14 @@ export function useCustomerAuth() {
         "/v1/auth/session",
         { idToken }
       );
+      // Drop customer-scoped cache from any previous session BEFORE auth flips,
+      // so stale snapshots (e.g. a since-closed "active" booking) never render
+      // during the login → home transition.
+      await queryClient.resetQueries({ queryKey: ["customer"] });
       setCustomer(data.customer);
       return data.customer;
     },
-    [setCustomer]
+    [queryClient, setCustomer]
   );
 
   const loginMutation = useMutation({
@@ -200,9 +205,12 @@ export function useCustomerAuth() {
       // best-effort server-side revoke
     }
     clearCustomer();
+    // Cache is not tied to auth state — without this, bookings from the old
+    // session keep feeding components (e.g. NotificationPermissionPrompt).
+    queryClient.removeQueries({ queryKey: ["customer"] });
     await auth.signOut().catch(() => {});
     router.replace("/login");
-  }, [clearCustomer, router]);
+  }, [clearCustomer, queryClient, router]);
 
   return {
     loginEmail: loginMutation.mutateAsync,

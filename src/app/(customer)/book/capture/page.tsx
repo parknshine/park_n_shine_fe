@@ -69,7 +69,7 @@ function WalkInCaptureContent() {
   const sites = [...unsortedSites].sort((a, b) => {
     const aUnavailable = a.intakePaused || isSitePastCutoff(a.cutoffTime);
     const bUnavailable = b.intakePaused || isSitePastCutoff(b.cutoffTime);
-    return aUnavailable === bUnavailable ? 0 : aUnavailable ? -1 : 1;
+    return aUnavailable === bUnavailable ? 0 : aUnavailable ? 1 : -1;
   });
   const { loyaltyEnabled } = usePublicSettings();
 
