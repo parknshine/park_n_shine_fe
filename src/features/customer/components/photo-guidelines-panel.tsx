@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { CheckCircle, CircleCheck, Info } from "lucide-react";
+import { CheckCircle, CircleCheck, Info, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
@@ -7,11 +7,13 @@ interface AvoidExample {
   src: string;
   label: string;
   blur?: boolean;
+  dark?: boolean;
+  obstructed?: boolean;
 }
 
 interface PhotoGuidelinesPanelProps {
   goodSrc: string;
-  avoidExamples: [AvoidExample, AvoidExample, AvoidExample];
+  avoidExamples: [AvoidExample, AvoidExample, AvoidExample, AvoidExample];
   checklistItems?: string[];
 }
 
@@ -32,40 +34,40 @@ export function PhotoGuidelinesPanel({
       </div>
 
       {/* Photo examples */}
-      <div className='flex gap-2.5'>
+      <div className='space-y-2.5'>
         {/* Good Example */}
-        <div className='flex w-[38%] shrink-0 flex-col gap-2 rounded-lg border border-border bg-white p-2.5 shadow-sm'>
+        <div className='flex items-center gap-3 rounded-lg border border-green-200 bg-white p-2.5 shadow-sm'>
+          <div className='relative h-16 w-20 shrink-0 overflow-hidden rounded-lg'>
+            <Image
+              src={goodSrc}
+              alt='Good example'
+              fill
+              sizes='80px'
+              className='object-cover'
+            />
+          </div>
           <div className='flex items-center gap-1.5'>
             <CheckCircle className='h-3.5 w-3.5 shrink-0 text-green-600' />
             <span className='text-xs font-semibold text-green-700'>
               {t("booking.capture.guidelines.goodExample")}
             </span>
           </div>
-          <div className='relative h-28 w-full overflow-hidden rounded-lg'>
-            <Image
-              src={goodSrc}
-              alt='Good example'
-              fill
-              sizes='150px'
-              className='object-cover'
-            />
-          </div>
         </div>
 
         {/* Avoid Examples */}
-        <div className='flex flex-1 flex-col gap-2 rounded-lg border border-border bg-white p-2.5 shadow-sm'>
-          <span className='text-xs font-semibold text-red-600'>
-            {t("booking.capture.guidelines.avoidExamples")}
-          </span>
-          <div className='flex gap-2'>
+        <div className='rounded-lg border border-red-200 bg-white p-2.5 shadow-sm'>
+          <div className='mb-2 flex items-center gap-1.5'>
+            <XCircle className='h-3.5 w-3.5 shrink-0 text-red-500' />
+            <span className='text-xs font-semibold text-red-600'>
+              {t("booking.capture.guidelines.avoidExamples")}
+            </span>
+          </div>
+          <div className='grid grid-cols-4 gap-2'>
             {avoidExamples.map((ex) => (
-              <div
-                key={ex.label}
-                className='flex flex-1 flex-col items-center gap-1.5'
-              >
+              <div key={ex.label} className='flex flex-col items-center gap-1'>
                 <div
                   className={cn(
-                    "relative h-20 w-full overflow-hidden rounded-lg",
+                    "relative aspect-square w-full overflow-hidden rounded-lg border border-red-100",
                     ex.blur && "blur-sm",
                   )}
                 >
@@ -74,10 +76,19 @@ export function PhotoGuidelinesPanel({
                     alt={ex.label}
                     fill
                     sizes='100px'
-                    className='object-cover'
+                    className={cn(
+                      "object-cover",
+                      ex.dark && "brightness-[0.35] contrast-125 saturate-75",
+                    )}
                   />
+                  {ex.dark && (
+                    <div className='pointer-events-none absolute inset-0 bg-black/40' />
+                  )}
+                  {ex.obstructed && (
+                    <div className='pointer-events-none absolute -bottom-4 -left-4 h-16 w-20 rounded-tr-[70%] bg-neutral-900/95 shadow-[4px_-4px_10px_rgba(0,0,0,0.35)]' />
+                  )}
                 </div>
-                <span className='text-center text-[10px] text-muted-foreground'>
+                <span className='text-center text-[10px] leading-tight text-muted-foreground'>
                   {ex.label}
                 </span>
               </div>

@@ -192,6 +192,7 @@
         "avoidAngled": "Angled",
         "avoidBlurry": "Blurry",
         "avoidDark": "Dark/Shadows",
+        "avoidObstructed": "Obstructed by Object",
         "plateChecklist_0": "Plate is clearly readable",
         "plateChecklist_1": "No glare or shadows",
         "plateChecklist_2": "Well-lit and in focus",

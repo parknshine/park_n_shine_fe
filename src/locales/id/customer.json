@@ -192,6 +192,7 @@
         "avoidAngled": "Miring",
         "avoidBlurry": "Buram",
         "avoidDark": "Gelap/Bayangan",
+        "avoidObstructed": "Terhalang Objek",
         "plateChecklist_0": "Plat terbaca dengan jelas",
         "plateChecklist_1": "Tidak ada silau atau bayangan",
         "plateChecklist_2": "Cahaya cukup dan fokus",

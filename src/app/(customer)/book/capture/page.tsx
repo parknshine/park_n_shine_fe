@@ -13,10 +13,18 @@ import { Button } from "@/components/ui/button";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { PhotoGuidelinesPanel } from "@/features/customer/components/photo-guidelines-panel";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
-import { usePhotoUpload, usePublicSettings, usePublicSites } from "@/features/customer/hooks";
+import {
+  usePhotoUpload,
+  usePublicSettings,
+  usePublicSites,
+} from "@/features/customer/hooks";
 import { useSessionGuard } from "@/features/customer/hooks/use-session-guard";
 import { SessionInvalidModal } from "@/features/customer/components/session-invalid-modal";
-import { getDialCodeOptions, isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
+import {
+  getDialCodeOptions,
+  isValidPhone,
+  normalizePhone,
+} from "@/features/customer/utils/phone";
 import type { CustomerBooking } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
@@ -74,7 +82,9 @@ function WalkInCaptureContent() {
   const { loyaltyEnabled } = usePublicSettings();
 
   const { clear: clearCapture, save: saveCapture } = useBookingCaptureStore();
-  const setCaptureHasProgress = useBookingCaptureStore((s) => s.setCaptureHasProgress);
+  const setCaptureHasProgress = useBookingCaptureStore(
+    (s) => s.setCaptureHasProgress,
+  );
 
   const profilePhone = useCustomerAuthStore((s) => s.customer?.phone ?? null);
 
@@ -87,10 +97,14 @@ function WalkInCaptureContent() {
 
   const [plateText, setPlateText] = useState(savedSession?.plateText ?? "");
   const [slotText, setSlotText] = useState(savedSession?.slotText ?? "");
-  const [location, setLocation] = useState(savedSession?.location ?? siteIdParam ?? "");
+  const [location, setLocation] = useState(
+    savedSession?.location ?? siteIdParam ?? "",
+  );
   const [phone, setPhone] = useState(savedSession?.phone ?? "");
   const [countryCode, setCountryCode] = useState("ID");
-  const selectedDialOption = DIAL_CODE_OPTIONS.find((d) => d.countryCode === countryCode);
+  const selectedDialOption = DIAL_CODE_OPTIONS.find(
+    (d) => d.countryCode === countryCode,
+  );
   const dialCode = selectedDialOption?.dialCode ?? "+62";
   const [useProfilePhone, setUseProfilePhone] = useState(
     !savedSession && !!profilePhone,
@@ -111,7 +125,8 @@ function WalkInCaptureContent() {
   });
 
   const bookingId = savedSession?.bookingId ?? createMutation.data?.id ?? null;
-  const signedToken = savedSession?.signedToken ?? createMutation.data?.signedToken ?? null;
+  const signedToken =
+    savedSession?.signedToken ?? createMutation.data?.signedToken ?? null;
 
   useEffect(() => {
     if (hasSession) return; // Restored session — skip creating new booking
@@ -190,8 +205,18 @@ function WalkInCaptureContent() {
       slotText: slot,
       location,
       phone: phoneForSave,
-      plateState: { progress: plateUpload.progress, status: plateUpload.status, error: plateUpload.error, media: plateUpload.media },
-      slotState: { progress: slotUpload.progress, status: slotUpload.status, error: slotUpload.error, media: slotUpload.media },
+      plateState: {
+        progress: plateUpload.progress,
+        status: plateUpload.status,
+        error: plateUpload.error,
+        media: plateUpload.media,
+      },
+      slotState: {
+        progress: slotUpload.progress,
+        status: slotUpload.status,
+        error: slotUpload.error,
+        media: slotUpload.media,
+      },
     });
     const selectedSite = sites.find((s) => s.id === location);
     const params = new URLSearchParams({
@@ -217,10 +242,13 @@ function WalkInCaptureContent() {
     return (
       <>
         <SessionInvalidModal open={sessionInvalid} />
-        <AppShell surface="customer">
-          <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground" suppressHydrationWarning>
+        <AppShell surface='customer'>
+          <div className='flex min-h-[60vh] flex-col items-center justify-center gap-3'>
+            <Loader2 className='h-8 w-8 animate-spin text-primary' />
+            <p
+              className='text-sm text-muted-foreground'
+              suppressHydrationWarning
+            >
               {t("state.preparing", { ns: "common" })}
             </p>
           </div>
@@ -231,8 +259,8 @@ function WalkInCaptureContent() {
 
   if (createMutation.isError) {
     return (
-      <AppShell surface="customer">
-        <div className="space-y-4 pt-10 text-center">
+      <AppShell surface='customer'>
+        <div className='space-y-4 pt-10 text-center'>
           <Button
             onClick={() => {
               hasCreatedRef.current = false;
@@ -250,25 +278,29 @@ function WalkInCaptureContent() {
     plateUpload.isOfflinePaused || slotUpload.isOfflinePaused;
 
   return (
-    <AppShell surface="customer" className="pt-0! px-0!">
-      <StepProgressBar current={1} total={2} label={t("booking.step", { current: 1, total: 2 })} />
+    <AppShell surface='customer' className='pt-0! px-0!'>
+      <StepProgressBar
+        current={1}
+        total={2}
+        label={t("booking.step", { current: 1, total: 2 })}
+      />
 
-      <div className="space-y-4 px-4 pb-6">
+      <div className='space-y-4 px-4 pb-6'>
         <OfflineBanner visible={isOfflinePaused} />
 
         <div>
-          <h1 className="text-2xl font-bold leading-tight text-foreground">
+          <h1 className='text-2xl font-bold leading-tight text-foreground'>
             {t("booking.capture.title")}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className='mt-1 text-sm text-muted-foreground'>
             {t("booking.capture.subtitle")}
           </p>
         </div>
 
         {/* Plate photo + OCR */}
         <PhotoUploadField
-          id="plate-photo"
-          kind="plate"
+          id='plate-photo'
+          kind='plate'
           label={t("booking.capture.platePhotoLabel")}
           hint={t("booking.capture.platePhotoGuideline")}
           state={plateUpload}
@@ -281,11 +313,26 @@ function WalkInCaptureContent() {
           ocrPlaceholder={t("booking.capture.platePlaceholder")}
           guidelines={
             <PhotoGuidelinesPanel
-              goodSrc="/images/guidelines/plate-good.webp"
+              goodSrc='/images/guidelines/plate-good.jpeg'
               avoidExamples={[
-                { src: "/images/guidelines/plate-good.webp", label: t("booking.capture.guidelines.avoidBlurry"), blur: true },
-                { src: "/images/guidelines/plate-angled.webp", label: t("booking.capture.guidelines.avoidAngled") },
-                { src: "/images/guidelines/plate-dark.webp", label: t("booking.capture.guidelines.avoidDark") },
+                {
+                  src: "/images/guidelines/plate-good.jpeg",
+                  label: t("booking.capture.guidelines.avoidBlurry"),
+                  blur: true,
+                },
+                {
+                  src: "/images/guidelines/plate-angled.webp",
+                  label: t("booking.capture.guidelines.avoidAngled"),
+                },
+                {
+                  src: "/images/guidelines/plate-dark.jpeg",
+                  label: t("booking.capture.guidelines.avoidDark"),
+                },
+                {
+                  src: "/images/guidelines/plate-good.jpeg",
+                  label: t("booking.capture.guidelines.avoidObstructed"),
+                  obstructed: true,
+                },
               ]}
               checklistItems={[
                 t("booking.capture.guidelines.plateChecklist_0"),
@@ -299,8 +346,8 @@ function WalkInCaptureContent() {
 
         {/* Slot photo + OCR */}
         <PhotoUploadField
-          id="slot-photo"
-          kind="slot"
+          id='slot-photo'
+          kind='slot'
           label={t("booking.capture.slotPhotoLabel")}
           hint={t("booking.capture.slotPhotoGuideline")}
           state={slotUpload}
@@ -313,11 +360,27 @@ function WalkInCaptureContent() {
           ocrPlaceholder={t("booking.capture.slotPlaceholder")}
           guidelines={
             <PhotoGuidelinesPanel
-              goodSrc="/images/guidelines/slot-good.webp"
+              goodSrc='/images/guidelines/slot-good.webp'
               avoidExamples={[
-                { src: "/images/guidelines/slot-good.webp", label: t("booking.capture.guidelines.avoidBlurry"), blur: true },
-                { src: "/images/guidelines/slot-angled.webp", label: t("booking.capture.guidelines.avoidAngled") },
-                { src: "/images/guidelines/slot-dark.webp", label: t("booking.capture.guidelines.avoidDark") },
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidBlurry"),
+                  blur: true,
+                },
+                {
+                  src: "/images/guidelines/slot-angled.webp",
+                  label: t("booking.capture.guidelines.avoidAngled"),
+                },
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidDark"),
+                  dark: true,
+                },
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidObstructed"),
+                  obstructed: true,
+                },
               ]}
               checklistItems={[
                 t("booking.capture.guidelines.slotChecklist_0"),
@@ -330,19 +393,24 @@ function WalkInCaptureContent() {
         />
 
         {/* Location — selectable (no QR) */}
-        <div className="rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2">
-          <label className="text-sm font-bold text-foreground">
+        <div className='rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2'>
+          <label className='text-sm font-bold text-foreground'>
             {t("booking.capture.locationLabel")}
           </label>
           <Combobox
             options={sites.map((site) => {
-              const unavailable = site.intakePaused || isSitePastCutoff(site.cutoffTime);
+              const unavailable =
+                site.intakePaused || isSitePastCutoff(site.cutoffTime);
               const statusSuffix = site.intakePaused
                 ? " (Sedang tutup)"
                 : isSitePastCutoff(site.cutoffTime)
                   ? " (Sudah cutoff)"
                   : "";
-              return { value: site.id, label: `${site.name}${statusSuffix}`, disabled: unavailable };
+              return {
+                value: site.id,
+                label: `${site.name}${statusSuffix}`,
+                disabled: unavailable,
+              };
             })}
             value={location}
             onChange={setLocation}
@@ -358,47 +426,47 @@ function WalkInCaptureContent() {
             emptyMessage={t("booking.capture.locationSearchEmpty", {
               defaultValue: "Mall tidak ditemukan.",
             })}
-            className="h-10 w-full rounded-lg border-border bg-[#eff8fe]"
+            className='h-10 w-full rounded-lg border-border bg-[#eff8fe]'
           />
-          <p className="text-xs text-muted-foreground">
+          <p className='text-xs text-muted-foreground'>
             {t("booking.capture.locationHelper")}
           </p>
         </div>
 
         {/* Phone */}
-        <div className="rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2">
-          <label htmlFor="phone" className="text-sm font-bold text-foreground">
+        <div className='rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2'>
+          <label htmlFor='phone' className='text-sm font-bold text-foreground'>
             {t("booking.capture.phoneLabel")}
           </label>
           {profilePhone && (
-            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+            <label className='flex items-center gap-2.5 cursor-pointer select-none'>
               <input
-                type="checkbox"
-                id="use-profile-phone"
+                type='checkbox'
+                id='use-profile-phone'
                 checked={useProfilePhone}
                 onChange={(e) => {
                   setUseProfilePhone(e.target.checked);
                   if (!e.target.checked) setPhone("");
                 }}
-                className="h-4 w-4 rounded border-border accent-primary"
+                className='h-4 w-4 rounded border-border accent-primary'
               />
-              <span className="text-sm text-muted-foreground">
+              <span className='text-sm text-muted-foreground'>
                 {t("booking.capture.useProfilePhone", { phone: profilePhone })}
               </span>
             </label>
           )}
-          <div className="flex h-10 overflow-hidden rounded-lg border border-border bg-[#eff8fe]">
+          <div className='flex h-10 overflow-hidden rounded-lg border border-border bg-[#eff8fe]'>
             <Select
               value={countryCode}
               onValueChange={setCountryCode}
               disabled={useProfilePhone}
             >
-              <SelectTrigger className="h-full w-24 rounded-none border-0 border-r border-border bg-transparent px-2 shadow-none focus:ring-0">
-                <span className="text-sm font-medium text-foreground">
+              <SelectTrigger className='h-full w-24 rounded-none border-0 border-r border-border bg-transparent px-2 shadow-none focus:ring-0'>
+                <span className='text-sm font-medium text-foreground'>
                   {selectedDialOption?.flag} {dialCode}
                 </span>
               </SelectTrigger>
-              <SelectContent className="w-64">
+              <SelectContent className='w-64'>
                 <SelectGroup>
                   <SelectLabel>Pilihan Utama</SelectLabel>
                   {DIAL_CODE_OPTIONS.filter((d) => d.isPriority).map((d) => (
@@ -419,33 +487,33 @@ function WalkInCaptureContent() {
               </SelectContent>
             </Select>
             <input
-              id="phone"
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
+              id='phone'
+              type='text'
+              inputMode='numeric'
+              pattern='[0-9]*'
               value={useProfilePhone ? (profilePhone ?? "") : phone}
               onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
               placeholder={t("booking.capture.phonePlaceholder")}
-              className="h-full flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none"
+              className='h-full flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none'
               readOnly={useProfilePhone}
             />
           </div>
           {loyaltyEnabled && (
-            <p className="text-xs text-muted-foreground">
+            <p className='text-xs text-muted-foreground'>
               Nomor HP akan digunakan untuk program loyalti Park N Shine
             </p>
           )}
-          <p className="text-xs text-muted-foreground">
+          <p className='text-xs text-muted-foreground'>
             {t("booking.capture.phoneHelper")}
           </p>
         </div>
 
         {/* Continue */}
         <Button
-          size="lg"
-          className="w-full rounded-full border-0 bg-linear-to-b from-[#1db1f1] to-[#006289] font-extrabold text-[#eff8fe] shadow-[0_24px_30px_rgba(29,177,241,0.16)] hover:opacity-90"
+          size='lg'
+          className='w-full rounded-full border-0 bg-linear-to-b from-[#1db1f1] to-[#006289] font-extrabold text-[#eff8fe] shadow-[0_24px_30px_rgba(29,177,241,0.16)] hover:opacity-90'
           disabled={!canContinue}
-          suffix={<ArrowRight className="h-4 w-4" />}
+          suffix={<ArrowRight className='h-4 w-4' />}
           onClick={handleContinue}
         >
           {t("action.next", { ns: "common" })}
