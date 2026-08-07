@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { setMarketingBackOrigin } from "@/lib/marketing-back-origin";
 import type { Customer } from "@/types";
-import { normalizePhone } from "@/features/customer/utils/phone";
+import { isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
 
 function getInitials(name: string | null): string {
   if (!name) return "?";
@@ -78,6 +78,14 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
   const [name, setName] = useState(customer.name ?? "");
   const [phone, setPhone] = useState(customer.phone ?? "");
   const [isSaving, setIsSaving] = useState(false);
+  const enteredPhone = phone.trim();
+  const phoneForValidation = enteredPhone.startsWith("+")
+    ? enteredPhone
+    : enteredPhone.startsWith("62")
+      ? `+${enteredPhone}`
+      : `+62${enteredPhone.replace(/^0/, "")}`;
+  const isPhoneValid =
+    !enteredPhone || isValidPhone(phoneForValidation);
 
   useEffect(() => {
     customerApi
@@ -100,13 +108,19 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
 
   async function handleSave(e: React.SyntheticEvent) {
     e.preventDefault();
+
+    if (!isPhoneValid) {
+      toast.error(t("account.phoneInvalid"));
+      return;
+    }
+
     setIsSaving(true);
     try {
       const payload: { name?: string; phone?: string } = {};
       if (name.trim() && name.trim() !== customer.name)
         payload.name = name.trim();
-      if (phone.trim() && phone.trim() !== customer.phone)
-        payload.phone = normalizePhone(phone);
+      if (enteredPhone !== (customer.phone ?? ""))
+        payload.phone = enteredPhone ? normalizePhone(phone) : "";
       if (Object.keys(payload).length === 0) return;
 
       const { data } = await customerApi.patch<Customer>("/v1/me", payload);
@@ -297,11 +311,16 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
                 className='h-12.5 w-full rounded-[14px] border border-[rgba(111,120,125,0.18)] bg-[#f4f9fc] pl-17.5 pr-4 font-sans text-[15px] font-semibold text-[#273034] outline-none transition-colors focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background'
               />
             </div>
+            {!isPhoneValid && (
+              <p className='mt-1.5 text-[12px] text-red-500'>
+                {t("account.phoneInvalid")}
+              </p>
+            )}
           </div>
 
           <button
             type='submit'
-            disabled={isSaving}
+            disabled={isSaving || !isPhoneValid}
             className='flex h-13.5 w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#006289] to-[#1db1f1] text-[16px] font-bold text-white shadow-[0_16px_32px_rgba(0,98,137,0.30)] disabled:opacity-70'
           >
             {isSaving ? (

@@ -10,6 +10,9 @@ import { StepProgressBar } from "@/features/customer/components/step-progress-ba
 import { PayButton } from "@/features/customer/components/pay-button";
 import { useBookingStatus } from "@/features/customer/hooks";
 
+const SKIP_PAYMENT_METHOD_SELECTION =
+  process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
+
 export default function BookConfirmPage() {
   return (
     <Suspense>
@@ -46,6 +49,9 @@ function BookConfirmContent() {
   useEffect(() => {
     if (!booking || !bookingId || !token) return;
     if (booking.status === "PENDING") {
+      // In Snap mode, usePaymentActionV2 navigates after the charge is created.
+      // Redirecting here races that charge and briefly opens payment-method.
+      if (SKIP_PAYMENT_METHOD_SELECTION) return;
       router.replace(`/booking/${bookingId}/payment-method?token=${token}`);
     } else if (booking.status !== "DRAFT") {
       router.replace(`/booking/${bookingId}/status?token=${token}`);

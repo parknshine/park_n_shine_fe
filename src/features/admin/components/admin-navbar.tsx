@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, LogOut, Menu, Timer, Undo2 } from "lucide-react";
+import { Bell, LogOut, Menu, PhoneCall, Timer, Undo2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
-import { useAdminAuth, useAdminEscalations, useAdminRefundsNeeded } from "@/features/admin/hooks";
+import { useAdminAuth, useAdminEscalations, useAdminNotificationRequests, useAdminRefundsNeeded } from "@/features/admin/hooks";
 import { LanguageSwitcher } from "@/components/shared";
 import { StatusBadge } from "@/components/shared";
 import { Button } from "@/components/ui/button";
@@ -30,9 +30,11 @@ export function AdminNavbar() {
   const [showEscalations, setShowEscalations] = useState(false);
   const [showTimeExt, setShowTimeExt] = useState(false);
   const [showRefunds, setShowRefunds] = useState(false);
+  const [showNotificationRequests, setShowNotificationRequests] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeExtDropdownRef = useRef<HTMLDivElement>(null);
   const refundsDropdownRef = useRef<HTMLDivElement>(null);
+  const notificationRequestsDropdownRef = useRef<HTMLDivElement>(null);
 
   const timeExtNotifications = useUIStore((s) => s.timeExtNotifications);
   const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
@@ -42,6 +44,8 @@ export function AdminNavbar() {
   const escalationCount = escalations.length;
 
   const { refunds, total: refundsCount } = useAdminRefundsNeeded();
+
+  const { requests: notificationRequests, total: notificationRequestsCount } = useAdminNotificationRequests();
 
   useEffect(() => {
     function handleOutsideClick(e: MouseEvent) {
@@ -53,6 +57,12 @@ export function AdminNavbar() {
       }
       if (refundsDropdownRef.current && !refundsDropdownRef.current.contains(e.target as Node)) {
         setShowRefunds(false);
+      }
+      if (
+        notificationRequestsDropdownRef.current &&
+        !notificationRequestsDropdownRef.current.contains(e.target as Node)
+      ) {
+        setShowNotificationRequests(false);
       }
     }
     document.addEventListener("mousedown", handleOutsideClick);
@@ -308,6 +318,98 @@ export function AdminNavbar() {
                 <div className="px-4 py-6 text-center">
                   <p className="text-sm text-muted-foreground">
                     {t("navbar.noRefundsDesc")}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Notification-requested bell */}
+        <div ref={notificationRequestsDropdownRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setShowNotificationRequests((v) => !v)}
+            className="relative rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label={t("navbar.notificationRequestsAriaLabel")}
+          >
+            <PhoneCall className="h-4 w-4" />
+            {notificationRequestsCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">
+                {notificationRequestsCount > 9 ? "9+" : notificationRequestsCount}
+              </span>
+            )}
+          </button>
+
+          {showNotificationRequests && (
+            <div className="absolute right-0 top-full z-50 mt-1 w-72 rounded-lg border border-border bg-background shadow-lg">
+              <div className="border-b border-border px-4 py-2.5">
+                <p className="text-xs font-semibold text-foreground">
+                  {notificationRequestsCount > 0
+                    ? t(
+                        notificationRequestsCount === 1
+                          ? "navbar.notificationRequestsTitle"
+                          : "navbar.notificationRequestsTitlePlural",
+                        { count: notificationRequestsCount }
+                      )
+                    : t("navbar.noNotificationRequests")}
+                </p>
+              </div>
+              {notificationRequests.length > 0 ? (
+                <>
+                  <ul className="max-h-64 divide-y divide-border overflow-y-auto">
+                    {notificationRequests.map((row) => (
+                      <li
+                        key={row.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          setShowNotificationRequests(false);
+                          setDrawerBookingId(row.id);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            setShowNotificationRequests(false);
+                            setDrawerBookingId(row.id);
+                          }
+                        }}
+                        className="flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/60"
+                      >
+                        <PhoneCall className="h-4 w-4 shrink-0 text-emerald-500" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-foreground">
+                            {row.siteName ?? row.plate ?? "-"}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {row.phone ?? "-"}
+                            {row.siteName && row.plate ? ` · ${row.plate}` : ""}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setShowNotificationRequests(false);
+                      router.push("/reports/jobs?hasPhone=true");
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        setShowNotificationRequests(false);
+                        router.push("/reports/jobs?hasPhone=true");
+                      }
+                    }}
+                    className="cursor-pointer border-t border-border px-4 py-2.5 text-center text-xs font-semibold text-primary hover:bg-muted/60"
+                  >
+                    {t("navbar.notificationRequestsSeeAll")}
+                  </div>
+                </>
+              ) : (
+                <div className="px-4 py-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    {t("navbar.noNotificationRequestsDesc")}
                   </p>
                 </div>
               )}

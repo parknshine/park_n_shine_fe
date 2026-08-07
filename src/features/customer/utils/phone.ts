@@ -16,7 +16,7 @@ export function isValidPhone(phone: string): boolean {
     try {
       return isValidPhoneNumber(phone);
     } catch {
-      // fall through to digit count
+      return false;
     }
   }
   const digits = phone.replace(/\D/g, "");

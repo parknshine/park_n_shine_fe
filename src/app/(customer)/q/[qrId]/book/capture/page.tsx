@@ -306,6 +306,11 @@ export default function BookCapturePage() {
           <p className="text-xs text-muted-foreground">
             {t("booking.capture.phoneHelper")}
           </p>
+          {effectivePhone && !isValidPhone(effectivePhone) && (
+            <p className="text-xs text-red-500">
+              {t("booking.capture.phoneInvalid")}
+            </p>
+          )}
         </div>
 
         {/* Continue */}

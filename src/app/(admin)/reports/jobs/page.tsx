@@ -41,6 +41,7 @@ function ReportJobsContent() {
   const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
   const searchParams = useSearchParams();
   const initialNeedsRefund = searchParams.get("paymentStatus") === "needs_refund";
+  const initialHasPhone = searchParams.get("hasPhone") === "true";
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -57,11 +58,20 @@ function ReportJobsContent() {
     "",
   );
   const [hasPhotosFilter, setHasPhotosFilter] = useState(false);
+  const [hasPhoneFilter, setHasPhoneFilter] = useState<"" | "true" | "false">(
+    initialHasPhone ? "true" : "",
+  );
+  const [notificationSentFilter, setNotificationSentFilter] = useState<
+    "" | "true" | "false"
+  >("");
   const [searchInput, setSearchInput] = useState("");
 
-  const [appliedFilters, setAppliedFilters] = useState<ReportBookingFilters>(
-    initialNeedsRefund ? { needsRefund: true } : {},
-  );
+  const [appliedFilters, setAppliedFilters] = useState<ReportBookingFilters>(() => {
+    const initial: ReportBookingFilters = {};
+    if (initialNeedsRefund) initial.needsRefund = true;
+    if (initialHasPhone) initial.hasPhone = true;
+    return initial;
+  });
   const [appliedSiteId, setAppliedSiteId] = useState<string | undefined>(
     undefined,
   );
@@ -74,6 +84,14 @@ function ReportJobsContent() {
     setPaymentStatusFilter("needs_refund");
     setPage(1);
     setAppliedFilters((prev) => ({ ...prev, needsRefund: true }));
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (searchParams.get("hasPhone") !== "true") return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHasPhoneFilter("true");
+    setPage(1);
+    setAppliedFilters((prev) => ({ ...prev, hasPhone: true }));
   }, [searchParams]);
 
   const [detailRow, setDetailRow] = useState<ReportBookingRow | null>(null);
@@ -121,6 +139,18 @@ function ReportJobsContent() {
             ? false
             : undefined,
       hasPhotos: hasPhotosFilter || undefined,
+      hasPhone:
+        hasPhoneFilter === "true"
+          ? true
+          : hasPhoneFilter === "false"
+            ? false
+            : undefined,
+      notificationSent:
+        notificationSentFilter === "true"
+          ? true
+          : notificationSentFilter === "false"
+            ? false
+            : undefined,
       search: searchInput.trim() || undefined,
     });
   }
@@ -151,6 +181,10 @@ function ReportJobsContent() {
         params.set("hasRating", String(appliedFilters.hasRating));
       if (appliedFilters.hasPhotos !== undefined)
         params.set("hasPhotos", String(appliedFilters.hasPhotos));
+      if (appliedFilters.hasPhone !== undefined)
+        params.set("hasPhone", String(appliedFilters.hasPhone));
+      if (appliedFilters.notificationSent !== undefined)
+        params.set("notificationSent", String(appliedFilters.notificationSent));
       if (appliedFilters.search) params.set("search", appliedFilters.search);
       params.set("page", "1");
       params.set("limit", String(jobTotal || 10000));
@@ -180,6 +214,8 @@ function ReportJobsContent() {
     setPaymentStatusFilter("");
     setHasRatingFilter("");
     setHasPhotosFilter(false);
+    setHasPhoneFilter("");
+    setNotificationSentFilter("");
     setSearchInput("");
     setAppliedFilters({});
   }
@@ -194,6 +230,8 @@ function ReportJobsContent() {
     appliedFilters.needsRefund !== undefined ||
     appliedFilters.hasRating !== undefined ||
     appliedFilters.hasPhotos ||
+    appliedFilters.hasPhone !== undefined ||
+    appliedFilters.notificationSent !== undefined ||
     !!appliedFilters.search;
 
   if (allSites.length === 0) {
@@ -218,6 +256,8 @@ function ReportJobsContent() {
     paymentStatusFilter !== "",
     hasRatingFilter !== "",
     hasPhotosFilter,
+    hasPhoneFilter !== "",
+    notificationSentFilter !== "",
     searchInput.trim() !== "",
   ].filter(Boolean).length;
 
@@ -285,6 +325,10 @@ function ReportJobsContent() {
         onHasRatingFilterChange={setHasRatingFilter}
         hasPhotosFilter={hasPhotosFilter}
         onHasPhotosFilterChange={setHasPhotosFilter}
+        hasPhoneFilter={hasPhoneFilter}
+        onHasPhoneFilterChange={setHasPhoneFilter}
+        notificationSentFilter={notificationSentFilter}
+        onNotificationSentFilterChange={setNotificationSentFilter}
       />
 
       {hasFilter && (

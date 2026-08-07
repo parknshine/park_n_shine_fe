@@ -26,6 +26,8 @@ const PAID_STATUSES = new Set<BookingStatus>([
   BOOKING_STATUSES.CLOSED,
 ]);
 
+const IS_SNAP_MODE = process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function isExpired(expiryTime: string): boolean {
@@ -131,10 +133,12 @@ function ExpiryBadge({ expiryTime, t }: { expiryTime: string; t: TFunction }) {
 function PaymentInstructionsUI({
   instructions,
   onChangeMethod,
+  canChangeMethod,
   t,
 }: Readonly<{
   instructions: PaymentInstructions;
   onChangeMethod: () => void;
+  canChangeMethod: boolean;
   t: TFunction;
 }>) {
   const expired = "expiryTime" in instructions && isExpired(instructions.expiryTime);
@@ -153,12 +157,14 @@ function PaymentInstructionsUI({
             {t("booking.payment.expiredDesc")}
           </p>
         </div>
-        <button
-          onClick={onChangeMethod}
-          className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
-        >
-          {t("booking.payment.changeMethod")}
-        </button>
+        {canChangeMethod && (
+          <button
+            onClick={onChangeMethod}
+            className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+          >
+            {t("booking.payment.changeMethod")}
+          </button>
+        )}
       </div>
     );
   }
@@ -238,7 +244,7 @@ function PaymentInstructionsUI({
     );
   }
 
-  // ── Credit card / Snap redirect ──
+  // ── Snap redirect ──
   if (instructions.type === "REDIRECT") {
     return (
       <div className="bg-primary rounded-2xl p-6 flex flex-col items-center gap-4 text-center">
@@ -246,9 +252,9 @@ function PaymentInstructionsUI({
           <Wallet className="w-7 h-7 text-primary-foreground" />
         </div>
         <div>
-          <p className="font-semibold text-primary-foreground mb-1">{t("booking.payment.payWithCard")}</p>
+          <p className="font-semibold text-primary-foreground mb-1">{t("booking.payment.completePayment")}</p>
           <p className="text-sm text-primary-foreground/70">
-            {t("booking.payment.payWithCardDesc")}
+            {t("booking.payment.completePaymentDesc")}
           </p>
         </div>
         <a
@@ -305,6 +311,12 @@ export default function PayPage() {
   const router = useRouter();
   const signedToken = token ?? "";
   const { t } = useTranslation("customer");
+
+  useEffect(() => {
+    if (token) {
+      sessionStorage.setItem(`booking_payment_token_${bookingId}`, token);
+    }
+  }, [bookingId, token]);
 
   const { booking } = useBookingStatus({
     bookingId,
@@ -366,6 +378,7 @@ export default function PayPage() {
           <PaymentInstructionsUI
             instructions={booking.paymentInstructions}
             onChangeMethod={handleChangeMethod}
+            canChangeMethod={!IS_SNAP_MODE}
             t={t}
           />
         ) : (
@@ -440,12 +453,14 @@ export default function PayPage() {
             />
             {isChecking ? t("booking.payment.checking") : t("booking.payment.updateStatus")}
           </button>
-          <button
-            onClick={handleChangeMethod}
-            className="w-full py-2.5 rounded-xl border border-border text-muted-foreground text-sm font-medium hover:bg-muted transition-colors"
-          >
-            {t("booking.payment.changeMethod")}
-          </button>
+          {!IS_SNAP_MODE && (
+            <button
+              onClick={handleChangeMethod}
+              className="w-full py-2.5 rounded-xl border border-border text-muted-foreground text-sm font-medium hover:bg-muted transition-colors"
+            >
+              {t("booking.payment.changeMethod")}
+            </button>
+          )}
         </div>
       </div>
     </AppShell>

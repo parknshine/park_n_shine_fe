@@ -12,6 +12,8 @@ export interface ReportBookingFilters {
   needsRefund?: boolean;
   hasRating?: boolean;
   hasPhotos?: boolean;
+  hasPhone?: boolean;
+  notificationSent?: boolean;
   search?: string;
 }
 
@@ -47,6 +49,8 @@ export function useAdminReportBookings(
       if (filters?.needsRefund !== undefined) params.set("needsRefund", String(filters.needsRefund));
       if (filters?.hasRating !== undefined) params.set("hasRating", String(filters.hasRating));
       if (filters?.hasPhotos !== undefined) params.set("hasPhotos", String(filters.hasPhotos));
+      if (filters?.hasPhone !== undefined) params.set("hasPhone", String(filters.hasPhone));
+      if (filters?.notificationSent !== undefined) params.set("notificationSent", String(filters.notificationSent));
       if (filters?.search) params.set("search", filters.search);
       params.set("page", String(page));
       params.set("limit", String(pageSize));

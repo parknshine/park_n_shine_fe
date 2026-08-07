@@ -10,6 +10,8 @@ import {
   X,
   Check,
   Camera,
+  Phone,
+  Send,
   Star,
   Banknote,
 } from "lucide-react";
@@ -57,6 +59,10 @@ export function JobFiltersPanel({
   onHasRatingFilterChange,
   hasPhotosFilter,
   onHasPhotosFilterChange,
+  hasPhoneFilter,
+  onHasPhoneFilterChange,
+  notificationSentFilter,
+  onNotificationSentFilterChange,
 }: {
   t: (key: string) => string;
   isLoading: boolean;
@@ -85,6 +91,10 @@ export function JobFiltersPanel({
   onHasRatingFilterChange: (v: "" | "true" | "false") => void;
   hasPhotosFilter: boolean;
   onHasPhotosFilterChange: (v: boolean) => void;
+  hasPhoneFilter: "" | "true" | "false";
+  onHasPhoneFilterChange: (v: "" | "true" | "false") => void;
+  notificationSentFilter: "" | "true" | "false";
+  onNotificationSentFilterChange: (v: "" | "true" | "false") => void;
 }) {
   return (
     <div className='overflow-hidden rounded-xl border border-border bg-card shadow-sm'>
@@ -355,6 +365,60 @@ export function JobFiltersPanel({
               <Camera className='h-3 w-3' />
               {t("reports.jobDetail.filterHasPhotos")}
             </button>
+
+            <div className='flex overflow-hidden rounded-lg border border-border text-xs'>
+              {(["", "true", "false"] as const).map((val) => {
+                const labels: Record<string, string> = {
+                  "": t("reports.jobDetail.filterHasPhoneAll"),
+                  true: t("reports.jobDetail.filterHasPhoneYes"),
+                  false: t("reports.jobDetail.filterHasPhoneNo"),
+                };
+                return (
+                  <button
+                    key={val}
+                    type='button'
+                    onClick={() => onHasPhoneFilterChange(val)}
+                    className={cn(
+                      "flex items-center gap-1 px-2.5 py-1.5 font-medium transition-colors",
+                      hasPhoneFilter === val
+                        ? "bg-primary text-white"
+                        : "bg-background text-muted-foreground hover:bg-muted hover:text-foreground",
+                      val !== "" && "border-l border-border",
+                    )}
+                  >
+                    {val === "true" && <Phone className='h-2.5 w-2.5' />}
+                    {labels[val]}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className='flex overflow-hidden rounded-lg border border-border text-xs'>
+              {(["", "true", "false"] as const).map((val) => {
+                const labels: Record<string, string> = {
+                  "": t("reports.jobDetail.filterNotificationSentAll"),
+                  true: t("reports.jobDetail.filterNotificationSentDone"),
+                  false: t("reports.jobDetail.filterNotificationSentPending"),
+                };
+                return (
+                  <button
+                    key={val}
+                    type='button'
+                    onClick={() => onNotificationSentFilterChange(val)}
+                    className={cn(
+                      "flex items-center gap-1 px-2.5 py-1.5 font-medium transition-colors",
+                      notificationSentFilter === val
+                        ? "bg-primary text-white"
+                        : "bg-background text-muted-foreground hover:bg-muted hover:text-foreground",
+                      val !== "" && "border-l border-border",
+                    )}
+                  >
+                    {val === "true" && <Send className='h-2.5 w-2.5' />}
+                    {labels[val]}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <Button onClick={onApply} disabled={isLoading} className='gap-2 px-5'>

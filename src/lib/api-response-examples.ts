@@ -666,6 +666,7 @@ export const adminSuccessExamples = {
       statusHistory: [],
       crewName: "Agus Widodo",
       elapsedSeconds: 300,
+      notificationSentAt: null,
       auditEntries: [
         {
           id: "audit_01",
@@ -705,6 +706,7 @@ export const adminSuccessExamples = {
       statusHistory: [],
       crewName: null,
       elapsedSeconds: 180,
+      notificationSentAt: null,
       auditEntries: [
         {
           id: "audit_02",
@@ -743,6 +745,7 @@ export const adminSuccessExamples = {
       statusHistory: [],
       crewName: null,
       elapsedSeconds: 120,
+      notificationSentAt: null,
       auditEntries: [
         {
           id: "audit_03",

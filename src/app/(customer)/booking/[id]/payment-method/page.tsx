@@ -9,6 +9,8 @@ import { PAYMENT_CATEGORIES } from "@/features/customer/payment-methods";
 import { BookingExpiredModal } from "@/features/customer/components/booking-expired-modal";
 import { AppShell } from "@/components/shared";
 
+const IS_SNAP_MODE = process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
+
 function formatIDR(amount: number): string {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -42,6 +44,11 @@ function PaymentMethodContent() {
   // unless they explicitly chose to change method (change=1), which must keep them here.
   const isChanging = searchParams.get("change") === "1";
   useEffect(() => {
+    if (IS_SNAP_MODE) {
+      router.replace(`/booking/${bookingId}/pay?token=${token}`);
+      return;
+    }
+
     if (!isChanging && booking?.paymentInstructions) {
       router.replace(`/booking/${bookingId}/pay?token=${token}`);
     }

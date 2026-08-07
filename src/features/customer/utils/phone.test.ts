@@ -33,4 +33,8 @@ describe("isValidPhone", () => {
   test("rejects letters-only string", () => {
     expect(isValidPhone("abcdefghij")).toBe(false);
   });
+
+  test("rejects invalid E.164 number even when digit count is sufficient", () => {
+    expect(isValidPhone("+62000000000")).toBe(false);
+  });
 });

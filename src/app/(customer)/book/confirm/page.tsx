@@ -13,6 +13,9 @@ import { useBookingStatus } from "@/features/customer/hooks";
 import { useTranslation } from "@/i18n";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
 
+const SKIP_PAYMENT_METHOD_SELECTION =
+  process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
+
 export default function WalkInConfirmPage() {
   return (
     <Suspense>
@@ -54,6 +57,9 @@ function WalkInConfirmContent() {
   useEffect(() => {
     if (!booking || !bookingId || !token) return;
     if (booking.status === "PENDING") {
+      // In Snap mode, usePaymentActionV2 navigates after the charge is created.
+      // Redirecting here races that charge and briefly opens payment-method.
+      if (SKIP_PAYMENT_METHOD_SELECTION) return;
       router.replace(`/booking/${bookingId}/payment-method?token=${token}`);
     } else if (booking.status !== "DRAFT") {
       router.replace(`/booking/${bookingId}/status?token=${token}`);

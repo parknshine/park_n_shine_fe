@@ -66,7 +66,7 @@ export function PayButton({
         ? { locationLat, locationLng }
         : {}),
       ...(locationName ? { locationName } : {}),
-      ...(siteId ? { siteId } : {}),
+      ...(siteId?.trim() ? { siteId } : {}),
     };
     void confirmAndRedirect(payload);
   }

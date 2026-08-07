@@ -8,6 +8,12 @@ import { API_ERROR_CODES } from "@/lib/api-error";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { PaymentIntentResponse } from "@/features/customer/types";
 
+// TEMPORARY: mirrors backend MIDTRANS_CHARGE_MODE=snap workaround. When set,
+// every method on this list routes to the same Snap redirect anyway, so skip
+// the payment-method selection screen and charge immediately after confirm.
+// Remove alongside the backend flag once Core API channels are activated.
+const SKIP_PAYMENT_METHOD_SELECTION = process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
+
 /** Type ini sengaja tidak dimasukkan ke types/index.ts agar flow baru berdiri sendiri */
 export interface ConfirmBookingPayloadV2 {
   plateText: string;
@@ -47,16 +53,39 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
     onError: (err: unknown) => {
       const code = (err as { code?: string }).code;
       if (code === API_ERROR_CODES.BOOKING_ALREADY_CONFIRMED) {
-        // Booking already PENDING — go straight to payment method selection
-        router.replace(`/booking/${bookingId}/payment-method?token=${signedToken}`);
+        // Booking already PENDING — avoid payment-method in Snap mode.
+        const destination = SKIP_PAYMENT_METHOD_SELECTION
+          ? "pay"
+          : "payment-method";
+        router.replace(`/booking/${bookingId}/${destination}?token=${signedToken}`);
         return;
       }
       setHasSubmitted(false);
     },
-    onSuccess: (_data) => {
+    onSuccess: async (_data) => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.customer.booking(bookingId),
       });
+
+      if (SKIP_PAYMENT_METHOD_SELECTION) {
+        try {
+          // Method is irrelevant in Snap mode — the backend routes any valid
+          // value straight to Snap, which shows its own channel selector.
+          await api.post(
+            `/v1/bookings/${bookingId}/charge`,
+            { paymentMethod: "QRIS" },
+            { headers: { "X-Booking-Token": signedToken } }
+          );
+          void queryClient.invalidateQueries({
+            queryKey: queryKeys.customer.booking(bookingId),
+          });
+          router.replace(`/booking/${bookingId}/pay?token=${signedToken}`);
+          return;
+        } catch {
+          // Charge failed — fall back to manual method selection so the user can retry.
+        }
+      }
+
       // Client-side nav: satu navigasi saja, tanpa full reload yang balapan
       // dengan efek redirect status PENDING di halaman konfirmasi.
       router.replace(`/booking/${bookingId}/payment-method?token=${signedToken}`);

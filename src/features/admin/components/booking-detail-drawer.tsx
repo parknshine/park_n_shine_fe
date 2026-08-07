@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { X, Timer } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { useAdminSettings } from "@/features/admin/hooks";
+import { useAdminSettings, useBookingActions } from "@/features/admin/hooks";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios-admin";
 import { queryKeys } from "@/lib/query-keys";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
+import { isValidPhone } from "@/features/customer/utils/phone";
 import type { AdminBookingDetail } from "@/features/admin/types";
 import { ReassignModal } from "./reassign-modal";
 import { StatusOverrideModal, hasValidStatusOverrideTransitions } from "./status-override-modal";
@@ -47,6 +48,22 @@ export function BookingDetailDrawer({
   const role = useAuthStore((s) => s.role);
   const { settings } = useAdminSettings();
   const defaultExtendMinutes = settings?.crewTimeExtensionMinutes ?? 10;
+  const { setNotificationSent, isSettingNotificationSent } = useBookingActions(bookingId ?? "");
+
+  async function handleToggleNotificationSent(currentlySent: boolean) {
+    if (!bookingId) return;
+    try {
+      await setNotificationSent(!currentlySent);
+      toast.success(
+        currentlySent
+          ? t("drawer.notificationSentMarkedPending")
+          : t("drawer.notificationSentMarkedDone"),
+      );
+      onActionSuccess();
+    } catch {
+      toast.error(t("drawer.notificationSentError"));
+    }
+  }
 
   async function handleTimeExtensionRespond(approved: boolean, minutes: number) {
     if (!bookingId) return;
@@ -191,10 +208,39 @@ export function BookingDetailDrawer({
 
                   <dt className="text-muted-foreground">{t("drawer.notifyRequested")}</dt>
                   <dd className="font-medium text-foreground">
-                    {booking.phone
+                    {booking.phone && isValidPhone(booking.phone)
                       ? `${t("drawer.notifyYes")} (${booking.phone})`
                       : t("drawer.notifyNo")}
                   </dd>
+
+                  {booking.phone && isValidPhone(booking.phone) && (
+                    <>
+                      <dt className="text-muted-foreground">{t("drawer.notificationSent")}</dt>
+                      <dd className="font-medium text-foreground">
+                        <div className="flex items-center gap-2">
+                          <span>
+                            {booking.notificationSentAt
+                              ? t("drawer.notificationSentDone")
+                              : t("drawer.notificationSentPending")}
+                          </span>
+                          {role === "super_admin" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={isSettingNotificationSent}
+                              onClick={() =>
+                                handleToggleNotificationSent(!!booking.notificationSentAt)
+                              }
+                            >
+                              {booking.notificationSentAt
+                                ? t("drawer.markNotificationPending")
+                                : t("drawer.markNotificationSent")}
+                            </Button>
+                          )}
+                        </div>
+                      </dd>
+                    </>
+                  )}
                 </dl>
               </section>
 

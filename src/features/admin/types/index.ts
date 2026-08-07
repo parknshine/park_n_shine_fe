@@ -127,6 +127,9 @@ export interface ReportBookingRow {
   ratingNote: string | null;
   duration: ReportBookingDuration;
   photos: ReportPhotoAsset[];
+  phone: string | null;
+  plate: string | null;
+  notificationSentAt: string | null;
 }
 
 export interface AdminSettings {
@@ -160,6 +163,7 @@ export interface TimeExtensionRequest {
 export interface AdminBookingDetail extends AdminQueueBooking {
   auditEntries: AuditEntry[];
   pendingTimeExtension?: TimeExtensionRequest | null;
+  notificationSentAt: string | null;
 }
 
 export interface AdminSiteDetail {

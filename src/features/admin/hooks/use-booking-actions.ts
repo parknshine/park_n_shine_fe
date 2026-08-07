@@ -70,6 +70,23 @@ export function useBookingActions(bookingId: string) {
     },
   });
 
+  const setNotificationSentMutation = useMutation({
+    meta: { persist: false },
+    mutationFn: async (sent: boolean) => {
+      const response = await api.post<{ bookingId: string; notificationSentAt: string | null }>(
+        `/v1/admin/bookings/${bookingId}/notification-sent`,
+        { sent }
+      );
+      return response.data;
+    },
+    mutationKey: mutationKeys.admin.setNotificationSent(bookingId),
+    onSuccess: () => {
+      void queryClient.refetchQueries({ queryKey: queryKeys.admin.booking(bookingId) });
+      void queryClient.refetchQueries({ queryKey: ["admin", "audit-log"] });
+      void queryClient.refetchQueries({ queryKey: ["admin", "report-bookings"] });
+    },
+  });
+
   const error =
     refundMutation.error instanceof Error
       ? refundMutation.error.message
@@ -77,24 +94,31 @@ export function useBookingActions(bookingId: string) {
         ? overrideStatusMutation.error.message
         : reassignMutation.error instanceof Error
           ? reassignMutation.error.message
-          : refundMutation.error ||
-              overrideStatusMutation.error ||
-              reassignMutation.error
-            ? "booking_action_failed"
-            : null;
+          : setNotificationSentMutation.error instanceof Error
+            ? setNotificationSentMutation.error.message
+            : refundMutation.error ||
+                overrideStatusMutation.error ||
+                reassignMutation.error ||
+                setNotificationSentMutation.error
+              ? "booking_action_failed"
+              : null;
 
   return {
     error,
     isOfflinePaused:
       refundMutation.isPaused ||
       overrideStatusMutation.isPaused ||
-      reassignMutation.isPaused,
+      reassignMutation.isPaused ||
+      setNotificationSentMutation.isPaused,
     isSubmitting:
       refundMutation.isPending ||
       overrideStatusMutation.isPending ||
-      reassignMutation.isPending,
+      reassignMutation.isPending ||
+      setNotificationSentMutation.isPending,
     overrideStatus: overrideStatusMutation.mutateAsync,
     reassign: reassignMutation.mutateAsync,
     refund: refundMutation.mutateAsync,
+    setNotificationSent: setNotificationSentMutation.mutateAsync,
+    isSettingNotificationSent: setNotificationSentMutation.isPending,
   };
 }

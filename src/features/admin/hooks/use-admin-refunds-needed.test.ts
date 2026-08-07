@@ -33,6 +33,9 @@ describe("ReportBookingRow shape used by the refund bell", () => {
       paymentStatus: "PAID",
       rating: null,
       ratingNote: null,
+      phone: null,
+      plate: null,
+      notificationSentAt: null,
       duration: { locateSeconds: 0, washSeconds: 0, totalJobSeconds: 0 },
       photos: [],
     };

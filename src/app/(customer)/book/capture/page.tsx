@@ -188,6 +188,7 @@ function WalkInCaptureContent() {
     plateText.trim().length > 0 &&
     slotText.trim().length > 0 &&
     location.length > 0 &&
+    sites.some((s) => s.id === location) &&
     (effectivePhone === "" || isValidPhone(effectivePhone));
 
   function handleContinue() {
@@ -506,6 +507,11 @@ function WalkInCaptureContent() {
           <p className='text-xs text-muted-foreground'>
             {t("booking.capture.phoneHelper")}
           </p>
+          {effectivePhone && !isValidPhone(effectivePhone) && (
+            <p className='text-xs text-red-500'>
+              {t("booking.capture.phoneInvalid")}
+            </p>
+          )}
         </div>
 
         {/* Continue */}

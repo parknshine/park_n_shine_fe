@@ -22,6 +22,7 @@ import type { AdminQueueBooking, AdminSiteQueue } from "@/features/admin/types";
 import { useTranslation } from "@/i18n";
 import { bookingRef } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
+import { isValidPhone } from "@/features/customer/utils/phone";
 
 const PREVIEW_LIMIT = 3;
 
@@ -126,7 +127,9 @@ function DashboardSiteCard({
                   </p>
                   <p className='text-xs text-muted-foreground shrink-0'>
                     {t("dashboard.notifyColumnLabel")}:{" "}
-                    {booking.phone ? t("drawer.notifyYes") : t("drawer.notifyNo")}
+                    {booking.phone && isValidPhone(booking.phone)
+                      ? t("drawer.notifyYes")
+                      : t("drawer.notifyNo")}
                   </p>
                   <p className='text-xs font-mono text-muted-foreground shrink-0'>
                     {formatElapsedShort(booking.elapsedSeconds, t)}

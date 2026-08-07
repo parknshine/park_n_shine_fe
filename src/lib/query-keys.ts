@@ -57,6 +57,8 @@ export const mutationKeys = {
       ["admin", "booking", bookingId, "reassign"] as const,
     refund: (bookingId: string) =>
       ["admin", "booking", bookingId, "refund"] as const,
+    setNotificationSent: (bookingId: string) =>
+      ["admin", "booking", bookingId, "notification-sent"] as const,
     saveSettings: () => ["admin", "settings", "save"] as const,
     createSite: () => ["admin", "sites", "create"] as const,
     updateSite: (siteId: string) => ["admin", "sites", siteId, "update"] as const,

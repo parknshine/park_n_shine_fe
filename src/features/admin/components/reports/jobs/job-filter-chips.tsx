@@ -1,4 +1,4 @@
-import { Calendar, Building2, Users, Star, Banknote, Search, Camera } from "lucide-react";
+import { Calendar, Building2, Users, Star, Banknote, Search, Camera, Phone, Send } from "lucide-react";
 import type { ReportBookingFilters } from "@/features/admin/hooks/use-admin-report-bookings";
 
 export function JobFilterChips({
@@ -76,6 +76,24 @@ export function JobFilterChips({
           <Camera className='h-2.5 w-2.5' />
           {t("reports.jobDetail.filterHasPhotos")}
         </span>
+      )}
+      {appliedFilters.hasPhone === true && (
+        <span className={chipClass}>
+          <Phone className='h-2.5 w-2.5' />
+          {t("reports.jobDetail.filterHasPhoneYes")}
+        </span>
+      )}
+      {appliedFilters.hasPhone === false && (
+        <span className={chipClass}>{t("reports.jobDetail.filterHasPhoneNo")}</span>
+      )}
+      {appliedFilters.notificationSent === true && (
+        <span className={chipClass}>
+          <Send className='h-2.5 w-2.5' />
+          {t("reports.jobDetail.filterNotificationSentDone")}
+        </span>
+      )}
+      {appliedFilters.notificationSent === false && (
+        <span className={chipClass}>{t("reports.jobDetail.filterNotificationSentPending")}</span>
       )}
       {appliedFilters.search && (
         <span className={chipClass}>
