@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import api from "@/lib/axios";
 
 export default function PaymentCallbackPage() {
   const { id: bookingId } = useParams<{ id: string }>();
@@ -13,15 +14,36 @@ export default function PaymentCallbackPage() {
       router.replace(`/booking/${bookingId}/status`);
       return;
     }
+    const bookingToken = token;
 
-    // Snap may use the finish callback even when its payment page is closed.
-    // Let the pay page check the booking status without blocking navigation.
-    // It redirects to status automatically when the payment is confirmed.
-    function returnToPayment() {
-      router.replace(`/booking/${bookingId}/pay?token=${token}`);
+    const result = new URLSearchParams(window.location.search).get("result");
+    let cancelled = false;
+
+    async function handleCallback() {
+      if (result !== "finish") {
+        router.replace(`/booking/${bookingId}/pay?token=${encodeURIComponent(bookingToken)}`);
+        return;
+      }
+
+      try {
+        await api.post(
+          `/v1/bookings/${bookingId}/check-payment`,
+          {},
+          { headers: { "X-Booking-Token": bookingToken } },
+        );
+        if (cancelled) return;
+        router.replace(`/booking/${bookingId}/status?token=${encodeURIComponent(bookingToken)}`);
+      } catch {
+        if (!cancelled) {
+          router.replace(`/booking/${bookingId}/status?token=${encodeURIComponent(bookingToken)}`);
+        }
+      }
     }
 
-    returnToPayment();
+    void handleCallback();
+    return () => {
+      cancelled = true;
+    };
   }, [bookingId, router]);
 
   return <div className="flex min-h-screen items-center justify-center" />;
