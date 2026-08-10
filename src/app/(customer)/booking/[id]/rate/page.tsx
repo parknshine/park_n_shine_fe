@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
@@ -23,6 +23,11 @@ const TIP_METHOD_LABELS: Record<TipPaymentMethod, string> = {
   shopeepay: "ShopeePay",
 };
 
+// Mirrors booking flow's IS_SNAP_MODE (payment-method/page.tsx) — same env flag
+// as backend's MIDTRANS_CHARGE_MODE=snap, so Snap's own channel selector takes
+// over and the in-app method picker is redundant.
+const IS_SNAP_MODE = process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
+
 function TipPayStep({
   instructions,
   onDone,
@@ -39,7 +44,7 @@ function TipPayStep({
   return (
     <div className="mx-auto max-w-md space-y-6 px-4 py-8 text-center">
       <h2 className="text-xl font-bold text-foreground">{t("rate.tip.pay.title")}</h2>
-      {instructions.type === "QRIS" ? (
+      {instructions.type === "QRIS" && (
         <div className="space-y-3">
           {instructions.qrString.startsWith("http") ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -57,7 +62,8 @@ function TipPayStep({
             {t("rate.tip.pay.validUntil")} {new Date(instructions.expiryTime).toLocaleTimeString("id-ID")}
           </p>
         </div>
-      ) : (
+      )}
+      {instructions.type === "EWALLET" && (
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
             {t("rate.tip.pay.openHint")} {providerName}
@@ -71,6 +77,17 @@ function TipPayStep({
           <p className="text-sm text-muted-foreground">
             {t("rate.tip.pay.validUntil")} {new Date(instructions.expiryTime).toLocaleTimeString("id-ID")}
           </p>
+        </div>
+      )}
+      {instructions.type === "REDIRECT" && (
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">{t("rate.tip.pay.redirectHint")}</p>
+          <a
+            href={instructions.redirectUrl}
+            className="inline-block w-full rounded-full bg-primary py-3 text-sm font-semibold !text-white transition-opacity hover:opacity-90"
+          >
+            {t("rate.tip.pay.redirectBtn")}
+          </a>
         </div>
       )}
       <button
@@ -153,25 +170,27 @@ function TipSelectStep({
         />
       </div>
 
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">{t("rate.tip.select.methodLabel")}</p>
-        <div className="grid grid-cols-3 gap-2">
-          {(["qris", "gopay", "shopeepay"] as TipPaymentMethod[]).map((method) => (
-            <button
-              key={method}
-              type="button"
-              onClick={() => setTipMethod(method)}
-              className={`rounded-xl border py-2 text-sm font-semibold transition-colors ${
-                tipMethod === method
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-foreground hover:border-primary"
-              }`}
-            >
-              {TIP_METHOD_LABELS[method]}
-            </button>
-          ))}
+      {!IS_SNAP_MODE && (
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-foreground">{t("rate.tip.select.methodLabel")}</p>
+          <div className="grid grid-cols-3 gap-2">
+            {(["qris", "gopay", "shopeepay"] as TipPaymentMethod[]).map((method) => (
+              <button
+                key={method}
+                type="button"
+                onClick={() => setTipMethod(method)}
+                className={`rounded-xl border py-2 text-sm font-semibold transition-colors ${
+                  tipMethod === method
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-foreground hover:border-primary"
+                }`}
+              >
+                {TIP_METHOD_LABELS[method]}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {isError && (
         <p className="text-sm text-destructive">{t("rate.tip.select.error")}</p>
@@ -200,8 +219,23 @@ function TipSelectStep({
 export default function BookingRatePage() {
   const { id: bookingId } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const tokenParam = searchParams.get("token");
+  // Snap callback URLs carry no token (Midtrans caps them at ~255 chars, the
+  // JWT alone is longer) — recover it from sessionStorage when Snap sends the
+  // user back here without a query param.
+  const [storedToken] = useState<string | null>(() =>
+    typeof window === "undefined"
+      ? null
+      : sessionStorage.getItem(`tip_payment_token_${bookingId}`),
+  );
+  const token = tokenParam ?? storedToken;
   const router = useRouter();
+
+  useEffect(() => {
+    if (tokenParam) {
+      sessionStorage.setItem(`tip_payment_token_${bookingId}`, tokenParam);
+    }
+  }, [tokenParam, bookingId]);
   const { t } = useTranslation("customer");
 
   const [score, setScore] = useState(0);
@@ -213,7 +247,10 @@ export default function BookingRatePage() {
   const [tipStep, setTipStep] = useState<"select" | "pay">("select");
   const [tipAmount, setTipAmount] = useState<number | null>(null);
   const [customTip, setCustomTip] = useState("");
-  const [tipMethod, setTipMethod] = useState<TipPaymentMethod | null>(null);
+  // Snap mode hides the in-app method picker entirely — its value is ignored
+  // by the backend once Snap takes over, but the field is still required by
+  // the request schema, so default it to a valid method.
+  const [tipMethod, setTipMethod] = useState<TipPaymentMethod | null>(IS_SNAP_MODE ? "qris" : null);
   const [tipInstructions, setTipInstructions] = useState<TipInstructions | null>(null);
 
   const mutation = useMutation({

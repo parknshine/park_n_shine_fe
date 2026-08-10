@@ -353,6 +353,8 @@
         "validUntil": "Valid until:",
         "openHint": "Tap the button below to open",
         "openBtn": "Open",
+        "redirectHint": "Tap the button below to complete your tip payment",
+        "redirectBtn": "Continue to Payment",
         "doneBtn": "Already Paid / Back to Home"
       },
       "select": {

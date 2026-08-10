@@ -15,7 +15,12 @@ export interface TipEwalletInstructions {
   expiryTime: string;
 }
 
-export type TipInstructions = TipQrisInstructions | TipEwalletInstructions;
+export interface TipRedirectInstructions {
+  type: "REDIRECT";
+  redirectUrl: string;
+}
+
+export type TipInstructions = TipQrisInstructions | TipEwalletInstructions | TipRedirectInstructions;
 
 export interface TipPaymentResponse {
   tipId: string;

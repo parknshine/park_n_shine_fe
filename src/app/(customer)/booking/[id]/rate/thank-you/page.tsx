@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Heart } from "lucide-react";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
@@ -15,7 +15,15 @@ function TipThankYouContent() {
   const { t } = useTranslation("customer");
   const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
   const hasHydrated = useCustomerAuthStore((s) => s._hasHydrated);
-  const token = searchParams.get("token");
+  const tokenParam = searchParams.get("token");
+  // Snap's finish callback lands here without a token (Midtrans caps callback
+  // URLs at ~255 chars) — fall back to the token the rate page stashed.
+  const [storedToken] = useState<string | null>(() =>
+    typeof window === "undefined"
+      ? null
+      : sessionStorage.getItem(`tip_payment_token_${bookingId}`),
+  );
+  const token = tokenParam ?? storedToken;
 
   // Sync tip status on mount — e-wallet redirects here directly, bypassing polling on the rate page.
   useEffect(() => {

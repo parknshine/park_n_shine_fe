@@ -353,6 +353,8 @@
         "validUntil": "Berlaku hingga:",
         "openHint": "Tap tombol di bawah untuk membuka",
         "openBtn": "Buka",
+        "redirectHint": "Tap tombol di bawah untuk menyelesaikan pembayaran tip",
+        "redirectBtn": "Lanjutkan Pembayaran",
         "doneBtn": "Sudah Bayar / Kembali ke Home"
       },
       "select": {
