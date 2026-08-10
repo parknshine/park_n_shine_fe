@@ -13,33 +13,22 @@ import {
   MessageThread,
   MessageComposer,
 } from "@/features/admin/components";
-import type { ChatConversation } from "@/features/admin/types";
 
 export default function InboxPage() {
   const { conversations, isLoading: isLoadingConversations } = useAdminChatConversations();
-  const [selectedConv, setSelectedConv] = useState<ChatConversation | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selectedConv =
+    conversations.find((conversation) => conversation.id === selectedId) ??
+    conversations[0] ??
+    null;
   const { messages, isLoading: isLoadingMessages } = useAdminChatMessages(selectedConv?.id ?? null);
   const { sendMessage, isSending } = useAdminChatSend(selectedConv?.id ?? "");
   const { markRead } = useAdminChatMarkRead(selectedConv?.id ?? "");
 
   useEffect(() => {
-    if (!selectedConv && conversations.length > 0) {
-      setSelectedConv(conversations[0] ?? null);
-    }
-  }, [conversations, selectedConv]);
-
-  useEffect(() => {
     if (selectedConv) markRead();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConv?.id]);
-
-  useEffect(() => {
-    if (!selectedConv) return;
-    const fresh = conversations.find((c) => c.id === selectedConv.id);
-    if (fresh && fresh.windowOpen !== selectedConv.windowOpen) {
-      setSelectedConv(fresh);
-    }
-  }, [conversations, selectedConv]);
 
   const handleSend = async (text: string): Promise<void> => {
     await sendMessage(text);
@@ -60,7 +49,7 @@ export default function InboxPage() {
           <ConversationList
             conversations={conversations}
             selectedId={selectedConv?.id ?? null}
-            onSelect={setSelectedConv}
+            onSelect={(conversation) => setSelectedId(conversation.id)}
           />
         )}
       </div>

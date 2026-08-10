@@ -49,15 +49,15 @@ async function applyLocale(page: Page, locale: Locale) {
 }
 
 export const test = base.extend<AppFixtures>({
-  customerPage: async ({ page }, use) => {
+  customerPage: async ({ page }, fixtureValue) => {
     // Seed ID (app default) so copy assertions are deterministic.
     await applyLocale(page, "id");
     await page.goto("/");
-    await use(page);
+    await fixtureValue(page);
   },
 
-  setLocale: async ({ page }, use) => {
-    await use(async (locale: Locale) => {
+  setLocale: async ({ page }, fixtureValue) => {
+    await fixtureValue(async (locale: Locale) => {
       await applyLocale(page, locale);
     });
   },

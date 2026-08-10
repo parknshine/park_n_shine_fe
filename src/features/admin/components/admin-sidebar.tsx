@@ -5,7 +5,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   BarChart2,
-  Inbox,
   LayoutGrid,
   MessageSquare,
   QrCode,
@@ -33,7 +32,6 @@ const MENU_ICONS: Record<string, typeof LayoutGrid> = {
   "/audit": ScrollText,
   "/crew-members": Users,
   "/testimonials": MessageSquare,
-  "/inbox": Inbox,
   "/settings": Settings,
 };
 

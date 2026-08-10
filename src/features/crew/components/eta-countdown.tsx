@@ -26,7 +26,10 @@ export function EtaCountdown({ etaEndsAt, compact = false, onExpire }: Readonly<
   );
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onExpireRef = useRef(onExpire);
-  onExpireRef.current = onExpire;
+
+  useEffect(() => {
+    onExpireRef.current = onExpire;
+  }, [onExpire]);
 
   useEffect(() => {
     function tick() {

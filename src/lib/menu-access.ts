@@ -15,7 +15,6 @@ export const ADMIN_MENUS = [
   { href: "/audit", key: "sidebar.auditTrail" },
   { href: "/crew-members", key: "sidebar.crew" },
   { href: "/testimonials", key: "sidebar.testimonials" },
-  { href: "/inbox", key: "sidebar.inbox" },
   { href: "/settings", key: "sidebar.settings" },
 ] as const;
 
