@@ -280,6 +280,17 @@
       "success": "Payment expiry duration saved successfully.",
       "error": "Failed to save. Please try again."
     },
+    "washPrice": {
+      "title": "Car Wash Price",
+      "description": "Default price charged for every new booking. Changes only apply to bookings created after saving.",
+      "unit": "Rupiah",
+      "hint": "Can only be changed by a super admin.",
+      "resetLabel": "Reset to Rp 50,000",
+      "saving": "Saving...",
+      "save": "Save Changes",
+      "success": "Wash price saved successfully.",
+      "error": "Failed to save wash price."
+    },
     "jobEta": {
       "title": "Job Completion Time Limit",
       "description": "Time given to crew to complete a job after claiming it. Should be greater than the average cleaning duration.",

@@ -25,6 +25,7 @@ import { useAdminSettings, useAdminWhatsapp } from "@/features/admin/hooks";
 import type { AdminSettings } from "@/features/admin/types";
 import type { WaStatus } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
+import { useAuthStore } from "@/store/auth-store";
 
 interface SettingsTableProps {
   settings: AdminSettings;
@@ -41,6 +42,7 @@ interface SettingsTableProps {
         | "signupDiscountPercent"
         | "loyaltyWashThreshold"
         | "loyaltyRewardDiscountPercent"
+        | "washPrice"
       >
     >,
   ) => Promise<unknown>;
@@ -53,6 +55,7 @@ function SettingsTable({
   isSaving,
 }: Readonly<SettingsTableProps>) {
   const { t } = useTranslation("admin");
+  const role = useAuthStore((s) => s.role);
   const [avgCleaning, setAvgCleaning] = useState(settings.avgCleaningMinutes);
   const [paymentExpiry, setPaymentExpiry] = useState(
     settings.paymentExpiryMinutes,
@@ -61,6 +64,7 @@ function SettingsTable({
   const [crewTimeExtension, setCrewTimeExtension] = useState(
     settings.crewTimeExtensionMinutes,
   );
+  const [washPrice, setWashPrice] = useState(settings.washPrice);
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(settings.loyaltyEnabled);
   const [signupDiscountPercent, setSignupDiscountPercent] = useState(
     settings.signupDiscountPercent,
@@ -259,6 +263,58 @@ function SettingsTable({
               </div>
             </td>
           </tr>
+
+          {role === "super_admin" && (
+            <tr className='align-top'>
+              <td className='px-4 py-3'>
+                <p className='font-medium text-foreground'>
+                  {t("settings.washPrice.title")}
+                </p>
+                <p className='text-xs text-muted-foreground mt-0.5'>
+                  {t("settings.washPrice.description")}
+                </p>
+              </td>
+              <td className='px-4 py-3'>
+                <div className='flex items-center gap-2'>
+                  <span className='text-xs text-muted-foreground'>Rp</span>
+                  <Input
+                    id='wash-price-input'
+                    type='text'
+                    inputMode='numeric'
+                    value={washPrice}
+                    onChange={(e) => setWashPrice(Number(e.target.value))}
+                    className='w-28 h-8 text-sm'
+                  />
+                </div>
+                <p className='text-xs text-muted-foreground mt-1'>
+                  {t("settings.washPrice.hint")}
+                </p>
+              </td>
+              <td className='px-4 py-3'>
+                <div className='flex flex-col gap-1.5'>
+                  <Button
+                    size='sm'
+                    disabled={isSaving}
+                    onClick={() =>
+                      handleSave(
+                        { washPrice },
+                        "settings.washPrice.success",
+                        "settings.washPrice.error",
+                      )
+                    }
+                  >
+                    {t("settings.table.save")}
+                  </Button>
+                  <button
+                    onClick={() => setWashPrice(50000)}
+                    className='text-xs text-muted-foreground underline hover:text-foreground text-left'
+                  >
+                    {t("settings.washPrice.resetLabel")}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          )}
 
           {/* Loyalty Program */}
           {/* <tr className='align-top'>
@@ -651,7 +707,7 @@ export default function SettingsPage() {
         <p className='text-sm text-muted-foreground'>{t("settings.loading")}</p>
       ) : (
         <SettingsTable
-          key={`${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}-${String(settings.loyaltyEnabled)}-${settings.signupDiscountPercent}-${settings.loyaltyWashThreshold}-${settings.loyaltyRewardDiscountPercent}`}
+          key={`${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}-${String(settings.loyaltyEnabled)}-${settings.signupDiscountPercent}-${settings.loyaltyWashThreshold}-${settings.loyaltyRewardDiscountPercent}-${settings.washPrice}`}
           settings={settings}
           save={save}
           isSaving={isSaving}

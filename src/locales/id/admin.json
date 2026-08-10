@@ -280,6 +280,17 @@
       "success": "Batas waktu pembayaran berhasil disimpan.",
       "error": "Gagal menyimpan. Coba lagi."
     },
+    "washPrice": {
+      "title": "Harga Cuci Mobil",
+      "description": "Harga default yang dikenakan untuk setiap booking baru. Perubahan hanya berlaku untuk booking yang dibuat setelah disimpan.",
+      "unit": "Rupiah",
+      "hint": "Hanya dapat diubah oleh super admin.",
+      "resetLabel": "Reset ke Rp 50.000",
+      "saving": "Menyimpan...",
+      "save": "Save Changes",
+      "success": "Harga cuci berhasil disimpan.",
+      "error": "Gagal menyimpan harga cuci."
+    },
     "jobEta": {
       "title": "Batas Waktu Pengerjaan Job",
       "description": "Waktu yang diberikan ke crew untuk menyelesaikan satu job sejak diklaim. Sesuaikan dengan rata-rata durasi cuci.",
