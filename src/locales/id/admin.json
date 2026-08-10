@@ -283,7 +283,6 @@
     "washPrice": {
       "title": "Harga Cuci Mobil",
       "description": "Harga default yang dikenakan untuk setiap booking baru. Perubahan hanya berlaku untuk booking yang dibuat setelah disimpan.",
-      "unit": "Rupiah",
       "hint": "Hanya dapat diubah oleh super admin.",
       "resetLabel": "Reset ke Rp 50.000",
       "saving": "Menyimpan...",
