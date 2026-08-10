@@ -137,6 +137,7 @@ export interface AdminSettings {
   avgCleaningMinutes: number;
   paymentExpiryMinutes: number;
   crewTimeExtensionMinutes: number;
+  washPrice: number;
   loyaltyEnabled: boolean;
   loyaltyOtpChannel: string;
   signupDiscountPercent: number;
