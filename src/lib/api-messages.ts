@@ -174,6 +174,10 @@ export const API_ERROR_MESSAGES = {
     "id-ID": "Link booking tidak valid atau sudah tidak berlaku.",
     "en-US": "The booking link is invalid or no longer active.",
   },
+  [API_ERROR_CODES.BOOKING_TOKEN_EXPIRED]: {
+    "id-ID": "Masa berlaku link booking ini sudah habis. Riwayat booking Anda tetap tersedia di halaman Riwayat.",
+    "en-US": "This booking link has expired. Your booking history remains available on the History page.",
+  },
   [API_ERROR_CODES.CHECKLIST_OUT_OF_ORDER]: {
     "id-ID": "Checklist harus diselesaikan sesuai urutan.",
     "en-US": "Checklist steps must be completed in order.",
