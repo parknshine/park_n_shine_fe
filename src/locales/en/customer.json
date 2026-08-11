@@ -238,6 +238,8 @@
       "expiredTitle": "Payment Expired",
       "expiredDesc": "Please select a new payment method to continue.",
       "changeMethod": "Change Payment Method",
+      "chargeFailedTitle": "Failed to Create Payment",
+      "chargeFailedRetry": "Retry",
       "bankLabel": "Bank",
       "vaLabel": "Virtual Account Number",
       "companyCodeLabel": "Company Code",

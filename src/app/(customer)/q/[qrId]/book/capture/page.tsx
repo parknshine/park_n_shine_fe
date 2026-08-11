@@ -8,13 +8,17 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import api from "@/lib/axios";
 import { AppShell, OfflineBanner } from "@/components/shared";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
+import { PhotoGuidelinesPanel } from "@/features/customer/components/photo-guidelines-panel";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { usePhotoUpload, usePublicSettings } from "@/features/customer/hooks";
 import { useSessionGuard } from "@/features/customer/hooks/use-session-guard";
 import { SessionInvalidModal } from "@/features/customer/components/session-invalid-modal";
-import { isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
+import {
+  getDialCodeOptions,
+  isValidPhone,
+  normalizePhone,
+} from "@/features/customer/utils/phone";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
@@ -26,12 +30,17 @@ import type {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 
 const QR_BOOK_FLOW = "qr-book-capture";
+
+const DIAL_CODE_OPTIONS = getDialCodeOptions();
 
 export default function BookCapturePage() {
   const { t } = useTranslation("customer");
@@ -53,6 +62,11 @@ export default function BookCapturePage() {
   const [slotText, setSlotText] = useState(savedSession?.slotText ?? "");
   const profilePhone = useCustomerAuthStore((s) => s.customer?.phone ?? null);
   const [phone, setPhone] = useState(savedSession?.phone ?? "");
+  const [countryCode, setCountryCode] = useState("ID");
+  const selectedDialOption = DIAL_CODE_OPTIONS.find(
+    (d) => d.countryCode === countryCode,
+  );
+  const dialCode = selectedDialOption?.dialCode ?? "+62";
   const [useProfilePhone, setUseProfilePhone] = useState(
     !savedSession && !!profilePhone,
   );
@@ -122,7 +136,12 @@ export default function BookCapturePage() {
     if (text) startTransition(() => setSlotText(text));
   }, [slotUpload.media?.ocrText]);
 
-  const effectivePhone = useProfilePhone ? (profilePhone ?? "") : phone;
+  let effectivePhone = "";
+  if (useProfilePhone) {
+    effectivePhone = profilePhone ?? "";
+  } else if (phone) {
+    effectivePhone = `${dialCode}${phone}`;
+  }
 
   const canContinue =
     !!bookingId &&
@@ -228,6 +247,37 @@ export default function BookCapturePage() {
           ocrLabel={t("booking.capture.plateOcrLabel")}
           ocrHint={t("booking.capture.plateOcrHint")}
           ocrPlaceholder={t("booking.capture.platePlaceholder")}
+          guidelines={
+            <PhotoGuidelinesPanel
+              goodSrc="/images/guidelines/plate-good.jpeg"
+              avoidExamples={[
+                {
+                  src: "/images/guidelines/plate-good.jpeg",
+                  label: t("booking.capture.guidelines.avoidBlurry"),
+                  blur: true,
+                },
+                {
+                  src: "/images/guidelines/plate-angled.webp",
+                  label: t("booking.capture.guidelines.avoidAngled"),
+                },
+                {
+                  src: "/images/guidelines/plate-dark.jpeg",
+                  label: t("booking.capture.guidelines.avoidDark"),
+                },
+                {
+                  src: "/images/guidelines/plate-good.jpeg",
+                  label: t("booking.capture.guidelines.avoidObstructed"),
+                  obstructed: true,
+                },
+              ]}
+              checklistItems={[
+                t("booking.capture.guidelines.plateChecklist_0"),
+                t("booking.capture.guidelines.plateChecklist_1"),
+                t("booking.capture.guidelines.plateChecklist_2"),
+                t("booking.capture.guidelines.plateChecklist_3"),
+              ]}
+            />
+          }
         />
 
         {/* Slot photo + OCR */}
@@ -244,6 +294,38 @@ export default function BookCapturePage() {
           ocrLabel={t("booking.capture.slotOcrLabel")}
           ocrHint={t("booking.capture.slotOcrHint")}
           ocrPlaceholder={t("booking.capture.slotPlaceholder")}
+          guidelines={
+            <PhotoGuidelinesPanel
+              goodSrc="/images/guidelines/slot-good.webp"
+              avoidExamples={[
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidBlurry"),
+                  blur: true,
+                },
+                {
+                  src: "/images/guidelines/slot-angled.webp",
+                  label: t("booking.capture.guidelines.avoidAngled"),
+                },
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidDark"),
+                  dark: true,
+                },
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidObstructed"),
+                  obstructed: true,
+                },
+              ]}
+              checklistItems={[
+                t("booking.capture.guidelines.slotChecklist_0"),
+                t("booking.capture.guidelines.slotChecklist_1"),
+                t("booking.capture.guidelines.slotChecklist_2"),
+                t("booking.capture.guidelines.slotChecklist_3"),
+              ]}
+            />
+          }
         />
 
         {/* Location */}
@@ -287,17 +369,49 @@ export default function BookCapturePage() {
               </span>
             </label>
           )}
-          <Input
-            id="phone"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={useProfilePhone ? (profilePhone ?? "") : phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-            placeholder={t("booking.capture.phonePlaceholder")}
-            className="h-10 rounded-lg border-border bg-[#eff8fe]"
-            readOnly={useProfilePhone}
-          />
+          <div className="flex h-10 overflow-hidden rounded-lg border border-border bg-[#eff8fe]">
+            <Select
+              value={countryCode}
+              onValueChange={setCountryCode}
+              disabled={useProfilePhone}
+            >
+              <SelectTrigger className="h-full w-24 rounded-none border-0 border-r border-border bg-transparent px-2 shadow-none focus:ring-0">
+                <span className="text-sm font-medium text-foreground">
+                  {selectedDialOption?.flag} {dialCode}
+                </span>
+              </SelectTrigger>
+              <SelectContent className="w-64">
+                <SelectGroup>
+                  <SelectLabel>Pilihan Utama</SelectLabel>
+                  {DIAL_CODE_OPTIONS.filter((d) => d.isPriority).map((d) => (
+                    <SelectItem key={d.countryCode} value={d.countryCode}>
+                      {d.flag} {d.dialCode} — {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>Semua Negara</SelectLabel>
+                  {DIAL_CODE_OPTIONS.filter((d) => !d.isPriority).map((d) => (
+                    <SelectItem key={d.countryCode} value={d.countryCode}>
+                      {d.flag} {d.dialCode} — {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <input
+              id="phone"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={useProfilePhone ? (profilePhone ?? "") : phone}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+              placeholder={t("booking.capture.phonePlaceholder")}
+              className="h-full flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none"
+              readOnly={useProfilePhone}
+            />
+          </div>
           {loyaltyEnabled && (
             <p className="text-xs text-muted-foreground">
               Nomor HP akan digunakan untuk program loyalti Park N Shine

@@ -1,32 +1,27 @@
 "use client";
 
 import QRCode from "react-qr-code";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Copy, CheckCircle, RefreshCw, AlertCircle, Wallet } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
 import { useCheckPayment } from "@/features/customer/hooks/use-check-payment";
 import { usePaymentAutoPoll } from "@/features/customer/hooks/use-payment-auto-poll";
+import { useChargePayment } from "@/features/customer/hooks/use-charge-payment";
 import { BOOKING_STATUSES } from "@/features/customer/types";
+import { resolvePayPageAction } from "@/features/customer/utils/pay-page-action";
 import { BookingExpiredModal } from "@/features/customer/components/booking-expired-modal";
 import { AppShell } from "@/components/shared";
-import type {
-  BookingStatus,
-  PaymentInstructions,
-} from "@/features/customer/types";
+import type { PaymentInstructions } from "@/features/customer/types";
 
 type TFunction = (key: string) => string;
 
-const PAID_STATUSES = new Set<BookingStatus>([
-  BOOKING_STATUSES.PAID,
-  BOOKING_STATUSES.ASSIGNED,
-  BOOKING_STATUSES.IN_PROGRESS,
-  BOOKING_STATUSES.READY,
-  BOOKING_STATUSES.CLOSED,
-]);
-
 const IS_SNAP_MODE = process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
+
+// SNAP mode ignores the paymentMethod value server-side (Midtrans Snap
+// bundles all channels), but the /charge endpoint still requires a valid one.
+const SNAP_AUTO_CHARGE_METHOD = "QRIS";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -302,6 +297,42 @@ function PaymentInstructionsUI({
   return null;
 }
 
+// ─── Charge failed ────────────────────────────────────────────────────────────
+
+function ChargeFailedCard({
+  chargeError,
+  isCharging,
+  onRetry,
+  t,
+}: Readonly<{
+  chargeError: string;
+  isCharging: boolean;
+  onRetry: () => void;
+  t: TFunction;
+}>) {
+  return (
+    <div className="bg-card rounded-2xl border border-border shadow-sm p-6 flex flex-col items-center gap-4 text-center">
+      <div className="w-14 h-14 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center">
+        <AlertCircle className="w-7 h-7 text-destructive" />
+      </div>
+      <div>
+        <p className="font-semibold text-foreground mb-1">
+          {t("booking.payment.chargeFailedTitle")}
+        </p>
+        <p className="text-sm text-muted-foreground">{chargeError}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onRetry}
+        disabled={isCharging}
+        className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-60 transition-colors"
+      >
+        {isCharging ? t("booking.payment.checking") : t("booking.payment.chargeFailedRetry")}
+      </button>
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function PayPage() {
@@ -336,20 +367,42 @@ export default function PayPage() {
     onPaid: () => router.replace(`/booking/${bookingId}/status?token=${token}`),
   });
 
-  useEffect(() => {
-    if (!booking) return;
-    if (PAID_STATUSES.has(booking.status)) {
-      router.replace(`/booking/${bookingId}/status?token=${token}`);
-    }
-  }, [booking, bookingId, token, router]);
+  const { charge, isCharging, error: chargeError } = useChargePayment(bookingId, signedToken);
+  const hasAutoChargedRef = useRef(false);
 
   useEffect(() => {
     if (!booking) return;
-    if (PAID_STATUSES.has(booking.status)) return;
-    if (!booking.paymentInstructions) {
-      router.replace(`/booking/${bookingId}/payment-method?token=${token}`);
+    const action = resolvePayPageAction({
+      isSnapMode: IS_SNAP_MODE,
+      status: booking.status,
+      hasPaymentInstructions: !!booking.paymentInstructions,
+    });
+
+    if (action === "redirect_status") {
+      router.replace(`/booking/${bookingId}/status?token=${token}`);
+      return;
     }
-  }, [booking, bookingId, token, router]);
+    if (action === "redirect_payment_method") {
+      router.replace(`/booking/${bookingId}/payment-method?token=${token}`);
+      return;
+    }
+    if (action === "auto_charge") {
+      if (hasAutoChargedRef.current || isCharging) return;
+      hasAutoChargedRef.current = true;
+      charge(
+        { paymentMethod: SNAP_AUTO_CHARGE_METHOD },
+        { onError: () => { hasAutoChargedRef.current = false; } },
+      );
+    }
+  }, [booking, bookingId, token, router, charge, isCharging]);
+
+  function handleRetryCharge() {
+    hasAutoChargedRef.current = true;
+    charge(
+      { paymentMethod: SNAP_AUTO_CHARGE_METHOD },
+      { onError: () => { hasAutoChargedRef.current = false; } },
+    );
+  }
 
   function handleChangeMethod() {
     router.push(`/booking/${bookingId}/payment-method?token=${token}&change=1`);
@@ -379,6 +432,13 @@ export default function PayPage() {
             instructions={booking.paymentInstructions}
             onChangeMethod={handleChangeMethod}
             canChangeMethod={!IS_SNAP_MODE}
+            t={t}
+          />
+        ) : chargeError ? (
+          <ChargeFailedCard
+            chargeError={chargeError}
+            isCharging={isCharging}
+            onRetry={handleRetryCharge}
             t={t}
           />
         ) : (

@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://apis.google.com`,
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https://res.cloudinary.com https://midtrans-website.al-mp-id-p.cdn.gtflabs.io https://storage.googleapis.com https://lh3.googleusercontent.com https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org blob:",
+              "img-src 'self' data: https://res.cloudinary.com https://midtrans-website.al-mp-id-p.cdn.gtflabs.io https://storage.googleapis.com https://lh3.googleusercontent.com https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://api.sandbox.midtrans.com https://api.midtrans.com blob:",
               `connect-src 'self'${isDev ? " ws: http://localhost:* http://127.0.0.1:*" : ""} https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://api.sandbox.midtrans.com https://api.midtrans.com https://nominatim.openstreetmap.org ` + (process.env.NEXT_PUBLIC_API_URL ?? ""),
               "frame-src https://app.sandbox.midtrans.com https://app.midtrans.com https://accounts.google.com https://parknshine-9c1c1.firebaseapp.com https://auth.parknshine.net",
               "object-src 'none'",

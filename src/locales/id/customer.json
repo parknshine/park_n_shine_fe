@@ -238,6 +238,8 @@
       "expiredTitle": "Waktu Pembayaran Habis",
       "expiredDesc": "Silakan pilih metode pembayaran baru untuk melanjutkan.",
       "changeMethod": "Ganti Metode Pembayaran",
+      "chargeFailedTitle": "Gagal Membuat Pembayaran",
+      "chargeFailedRetry": "Coba Lagi",
       "bankLabel": "Bank",
       "vaLabel": "Nomor Virtual Account",
       "companyCodeLabel": "Kode Perusahaan",
