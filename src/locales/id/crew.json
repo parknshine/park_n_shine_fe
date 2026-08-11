@@ -13,6 +13,7 @@
     "errors": {
       "shiftCodeInvalid": "Kode shift tidak valid atau sudah berakhir.",
       "pinInvalid": "PIN salah. Coba lagi.",
+      "invalidCredentials": "Kode shift atau PIN salah.",
       "default": "Login gagal. Coba lagi."
     }
   },

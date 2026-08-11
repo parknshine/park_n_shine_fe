@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
+import { PhotoGuidelinesPanel } from "@/features/customer/components/photo-guidelines-panel";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { useBookingStatus, usePhotoUpload, usePublicSettings } from "@/features/customer/hooks";
 import { getDialCodeOptions, isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
@@ -186,6 +187,37 @@ function CaptureContent() {
           ocrLabel={t("booking.capture.plateOcrLabel")}
           ocrHint={t("booking.capture.plateOcrHint")}
           ocrPlaceholder={t("booking.capture.platePlaceholder")}
+          guidelines={
+            <PhotoGuidelinesPanel
+              goodSrc="/images/guidelines/plate-good.jpeg"
+              avoidExamples={[
+                {
+                  src: "/images/guidelines/plate-good.jpeg",
+                  label: t("booking.capture.guidelines.avoidBlurry"),
+                  blur: true,
+                },
+                {
+                  src: "/images/guidelines/plate-angled.webp",
+                  label: t("booking.capture.guidelines.avoidAngled"),
+                },
+                {
+                  src: "/images/guidelines/plate-dark.jpeg",
+                  label: t("booking.capture.guidelines.avoidDark"),
+                },
+                {
+                  src: "/images/guidelines/plate-good.jpeg",
+                  label: t("booking.capture.guidelines.avoidObstructed"),
+                  obstructed: true,
+                },
+              ]}
+              checklistItems={[
+                t("booking.capture.guidelines.plateChecklist_0"),
+                t("booking.capture.guidelines.plateChecklist_1"),
+                t("booking.capture.guidelines.plateChecklist_2"),
+                t("booking.capture.guidelines.plateChecklist_3"),
+              ]}
+            />
+          }
         />
 
         {/* Slot photo + OCR */}
@@ -202,6 +234,38 @@ function CaptureContent() {
           ocrLabel={t("booking.capture.slotOcrLabel")}
           ocrHint={t("booking.capture.slotOcrHint")}
           ocrPlaceholder={t("booking.capture.slotPlaceholder")}
+          guidelines={
+            <PhotoGuidelinesPanel
+              goodSrc="/images/guidelines/slot-good.webp"
+              avoidExamples={[
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidBlurry"),
+                  blur: true,
+                },
+                {
+                  src: "/images/guidelines/slot-angled.webp",
+                  label: t("booking.capture.guidelines.avoidAngled"),
+                },
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidDark"),
+                  dark: true,
+                },
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidObstructed"),
+                  obstructed: true,
+                },
+              ]}
+              checklistItems={[
+                t("booking.capture.guidelines.slotChecklist_0"),
+                t("booking.capture.guidelines.slotChecklist_1"),
+                t("booking.capture.guidelines.slotChecklist_2"),
+                t("booking.capture.guidelines.slotChecklist_3"),
+              ]}
+            />
+          }
         />
 
         {/* Location */}
