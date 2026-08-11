@@ -25,14 +25,21 @@ export default function PaymentCallbackPage() {
         return;
       }
 
+      // Midtrans only honors callbacks.finish — closing the Snap page without
+      // paying also lands here with result=finish (transaction_status=pending),
+      // so the actual payment status decides where to go, not the result param.
       try {
-        await api.post(
+        const response = await api.post<{ status: string }>(
           `/v1/bookings/${bookingId}/check-payment`,
           {},
           { headers: { "X-Booking-Token": bookingToken } },
         );
         if (cancelled) return;
-        router.replace(`/booking/${bookingId}/status?token=${encodeURIComponent(bookingToken)}`);
+        if (response.data.status === "PAID") {
+          router.replace(`/booking/${bookingId}/status?token=${encodeURIComponent(bookingToken)}`);
+        } else {
+          router.replace(`/booking/${bookingId}/pay?token=${encodeURIComponent(bookingToken)}`);
+        }
       } catch {
         if (!cancelled) {
           router.replace(`/booking/${bookingId}/status?token=${encodeURIComponent(bookingToken)}`);
