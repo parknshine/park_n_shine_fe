@@ -47,9 +47,6 @@ export function CrewLoginPage() {
     } catch (err) {
       const code = (err as { code?: string }).code;
       let msgKey = "login.errors.default";
-      // Server now returns a single CREW_INVALID_CREDENTIALS for both wrong shift
-      // code and wrong PIN (F-01). Old codes kept for backward-compat.
-      if (code === "CREW_INVALID_CREDENTIALS") msgKey = "login.errors.invalidCredentials";
       if (code === "CREW_INVALID_SHIFT_CODE") msgKey = "login.errors.shiftCodeInvalid";
       if (code === "CREW_INVALID_PIN") msgKey = "login.errors.pinInvalid";
       toast.error(t(msgKey));

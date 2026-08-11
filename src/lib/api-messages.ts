@@ -186,10 +186,6 @@ export const API_ERROR_MESSAGES = {
     "id-ID": "Checklist gagal disimpan. Coba lagi.",
     "en-US": "Checklist could not be saved. Try again.",
   },
-  [API_ERROR_CODES.CREW_INVALID_CREDENTIALS]: {
-    "id-ID": "Kode shift atau PIN salah.",
-    "en-US": "Invalid shift code or PIN.",
-  },
   [API_ERROR_CODES.CREW_INVALID_PIN]: {
     "id-ID": "PIN salah. Coba lagi.",
     "en-US": "Incorrect PIN. Please try again.",

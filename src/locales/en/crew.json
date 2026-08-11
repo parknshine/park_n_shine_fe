@@ -13,7 +13,6 @@
     "errors": {
       "shiftCodeInvalid": "Invalid or expired shift code.",
       "pinInvalid": "Incorrect PIN. Please try again.",
-      "invalidCredentials": "Invalid shift code or PIN.",
       "default": "Login failed. Please try again."
     }
   },

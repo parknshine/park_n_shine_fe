@@ -51,7 +51,6 @@ export function useCrewSession() {
   function getErrorKey(err: unknown): string | null {
     if (!err) return null;
     const code = (err as { code?: string }).code;
-    if (code === API_ERROR_CODES.CREW_INVALID_CREDENTIALS) return "login.errors.invalidCredentials";
     if (code === API_ERROR_CODES.CREW_INVALID_SHIFT_CODE) return "login.errors.shiftCodeInvalid";
     if (code === API_ERROR_CODES.CREW_INVALID_PIN) return "login.errors.pinInvalid";
     return "login.errors.default";
