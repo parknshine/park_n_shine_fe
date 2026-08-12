@@ -9,17 +9,37 @@ export default function PaymentCallbackPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = sessionStorage.getItem(`booking_payment_token_${bookingId}`);
-    if (!token) {
-      router.replace(`/booking/${bookingId}/status`);
-      return;
-    }
-    const bookingToken = token;
-
-    const result = new URLSearchParams(window.location.search).get("result");
     let cancelled = false;
 
+    // Same-tab checkout keeps this in sessionStorage. Mobile browsers often
+    // return from Snap (e.g. after handing off to the GoPay/bank app) in a
+    // different tab or context, losing it — fall back to the short-lived
+    // server-side code the backend put in the callback URL for that case.
+    async function resolveToken(): Promise<string | null> {
+      const stored = sessionStorage.getItem(`booking_payment_token_${bookingId}`);
+      if (stored) return stored;
+
+      const code = new URLSearchParams(window.location.search).get("c");
+      if (!code) return null;
+      try {
+        const response = await api.get<{ token: string }>(
+          `/v1/bookings/payment-callback-token/${code}`,
+        );
+        return response.data.token;
+      } catch {
+        return null;
+      }
+    }
+
     async function handleCallback() {
+      const bookingToken = await resolveToken();
+      if (cancelled) return;
+      if (!bookingToken) {
+        router.replace(`/booking/${bookingId}/status`);
+        return;
+      }
+
+      const result = new URLSearchParams(window.location.search).get("result");
       if (result !== "finish") {
         router.replace(`/booking/${bookingId}/pay?token=${encodeURIComponent(bookingToken)}`);
         return;
