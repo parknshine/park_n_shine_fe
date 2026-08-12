@@ -2,28 +2,12 @@
 
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import QRCode from "react-qr-code";
-import {
-  CheckCircle2,
-  Loader2,
-  LogOut,
-  MessageCircle,
-  QrCode,
-  WifiOff,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useAdminSettings, useAdminWhatsapp } from "@/features/admin/hooks";
+import { useAdminSettings } from "@/features/admin/hooks";
 import type { AdminSettings } from "@/features/admin/types";
-import type { WaStatus } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
 import { useAuthStore } from "@/store/auth-store";
 
@@ -521,173 +505,6 @@ function SettingsTable({
   );
 }
 
-function WhatsAppStatusBadge({ status }: { status: WaStatus }) {
-  const { t } = useTranslation("admin");
-
-  if (status === "connected") {
-    return (
-      <span className='inline-flex items-center gap-1.5 text-sm font-medium text-green-600'>
-        <CheckCircle2 className='h-4 w-4' />
-        {t("settingsWhatsapp.status.connected")}
-      </span>
-    );
-  }
-  if (status === "connecting") {
-    return (
-      <span className='inline-flex items-center gap-1.5 text-sm font-medium text-amber-600'>
-        <Loader2 className='h-4 w-4 animate-spin' />
-        {t("settingsWhatsapp.status.connecting")}
-      </span>
-    );
-  }
-  if (status === "qr_ready") {
-    return (
-      <span className='inline-flex items-center gap-1.5 text-sm font-medium text-amber-600'>
-        <QrCode className='h-4 w-4' />
-        {t("settingsWhatsapp.status.scanQr")}
-      </span>
-    );
-  }
-  return (
-    <span className='inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground'>
-      <WifiOff className='h-4 w-4' />
-      {status === "disabled"
-        ? t("settingsWhatsapp.status.inactive")
-        : t("settingsWhatsapp.status.disconnected")}
-    </span>
-  );
-}
-
-function WhatsAppCard() {
-  const { t } = useTranslation("admin");
-  const { state, isLoading, connect, isConnecting, logout, isLoggingOut } =
-    useAdminWhatsapp();
-  const [showQr, setShowQr] = useState(false);
-
-  const isQrReady = state.status === "qr_ready" && !!state.qr;
-  // Only open when user explicitly triggered — never auto-open on page load
-  const modalOpen = showQr;
-
-  async function handleConnect() {
-    try {
-      setShowQr(true);
-      await connect();
-    } catch {
-      toast.error(t("settingsWhatsapp.toast.connectFailed"));
-    }
-  }
-
-  async function handleLogout() {
-    try {
-      await logout();
-      setShowQr(false);
-      toast.success(t("settingsWhatsapp.toast.logoutSuccess"));
-    } catch {
-      toast.error(t("settingsWhatsapp.toast.logoutFailed"));
-    }
-  }
-
-  return (
-    <>
-      <div className='rounded-lg border border-border p-4 space-y-4'>
-        <div className='flex items-start justify-between gap-3'>
-          <div>
-            <h2 className='flex items-center gap-2 text-sm font-semibold text-foreground'>
-              <MessageCircle className='h-4 w-4 text-green-600' />
-              {t("settingsWhatsapp.notificationTitle")}
-            </h2>
-            <p className='text-xs text-muted-foreground mt-0.5'>
-              {t("settingsWhatsapp.notificationDesc")}
-            </p>
-          </div>
-          {!isLoading && <WhatsAppStatusBadge status={state.status} />}
-        </div>
-
-        {state.status === "connected" && (
-          <div className='flex items-center gap-3'>
-            <Button
-              size='sm'
-              variant='outline'
-              className='text-destructive hover:text-destructive'
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-            >
-              {isLoggingOut ? (
-                <Loader2 className='mr-2 h-3.5 w-3.5 animate-spin' />
-              ) : (
-                <LogOut className='mr-2 h-3.5 w-3.5' />
-              )}
-              {t("settingsWhatsapp.logout")}
-            </Button>
-          </div>
-        )}
-
-        {state.status !== "connected" && (
-          <div className='flex items-center gap-3'>
-            <Button
-              size='sm'
-              onClick={handleConnect}
-              disabled={isConnecting || state.status === "connecting"}
-            >
-              {isConnecting || state.status === "connecting" ? (
-                <>
-                  <Loader2 className='mr-2 h-3.5 w-3.5 animate-spin' />
-                  {t("settingsWhatsapp.connecting")}
-                </>
-              ) : (
-                t("settingsWhatsapp.connect")
-              )}
-            </Button>
-
-            {isQrReady && (
-              <Button
-                size='sm'
-                variant='outline'
-                onClick={() => setShowQr(true)}
-              >
-                {t("settingsWhatsapp.viewQr")}
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
-
-      <Dialog
-        open={modalOpen}
-        onOpenChange={(open) => {
-          if (!open) setShowQr(false);
-        }}
-      >
-        <DialogContent className='max-w-sm'>
-          <DialogHeader>
-            <DialogTitle className='flex items-center gap-2'>
-              <MessageCircle className='h-5 w-5 text-green-600' />
-              {t("settingsWhatsapp.qrDialog.title")}
-            </DialogTitle>
-          </DialogHeader>
-          <div className='space-y-4 py-2'>
-            <p className='text-sm text-muted-foreground'>
-              {t("settingsWhatsapp.qrDialog.instructions")}
-            </p>
-            <div className='flex justify-center rounded-lg bg-white p-4'>
-              {state.qr ? (
-                <QRCode value={state.qr} size={220} />
-              ) : (
-                <div className='flex h-55 w-55 items-center justify-center'>
-                  <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
-                </div>
-              )}
-            </div>
-            <p className='text-center text-xs text-muted-foreground'>
-              {t("settingsWhatsapp.qrDialog.autoRefresh")}
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
-
 export default function SettingsPage() {
   const { t } = useTranslation("admin");
   const { settings, isLoading, save, isSaving } = useAdminSettings();
@@ -713,8 +530,6 @@ export default function SettingsPage() {
           isSaving={isSaving}
         />
       )}
-
-      <WhatsAppCard />
     </div>
   );
 }

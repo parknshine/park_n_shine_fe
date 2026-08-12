@@ -11,8 +11,6 @@ export { useAdminSites, useAdminSite } from "./use-admin-sites";
 export { useAdminQr } from "./use-admin-qr";
 export { useAdminCrew, useDeleteCrew } from "./use-admin-crew";
 export { useAdminShifts } from "./use-admin-shifts";
-export { useAdminWhatsapp } from "./use-admin-whatsapp";
-export type { WaStatus, WaState } from "./use-admin-whatsapp";
 export { useAdminEmail } from "./use-admin-email";
 export type { EmailTemplateType, SendEmailPayload, BroadcastEmailPayload, BroadcastRecipient, BroadcastAllPayload } from "./use-admin-email";
 export * from "./use-admin-testimonials";
