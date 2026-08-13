@@ -3,10 +3,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios-crew";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
-import type { CrewJob, JobPreview, RejectionReason } from "@/features/crew/types";
+import type {
+  CrewJob,
+  JobPreview,
+  RejectionReason,
+} from "@/features/crew/types";
 
 export async function previewNextJob(): Promise<JobPreview | null> {
-  const response = await api.get<JobPreview | null>("/v1/crew/jobs/next-preview");
+  const response = await api.get<JobPreview | null>(
+    "/v1/crew/jobs/next-preview",
+  );
   return response.data ?? null;
 }
 
@@ -25,7 +31,9 @@ export function useNextJob() {
   const waitStatusQuery = useQuery<{ waitUntil: number | null }>({
     queryKey: queryKeys.crew.waitStatus(),
     queryFn: async () => {
-      const response = await api.get<{ waitUntil: number | null }>("/v1/crew/jobs/wait-status");
+      const response = await api.get<{ waitUntil: number | null }>(
+        "/v1/crew/jobs/wait-status",
+      );
       return response.data;
     },
     staleTime: 30_000,
@@ -33,8 +41,11 @@ export function useNextJob() {
 
   const claimMutation = useMutation({
     meta: { persist: false },
-    mutationFn: async () => {
-      const response = await api.post<CrewJob | null>("/v1/crew/jobs/next");
+    mutationFn: async (bookingId?: string) => {
+      const response = await api.post<CrewJob | null>(
+        "/v1/crew/jobs/next",
+        bookingId ? { bookingId } : {},
+      );
       return response.data;
     },
     mutationKey: mutationKeys.crew.nextJob(),
@@ -48,19 +59,42 @@ export function useNextJob() {
 
   const rejectMutation = useMutation({
     meta: { persist: false },
-    mutationFn: async ({ bookingId, reason, note }: { bookingId: string; reason: RejectionReason; note?: string }) => {
-      await api.post("/v1/crew/jobs/reject", { bookingId, reason, note: note?.trim() || undefined });
+    mutationFn: async ({
+      bookingId,
+      reason,
+      note,
+    }: {
+      bookingId: string;
+      reason: RejectionReason;
+      note?: string;
+    }) => {
+      await api.post("/v1/crew/jobs/reject", {
+        bookingId,
+        reason,
+        note: note?.trim() || undefined,
+      });
     },
   });
 
   const requestWaitMutation = useMutation({
     meta: { persist: false },
-    mutationFn: async ({ bookingId, minutes }: { bookingId: string; minutes: 10 | 30 }) => {
-      const response = await api.post<{ ok: boolean; waitUntil: number }>("/v1/crew/jobs/request-wait", { bookingId, minutes });
+    mutationFn: async ({
+      bookingId,
+      minutes,
+    }: {
+      bookingId: string;
+      minutes: 10 | 30;
+    }) => {
+      const response = await api.post<{ ok: boolean; waitUntil: number }>(
+        "/v1/crew/jobs/request-wait",
+        { bookingId, minutes },
+      );
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(queryKeys.crew.waitStatus(), { waitUntil: data.waitUntil });
+      queryClient.setQueryData(queryKeys.crew.waitStatus(), {
+        waitUntil: data.waitUntil,
+      });
     },
   });
 
@@ -70,15 +104,21 @@ export function useNextJob() {
       await api.delete("/v1/crew/jobs/wait");
     },
     onSuccess: () => {
-      queryClient.setQueryData(queryKeys.crew.waitStatus(), { waitUntil: null });
+      queryClient.setQueryData(queryKeys.crew.waitStatus(), {
+        waitUntil: null,
+      });
     },
   });
 
-  function claimNextJob() {
-    return claimMutation.mutateAsync();
+  function claimNextJob(bookingId?: string) {
+    return claimMutation.mutateAsync(bookingId);
   }
 
-  function rejectJob(bookingId: string, reason: RejectionReason, note?: string) {
+  function rejectJob(
+    bookingId: string,
+    reason: RejectionReason,
+    note?: string,
+  ) {
     return rejectMutation.mutateAsync({ bookingId, reason, note });
   }
 
@@ -104,7 +144,11 @@ export function useNextJob() {
     waitUntil: waitStatusQuery.data?.waitUntil ?? null,
     isWaitStatusLoading: waitStatusQuery.isLoading,
     error,
-    hasNoJob: !jobQuery.isLoading && !job && claimMutation.isSuccess && !claimMutation.data,
+    hasNoJob:
+      !jobQuery.isLoading &&
+      !job &&
+      claimMutation.isSuccess &&
+      !claimMutation.data,
     isLoading: jobQuery.isLoading || claimMutation.isPending,
     isNewlyClaimed: claimMutation.isSuccess && !!claimMutation.data,
     isOfflinePaused: claimMutation.isPaused,
