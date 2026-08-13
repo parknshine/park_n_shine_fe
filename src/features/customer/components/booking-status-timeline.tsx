@@ -86,6 +86,52 @@ function formatTimestamp(iso: string): string {
   return `${date} • ${time}`;
 }
 
+// Builds the status → formatted-timestamp map used by the stepper. Fallbacks
+// backfill a timestamp from the nearest earlier step when a step's own
+// transition wasn't recorded (e.g. older bookings), but only for steps
+// already reached — a step still in the future must never show a time.
+export function buildStepTimestamps(
+  status: BookingStatus,
+  statusHistory: BookingStatusEvent[],
+): Map<BookingStatus, string> {
+  const currentStep = STATUS_STEP[status] ?? 0;
+  const isTerminal =
+    status === "EXPIRED" || status === "CANCELLED" || status === "CLOSED";
+
+  const timestampMap = new Map<BookingStatus, string>();
+  statusHistory.forEach((e) => {
+    if (!timestampMap.has(e.status)) {
+      timestampMap.set(e.status, formatTimestamp(e.changedAt));
+    }
+  });
+
+  // Fallback: show PAID timestamp on ASSIGNED step when ASSIGNED hasn't fired yet
+  if (!timestampMap.has("ASSIGNED") && timestampMap.has("PAID")) {
+    timestampMap.set("ASSIGNED", timestampMap.get("PAID")!);
+  }
+  // Fallback: show ASSIGNED timestamp on LOCATED step when LOCATED hasn't fired yet
+  if (!timestampMap.has("LOCATED") && timestampMap.has("ASSIGNED")) {
+    timestampMap.set("LOCATED", timestampMap.get("ASSIGNED")!);
+  }
+  // Fallback: show LOCATED timestamp on IN_PROGRESS step when IN_PROGRESS hasn't fired yet
+  if (!timestampMap.has("IN_PROGRESS") && timestampMap.has("LOCATED")) {
+    timestampMap.set("IN_PROGRESS", timestampMap.get("LOCATED")!);
+  }
+
+  STEPS.forEach((step, index) => {
+    const stepIndex = index + 1;
+    const isDone =
+      currentStep > stepIndex ||
+      (step.status === "CLOSED" && isTerminal && status === "CLOSED");
+    const isActive = currentStep === stepIndex && !isTerminal;
+    if (!isDone && !isActive) {
+      timestampMap.delete(step.status);
+    }
+  });
+
+  return timestampMap;
+}
+
 function stepConnectorClass(isDone: boolean, isTerminalNonClosed: boolean): string {
   if (isDone) return "bg-green-600";
   if (isTerminalNonClosed) return "bg-[#f8e5e0]";
@@ -130,26 +176,7 @@ export function BookingStatusTimeline({
     status === "EXPIRED" || status === "CANCELLED" || status === "CLOSED";
   const isTerminalNonClosed = status === "CANCELLED" || status === "EXPIRED";
 
-  // Build timestamp map from history: status → formatted time
-  const timestampMap = new Map<BookingStatus, string>();
-  statusHistory.forEach((e) => {
-    if (!timestampMap.has(e.status)) {
-      timestampMap.set(e.status, formatTimestamp(e.changedAt));
-    }
-  });
-
-  // Fallback: show PAID timestamp on ASSIGNED step when ASSIGNED hasn't fired yet
-  if (!timestampMap.has("ASSIGNED") && timestampMap.has("PAID")) {
-    timestampMap.set("ASSIGNED", timestampMap.get("PAID")!);
-  }
-  // Fallback: show ASSIGNED timestamp on LOCATED step when LOCATED hasn't fired yet
-  if (!timestampMap.has("LOCATED") && timestampMap.has("ASSIGNED")) {
-    timestampMap.set("LOCATED", timestampMap.get("ASSIGNED")!);
-  }
-  // Fallback: show LOCATED timestamp on IN_PROGRESS step when IN_PROGRESS hasn't fired yet
-  if (!timestampMap.has("IN_PROGRESS") && timestampMap.has("LOCATED")) {
-    timestampMap.set("IN_PROGRESS", timestampMap.get("LOCATED")!);
-  }
+  const timestampMap = buildStepTimestamps(status, statusHistory);
 
   const terminalIsDestructive = !isRefunded;
   const terminalDotClass = terminalIsDestructive

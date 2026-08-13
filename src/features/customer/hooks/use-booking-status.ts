@@ -3,18 +3,40 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { queryKeys } from "@/lib/query-keys";
-import type { BookingStatus, CustomerBooking, PaymentInstructions } from "@/features/customer/types";
+import type {
+  BookingStatus,
+  BookingStatusEvent,
+  CustomerBooking,
+  PaymentInstructions,
+} from "@/features/customer/types";
 
-// Statuses that are meaningful to the customer.
-// Internal / crew-operational statuses are hidden from the timeline.
+// Statuses that are meaningful to the customer — matches every step the
+// booking status timeline renders (see booking-status-timeline.tsx STEPS),
+// so each step can show the crew's real transition timestamp instead of
+// falling back to an earlier step's time.
 const CUSTOMER_VISIBLE_STATUSES = new Set<BookingStatus>([
   "PAID",
+  "ASSIGNED",
+  "LOCATED",
   "IN_PROGRESS",
   "READY",
   "CLOSED",
   "EXPIRED",
   "CANCELLED",
 ]);
+
+export function toCustomerStatusHistory(
+  timeline: { status: BookingStatus; timestamp: string; reason?: string | null }[],
+): BookingStatusEvent[] {
+  return timeline
+    .filter((t) => CUSTOMER_VISIBLE_STATUSES.has(t.status))
+    .map((t) => ({
+      status: t.status,
+      changedAt: t.timestamp,
+      labelKey: `booking.status.${t.status.toLowerCase()}`,
+      reason: t.reason ?? null,
+    }));
+}
 
 interface UseBookingStatusOptions {
   bookingId: string;
@@ -75,14 +97,7 @@ export function useBookingStatus({
         completedSteps: d.completedSteps ?? 0,
         hasRated: d.hasRated ?? false,
         refundedAmount: d.refundedAmount ?? 0,
-        statusHistory: (d.timeline ?? [])
-          .filter((t) => CUSTOMER_VISIBLE_STATUSES.has(t.status))
-          .map((t) => ({
-            status: t.status,
-            changedAt: t.timestamp,
-            labelKey: `booking.status.${t.status.toLowerCase()}`,
-            reason: t.reason ?? null,
-          })),
+        statusHistory: toCustomerStatusHistory(d.timeline ?? []),
       };
       return booking;
     },

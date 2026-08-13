@@ -24,6 +24,7 @@ import {
   getDialCodeOptions,
   isValidPhone,
   normalizePhone,
+  splitStoredPhone,
 } from "@/features/customer/utils/phone";
 import type { CustomerBooking } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
@@ -87,6 +88,7 @@ function WalkInCaptureContent() {
   );
 
   const profilePhone = useCustomerAuthStore((s) => s.customer?.phone ?? null);
+  const profilePhoneParts = splitStoredPhone(profilePhone);
 
   // Read store state once at mount via lazy initializer to avoid ref-during-render error
   const [savedSession] = useState(() => {
@@ -102,13 +104,19 @@ function WalkInCaptureContent() {
   );
   const [phone, setPhone] = useState(savedSession?.phone ?? "");
   const [countryCode, setCountryCode] = useState("ID");
-  const selectedDialOption = DIAL_CODE_OPTIONS.find(
-    (d) => d.countryCode === countryCode,
-  );
-  const dialCode = selectedDialOption?.dialCode ?? "+62";
   const [useProfilePhone, setUseProfilePhone] = useState(
     !savedSession && !!profilePhone,
   );
+  const activeCountryCode = useProfilePhone
+    ? profilePhoneParts.countryCode
+    : countryCode;
+  const activePhone = useProfilePhone
+    ? profilePhoneParts.nationalNumber
+    : phone;
+  const selectedDialOption = DIAL_CODE_OPTIONS.find(
+    (d) => d.countryCode === activeCountryCode,
+  );
+  const dialCode = selectedDialOption?.dialCode ?? "+62";
 
   const hasCreatedRef = useRef(false);
   const { sessionInvalid, ensureValidSession } = useSessionGuard();
@@ -447,7 +455,10 @@ function WalkInCaptureContent() {
                 checked={useProfilePhone}
                 onChange={(e) => {
                   setUseProfilePhone(e.target.checked);
-                  if (!e.target.checked) setPhone("");
+                  if (!e.target.checked) {
+                    setCountryCode(profilePhoneParts.countryCode);
+                    setPhone(profilePhoneParts.nationalNumber);
+                  }
                 }}
                 className='h-4 w-4 rounded border-border accent-primary'
               />
@@ -458,7 +469,7 @@ function WalkInCaptureContent() {
           )}
           <div className='flex h-10 overflow-hidden rounded-lg border border-border bg-[#eff8fe]'>
             <Select
-              value={countryCode}
+              value={activeCountryCode}
               onValueChange={setCountryCode}
               disabled={useProfilePhone}
             >
@@ -492,7 +503,7 @@ function WalkInCaptureContent() {
               type='text'
               inputMode='numeric'
               pattern='[0-9]*'
-              value={useProfilePhone ? (profilePhone ?? "") : phone}
+              value={activePhone}
               onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
               placeholder={t("booking.capture.phonePlaceholder")}
               className='h-full flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none'
