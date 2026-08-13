@@ -22,7 +22,22 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { setMarketingBackOrigin } from "@/lib/marketing-back-origin";
 import type { Customer } from "@/types";
-import { isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
+import {
+  getDialCodeOptions,
+  isValidPhone,
+  normalizePhone,
+  splitStoredPhone,
+} from "@/features/customer/utils/phone";
+import type { CountryCode } from "libphonenumber-js";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+} from "@/components/ui/select";
 
 function getInitials(name: string | null): string {
   if (!name) return "?";
@@ -34,6 +49,8 @@ function getInitials(name: string | null): string {
     .join("")
     .toUpperCase();
 }
+
+const DIAL_CODE_OPTIONS = getDialCodeOptions();
 
 // ── Unauthenticated gate ──────────────────────────────────────────────────────
 
@@ -76,16 +93,20 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
   const { logout } = useCustomerAuth();
 
   const [name, setName] = useState(customer.name ?? "");
-  const [phone, setPhone] = useState(customer.phone ?? "");
+  const [countryCode, setCountryCode] = useState<CountryCode>(
+    () => splitStoredPhone(customer.phone).countryCode,
+  );
+  const [phone, setPhone] = useState(
+    () => splitStoredPhone(customer.phone).nationalNumber,
+  );
+  const selectedDialOption = DIAL_CODE_OPTIONS.find(
+    (d) => d.countryCode === countryCode,
+  );
+  const dialCode = selectedDialOption?.dialCode ?? "+62";
   const [isSaving, setIsSaving] = useState(false);
   const enteredPhone = phone.trim();
-  const phoneForValidation = enteredPhone.startsWith("+")
-    ? enteredPhone
-    : enteredPhone.startsWith("62")
-      ? `+${enteredPhone}`
-      : `+62${enteredPhone.replace(/^0/, "")}`;
-  const isPhoneValid =
-    !enteredPhone || isValidPhone(phoneForValidation);
+  const phoneForValidation = enteredPhone ? `${dialCode}${enteredPhone}` : "";
+  const isPhoneValid = !enteredPhone || isValidPhone(phoneForValidation);
 
   useEffect(() => {
     customerApi
@@ -94,7 +115,9 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
         if (data) {
           updateCustomer(data);
           setName(data.name ?? "");
-          setPhone(data.phone ?? "");
+          const split = splitStoredPhone(data.phone);
+          setCountryCode(split.countryCode);
+          setPhone(split.nationalNumber);
         }
       })
       .catch(() => {});
@@ -119,8 +142,11 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
       const payload: { name?: string; phone?: string } = {};
       if (name.trim() && name.trim() !== customer.name)
         payload.name = name.trim();
-      if (enteredPhone !== (customer.phone ?? ""))
-        payload.phone = enteredPhone ? normalizePhone(phone) : "";
+      const newPhoneNormalized = enteredPhone
+        ? normalizePhone(phoneForValidation)
+        : "";
+      if (newPhoneNormalized !== (customer.phone ?? ""))
+        payload.phone = newPhoneNormalized;
       if (Object.keys(payload).length === 0) return;
 
       const { data } = await customerApi.patch<Customer>("/v1/me", payload);
@@ -297,10 +323,36 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
             <label className='mb-1.5 block text-[12px] font-bold uppercase tracking-[0.04em] text-[#9aa6ad]'>
               {t("account.phoneLabel")}
             </label>
-            <div className='relative'>
-              <div className='pointer-events-none absolute inset-y-0 left-0 flex w-14.5 items-center justify-center border-r border-[rgba(111,120,125,0.15)] text-[15px] font-semibold text-[#5a666d]'>
-                +62
-              </div>
+            <div className='flex h-12.5 overflow-hidden rounded-[14px] border border-[rgba(111,120,125,0.18)] bg-[#f4f9fc]'>
+              <Select
+                value={countryCode}
+                onValueChange={(v) => setCountryCode(v as CountryCode)}
+              >
+                <SelectTrigger className='h-full w-24 shrink-0 rounded-none border-0 border-r border-[rgba(111,120,125,0.18)] bg-transparent px-3 shadow-none focus:ring-0'>
+                  <span className='text-[15px] font-semibold text-[#273034]'>
+                    {selectedDialOption?.flag} {dialCode}
+                  </span>
+                </SelectTrigger>
+                <SelectContent className='w-64'>
+                  <SelectGroup>
+                    <SelectLabel>Pilihan Utama</SelectLabel>
+                    {DIAL_CODE_OPTIONS.filter((d) => d.isPriority).map((d) => (
+                      <SelectItem key={d.countryCode} value={d.countryCode}>
+                        {d.flag} {d.dialCode} — {d.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                  <SelectSeparator />
+                  <SelectGroup>
+                    <SelectLabel>Semua Negara</SelectLabel>
+                    {DIAL_CODE_OPTIONS.filter((d) => !d.isPriority).map((d) => (
+                      <SelectItem key={d.countryCode} value={d.countryCode}>
+                        {d.flag} {d.dialCode} — {d.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
               <input
                 type='tel'
                 inputMode='numeric'
@@ -308,7 +360,7 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
                 autoComplete='tel'
-                className='h-12.5 w-full rounded-[14px] border border-[rgba(111,120,125,0.18)] bg-[#f4f9fc] pl-17.5 pr-4 font-sans text-[15px] font-semibold text-[#273034] outline-none transition-colors focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background'
+                className='h-full flex-1 bg-transparent px-4 font-sans text-[15px] font-semibold text-[#273034] outline-none'
               />
             </div>
             {!isPhoneValid && (
