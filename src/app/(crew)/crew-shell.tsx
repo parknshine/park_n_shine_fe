@@ -150,8 +150,7 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
 
   useEffect(() => {
     function handleSessionExpired() {
-      clearSession();
-      router.replace("/crew/login");
+      void clearSession().then(() => router.replace("/crew/login"));
     }
     globalThis.addEventListener("crew-session-expired", handleSessionExpired);
     return () => globalThis.removeEventListener("crew-session-expired", handleSessionExpired);
@@ -159,8 +158,8 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
 
   if (!hasHydrated || !session) return null;
 
-  function handleLogout() {
-    clearSession();
+  async function handleLogout() {
+    await clearSession();
     router.replace("/crew/login");
   }
 

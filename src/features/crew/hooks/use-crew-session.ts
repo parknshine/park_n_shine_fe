@@ -58,10 +58,14 @@ export function useCrewSession() {
     return mutation.mutateAsync(payload);
   }
 
-  function clearSession() {
+  async function clearSession() {
+    // Invalidate the server-side cookie BEFORE clearing local state. Otherwise
+    // CrewShell's recoverSession effect (which fires the moment the local
+    // session goes null) can race this call, find the cookie still valid, and
+    // silently re-authenticate the crew right after they logged out.
+    await api.delete("/v1/crew/sessions/current").catch(() => {});
     store.clearCrewSession();
     queryClient.removeQueries({ queryKey: ["crew"] });
-    api.delete("/v1/crew/sessions/current").catch(() => {});
   }
 
   /**
