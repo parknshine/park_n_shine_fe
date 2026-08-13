@@ -99,7 +99,8 @@
     "retake": "Retake",
     "retry": "Retry",
     "uploading": "Uploading...",
-    "retrying": "Retrying..."
+    "retrying": "Retrying...",
+    "emptyFile": "Photo failed to save (device storage may be full). Please try taking it again."
   },
   "booking": {
     "status": {

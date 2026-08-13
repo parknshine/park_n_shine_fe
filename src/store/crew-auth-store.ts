@@ -1,8 +1,9 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { wrapStorageSafely } from "@/lib/safe-storage";
 
 interface CrewAuthState {
   crewId: string | null;
@@ -50,6 +51,7 @@ export const useCrewAuthStore = create<CrewAuthState & CrewAuthActions>()(
     })),
     {
       name: "crew-auth",
+      storage: createJSONStorage(() => wrapStorageSafely(window.localStorage)),
       partialize: (state) => ({
         crewId: state.crewId,
         crewName: state.crewName,

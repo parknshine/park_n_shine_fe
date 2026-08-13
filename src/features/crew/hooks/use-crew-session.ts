@@ -7,6 +7,22 @@ import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import { useCrewAuthStore } from "@/store/crew-auth-store";
 import type { CrewLoginPayload, CrewSession } from "@/features/crew/types";
 
+/**
+ * Confirms whether the httpOnly crew-token cookie still has a live server
+ * session, without relying on the (possibly evicted) local auth store.
+ * Never throws — a missing/expired session resolves to null.
+ */
+export async function fetchCrewSession(
+  client: Pick<typeof api, "get">,
+): Promise<CrewSession | null> {
+  try {
+    const response = await client.get<CrewSession>("/v1/crew/sessions/current");
+    return response.data;
+  } catch {
+    return null;
+  }
+}
+
 export function useCrewSession() {
   const queryClient = useQueryClient();
   const store = useCrewAuthStore();
@@ -48,6 +64,22 @@ export function useCrewSession() {
     api.delete("/v1/crew/sessions/current").catch(() => {});
   }
 
+  /**
+   * Called when the local auth store looks logged-out (e.g. localStorage was
+   * evicted by the OS under low device storage) but the httpOnly crew-token
+   * cookie may still be valid server-side. Restores the store from the server
+   * instead of forcing a redirect to login. Returns whether a session was
+   * recovered.
+   */
+  async function recoverSession(): Promise<boolean> {
+    const data = await fetchCrewSession(api);
+    if (!data) return false;
+    queryClient.removeQueries({ queryKey: ["crew"] });
+    store.setCrewSession(data.crewId, data.crewName, data.siteId);
+    queryClient.setQueryData(queryKeys.crew.session(), data);
+    return true;
+  }
+
   function getErrorKey(err: unknown): string | null {
     if (!err) return null;
     const code = (err as { code?: string }).code;
@@ -65,6 +97,7 @@ export function useCrewSession() {
     isLoading: mutation.isPending,
     isOfflinePaused: mutation.isPaused,
     login,
+    recoverSession,
     session,
   };
 }

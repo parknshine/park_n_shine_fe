@@ -99,7 +99,8 @@
     "retake": "Foto Ulang",
     "retry": "Coba Lagi",
     "uploading": "Mengunggah...",
-    "retrying": "Mencoba ulang..."
+    "retrying": "Mencoba ulang...",
+    "emptyFile": "Foto gagal tersimpan (kemungkinan memori HP penuh). Coba ambil foto lagi."
   },
   "booking": {
     "status": {

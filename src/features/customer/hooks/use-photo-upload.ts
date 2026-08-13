@@ -195,7 +195,10 @@ export function usePhotoUpload({
   });
 
   function uploadPhoto(options: UploadPhotoOptions) {
-    return mutation.mutateAsync(options);
+    // Failure is already reflected in `state.status === "failed"` above — no
+    // caller awaits or handles this promise, so let it resolve instead of
+    // rejecting to avoid an unhandled promise rejection on every failed upload.
+    return mutation.mutateAsync(options).catch(() => null);
   }
 
   function reset() {

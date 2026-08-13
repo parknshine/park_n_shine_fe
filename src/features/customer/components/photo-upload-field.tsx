@@ -17,6 +17,7 @@ import { ProgressBar } from "@/components/shared";
 import { useTranslation } from "@/i18n";
 import type { UploadState } from "@/features/customer/types";
 import type { MediaKind } from "@/types/media";
+import { isReadablePhotoFile } from "./photo-file-validation";
 
 interface PhotoUploadFieldProps {
   id: string;
@@ -80,6 +81,7 @@ export function PhotoUploadField({
   const hasPhoto = !!state.status && state.status !== "idle";
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const prevUrlRef = useRef<string | null>(null);
   let displayUrl: string | null = null;
   if (state.status !== "idle") {
@@ -103,13 +105,21 @@ export function PhotoUploadField({
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
+    event.target.value = "";
     if (!file) return;
+    if (!isReadablePhotoFile(file)) {
+      // Camera/gallery returned a File handle with no data — typically the
+      // device ran out of storage mid-capture. Surface it instead of
+      // uploading an empty file that would falsely show as "success".
+      setValidationError(t("upload.emptyFile"));
+      return;
+    }
+    setValidationError(null);
     if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
     const url = URL.createObjectURL(file);
     prevUrlRef.current = url;
     setPreviewUrl(url);
     onSelect(file, kind);
-    event.target.value = "";
   }
 
   let uploadingLabel: string | null = null;
@@ -282,6 +292,11 @@ export function PhotoUploadField({
             </Button>
           )}
         </div>
+      )}
+
+      {/* Local validation error (e.g. empty file from a failed capture) */}
+      {validationError && (
+        <p className='text-sm text-destructive'>{validationError}</p>
       )}
 
       {/* ── Integrated OCR edit field ────────────── */}

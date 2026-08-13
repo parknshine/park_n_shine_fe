@@ -27,7 +27,7 @@ interface CrewShellProps {
 
 export function CrewShell({ children }: Readonly<CrewShellProps>) {
   const router = useRouter();
-  const { session, clearSession } = useCrewSession();
+  const { session, clearSession, recoverSession } = useCrewSession();
   const hasHydrated = useCrewAuthStore((s) => s._hasHydrated);
   const queryClient = useQueryClient();
   const { t } = useTranslation("crew");
@@ -135,11 +135,18 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
   });
 
   useEffect(() => {
-    if (!hasHydrated) return;
-    if (!session) {
-      router.replace("/crew/login");
-    }
-  }, [hasHydrated, session, router]);
+    if (!hasHydrated || session) return;
+    // Local store looks logged-out (e.g. localStorage was evicted by the OS
+    // under low device storage) — confirm with the server before bouncing to
+    // login, since the httpOnly session cookie may still be valid.
+    let cancelled = false;
+    recoverSession().then((recovered) => {
+      if (!cancelled && !recovered) router.replace("/crew/login");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasHydrated, session, router, recoverSession]);
 
   useEffect(() => {
     function handleSessionExpired() {
