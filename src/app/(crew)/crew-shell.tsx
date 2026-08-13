@@ -19,7 +19,12 @@ import type { CrewJob } from "@/features/crew/types";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "@/i18n";
 
-const TIMER_HIDDEN_STATUSES = new Set(["READY", "CLOSED", "CANCELLED", "EXPIRED"]);
+const TIMER_HIDDEN_STATUSES = new Set([
+  "READY",
+  "CLOSED",
+  "CANCELLED",
+  "EXPIRED",
+]);
 
 interface CrewShellProps {
   children: ReactNode;
@@ -32,10 +37,14 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
   const queryClient = useQueryClient();
   const { t } = useTranslation("crew");
   const [staleJobId, setStaleJobId] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [activeEtaEndsAt, setActiveEtaEndsAt] = useState<string | null>(() => {
-    for (const query of queryClient.getQueryCache().findAll({ queryKey: ["crew", "job"] })) {
+    for (const query of queryClient
+      .getQueryCache()
+      .findAll({ queryKey: ["crew", "job"] })) {
       const data = query.state.data as CrewJob | null;
-      if (data?.etaEndsAt && !TIMER_HIDDEN_STATUSES.has(data.status)) return data.etaEndsAt;
+      if (data?.etaEndsAt && !TIMER_HIDDEN_STATUSES.has(data.status))
+        return data.etaEndsAt;
     }
     return null;
   });
@@ -55,7 +64,9 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
           return;
         }
         const data = event.query.state.data as CrewJob | null;
-        const isTerminal = data?.status ? TIMER_HIDDEN_STATUSES.has(data.status) : false;
+        const isTerminal = data?.status
+          ? TIMER_HIDDEN_STATUSES.has(data.status)
+          : false;
         setActiveEtaEndsAt(isTerminal ? null : (data?.etaEndsAt ?? null));
       }
     });
@@ -81,7 +92,9 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
   }, [crewId]);
 
   useRealtimeEvents({
-    url: crewSseToken ? `${baseUrl}/v1/crew/realtime/stream?token=${crewSseToken}` : "",
+    url: crewSseToken
+      ? `${baseUrl}/v1/crew/realtime/stream?token=${crewSseToken}`
+      : "",
     enabled: !!crewSseToken,
     onEvent: (event) => {
       if (event.type === "booking_status_changed" && event.status === "STALE") {
@@ -92,22 +105,37 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
         (event.status === "CANCELLED" || event.status === "EXPIRED") &&
         event.bookingId
       ) {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.job(event.bookingId as string) });
-        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.nextJob() });
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.crew.job(event.bookingId as string),
+        });
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.crew.nextJob(),
+        });
       }
       if (event.type === "job_assigned" || event.type === "new_job") {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.queue() });
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.crew.queue(),
+        });
         if (event.type === "job_assigned") {
-          void queryClient.invalidateQueries({ queryKey: queryKeys.crew.nextJob() });
+          void queryClient.invalidateQueries({
+            queryKey: queryKeys.crew.nextJob(),
+          });
         }
-        const msg = event.type === "new_job"
-          ? t("home.newJobQueued", { defaultValue: "New job available in queue!" })
-          : t("home.newJobNotification", { defaultValue: "New job assigned to you!" });
+        const msg =
+          event.type === "new_job"
+            ? t("home.newJobQueued", {
+                defaultValue: "New job available in queue!",
+              })
+            : t("home.newJobNotification", {
+                defaultValue: "New job assigned to you!",
+              });
         toast.success(msg);
       }
       if (
-        (event.type === "eta_extended" || event.type === "time_extension_approved") &&
-        event.bookingId && event.etaEndsAt
+        (event.type === "eta_extended" ||
+          event.type === "time_extension_approved") &&
+        event.bookingId &&
+        event.etaEndsAt
       ) {
         queryClient.setQueryData<CrewJob | null>(
           queryKeys.crew.job(event.bookingId as string),
@@ -125,11 +153,15 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
       }
       if (event.type === "time_extension_rejected" && event.bookingId) {
         globalThis.dispatchEvent(
-          new CustomEvent("time-extension-rejected", { detail: { bookingId: event.bookingId } })
+          new CustomEvent("time-extension-rejected", {
+            detail: { bookingId: event.bookingId },
+          }),
         );
       }
       if (event.type === "tip_paid") {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.crew.monthlyStats() });
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.crew.monthlyStats(),
+        });
       }
     },
   });
@@ -153,14 +185,23 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
       void clearSession().then(() => router.replace("/crew/login"));
     }
     globalThis.addEventListener("crew-session-expired", handleSessionExpired);
-    return () => globalThis.removeEventListener("crew-session-expired", handleSessionExpired);
+    return () =>
+      globalThis.removeEventListener(
+        "crew-session-expired",
+        handleSessionExpired,
+      );
   }, [clearSession, router]);
 
   if (!hasHydrated || !session) return null;
 
   async function handleLogout() {
-    await clearSession();
-    router.replace("/crew/login");
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await clearSession();
+    } finally {
+      router.replace("/crew/login");
+    }
   }
 
   const initials = session.crewName
@@ -182,20 +223,20 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
           }}
         />
       )}
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-md items-center justify-between px-4">
-          <div className="flex items-center gap-2.5">
+      <header className='fixed inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm'>
+        <div className='mx-auto flex h-16 max-w-md items-center justify-between px-4'>
+          <div className='flex items-center gap-2.5'>
             <Image
-              src="/parknshinelogo.svg"
-              alt="Park & Shine"
+              src='/parknshinelogo.svg'
+              alt='Park & Shine'
               width={120}
               height={32}
-              className="shrink-0"
+              className='shrink-0'
               style={{ width: "auto", height: "32px" }}
             />
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className='flex items-center gap-1'>
             {activeEtaEndsAt && (
               <EtaCountdown
                 etaEndsAt={activeEtaEndsAt}
@@ -207,26 +248,51 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
 
             <div
               title={session.crewName}
-              className="ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+              className='ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground'
             >
               {initials}
             </div>
 
             <Button
-              variant="ghost"
-              size="sm"
+              variant='ghost'
+              size='sm'
               onClick={handleLogout}
-              aria-label="Logout"
-              className="h-9 w-9 p-0 text-muted-foreground hover:text-destructive"
+              disabled={isLoggingOut}
+              aria-label='Logout'
+              className='h-9 w-9 p-0 text-muted-foreground hover:text-destructive'
             >
-              <LogOut className="h-4 w-4" />
+              {isLoggingOut ? (
+                <svg
+                  aria-hidden='true'
+                  className='h-4 w-4 animate-spin'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                >
+                  <circle
+                    cx='12'
+                    cy='12'
+                    r='10'
+                    stroke='currentColor'
+                    strokeWidth='3'
+                    strokeOpacity='0.25'
+                  />
+                  <path
+                    d='M12 2a10 10 0 0 1 10 10'
+                    stroke='currentColor'
+                    strokeWidth='3'
+                    strokeLinecap='round'
+                  />
+                </svg>
+              ) : (
+                <LogOut className='h-4 w-4' />
+              )}
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="pt-16">
-        <AppShell surface="crew">{children}</AppShell>
+      <div className='pt-16'>
+        <AppShell surface='crew'>{children}</AppShell>
       </div>
     </>
   );
