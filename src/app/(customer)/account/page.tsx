@@ -339,8 +339,8 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
                   setPhoneDirty(true);
                 }}
               >
-                <SelectTrigger className='h-full w-24 shrink-0 rounded-none border-0 border-r border-[rgba(111,120,125,0.18)] bg-transparent px-3 shadow-none focus:ring-0'>
-                  <span className='text-[15px] font-semibold text-[#273034]'>
+                <SelectTrigger className='h-full w-27 shrink-0 gap-1 rounded-none border-0 border-r border-[rgba(111,120,125,0.18)] bg-transparent px-2.5 shadow-none focus:ring-0'>
+                  <span className='whitespace-nowrap text-[15px] font-semibold text-[#273034]'>
                     {selectedDialOption?.flag} {dialCode}
                   </span>
                 </SelectTrigger>
