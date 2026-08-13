@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Building2, ArrowLeft, AlertTriangle, RefreshCw } from "lucide-react";
@@ -291,19 +291,17 @@ function DashboardContent() {
     ? (allQueueBookings.find((b) => b.id === urlBookingId) ?? null)
     : null;
 
-  useEffect(() => {
-    if (!urlBookingId) return;
-    const found = allQueueBookings.find((b) => b.id === urlBookingId);
-    if (found) {
+  const selectedBooking = urlBooking ?? clickedBooking;
+
+  function closeSelectedBooking() {
+    setClickedBooking(null);
+    if (urlBookingId) {
       const base = selectedSiteId
         ? `/dashboard?siteId=${selectedSiteId}`
         : "/dashboard";
       router.replace(base);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlBookingId, selectedSiteId]);
-
-  const selectedBooking = urlBooking ?? clickedBooking;
+  }
 
   function handleActionSuccess() {
     void refresh();
@@ -340,7 +338,7 @@ function DashboardContent() {
           site={site}
           selectedBooking={selectedBooking}
           onBookingClick={setClickedBooking}
-          onClose={() => setClickedBooking(null)}
+          onClose={closeSelectedBooking}
           onActionSuccess={handleActionSuccess}
           onRefresh={() => refresh()}
         />
@@ -394,7 +392,7 @@ function DashboardContent() {
       />
       <BookingDetailDrawer
         bookingId={selectedBooking?.id ?? null}
-        onClose={() => setClickedBooking(null)}
+        onClose={closeSelectedBooking}
         onActionSuccess={handleActionSuccess}
       />
     </div>
