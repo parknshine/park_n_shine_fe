@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { isValidPhone } from "./phone";
+import { isValidPhone, splitStoredPhone } from "./phone";
 
 describe("isValidPhone", () => {
   test("valid 12-digit Indonesian number", () => {
@@ -36,5 +36,42 @@ describe("isValidPhone", () => {
 
   test("rejects invalid E.164 number even when digit count is sufficient", () => {
     expect(isValidPhone("+62000000000")).toBe(false);
+  });
+});
+
+describe("splitStoredPhone", () => {
+  test("splits a stored Indonesian number into ID + national number", () => {
+    expect(splitStoredPhone("6281234567890")).toEqual({
+      countryCode: "ID",
+      nationalNumber: "81234567890",
+    });
+  });
+
+  test("splits a stored Singapore number into SG + national number", () => {
+    expect(splitStoredPhone("6591234567")).toEqual({
+      countryCode: "SG",
+      nationalNumber: "91234567",
+    });
+  });
+
+  test("defaults to ID with empty national number for empty string", () => {
+    expect(splitStoredPhone("")).toEqual({
+      countryCode: "ID",
+      nationalNumber: "",
+    });
+  });
+
+  test("defaults to ID with empty national number for null", () => {
+    expect(splitStoredPhone(null)).toEqual({
+      countryCode: "ID",
+      nationalNumber: "",
+    });
+  });
+
+  test("falls back to ID with the raw digits when the number can't be parsed", () => {
+    expect(splitStoredPhone("1234567")).toEqual({
+      countryCode: "ID",
+      nationalNumber: "1234567",
+    });
   });
 });

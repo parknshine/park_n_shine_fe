@@ -1,5 +1,6 @@
 import {
   isValidPhoneNumber,
+  parsePhoneNumberFromString,
   getCountries,
   getCountryCallingCode,
   type CountryCode,
@@ -42,6 +43,34 @@ export function normalizePhone(phone: string): string {
   if (digits.startsWith("62")) return digits;
   if (digits.startsWith("0")) return "62" + digits.slice(1);
   return digits;
+}
+
+export interface SplitPhone {
+  countryCode: CountryCode;
+  nationalNumber: string;
+}
+
+/**
+ * Splits a stored digits-only phone number (the shape normalizePhone()
+ * produces) back into a country code and national number, for
+ * pre-filling a country-selector input. Falls back to Indonesia when the
+ * number can't be parsed (matches the app's prior Indonesia-only default).
+ */
+export function splitStoredPhone(
+  phone: string | null | undefined,
+): SplitPhone {
+  const digits = (phone ?? "").replace(/\D/g, "");
+  if (!digits) return { countryCode: "ID", nationalNumber: "" };
+
+  const parsed = parsePhoneNumberFromString(`+${digits}`);
+  if (parsed?.country) {
+    return { countryCode: parsed.country, nationalNumber: parsed.nationalNumber };
+  }
+
+  if (digits.startsWith("62")) {
+    return { countryCode: "ID", nationalNumber: digits.slice(2) };
+  }
+  return { countryCode: "ID", nationalNumber: digits };
 }
 
 export interface DialCodeOption {
