@@ -89,6 +89,7 @@ export function CrewHomePage() {
     waitUntil,
     job,
     isLoading,
+    isJobLoading,
     hasNoJob,
     error,
     isNewlyClaimed,
@@ -304,6 +305,17 @@ export function CrewHomePage() {
           </p>
         )}
       </div>
+    );
+  }
+
+  // Hold the "claim a job" shell off-screen until the active-job fetch
+  // resolves — otherwise a crew who already has an active job briefly sees
+  // the empty-home UI flash before the redirect effect above kicks in.
+  if (isJobLoading) {
+    return (
+      <main className='flex min-h-[calc(100dvh-44px)] items-center justify-center'>
+        <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' aria-label={t("job.loading")} />
+      </main>
     );
   }
 

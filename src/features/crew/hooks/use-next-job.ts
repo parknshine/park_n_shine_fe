@@ -160,6 +160,10 @@ export function useNextJob() {
       claimMutation.isSuccess &&
       !claimMutation.data,
     isLoading: jobQuery.isLoading || claimMutation.isPending,
+    // Initial active-job fetch only (excludes claim-in-progress) — used to
+    // gate the home page's first paint so it doesn't flash the "claim a job"
+    // shell before redirecting a crew who already has an active job.
+    isJobLoading: jobQuery.isLoading,
     isNewlyClaimed: claimMutation.isSuccess && !!claimMutation.data,
     isOfflinePaused: claimMutation.isPaused,
     job,
