@@ -40,11 +40,16 @@ function getResumeTarget(job: CrewJob): string {
   if (job.status === "ASSIGNED") return base;
   if (job.status === "LOCATED") return base;
   if (job.status === "IN_PROGRESS") {
-    const crewKinds = ["front", "back", "left", "right"];
-    const hasAllPhotos = crewKinds.every((k) =>
+    const beforeKinds = ["before_front", "before_back", "before_left", "before_right"];
+    const afterKinds = ["after_front", "after_back", "after_left", "after_right"];
+    const hasAllBeforePhotos = beforeKinds.every((k) =>
       job.media.some((m) => m.kind === k),
     );
-    if (!hasAllPhotos) return `${base}/before-photos`;
+    if (!hasAllBeforePhotos) return `${base}/before-photos`;
+    const hasAnyAfterPhoto = afterKinds.some((k) =>
+      job.media.some((m) => m.kind === k),
+    );
+    if (hasAnyAfterPhoto) return `${base}/finish`;
     return `${base}/wash`;
   }
   if (job.status === "NEEDS_HELP") return base;

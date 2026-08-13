@@ -132,9 +132,19 @@ export function useNextJob() {
 
   const job = jobQuery.data ?? null;
   const claimError = claimMutation.error;
+  const activeJobError = jobQuery.error;
   let error: string | null = null;
   if (claimError instanceof Error) error = claimError.message;
   else if (claimError) error = "claim_job_failed";
+  else if (activeJobError instanceof Error) {
+    // Surface active-job fetch failures instead of silently rendering as
+    // "no active job" — a transient/auth failure here otherwise looks
+    // identical to a crew member genuinely having no job.
+    console.error("[useNextJob] active job fetch failed", activeJobError);
+    error = activeJobError.message;
+  } else if (activeJobError) {
+    error = "active_job_fetch_failed";
+  }
 
   return {
     claimNextJob,
