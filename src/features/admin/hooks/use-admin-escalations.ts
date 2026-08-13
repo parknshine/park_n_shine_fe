@@ -5,7 +5,7 @@ import api from "@/lib/axios-admin";
 import { queryKeys } from "@/lib/query-keys";
 import type { AdminEscalationsResponse } from "@/features/admin/types";
 
-export function useAdminEscalations(pollIntervalMs = 10_000) {
+export function useAdminEscalations(pollIntervalMs = 3_000) {
   const query = useQuery({
     meta: { persist: true },
     queryFn: async () => {
@@ -16,6 +16,7 @@ export function useAdminEscalations(pollIntervalMs = 10_000) {
     },
     queryKey: queryKeys.admin.escalations(),
     refetchInterval: pollIntervalMs,
+    refetchIntervalInBackground: true,
   });
 
   const error =

@@ -20,6 +20,7 @@ export function useAdminAllSitesQueue({
     },
     queryKey: queryKeys.admin.allSitesQueue(),
     refetchInterval: pollIntervalMs,
+    refetchIntervalInBackground: true,
   });
 
   async function refresh() {

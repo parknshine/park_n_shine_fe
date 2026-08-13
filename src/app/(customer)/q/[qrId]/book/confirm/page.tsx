@@ -32,6 +32,9 @@ function BookConfirmContent() {
   const phone = searchParams.get("phone");
   const plate = searchParams.get("plate");
   const slot = searchParams.get("slot");
+  const loc = searchParams.get("loc");
+  const addr = searchParams.get("addr");
+  const siteId = searchParams.get("siteId");
 
   useEffect(() => {
     if (!bookingId || !token || !plate || !slot) {
@@ -45,6 +48,9 @@ function BookConfirmContent() {
     pollIntervalMs: Infinity,
     enabled: !!bookingId && !!token,
   });
+
+  const locationName = loc ?? booking?.siteName ?? "";
+  const locationAddress = addr ?? booking?.siteAddress ?? undefined;
 
   useEffect(() => {
     if (!booking || !bookingId || !token) return;
@@ -63,8 +69,12 @@ function BookConfirmContent() {
   }
 
   return (
-    <AppShell surface='customer' className="pt-0! px-0!">
-      <StepProgressBar current={2} total={2} label={t("booking.step", { current: 2, total: 2 })} />
+    <AppShell surface='customer' className='pt-0! px-0!'>
+      <StepProgressBar
+        current={2}
+        total={2}
+        label={t("booking.step", { current: 2, total: 2 })}
+      />
 
       <div className='space-y-4 px-4 pb-6'>
         <div>
@@ -80,15 +90,16 @@ function BookConfirmContent() {
           <BookingSummaryCard
             plate={plate}
             slot={slot}
+            siteName={locationName}
             priceAmount={booking?.priceAmount}
             currency={booking?.currency}
             estimatedReadyAt={booking?.estimatedReadyAt}
           />
 
-          {booking?.siteName && (
+          {locationName && (
             <BookingLocationCard
-              locationName={booking.siteName}
-              locationAddress={booking.siteAddress ?? undefined}
+              locationName={locationName}
+              locationAddress={locationAddress}
               phone={phone ?? undefined}
             />
           )}
@@ -100,6 +111,7 @@ function BookConfirmContent() {
           plateText={plate}
           slotText={slot}
           phone={phone ?? undefined}
+          siteId={siteId ?? undefined}
         />
       </div>
     </AppShell>

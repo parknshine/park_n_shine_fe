@@ -73,6 +73,22 @@ export function splitStoredPhone(
   return { countryCode: "ID", nationalNumber: digits };
 }
 
+/**
+ * Builds an E.164 phone number from a selected country and the raw
+ * national-number input a user typed (e.g. Indonesian users habitually
+ * type a leading trunk "0", as in "081234567890"). Uses libphonenumber-js
+ * to parse the input in the context of the selected country so trunk
+ * prefixes and formatting are handled correctly instead of being naively
+ * concatenated onto the dial code.
+ */
+export function buildE164(countryCode: CountryCode, nationalInput: string): string {
+  const trimmed = nationalInput.trim();
+  if (!trimmed) return "";
+  const parsed = parsePhoneNumberFromString(trimmed, countryCode);
+  if (parsed) return parsed.number;
+  return `+${getCountryCallingCode(countryCode)}${trimmed.replace(/\D/g, "")}`;
+}
+
 export interface DialCodeOption {
   countryCode: CountryCode;
   dialCode: string;

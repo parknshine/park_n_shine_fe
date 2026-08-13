@@ -28,6 +28,9 @@ function ConfirmContent() {
   const plate = searchParams.get("plate");
   const slot = searchParams.get("slot");
   const phone = searchParams.get("phone");
+  const loc = searchParams.get("loc");
+  const addr = searchParams.get("addr");
+  const siteId = searchParams.get("siteId");
 
   useEffect(() => {
     if (!bookingId || !token || !plate || !slot) {
@@ -43,38 +46,45 @@ function ConfirmContent() {
     enabled: !!bookingId && !!token,
   });
 
+  const locationName = loc ?? booking?.siteName ?? "";
+  const locationAddress = addr ?? booking?.siteAddress ?? undefined;
+
   if (!bookingId || !token || !plate || !slot) {
     return null;
   }
 
   return (
-    <AppShell surface="customer" className="pt-0! px-0!">
-      <StepProgressBar current={2} total={2} label={t("booking.step", { current: 2, total: 2 })} />
+    <AppShell surface='customer' className='pt-0! px-0!'>
+      <StepProgressBar
+        current={2}
+        total={2}
+        label={t("booking.step", { current: 2, total: 2 })}
+      />
 
-      <div className="space-y-4 px-4 pb-6">
+      <div className='space-y-4 px-4 pb-6'>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className='text-2xl font-bold text-foreground'>
             {t("booking.confirm.title")}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className='mt-1 text-sm text-muted-foreground'>
             {t("booking.confirm.subtitle")}
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className='space-y-3'>
           <BookingSummaryCard
             plate={plate}
             slot={slot}
-            siteName={booking?.siteName}
+            siteName={locationName}
             priceAmount={booking?.priceAmount}
             currency={booking?.currency}
             estimatedReadyAt={booking?.estimatedReadyAt}
           />
 
-          {booking?.siteName && (
+          {locationName && (
             <BookingLocationCard
-              locationName={booking.siteName}
-              locationAddress={booking.siteAddress ?? undefined}
+              locationName={locationName}
+              locationAddress={locationAddress}
               phone={phone ?? undefined}
             />
           )}
@@ -86,6 +96,7 @@ function ConfirmContent() {
           plateText={plate}
           slotText={slot}
           phone={phone ?? undefined}
+          siteId={siteId ?? undefined}
         />
       </div>
     </AppShell>

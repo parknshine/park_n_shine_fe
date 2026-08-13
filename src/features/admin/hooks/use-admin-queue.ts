@@ -13,7 +13,7 @@ interface UseAdminQueueOptions {
 
 export function useAdminQueue({
   siteId,
-  pollIntervalMs = 10_000,
+  pollIntervalMs = 3_000,
   enabled = true,
 }: UseAdminQueueOptions) {
   const query = useQuery({
@@ -27,6 +27,7 @@ export function useAdminQueue({
     },
     queryKey: queryKeys.admin.queue(siteId),
     refetchInterval: pollIntervalMs,
+    refetchIntervalInBackground: true,
   });
 
   async function refresh() {

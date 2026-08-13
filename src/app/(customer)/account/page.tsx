@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { setMarketingBackOrigin } from "@/lib/marketing-back-origin";
 import type { Customer } from "@/types";
 import {
+  buildE164,
   getDialCodeOptions,
   isValidPhone,
   normalizePhone,
@@ -104,8 +105,11 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
   );
   const dialCode = selectedDialOption?.dialCode ?? "+62";
   const [isSaving, setIsSaving] = useState(false);
+  const [phoneDirty, setPhoneDirty] = useState(false);
   const enteredPhone = phone.trim();
-  const phoneForValidation = enteredPhone ? `${dialCode}${enteredPhone}` : "";
+  const phoneForValidation = enteredPhone
+    ? buildE164(countryCode, enteredPhone)
+    : "";
   const isPhoneValid = !enteredPhone || isValidPhone(phoneForValidation);
 
   useEffect(() => {
@@ -118,6 +122,7 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
           const split = splitStoredPhone(data.phone);
           setCountryCode(split.countryCode);
           setPhone(split.nationalNumber);
+          setPhoneDirty(false);
         }
       })
       .catch(() => {});
@@ -142,15 +147,18 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
       const payload: { name?: string; phone?: string } = {};
       if (name.trim() && name.trim() !== customer.name)
         payload.name = name.trim();
-      const newPhoneNormalized = enteredPhone
-        ? normalizePhone(phoneForValidation)
-        : "";
-      if (newPhoneNormalized !== (customer.phone ?? ""))
-        payload.phone = newPhoneNormalized;
+      if (phoneDirty) {
+        const newPhoneNormalized = enteredPhone
+          ? normalizePhone(phoneForValidation)
+          : "";
+        if (newPhoneNormalized !== (customer.phone ?? ""))
+          payload.phone = newPhoneNormalized;
+      }
       if (Object.keys(payload).length === 0) return;
 
       const { data } = await customerApi.patch<Customer>("/v1/me", payload);
       if (data) updateCustomer(data);
+      setPhoneDirty(false);
       toast.success(t("account.saveSuccess"));
     } catch {
       toast.error(t("account.saveError"));
@@ -323,10 +331,13 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
             <label className='mb-1.5 block text-[12px] font-bold uppercase tracking-[0.04em] text-[#9aa6ad]'>
               {t("account.phoneLabel")}
             </label>
-            <div className='flex h-12.5 overflow-hidden rounded-[14px] border border-[rgba(111,120,125,0.18)] bg-[#f4f9fc]'>
+            <div className='flex h-12.5 overflow-hidden rounded-[14px] border border-[rgba(111,120,125,0.18)] bg-[#f4f9fc] focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2'>
               <Select
                 value={countryCode}
-                onValueChange={(v) => setCountryCode(v as CountryCode)}
+                onValueChange={(v) => {
+                  setCountryCode(v as CountryCode);
+                  setPhoneDirty(true);
+                }}
               >
                 <SelectTrigger className='h-full w-24 shrink-0 rounded-none border-0 border-r border-[rgba(111,120,125,0.18)] bg-transparent px-3 shadow-none focus:ring-0'>
                   <span className='text-[15px] font-semibold text-[#273034]'>
@@ -358,7 +369,10 @@ function AccountView({ customer }: Readonly<{ customer: Customer }>) {
                 inputMode='numeric'
                 placeholder='81234567890'
                 value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                onChange={(e) => {
+                  setPhone(e.target.value.replace(/\D/g, ""));
+                  setPhoneDirty(true);
+                }}
                 autoComplete='tel'
                 className='h-full flex-1 bg-transparent px-4 font-sans text-[15px] font-semibold text-[#273034] outline-none'
               />

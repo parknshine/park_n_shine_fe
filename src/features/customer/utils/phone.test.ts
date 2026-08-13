@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { isValidPhone, splitStoredPhone } from "./phone";
+import { buildE164, isValidPhone, normalizePhone, splitStoredPhone } from "./phone";
 
 describe("isValidPhone", () => {
   test("valid 12-digit Indonesian number", () => {
@@ -72,6 +72,44 @@ describe("splitStoredPhone", () => {
     expect(splitStoredPhone("1234567")).toEqual({
       countryCode: "ID",
       nationalNumber: "1234567",
+    });
+  });
+});
+
+describe("buildE164", () => {
+  test("strips a leading trunk 0 from an Indonesian national number", () => {
+    expect(buildE164("ID", "081234567890")).toBe("+6281234567890");
+  });
+
+  test("builds an Indonesian E.164 number from a bare national number", () => {
+    expect(buildE164("ID", "81234567890")).toBe("+6281234567890");
+  });
+
+  test("builds a Singapore E.164 number", () => {
+    expect(buildE164("SG", "91234567")).toBe("+6591234567");
+  });
+
+  test("returns empty string for empty input", () => {
+    expect(buildE164("ID", "")).toBe("");
+  });
+
+  test("round-trips the leading-zero Indonesian case through splitStoredPhone and normalizePhone", () => {
+    const e164 = buildE164("ID", "081234567890");
+    const normalized = normalizePhone(e164);
+    expect(normalized).toBe("6281234567890");
+    expect(splitStoredPhone(normalized)).toEqual({
+      countryCode: "ID",
+      nationalNumber: "81234567890",
+    });
+  });
+
+  test("round-trips the Singapore case through splitStoredPhone and normalizePhone", () => {
+    const e164 = buildE164("SG", "91234567");
+    const normalized = normalizePhone(e164);
+    expect(normalized).toBe("6591234567");
+    expect(splitStoredPhone(normalized)).toEqual({
+      countryCode: "SG",
+      nationalNumber: "91234567",
     });
   });
 });

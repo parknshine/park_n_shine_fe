@@ -14,13 +14,22 @@ import {
   SelectLabel,
   SelectSeparator,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { PhotoGuidelinesPanel } from "@/features/customer/components/photo-guidelines-panel";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
-import { useBookingStatus, usePhotoUpload, usePublicSettings } from "@/features/customer/hooks";
-import { getDialCodeOptions, isValidPhone, normalizePhone } from "@/features/customer/utils/phone";
+import {
+  useBookingStatus,
+  usePhotoUpload,
+  usePublicSettings,
+  usePublicSites,
+} from "@/features/customer/hooks";
+import {
+  getDialCodeOptions,
+  isValidPhone,
+  normalizePhone,
+} from "@/features/customer/utils/phone";
 import { useTranslation } from "@/i18n";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
@@ -37,6 +46,15 @@ const QR_CAPTURE_FLOW = "qr-capture";
 
 const DIAL_CODE_OPTIONS = getDialCodeOptions();
 
+function isSitePastCutoff(cutoffTime: string | null): boolean {
+  if (!cutoffTime) return false;
+  const now = new Date();
+  const [h, m] = cutoffTime.split(":").map(Number);
+  const cutoff = new Date(now);
+  cutoff.setHours(h, m, 0, 0);
+  return now > cutoff;
+}
+
 function CaptureContent() {
   const router = useRouter();
   const { qrId } = useParams<{ qrId: string }>();
@@ -47,27 +65,44 @@ function CaptureContent() {
   const token = searchParams.get("token");
 
   const { save: saveCapture } = useBookingCaptureStore();
-  const setCaptureHasProgress = useBookingCaptureStore((s) => s.setCaptureHasProgress);
+  const setCaptureHasProgress = useBookingCaptureStore(
+    (s) => s.setCaptureHasProgress,
+  );
 
   // Restore session if it matches the current bookingId (back-navigation)
   const [savedSession] = useState(() => {
-    const urlBookingId = new URLSearchParams(globalThis.location?.search ?? "").get("bookingId");
+    const urlBookingId = new URLSearchParams(
+      globalThis.location?.search ?? "",
+    ).get("bookingId");
     const s = useBookingCaptureStore.getState();
-    return s.flowKey === QR_CAPTURE_FLOW && s.bookingId === urlBookingId ? s : null;
+    return s.flowKey === QR_CAPTURE_FLOW && s.bookingId === urlBookingId
+      ? s
+      : null;
   });
 
   const [plateText, setPlateText] = useState(savedSession?.plateText ?? "");
   const [slotText, setSlotText] = useState(savedSession?.slotText ?? "");
+  const [selectedSiteId, setSelectedSiteId] = useState(
+    savedSession?.location ?? "",
+  );
   const profilePhone = useCustomerAuthStore((s) => s.customer?.phone ?? null);
   const [phone, setPhone] = useState(savedSession?.phone ?? "");
   const [countryCode, setCountryCode] = useState("ID");
-  const selectedDialOption = DIAL_CODE_OPTIONS.find((d) => d.countryCode === countryCode);
+  const selectedDialOption = DIAL_CODE_OPTIONS.find(
+    (d) => d.countryCode === countryCode,
+  );
   const dialCode = selectedDialOption?.dialCode ?? "+62";
   const [useProfilePhone, setUseProfilePhone] = useState(
     !savedSession && !!profilePhone,
   );
 
   const { loyaltyEnabled } = usePublicSettings();
+  const { sites: unsortedSites, isLoading: isSitesLoading } = usePublicSites();
+  const sites = [...unsortedSites].sort((a, b) => {
+    const aUnavailable = a.intakePaused || isSitePastCutoff(a.cutoffTime);
+    const bUnavailable = b.intakePaused || isSitePastCutoff(b.cutoffTime);
+    return aUnavailable === bUnavailable ? 0 : aUnavailable ? 1 : -1;
+  });
 
   const { booking } = useBookingStatus({
     bookingId: bookingId ?? "",
@@ -76,7 +111,12 @@ function CaptureContent() {
     enabled: !!bookingId && !!token,
   });
 
-  const siteName = booking?.siteName ?? null;
+  const effectiveSiteId =
+    selectedSiteId ||
+    (booking?.siteName
+      ? (sites.find((s) => s.name === booking.siteName)?.id ?? "")
+      : "");
+  const selectedSite = sites.find((s) => s.id === effectiveSiteId);
 
   const plateUpload = usePhotoUpload({
     bookingId: bookingId ?? "",
@@ -125,6 +165,8 @@ function CaptureContent() {
   }
 
   const canContinue =
+    !!effectiveSiteId &&
+    sites.some((s) => s.id === effectiveSiteId) &&
     plateUpload.status === "success" &&
     slotUpload.status === "success" &&
     plateText.trim().length > 0 &&
@@ -140,10 +182,20 @@ function CaptureContent() {
       signedToken: token,
       plateText: plate,
       slotText: slot,
-      location: "",
+      location: effectiveSiteId,
       phone: normalizePhone(effectivePhone),
-      plateState: { progress: plateUpload.progress, status: plateUpload.status, error: plateUpload.error, media: plateUpload.media },
-      slotState: { progress: slotUpload.progress, status: slotUpload.status, error: slotUpload.error, media: slotUpload.media },
+      plateState: {
+        progress: plateUpload.progress,
+        status: plateUpload.status,
+        error: plateUpload.error,
+        media: plateUpload.media,
+      },
+      slotState: {
+        progress: slotUpload.progress,
+        status: slotUpload.status,
+        error: slotUpload.error,
+        media: slotUpload.media,
+      },
     });
     const params = new URLSearchParams({
       bookingId: bookingId ?? "",
@@ -151,32 +203,40 @@ function CaptureContent() {
       phone: normalizePhone(effectivePhone),
       plate,
       slot,
+      siteId: effectiveSiteId,
+      loc: selectedSite?.name ?? "",
+      addr: selectedSite?.address ?? "",
     });
     router.push(`/q/${qrId}/confirm?${params.toString()}`);
   }
 
-  const isOfflinePaused = plateUpload.isOfflinePaused || slotUpload.isOfflinePaused;
+  const isOfflinePaused =
+    plateUpload.isOfflinePaused || slotUpload.isOfflinePaused;
 
   return (
-    <AppShell surface="customer" className="pt-0! px-0!">
-      <StepProgressBar current={1} total={2} label={t("booking.step", { current: 1, total: 2 })} />
+    <AppShell surface='customer' className='pt-0! px-0!'>
+      <StepProgressBar
+        current={1}
+        total={2}
+        label={t("booking.step", { current: 1, total: 2 })}
+      />
 
-      <div className="space-y-4 px-4 pb-6">
+      <div className='space-y-4 px-4 pb-6'>
         <OfflineBanner visible={isOfflinePaused} />
 
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className='text-2xl font-bold text-foreground'>
             {t("booking.capture.title")}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className='mt-1 text-sm text-muted-foreground'>
             {t("booking.capture.subtitle")}
           </p>
         </div>
 
         {/* Plate photo + OCR */}
         <PhotoUploadField
-          id="plate-photo"
-          kind="plate"
+          id='plate-photo'
+          kind='plate'
           label={t("booking.capture.platePhotoLabel")}
           hint={t("booking.capture.platePhotoGuideline")}
           state={plateUpload}
@@ -189,7 +249,7 @@ function CaptureContent() {
           ocrPlaceholder={t("booking.capture.platePlaceholder")}
           guidelines={
             <PhotoGuidelinesPanel
-              goodSrc="/images/guidelines/plate-good.jpeg"
+              goodSrc='/images/guidelines/plate-good.jpeg'
               avoidExamples={[
                 {
                   src: "/images/guidelines/plate-good.jpeg",
@@ -222,8 +282,8 @@ function CaptureContent() {
 
         {/* Slot photo + OCR */}
         <PhotoUploadField
-          id="slot-photo"
-          kind="slot"
+          id='slot-photo'
+          kind='slot'
           label={t("booking.capture.slotPhotoLabel")}
           hint={t("booking.capture.slotPhotoGuideline")}
           state={slotUpload}
@@ -236,7 +296,7 @@ function CaptureContent() {
           ocrPlaceholder={t("booking.capture.slotPlaceholder")}
           guidelines={
             <PhotoGuidelinesPanel
-              goodSrc="/images/guidelines/slot-good.webp"
+              goodSrc='/images/guidelines/slot-good.webp'
               avoidExamples={[
                 {
                   src: "/images/guidelines/slot-good.webp",
@@ -269,58 +329,80 @@ function CaptureContent() {
         />
 
         {/* Location */}
-        <div className="rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2">
-          <label className="text-sm font-bold text-foreground">
+        <div className='rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2'>
+          <label className='text-sm font-bold text-foreground'>
             {t("booking.capture.locationLabel")}
           </label>
-          <Select disabled value={siteName ?? undefined}>
-            <SelectTrigger className="h-10 w-full rounded-lg border-border bg-[#eff8fe]">
-              <SelectValue
-                placeholder={t("booking.capture.locationDisabledPlaceholder")}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {siteName && (
-                <SelectItem value={siteName}>{siteName}</SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+          <Combobox
+            options={sites.map((site) => {
+              const unavailable =
+                site.intakePaused || isSitePastCutoff(site.cutoffTime);
+              const statusSuffix = site.intakePaused
+                ? " (Sedang tutup)"
+                : isSitePastCutoff(site.cutoffTime)
+                  ? " (Sudah cutoff)"
+                  : "";
+              return {
+                value: site.id,
+                label: `${site.name}${statusSuffix}`,
+                disabled: unavailable,
+              };
+            })}
+            value={effectiveSiteId}
+            onChange={setSelectedSiteId}
+            disabled={isSitesLoading}
+            placeholder={
+              isSitesLoading
+                ? t("booking.capture.locationLoading")
+                : t("booking.capture.locationPlaceholder")
+            }
+            searchPlaceholder={t("booking.capture.locationSearchPlaceholder", {
+              defaultValue: "Cari mall…",
+            })}
+            emptyMessage={t("booking.capture.locationSearchEmpty", {
+              defaultValue: "Mall tidak ditemukan.",
+            })}
+            className='h-10 w-full rounded-lg border-border bg-[#eff8fe]'
+          />
+          <p className='text-xs text-muted-foreground'>
+            {t("booking.capture.locationHelper")}
+          </p>
         </div>
 
         {/* Phone */}
-        <div className="rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2">
-          <label htmlFor="phone" className="text-sm font-bold text-foreground">
+        <div className='rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2'>
+          <label htmlFor='phone' className='text-sm font-bold text-foreground'>
             {t("booking.capture.phoneLabel")}
           </label>
           {profilePhone && (
-            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+            <label className='flex items-center gap-2.5 cursor-pointer select-none'>
               <input
-                type="checkbox"
-                id="use-profile-phone"
+                type='checkbox'
+                id='use-profile-phone'
                 checked={useProfilePhone}
                 onChange={(e) => {
                   setUseProfilePhone(e.target.checked);
                   if (!e.target.checked) setPhone("");
                 }}
-                className="h-4 w-4 rounded border-border accent-primary"
+                className='h-4 w-4 rounded border-border accent-primary'
               />
-              <span className="text-sm text-muted-foreground">
+              <span className='text-sm text-muted-foreground'>
                 {t("booking.capture.useProfilePhone", { phone: profilePhone })}
               </span>
             </label>
           )}
-          <div className="flex h-10 overflow-hidden rounded-lg border border-border bg-[#eff8fe]">
+          <div className='flex h-10 overflow-hidden rounded-lg border border-border bg-[#eff8fe]'>
             <Select
               value={countryCode}
               onValueChange={setCountryCode}
               disabled={useProfilePhone}
             >
-              <SelectTrigger className="h-full w-24 rounded-none border-0 border-r border-border bg-transparent px-2 shadow-none focus:ring-0">
-                <span className="text-sm font-medium text-foreground">
+              <SelectTrigger className='h-full w-24 rounded-none border-0 border-r border-border bg-transparent px-2 shadow-none focus:ring-0'>
+                <span className='text-sm font-medium text-foreground'>
                   {selectedDialOption?.flag} {dialCode}
                 </span>
               </SelectTrigger>
-              <SelectContent className="w-64">
+              <SelectContent className='w-64'>
                 <SelectGroup>
                   <SelectLabel>Pilihan Utama</SelectLabel>
                   {DIAL_CODE_OPTIONS.filter((d) => d.isPriority).map((d) => (
@@ -341,27 +423,27 @@ function CaptureContent() {
               </SelectContent>
             </Select>
             <input
-              id="phone"
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
+              id='phone'
+              type='text'
+              inputMode='numeric'
+              pattern='[0-9]*'
               value={useProfilePhone ? (profilePhone ?? "") : phone}
               onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
               placeholder={t("booking.capture.phonePlaceholder")}
-              className="h-full flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none"
+              className='h-full flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none'
               readOnly={useProfilePhone}
             />
           </div>
           {loyaltyEnabled && (
-            <p className="text-xs text-muted-foreground">
+            <p className='text-xs text-muted-foreground'>
               Nomor HP akan digunakan untuk program loyalti Park N Shine
             </p>
           )}
-          <p className="text-xs text-muted-foreground">
+          <p className='text-xs text-muted-foreground'>
             {t("booking.capture.phoneHelper")}
           </p>
           {effectivePhone && !isValidPhone(effectivePhone) && (
-            <p className="text-xs text-red-500">
+            <p className='text-xs text-red-500'>
               {t("booking.capture.phoneInvalid")}
             </p>
           )}
@@ -369,10 +451,10 @@ function CaptureContent() {
 
         {/* Continue */}
         <Button
-          size="lg"
-          className="w-full"
+          size='lg'
+          className='w-full'
           disabled={!canContinue}
-          suffix={<ArrowRight className="h-4 w-4" />}
+          suffix={<ArrowRight className='h-4 w-4' />}
           onClick={handleContinue}
         >
           {t("action.next", { ns: "common" })}
