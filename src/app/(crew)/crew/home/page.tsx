@@ -35,12 +35,19 @@ import { useTranslation } from "@/i18n";
 import { usePushNotification } from "@/lib/use-push-notification";
 import { queryKeys } from "@/lib/query-keys";
 
-function getResumeTarget(job: CrewJob): string {
+export function getResumeTarget(job: CrewJob): string {
   const base = `/crew/jobs/${job.id}`;
-  if (job.status === "ASSIGNED") return base;
-  if (job.status === "LOCATED") return base;
+  // Resume directly to the step the crew was actually on, not the job detail
+  // landing page — logging out mid-step must not cost them an extra tap.
+  if (job.status === "ASSIGNED") return `${base}/verify`;
+  if (job.status === "LOCATED") return `${base}/before-photos`;
   if (job.status === "IN_PROGRESS") {
-    const beforeKinds = ["before_front", "before_back", "before_left", "before_right"];
+    // GET /jobs/active serializes media via MEDIA_TYPE_TO_KIND, which maps
+    // BEFORE_FRONT/BACK/LEFT/RIGHT down to the short "front"/"back"/"left"/
+    // "right" kinds (legacy naming) — NOT "before_front" etc. After-photo
+    // types have no explicit mapping, so they fall through to the lowercased
+    // type string ("after_front" etc), which does match the upload-side kind.
+    const beforeKinds = ["front", "back", "left", "right"];
     const afterKinds = ["after_front", "after_back", "after_left", "after_right"];
     const hasAllBeforePhotos = beforeKinds.every((k) =>
       job.media.some((m) => m.kind === k),
@@ -52,6 +59,11 @@ function getResumeTarget(job: CrewJob): string {
     if (hasAnyAfterPhoto) return `${base}/finish`;
     return `${base}/wash`;
   }
+  // "Selesai Cuci" flips status to READY immediately (before after-photos are
+  // uploaded) so the customer sees progress right away — the crew still needs
+  // to finish the after-photos step, so resume there rather than the job detail
+  // page, which has no action for READY.
+  if (job.status === "READY") return `${base}/finish`;
   if (job.status === "NEEDS_HELP") return base;
   if (job.status === "STALE") return base;
   return base;

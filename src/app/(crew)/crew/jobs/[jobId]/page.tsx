@@ -326,6 +326,19 @@ export function CrewJobDetailPage() {
               </Button>
             </div>
           )}
+          {job.status === "READY" && (
+            <div className="flex flex-col gap-2">
+              <Button
+                size="lg"
+                variant="default"
+                className="h-14 w-full rounded-xl text-base font-bold"
+                onClick={() => router.push(`/crew/jobs/${jobId}/finish`)}
+                suffix={<ArrowRight className="h-5 w-5" />}
+              >
+                {t("job.continueToFinish")}
+              </Button>
+            </div>
+          )}
           {expired && (
             <div className="mt-2">
               <TimeExtensionControl jobId={jobId} etaEndsAt={job.etaEndsAt} />

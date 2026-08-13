@@ -58,6 +58,7 @@
     "verifyAriaLabel": "Verify vehicle plate",
     "continueToPhotos": "Continue to Photos",
     "continueWash": "Continue Washing",
+    "continueToFinish": "Continue to After Photos",
     "requestTimeExtension": "Request More Time",
     "requestTimeExtensionSending": "Sending...",
     "requestTimeExtensionSent": "Request sent to admin",
