@@ -18,10 +18,9 @@ function makeJob(overrides: Partial<CrewJob>): CrewJob {
   };
 }
 
-// GET /jobs/active serializes before-photo kinds down to the short legacy
-// form ("front"/"back"/"left"/"right") via MEDIA_TYPE_TO_KIND in
-// CrewController — NOT "before_front" etc, which is only the upload-side
-// payload kind. Resume logic must match the *response* shape.
+// GET /jobs/active serializes before-photo kinds via MEDIA_TYPE_TO_KIND in
+// CrewController, which round-trips the same "before_front" etc kind the
+// crew app used to upload the photo. Resume logic must match that shape.
 describe("getResumeTarget", () => {
   it("sends ASSIGNED jobs directly to the verify-plate step", () => {
     expect(getResumeTarget(makeJob({ status: "ASSIGNED" }))).toBe("/crew/jobs/job-1/verify");
@@ -41,21 +40,21 @@ describe("getResumeTarget", () => {
 
   it("sends IN_PROGRESS jobs with a before-photo missing to before-photos", () => {
     const media = [
-      { id: "1", kind: "front", url: "u" },
-      { id: "2", kind: "back", url: "u" },
-      { id: "3", kind: "left", url: "u" },
+      { id: "1", kind: "before_front", url: "u" },
+      { id: "2", kind: "before_back", url: "u" },
+      { id: "3", kind: "before_left", url: "u" },
     ] as CrewJob["media"];
     expect(getResumeTarget(makeJob({ status: "IN_PROGRESS", media }))).toBe(
       "/crew/jobs/job-1/before-photos",
     );
   });
 
-  it("sends IN_PROGRESS jobs with all before-photos (short kinds) to wash", () => {
+  it("sends IN_PROGRESS jobs with all before-photos to wash", () => {
     const media = [
-      { id: "1", kind: "front", url: "u" },
-      { id: "2", kind: "back", url: "u" },
-      { id: "3", kind: "left", url: "u" },
-      { id: "4", kind: "right", url: "u" },
+      { id: "1", kind: "before_front", url: "u" },
+      { id: "2", kind: "before_back", url: "u" },
+      { id: "3", kind: "before_left", url: "u" },
+      { id: "4", kind: "before_right", url: "u" },
     ] as CrewJob["media"];
     expect(getResumeTarget(makeJob({ status: "IN_PROGRESS", media }))).toBe(
       "/crew/jobs/job-1/wash",
@@ -64,10 +63,10 @@ describe("getResumeTarget", () => {
 
   it("sends IN_PROGRESS jobs with any after-photo uploaded to finish", () => {
     const media = [
-      { id: "1", kind: "front", url: "u" },
-      { id: "2", kind: "back", url: "u" },
-      { id: "3", kind: "left", url: "u" },
-      { id: "4", kind: "right", url: "u" },
+      { id: "1", kind: "before_front", url: "u" },
+      { id: "2", kind: "before_back", url: "u" },
+      { id: "3", kind: "before_left", url: "u" },
+      { id: "4", kind: "before_right", url: "u" },
       { id: "5", kind: "after_front", url: "u" },
     ] as CrewJob["media"];
     expect(getResumeTarget(makeJob({ status: "IN_PROGRESS", media }))).toBe(

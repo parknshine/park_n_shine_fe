@@ -42,12 +42,7 @@ export function getResumeTarget(job: CrewJob): string {
   if (job.status === "ASSIGNED") return `${base}/verify`;
   if (job.status === "LOCATED") return `${base}/before-photos`;
   if (job.status === "IN_PROGRESS") {
-    // GET /jobs/active serializes media via MEDIA_TYPE_TO_KIND, which maps
-    // BEFORE_FRONT/BACK/LEFT/RIGHT down to the short "front"/"back"/"left"/
-    // "right" kinds (legacy naming) — NOT "before_front" etc. After-photo
-    // types have no explicit mapping, so they fall through to the lowercased
-    // type string ("after_front" etc), which does match the upload-side kind.
-    const beforeKinds = ["front", "back", "left", "right"];
+    const beforeKinds = ["before_front", "before_back", "before_left", "before_right"];
     const afterKinds = ["after_front", "after_back", "after_left", "after_right"];
     const hasAllBeforePhotos = beforeKinds.every((k) =>
       job.media.some((m) => m.kind === k),
