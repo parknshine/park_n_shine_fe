@@ -1,5 +1,11 @@
-import { describe, expect, test } from "bun:test";
-import { SUBDOMAIN_CONFIG, detectSubdomain, isPathAllowed } from "./middleware";
+import { afterEach, describe, expect, test } from "bun:test";
+import { NextRequest } from "next/server";
+import {
+  SUBDOMAIN_CONFIG,
+  detectSubdomain,
+  isPathAllowed,
+  middleware,
+} from "./middleware";
 
 describe("detectSubdomain", () => {
   test("detects app subdomain", () => {
@@ -123,5 +129,97 @@ describe("isPathAllowed", () => {
 
   test("blocks /adminstration on admin subdomain (prefix boundary)", () => {
     expect(isPathAllowed("/adminstration", adminPrefixes)).toBe(false);
+  });
+});
+
+describe("middleware cookie auth gating (NEXT_PUBLIC_COOKIE_AUTH)", () => {
+  const originalFlag = process.env.NEXT_PUBLIC_COOKIE_AUTH;
+  const originalSecret = process.env.CREW_JWT_SECRET;
+
+  afterEach(() => {
+    if (originalFlag === undefined) delete process.env.NEXT_PUBLIC_COOKIE_AUTH;
+    else process.env.NEXT_PUBLIC_COOKIE_AUTH = originalFlag;
+    if (originalSecret === undefined) delete process.env.CREW_JWT_SECRET;
+    else process.env.CREW_JWT_SECRET = originalSecret;
+  });
+
+  function crewHomeRequest() {
+    return new NextRequest("http://localhost:3000/crew/home");
+  }
+
+  test("skips cookie verification when flag is not 'true'", async () => {
+    process.env.NEXT_PUBLIC_COOKIE_AUTH = "false";
+    process.env.CREW_JWT_SECRET = "dev-crew-secret";
+    const res = await middleware(crewHomeRequest());
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  test("skips cookie verification when flag is unset", async () => {
+    delete process.env.NEXT_PUBLIC_COOKIE_AUTH;
+    process.env.CREW_JWT_SECRET = "dev-crew-secret";
+    const res = await middleware(crewHomeRequest());
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  test("redirects /crew/home without cookie when flag is 'true'", async () => {
+    process.env.NEXT_PUBLIC_COOKIE_AUTH = "true";
+    process.env.CREW_JWT_SECRET = "dev-crew-secret";
+    const res = await middleware(crewHomeRequest());
+    expect(res.headers.get("location")).toBe(
+      "http://localhost:3000/crew/login",
+    );
+  });
+
+  // Signs an HS256 JWT the same way the API's hono/jwt sign() does
+  // (base64url, no padding) so the middleware is tested against a real token.
+  function signCrewToken(secret: string, exp: number): string {
+    const b64url = (s: string) =>
+      Buffer.from(s)
+        .toString("base64")
+        .replaceAll("+", "-")
+        .replaceAll("/", "_")
+        .replace(/=+$/, "");
+    const header = b64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+    const payload = b64url(
+      JSON.stringify({ crewId: "c1", shiftId: "s1", siteId: "site1", exp }),
+    );
+    const sig = require("node:crypto")
+      .createHmac("sha256", secret)
+      .update(`${header}.${payload}`)
+      .digest("base64")
+      .replaceAll("+", "-")
+      .replaceAll("/", "_")
+      .replace(/=+$/, "");
+    return `${header}.${payload}.${sig}`;
+  }
+
+  test("allows /crew/home with a valid crew-token cookie when flag is 'true'", async () => {
+    process.env.NEXT_PUBLIC_COOKIE_AUTH = "true";
+    process.env.CREW_JWT_SECRET = "dev-crew-secret";
+    const token = signCrewToken(
+      "dev-crew-secret",
+      Math.floor(Date.now() / 1000) + 3600,
+    );
+    const req = new NextRequest("http://localhost:3000/crew/home", {
+      headers: { cookie: `crew-token=${token}` },
+    });
+    const res = await middleware(req);
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  test("redirects /crew/home with an expired crew-token cookie when flag is 'true'", async () => {
+    process.env.NEXT_PUBLIC_COOKIE_AUTH = "true";
+    process.env.CREW_JWT_SECRET = "dev-crew-secret";
+    const token = signCrewToken(
+      "dev-crew-secret",
+      Math.floor(Date.now() / 1000) - 60,
+    );
+    const req = new NextRequest("http://localhost:3000/crew/home", {
+      headers: { cookie: `crew-token=${token}` },
+    });
+    const res = await middleware(req);
+    expect(res.headers.get("location")).toBe(
+      "http://localhost:3000/crew/login",
+    );
   });
 });

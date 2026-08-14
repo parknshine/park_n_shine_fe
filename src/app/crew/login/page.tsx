@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useCrewSession } from "@/features/crew/hooks";
+import { fetchCrewSession } from "@/features/crew/hooks/use-crew-session";
+import api from "@/lib/axios-crew";
 import { useCrewAuthStore } from "@/store/crew-auth-store";
 import { useTranslation } from "@/i18n";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
@@ -14,10 +15,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function CrewLoginPage() {
-  const router = useRouter();
   const { t } = useTranslation("crew");
   const { login, session, isLoading: isLoggingIn } = useCrewSession();
   const hasHydrated = useCrewAuthStore((s) => s._hasHydrated);
+  const clearCrewSession = useCrewAuthStore((s) => s.clearCrewSession);
 
   const [shiftCode, setShiftCode] = useState("");
   const [pin, setPin] = useState("");
@@ -30,11 +31,25 @@ export function CrewLoginPage() {
   const isBusy = isLoggingIn || isRedirecting;
 
   useEffect(() => {
-    if (!hasHydrated) return;
-    if (session) {
-      router.replace("/crew/home");
-    }
-  }, [hasHydrated, session, router]);
+    if (!hasHydrated || !session || isRedirecting) return;
+    let cancelled = false;
+    // The persisted store can outlive the httpOnly crew-token cookie (e.g.
+    // overnight). Confirm the server session is alive before auto-redirecting;
+    // redirecting on a dead cookie used to bounce off the middleware and trap
+    // this page in a 307 loop. Dead session → drop the stale store instead.
+    fetchCrewSession(api).then((live) => {
+      if (cancelled) return;
+      if (live) {
+        setIsRedirecting(true);
+        window.location.replace("/crew/home");
+      } else {
+        clearCrewSession();
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasHydrated, session, isRedirecting, clearCrewSession]);
 
   const canSubmit = shiftCode.length === 6 && pin.length > 0 && !isBusy;
 
@@ -49,7 +64,11 @@ export function CrewLoginPage() {
     try {
       await login({ shiftCode, pin });
       setIsRedirecting(true);
-      router.replace("/crew/home");
+      // Full-page navigation, not router.replace: it forces the middleware to
+      // re-evaluate the fresh crew-token cookie. A client-side replace can
+      // replay the pre-login 307 bounce (expired cookie) and strand the
+      // spinner on this page until the user hard-refreshes.
+      window.location.replace("/crew/home");
     } catch (err) {
       const code = (err as { code?: string }).code;
       let msgKey = "login.errors.default";

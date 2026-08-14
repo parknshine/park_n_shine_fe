@@ -122,6 +122,12 @@ const PUBLIC_PATHS = new Set([
 async function verifyCookieAuth(
   req: NextRequest,
 ): Promise<NextResponse | null> {
+  // In local dev the API (different port) sets the httpOnly cookies, so they
+  // never reach this middleware and every /crew|/admin navigation would bounce
+  // back to the login page. Keep the flag off in dev; client-side shells still
+  // guard those routes.
+  if (process.env.NEXT_PUBLIC_COOKIE_AUTH !== "true") return null;
+
   const { pathname } = req.nextUrl;
 
   if (PUBLIC_PATHS.has(pathname)) return null;
