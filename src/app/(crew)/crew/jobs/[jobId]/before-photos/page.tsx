@@ -38,6 +38,11 @@ export function BeforePhotosPage() {
       id: "photo-before-front",
     },
     {
+      kind: "before_right" as const,
+      label: t("job.photoKind.before_right"),
+      id: "photo-before-right",
+    },
+    {
       kind: "before_back" as const,
       label: t("job.photoKind.before_back"),
       id: "photo-before-back",
@@ -46,11 +51,6 @@ export function BeforePhotosPage() {
       kind: "before_left" as const,
       label: t("job.photoKind.before_left"),
       id: "photo-before-left",
-    },
-    {
-      kind: "before_right" as const,
-      label: t("job.photoKind.before_right"),
-      id: "photo-before-right",
     },
   ];
 
@@ -65,10 +65,26 @@ export function BeforePhotosPage() {
   const { job } = useCrewJob(jobId);
   const expired = useEtaExpired(job?.etaEndsAt);
 
-  const frontUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_front") ?? null });
-  const backUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_back") ?? null });
-  const leftUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_left") ?? null });
-  const rightUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_right") ?? null });
+  const frontUpload = usePhotoUpload({
+    uploadUrl,
+    apiClient: crewApi,
+    serverMedia: job?.media.find((m) => m.kind === "before_front") ?? null,
+  });
+  const backUpload = usePhotoUpload({
+    uploadUrl,
+    apiClient: crewApi,
+    serverMedia: job?.media.find((m) => m.kind === "before_back") ?? null,
+  });
+  const leftUpload = usePhotoUpload({
+    uploadUrl,
+    apiClient: crewApi,
+    serverMedia: job?.media.find((m) => m.kind === "before_left") ?? null,
+  });
+  const rightUpload = usePhotoUpload({
+    uploadUrl,
+    apiClient: crewApi,
+    serverMedia: job?.media.find((m) => m.kind === "before_right") ?? null,
+  });
 
   const uploadMap: Record<string, ReturnType<typeof usePhotoUpload>> = {
     before_front: frontUpload,

@@ -94,6 +94,12 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
         setExpiredJobId(null);
         return;
       }
+      // Only react to "updated" (data actually changed). Other event types —
+      // notably "added", fired synchronously when a component's useQuery call
+      // creates a brand-new cache entry during its own render — would call
+      // setActiveJob on CrewShell mid-render of that other component, which
+      // React flags as an invalid cross-component setState-during-render.
+      if (event.type !== "updated") return;
       const data = event.query.state.data as CrewJob | null;
       setActiveJob(deriveActiveJob(data));
     });
