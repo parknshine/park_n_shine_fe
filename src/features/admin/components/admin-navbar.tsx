@@ -3,14 +3,15 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, LogOut, Menu, PhoneCall, Timer, Undo2 } from "lucide-react";
+import { AlarmClock, Bell, LogOut, Menu, PhoneCall, Timer, Undo2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useUIStore } from "@/store/ui-store";
-import { useAdminAuth, useAdminEscalations, useAdminNotificationRequests, useAdminRefundsNeeded } from "@/features/admin/hooks";
+import { useAdminAuth, useAdminEscalations, useAdminExpiringJobs, useAdminNotificationRequests, useAdminRefundsNeeded } from "@/features/admin/hooks";
 import { LanguageSwitcher } from "@/components/shared";
 import { StatusBadge } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
+import { bookingRef, shortId } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 
 const PAGE_TITLE_KEYS: Record<string, string> = {
@@ -29,10 +30,12 @@ export function AdminNavbar() {
   const { t } = useTranslation("admin");
   const [showEscalations, setShowEscalations] = useState(false);
   const [showTimeExt, setShowTimeExt] = useState(false);
+  const [showExpiring, setShowExpiring] = useState(false);
   const [showRefunds, setShowRefunds] = useState(false);
   const [showNotificationRequests, setShowNotificationRequests] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeExtDropdownRef = useRef<HTMLDivElement>(null);
+  const expiringDropdownRef = useRef<HTMLDivElement>(null);
   const refundsDropdownRef = useRef<HTMLDivElement>(null);
   const notificationRequestsDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +45,9 @@ export function AdminNavbar() {
 
   const { escalations } = useAdminEscalations();
   const escalationCount = escalations.length;
+
+  const { jobs: expiringJobs } = useAdminExpiringJobs();
+  const expiringCount = expiringJobs.length;
 
   const { refunds, total: refundsCount } = useAdminRefundsNeeded();
 
@@ -54,6 +60,9 @@ export function AdminNavbar() {
       }
       if (timeExtDropdownRef.current && !timeExtDropdownRef.current.contains(e.target as Node)) {
         setShowTimeExt(false);
+      }
+      if (expiringDropdownRef.current && !expiringDropdownRef.current.contains(e.target as Node)) {
+        setShowExpiring(false);
       }
       if (refundsDropdownRef.current && !refundsDropdownRef.current.contains(e.target as Node)) {
         setShowRefunds(false);
@@ -143,10 +152,10 @@ export function AdminNavbar() {
                       <Timer className="h-4 w-4 shrink-0 text-amber-500" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-foreground">
-                          {t("timeExtension.toastTitle")}
+                          {shortId(n.bookingId)}
                         </p>
                         <p className="truncate text-xs text-muted-foreground">
-                          {t("timeExtension.toastBody", { bookingId: n.bookingId.slice(0, 8) })}
+                          {t("timeExtension.toastTitle")}
                         </p>
                       </div>
                     </li>
@@ -156,6 +165,93 @@ export function AdminNavbar() {
                 <div className="px-4 py-6 text-center">
                   <p className="text-sm text-muted-foreground">
                     {t("navbar.noTimeExtDesc")}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Expiring-soon bell */}
+        <div ref={expiringDropdownRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setShowExpiring((v) => !v)}
+            className="relative rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label={t("navbar.expiringAriaLabel")}
+          >
+            <AlarmClock className="h-4 w-4" />
+            {expiringCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">
+                {expiringCount > 9 ? "9+" : expiringCount}
+              </span>
+            )}
+          </button>
+
+          {showExpiring && (
+            <div className="absolute right-0 top-full z-50 mt-1 w-72 rounded-lg border border-border bg-background shadow-lg">
+              <div className="border-b border-border px-4 py-2.5">
+                <p className="text-xs font-semibold text-foreground">
+                  {expiringCount > 0
+                    ? t(
+                        expiringCount === 1
+                          ? "navbar.expiringTitle"
+                          : "navbar.expiringTitlePlural",
+                        { count: expiringCount }
+                      )
+                    : t("navbar.noExpiring")}
+                </p>
+              </div>
+              {expiringJobs.length > 0 ? (
+                <ul className="max-h-64 divide-y divide-border overflow-y-auto">
+                  {expiringJobs.map((job) => {
+                    const minutesLeft = job.estimatedReadyAt
+                      ? Math.max(
+                          0,
+                          Math.round(
+                            (new Date(job.estimatedReadyAt).getTime() - Date.now()) / 60_000
+                          )
+                        )
+                      : null;
+                    return (
+                      <li
+                        key={job.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          setShowExpiring(false);
+                          setDrawerBookingId(job.id);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            setShowExpiring(false);
+                            setDrawerBookingId(job.id);
+                          }
+                        }}
+                        className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-muted/60"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-foreground">
+                            {bookingRef(job.reference, job.id)}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {job.plateText ?? "-"} · {job.siteName}
+                            {job.slotText ? ` · ${job.slotText}` : ""}
+                          </p>
+                        </div>
+                        <span className="shrink-0 text-xs font-semibold text-orange-600 dark:text-orange-400">
+                          {minutesLeft !== null
+                            ? t("navbar.expiringMinutesLeft", { minutes: minutesLeft })
+                            : "—"}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <div className="px-4 py-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    {t("navbar.noExpiringDesc")}
                   </p>
                 </div>
               )}
@@ -210,10 +306,10 @@ export function AdminNavbar() {
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-foreground">
-                          {booking.plateText ?? booking.id}
+                          {bookingRef(booking.reference, booking.id)}
                         </p>
                         <p className="truncate text-xs text-muted-foreground">
-                          {booking.siteName}
+                          {booking.plateText ?? "-"} · {booking.siteName}
                           {booking.slotText ? ` · ${booking.slotText}` : ""}
                         </p>
                       </div>
@@ -287,10 +383,10 @@ export function AdminNavbar() {
                         <Undo2 className="h-4 w-4 shrink-0 text-blue-500" />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-semibold text-foreground">
-                            {row.reference ?? row.id}
+                            {bookingRef(row.reference, row.id)}
                           </p>
                           <p className="truncate text-xs text-muted-foreground">
-                            {row.siteName ?? "-"}
+                            {row.plate ?? "-"} · {row.siteName ?? "-"}
                           </p>
                         </div>
                       </li>
@@ -378,11 +474,10 @@ export function AdminNavbar() {
                         <PhoneCall className="h-4 w-4 shrink-0 text-emerald-500" />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-semibold text-foreground">
-                            {row.siteName ?? row.plate ?? "-"}
+                            {bookingRef(row.reference, row.id)}
                           </p>
                           <p className="truncate text-xs text-muted-foreground">
-                            {row.phone ?? "-"}
-                            {row.siteName && row.plate ? ` · ${row.plate}` : ""}
+                            {row.plate ?? "-"} · {row.phone ?? "-"}
                           </p>
                         </div>
                       </li>

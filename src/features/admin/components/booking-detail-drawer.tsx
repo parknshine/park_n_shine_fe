@@ -177,10 +177,17 @@ export function BookingDetailDrawer({
             )}
             {booking && (
               <>
-                <span className='font-semibold text-foreground'>
-                  {booking.plateText ??
-                    bookingRef(booking.reference, booking.id)}
-                </span>
+                <div className='flex flex-col leading-tight'>
+                  <span className='font-semibold text-foreground'>
+                    {booking.plateText ??
+                      bookingRef(booking.reference, booking.id)}
+                  </span>
+                  {booking.plateText && (
+                    <span className='text-xs text-muted-foreground'>
+                      {bookingRef(booking.reference, booking.id)}
+                    </span>
+                  )}
+                </div>
                 {(() => {
                   const isRefunded = (booking.refundedAmount ?? 0) > 0;
                   const effStatus = isRefunded ? "REFUNDED" : booking.status;

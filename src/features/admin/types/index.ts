@@ -43,6 +43,11 @@ export interface AdminTimeExtensionRequestsResponse {
   requests: TimeExtensionRequest[];
 }
 
+export interface AdminExpiringJobsResponse {
+  fetchedAt: string;
+  jobs: AdminEscalationBooking[];
+}
+
 export interface RefundPayload {
   reasonCode: string;
 }

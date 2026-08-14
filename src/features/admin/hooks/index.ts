@@ -22,6 +22,7 @@ export type {
 export * from "./use-admin-testimonials";
 export { useSiteSelection } from "./use-site-selection";
 export { useAdminEscalations } from "./use-admin-escalations";
+export { useAdminExpiringJobs } from "./use-admin-expiring-jobs";
 export { useAdminTimeExtensionRequests } from "./use-admin-time-extensions";
 export { useAdminRefundsNeeded } from "./use-admin-refunds-needed";
 export { useAdminNotificationRequests } from "./use-admin-notification-requests";

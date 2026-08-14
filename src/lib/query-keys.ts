@@ -3,6 +3,7 @@ export const queryKeys = {
     queue: (siteId: string) => ["admin", "queue", siteId] as const,
     allSitesQueue: () => ["admin", "queue", "all"] as const,
     escalations: () => ["admin", "escalations"] as const,
+    expiringJobs: () => ["admin", "expiring-jobs"] as const,
     timeExtensionRequests: () => ["admin", "time-extension-requests"] as const,
     booking: (bookingId: string) => ["admin", "booking", bookingId] as const,
     report: (siteId: string, from: string, to: string) =>
