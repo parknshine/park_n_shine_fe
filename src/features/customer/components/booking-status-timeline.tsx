@@ -55,7 +55,7 @@ const STATUS_STEP: Record<BookingStatus, number> = {
   ASSIGNED: 2,
   LOCATED: 3,
   IN_PROGRESS: 4,
-  NEEDS_HELP: 4,
+  NEEDS_HELP: 3,
   READY: 5,
   CLOSED: 6,
   EXPIRED: 1,
@@ -132,8 +132,12 @@ export function buildStepTimestamps(
   return timestampMap;
 }
 
-function stepConnectorClass(isDone: boolean, isTerminalNonClosed: boolean): string {
-  if (isDone) return "bg-green-600";
+function stepConnectorClass(
+  isDone: boolean,
+  isTerminalNonClosed: boolean,
+  isNeedsHelp: boolean,
+): string {
+  if (isDone) return isNeedsHelp ? "bg-amber-600" : "bg-green-600";
   if (isTerminalNonClosed) return "bg-[#f8e5e0]";
   return "bg-muted";
 }
@@ -142,11 +146,34 @@ function stepDotClass(
   isDone: boolean,
   isActive: boolean,
   isTerminalNonClosed: boolean,
+  isNeedsHelp: boolean,
 ): string {
-  if (isDone) return "border-green-600 bg-green-600 text-white";
-  if (isActive) return "border-primary bg-primary/10 text-primary";
-  if (isTerminalNonClosed) return "border-[#f8e5e0] bg-white text-muted-foreground/50";
+  if (isDone)
+    return isNeedsHelp
+      ? "border-amber-600 bg-amber-600 text-white"
+      : "border-green-600 bg-green-600 text-white";
+  if (isActive)
+    return isNeedsHelp
+      ? "border-amber-600 bg-amber-50 text-amber-600"
+      : "border-primary bg-primary/10 text-primary";
+  if (isTerminalNonClosed)
+    return "border-[#f8e5e0] bg-white text-muted-foreground/50";
   return "border-muted bg-background text-muted-foreground";
+}
+
+function stepTextClass(
+  isDone: boolean,
+  isActive: boolean,
+  isFuture: boolean,
+  isNeedsHelp: boolean,
+): string {
+  if (isDone) return isNeedsHelp ? "text-amber-700" : "text-green-700";
+  if (isActive)
+    return isNeedsHelp
+      ? "font-semibold text-amber-600"
+      : "font-semibold text-primary";
+  if (isFuture) return "text-muted-foreground/50";
+  return "";
 }
 
 function terminalDescKey(status: BookingStatus, isRefunded: boolean): string {
@@ -155,10 +182,7 @@ function terminalDescKey(status: BookingStatus, isRefunded: boolean): string {
   return "status.cancelledMessage";
 }
 
-function terminalLabelKey(
-  status: BookingStatus,
-  isRefunded: boolean,
-): string {
+function terminalLabelKey(status: BookingStatus, isRefunded: boolean): string {
   if (status === "EXPIRED") return "booking.stepper.expired.label";
   if (isRefunded) return "booking.stepper.cancelled_refunded.label";
   return "booking.stepper.cancelled.label";
@@ -175,6 +199,7 @@ export function BookingStatusTimeline({
   const isTerminal =
     status === "EXPIRED" || status === "CANCELLED" || status === "CLOSED";
   const isTerminalNonClosed = status === "CANCELLED" || status === "EXPIRED";
+  const isNeedsHelp = status === "NEEDS_HELP";
 
   const timestampMap = buildStepTimestamps(status, statusHistory);
 
@@ -182,7 +207,9 @@ export function BookingStatusTimeline({
   const terminalDotClass = terminalIsDestructive
     ? "border-destructive bg-destructive/10 text-destructive"
     : "border-[#f7481f] bg-[#fff0ed] text-[#f7481f]";
-  const terminalTextClass = terminalIsDestructive ? "text-destructive" : "text-[#f7481f]";
+  const terminalTextClass = terminalIsDestructive
+    ? "text-destructive"
+    : "text-[#f7481f]";
 
   return (
     <ol aria-label='Booking progress'>
@@ -233,7 +260,12 @@ export function BookingStatusTimeline({
                 <div
                   className={cn(
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                    stepDotClass(isDone, isActive, isTerminalNonClosed),
+                    stepDotClass(
+                      isDone,
+                      isActive,
+                      isTerminalNonClosed,
+                      isNeedsHelp,
+                    ),
                   )}
                 >
                   {isDone ? (
@@ -248,7 +280,11 @@ export function BookingStatusTimeline({
                   <div
                     className={cn(
                       "my-1 w-0.5 flex-1",
-                      stepConnectorClass(isDone, isTerminalNonClosed),
+                      stepConnectorClass(
+                        isDone,
+                        isTerminalNonClosed,
+                        isNeedsHelp,
+                      ),
                     )}
                     style={{ minHeight: 20 }}
                   />
@@ -260,9 +296,7 @@ export function BookingStatusTimeline({
                 <p
                   className={cn(
                     "text-sm font-medium leading-tight",
-                    isDone && "text-green-700",
-                    isActive && "font-semibold text-primary",
-                    isFuture && "text-muted-foreground/50",
+                    stepTextClass(isDone, isActive, isFuture, isNeedsHelp),
                   )}
                 >
                   {t(step.labelKey, { defaultValue: step.status })}

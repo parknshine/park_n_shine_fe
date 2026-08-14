@@ -15,19 +15,23 @@ import { EtaCountdown, JobStaleModal } from "@/features/crew/components";
 import { useRealtimeEvents } from "@/lib/use-realtime-events";
 import crewApi from "@/lib/axios-crew";
 import { queryKeys } from "@/lib/query-keys";
-import type { CrewJob } from "@/features/crew/types";
+import { type CrewJob, TIMER_HIDDEN_STATUSES } from "@/features/crew/types";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "@/i18n";
 
-const TIMER_HIDDEN_STATUSES = new Set([
-  "READY",
-  "CLOSED",
-  "CANCELLED",
-  "EXPIRED",
-]);
-
 interface CrewShellProps {
   children: ReactNode;
+}
+
+// Derive the header timer's active job from a CrewJob payload. Returns null
+// when the status is terminal/needs-admin (timer hidden) or etaEndsAt is
+// missing — the timer pill should not render in those cases.
+function deriveActiveJob(data: CrewJob | null): {
+  id: string;
+  etaEndsAt: string;
+} | null {
+  if (!data?.etaEndsAt || TIMER_HIDDEN_STATUSES.has(data.status)) return null;
+  return { id: data.id, etaEndsAt: data.etaEndsAt };
 }
 
 export function CrewShell({ children }: Readonly<CrewShellProps>) {
@@ -42,12 +46,26 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
     id: string;
     etaEndsAt: string;
   } | null>(() => {
-    for (const query of queryClient
-      .getQueryCache()
-      .findAll({ queryKey: ["crew", "job"] })) {
+    // On hard refresh the cache may be empty or still rehydrating from
+    // localStorage. Check both the single-job cache (crew.job:jobId, set by
+    // the job detail page / claim mutation) and the active-job cache
+    // (crew.jobs:next, set by the home page's useNextJob). Without the latter,
+    // a hard refresh on the home page never restores the header timer because
+    // useNextJob only writes to ["crew","jobs","next"], which the old
+    // findAll({ queryKey: ["crew","job"] }) prefix match did not cover.
+    for (const query of queryClient.getQueryCache().findAll()) {
+      const key = query.queryKey;
+      const isJobQuery =
+        key[0] === "crew" && key[1] === "job" && key.length === 3;
+      const isNextJobQuery =
+        key[0] === "crew" &&
+        key[1] === "jobs" &&
+        key[2] === "next" &&
+        key.length === 3;
+      if (!isJobQuery && !isNextJobQuery) continue;
       const data = query.state.data as CrewJob | null;
-      if (data?.etaEndsAt && !TIMER_HIDDEN_STATUSES.has(data.status))
-        return { id: data.id, etaEndsAt: data.etaEndsAt };
+      const derived = deriveActiveJob(data);
+      if (derived) return derived;
     }
     return null;
   });
@@ -56,27 +74,28 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
   const [crewSseToken, setCrewSseToken] = useState<string | null>(null);
   const fetchingCrewSseRef = useRef(false);
 
-  // Subscribe to etaEndsAt changes from crew job query cache
+  // Subscribe to etaEndsAt changes from crew job query cache. Watch both
+  // crew.job:jobId (job detail page) and crew.jobs:next (home page) so the
+  // header timer restores on hard refresh regardless of which page loaded.
   useEffect(() => {
     const cache = queryClient.getQueryCache();
     return cache.subscribe((event) => {
       const key = event.query.queryKey;
-      if (key[0] === "crew" && key[1] === "job" && key.length === 3) {
-        if (event.type === "removed") {
-          setActiveJob(null);
-          setExpiredJobId(null);
-          return;
-        }
-        const data = event.query.state.data as CrewJob | null;
-        const isTerminal = data?.status
-          ? TIMER_HIDDEN_STATUSES.has(data.status)
-          : false;
-        setActiveJob(
-          isTerminal || !data?.etaEndsAt
-            ? null
-            : { id: data.id, etaEndsAt: data.etaEndsAt },
-        );
+      const isJobQuery =
+        key[0] === "crew" && key[1] === "job" && key.length === 3;
+      const isNextJobQuery =
+        key[0] === "crew" &&
+        key[1] === "jobs" &&
+        key[2] === "next" &&
+        key.length === 3;
+      if (!isJobQuery && !isNextJobQuery) return;
+      if (event.type === "removed") {
+        setActiveJob(null);
+        setExpiredJobId(null);
+        return;
       }
+      const data = event.query.state.data as CrewJob | null;
+      setActiveJob(deriveActiveJob(data));
     });
   }, [queryClient]);
 
@@ -109,12 +128,12 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
         void queryClient.invalidateQueries({
           queryKey: queryKeys.crew.job(event.bookingId as string),
         });
-      }
-      if (
-        event.type === "booking_status_changed" &&
-        (event.status === "CANCELLED" || event.status === "EXPIRED") &&
-        event.bookingId
-      ) {
+        // The crew SSE channel (crew:${crewId}) only delivers events for this
+        // crew's own bookings, so any status change here affects their active
+        // job view (home page reads /jobs/active via crew.nextJob()). Always
+        // invalidate it — not just on CANCELLED/EXPIRED — so admin overrides
+        // like NEEDS_HELP → IN_PROGRESS reflect immediately on the home page
+        // instead of sticking on "Menunggu admin".
         void queryClient.invalidateQueries({
           queryKey: queryKeys.crew.nextJob(),
         });

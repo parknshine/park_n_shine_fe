@@ -1,11 +1,14 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
 import api from "@/lib/axios-crew";
 import { queryKeys } from "@/lib/query-keys";
 import type { CrewJob } from "@/features/crew/types";
 
-export function useCrewJob(jobId: string) {
+export function useCrewJob(
+  jobId: string,
+  options?: Pick<UseQueryOptions<CrewJob | null>, "refetchInterval">,
+) {
   const jobQuery = useQuery<CrewJob | null>({
     enabled: !!jobId,
     queryFn: async () => {
@@ -14,14 +17,16 @@ export function useCrewJob(jobId: string) {
     },
     queryKey: queryKeys.crew.job(jobId),
     staleTime: 30_000,
+    refetchInterval: options?.refetchInterval,
   });
 
-  const error =
-    jobQuery.error instanceof Error
-      ? jobQuery.error.message
-      : jobQuery.error
-        ? "job_fetch_failed"
-        : null;
+  let error: string | null = null;
+  if (jobQuery.error) {
+    error =
+      jobQuery.error instanceof Error
+        ? jobQuery.error.message
+        : "job_fetch_failed";
+  }
 
   return {
     error,

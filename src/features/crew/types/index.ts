@@ -27,6 +27,20 @@ export interface CrewJob {
   checklist: WashChecklistItem[];
 }
 
+// Statuses where the ETA countdown timer is no longer relevant and should be
+// hidden from the crew UI (header pill + job detail page).
+// NEEDS_HELP / STALE: crew is waiting for admin intervention — timer adds noise.
+// READY / CLOSED: job past the wash phase — no ETA to count down.
+// CANCELLED / EXPIRED: terminal — no timer needed.
+export const TIMER_HIDDEN_STATUSES = new Set<BookingStatus>([
+  "NEEDS_HELP",
+  "STALE",
+  "READY",
+  "CLOSED",
+  "CANCELLED",
+  "EXPIRED",
+]);
+
 export interface WashChecklistItem {
   id: string;
   labelKey: string;
@@ -65,4 +79,4 @@ export const REJECTION_REASONS = [
   "CREW_UNAVAILABLE",
 ] as const;
 
-export type RejectionReason = typeof REJECTION_REASONS[number];
+export type RejectionReason = (typeof REJECTION_REASONS)[number];
