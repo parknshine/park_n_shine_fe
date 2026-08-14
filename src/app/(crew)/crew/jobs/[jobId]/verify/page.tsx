@@ -6,7 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, ArrowRight, ChevronLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCrewJob, useVerifyPlate } from "@/features/crew/hooks";
+import { TimeExtensionControl } from "@/features/crew/components";
+import { useCrewJob, useEtaExpired, useVerifyPlate } from "@/features/crew/hooks";
 import { queryKeys } from "@/lib/query-keys";
 import { useTranslation } from "@/i18n";
 
@@ -27,6 +28,7 @@ export function VerifyPlatePage() {
       query.state.data?.status === "NEEDS_HELP" ? 5_000 : false,
   });
   const { verify, isLoading, error } = useVerifyPlate(jobId);
+  const expired = useEtaExpired(job?.etaEndsAt);
 
   // localEscalated gives immediate UI feedback after the crew clicks
   // "not found" — before the job query refetches. isEscalated also
@@ -221,6 +223,12 @@ export function VerifyPlatePage() {
       {!isEscalated && (
         <div className='fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3'>
           <div className='mx-auto max-w-md space-y-2'>
+            {expired && (
+              <p className='text-center text-xs font-medium text-red-500'>
+                {t("job.timeExpiredHint")}
+              </p>
+            )}
+
             {/* Primary: Plat Cocok */}
             <Button
               size='lg'
@@ -233,7 +241,7 @@ export function VerifyPlatePage() {
                   <ArrowRight className='h-5 w-5' />
                 )
               }
-              disabled={isLoading}
+              disabled={isLoading || expired}
               onClick={handleMatched}
             >
               {t("verify.matched")}
@@ -244,11 +252,15 @@ export function VerifyPlatePage() {
               size='lg'
               variant='outline'
               className='h-12 w-full rounded-xl border-destructive text-destructive hover:bg-destructive/10'
-              disabled={isLoading}
+              disabled={isLoading || expired}
               onClick={handleNotFound}
             >
               {t("verify.notFound")}
             </Button>
+
+            {expired && job && (
+              <TimeExtensionControl jobId={jobId} etaEndsAt={job.etaEndsAt} />
+            )}
           </div>
         </div>
       )}

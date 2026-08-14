@@ -407,7 +407,7 @@ export default function BookCapturePage() {
             })}
             value={effectiveSiteId}
             onChange={setSelectedSiteId}
-            disabled={isSitesLoading}
+            disabled
             placeholder={
               isSitesLoading
                 ? t("booking.capture.locationLoading")

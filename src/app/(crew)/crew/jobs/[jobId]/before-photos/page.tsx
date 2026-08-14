@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { OfflineBanner } from "@/components/shared";
 import { PhotoUploadField } from "@/features/customer/components/photo-upload-field";
 import { usePhotoUpload } from "@/features/customer/hooks/use-photo-upload";
-import { useCrewJob } from "@/features/crew/hooks";
+import { TimeExtensionControl } from "@/features/crew/components";
+import { useCrewJob, useEtaExpired } from "@/features/crew/hooks";
 import crewApi from "@/lib/axios-crew";
 import type { MediaKind } from "@/types/media";
 import { useTranslation } from "@/i18n";
@@ -62,6 +63,7 @@ export function BeforePhotosPage() {
 
   const uploadUrl = `/v1/crew/jobs/${jobId}/media`;
   const { job } = useCrewJob(jobId);
+  const expired = useEtaExpired(job?.etaEndsAt);
 
   const frontUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_front") ?? null });
   const backUpload = usePhotoUpload({ uploadUrl, apiClient: crewApi, serverMedia: job?.media.find((m) => m.kind === "before_back") ?? null });
@@ -143,12 +145,17 @@ export function BeforePhotosPage() {
 
       {/* Sticky CTA */}
       <div className='fixed bottom-5 left-0 right-0 z-30 border-t border-border bg-background px-4 pb-[env(safe-area-inset-bottom,16px)] pt-3'>
-        <div className='mx-auto max-w-md'>
+        <div className='mx-auto max-w-md flex flex-col gap-2'>
+          {expired && (
+            <p className='text-center text-xs font-medium text-red-500'>
+              {t("job.timeExpiredHint")}
+            </p>
+          )}
           <Button
             size='lg'
             variant='default'
             className='h-14 w-full rounded-xl text-base font-bold'
-            disabled={!allDone}
+            disabled={!allDone || expired}
             onClick={() => router.replace(`/crew/jobs/${jobId}/wash`)}
             suffix={<ArrowRight className='h-5 w-5' />}
             aria-label={
@@ -161,6 +168,10 @@ export function BeforePhotosPage() {
               ? t("beforePhotos.continueButton")
               : t("beforePhotos.photoCount", { done: doneCount })}
           </Button>
+
+          {expired && job && (
+            <TimeExtensionControl jobId={jobId} etaEndsAt={job.etaEndsAt} />
+          )}
         </div>
       </div>
     </>
