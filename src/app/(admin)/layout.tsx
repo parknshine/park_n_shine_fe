@@ -5,21 +5,33 @@ import { usePathname, useRouter } from "next/navigation";
 import { ADMIN_MENUS, accessForPath } from "@/lib/menu-access";
 import type { ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { AdminSidebar, AdminNavbar, BookingDetailDrawer } from "@/features/admin/components";
-import { useAdminSites } from "@/features/admin/hooks";
+import {
+  AdminSidebar,
+  AdminNavbar,
+  BookingDetailDrawer,
+} from "@/features/admin/components";
+import {
+  useAdminSites,
+  useAdminTimeExtensionRequests,
+} from "@/features/admin/hooks";
 import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 import { invalidatePaymentQueries } from "@/features/admin/utils/realtime-invalidations";
 import { useUIStore } from "@/store/ui-store";
 import { useAuthStore } from "@/store/auth-store";
 import { queryKeys } from "@/lib/query-keys";
 
-export default function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default function AdminLayout({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const addTimeExtNotification = useUIStore((s) => s.addTimeExtNotification);
+  const setTimeExtNotifications = useUIStore((s) => s.setTimeExtNotifications);
   const drawerBookingId = useUIStore((s) => s.drawerBookingId);
   const setDrawerBookingId = useUIStore((s) => s.setDrawerBookingId);
-  const removeTimeExtNotification = useUIStore((s) => s.removeTimeExtNotification);
+  const removeTimeExtNotification = useUIStore(
+    (s) => s.removeTimeExtNotification,
+  );
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const role = useAuthStore((s) => s.role);
@@ -43,6 +55,17 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
   // Always fetch fresh sites on every admin page so sidebar stays in sync
   useAdminSites();
 
+  const { requests } = useAdminTimeExtensionRequests();
+  useEffect(() => {
+    setTimeExtNotifications(
+      requests.map((r) => ({
+        bookingId: r.bookingId,
+        crewId: r.crewId,
+        ts: new Date(r.requestedAt).getTime(),
+      })),
+    );
+  }, [requests, setTimeExtNotifications]);
+
   useAdminRealtime({
     onEvent: (event) => {
       if (event.type === "crew_time_extension_request" && event.bookingId) {
@@ -51,17 +74,23 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
           crewId: event.crewId as string | undefined,
           ts: Date.now(),
         });
-        void queryClient.invalidateQueries({ queryKey: queryKeys.admin.booking(event.bookingId as string) });
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.booking(event.bookingId as string),
+        });
       }
       if (event.type === "new_job" || event.type === "job_assigned") {
         void queryClient.invalidateQueries({ queryKey: ["admin", "queue"] });
         if (event.type === "job_assigned" && event.bookingId) {
-          void queryClient.invalidateQueries({ queryKey: queryKeys.admin.booking(event.bookingId as string) });
+          void queryClient.invalidateQueries({
+            queryKey: queryKeys.admin.booking(event.bookingId as string),
+          });
         }
       }
       invalidatePaymentQueries(queryClient, event);
       if (event.type === "chat_message") {
-        void queryClient.invalidateQueries({ queryKey: queryKeys.admin.chatConversations() });
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.chatConversations(),
+        });
         if (typeof event.conversationId === "string") {
           void queryClient.invalidateQueries({
             queryKey: queryKeys.admin.chatMessages(event.conversationId),
@@ -72,11 +101,11 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
   });
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-background">
+    <div className='flex h-dvh overflow-hidden bg-background'>
       <AdminSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className='flex flex-1 flex-col overflow-hidden'>
         <AdminNavbar />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className='flex-1 overflow-y-auto p-6'>{children}</main>
       </div>
 
       <BookingDetailDrawer
@@ -85,8 +114,15 @@ export default function AdminLayout({ children }: Readonly<{ children: ReactNode
         onActionSuccess={() => {
           if (drawerBookingId) {
             removeTimeExtNotification(drawerBookingId);
-            void queryClient.invalidateQueries({ queryKey: ["admin", "booking", drawerBookingId] });
-            void queryClient.invalidateQueries({ queryKey: ["admin", "queue"] });
+            void queryClient.invalidateQueries({
+              queryKey: ["admin", "booking", drawerBookingId],
+            });
+            void queryClient.invalidateQueries({
+              queryKey: ["admin", "queue"],
+            });
+            void queryClient.invalidateQueries({
+              queryKey: queryKeys.admin.timeExtensionRequests(),
+            });
           }
           setDrawerBookingId(null);
         }}

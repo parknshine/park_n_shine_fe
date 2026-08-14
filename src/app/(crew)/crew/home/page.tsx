@@ -42,8 +42,18 @@ export function getResumeTarget(job: CrewJob): string {
   if (job.status === "ASSIGNED") return `${base}/verify`;
   if (job.status === "LOCATED") return `${base}/before-photos`;
   if (job.status === "IN_PROGRESS") {
-    const beforeKinds = ["before_front", "before_back", "before_left", "before_right"];
-    const afterKinds = ["after_front", "after_back", "after_left", "after_right"];
+    const beforeKinds = [
+      "before_front",
+      "before_back",
+      "before_left",
+      "before_right",
+    ];
+    const afterKinds = [
+      "after_front",
+      "after_back",
+      "after_left",
+      "after_right",
+    ];
     const hasAllBeforePhotos = beforeKinds.every((k) =>
       job.media.some((m) => m.kind === k),
     );
@@ -62,6 +72,38 @@ export function getResumeTarget(job: CrewJob): string {
   if (job.status === "NEEDS_HELP") return base;
   if (job.status === "STALE") return base;
   return base;
+}
+
+function ActiveJobCard({ job }: Readonly<{ job: CrewJob }>) {
+  const router = useRouter();
+  const { t } = useTranslation("crew");
+  const canResume = !["NEEDS_HELP", "STALE"].includes(job.status);
+
+  return (
+    <div className='w-full space-y-4'>
+      <div className='flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 p-5'>
+        <p className='text-xs font-semibold uppercase tracking-widest text-primary'>
+          {t("home.activeJobLabel", { defaultValue: "Job aktif kamu" })}
+        </p>
+        <p className='font-mono text-2xl font-bold tracking-widest text-foreground'>
+          {job.plateText}
+        </p>
+        <Button
+          size='lg'
+          className='h-14 w-full rounded-xl text-base font-bold'
+          suffix={<ArrowRight className='h-5 w-5' />}
+          disabled={!canResume}
+          onClick={
+            canResume ? () => router.replace(getResumeTarget(job)) : undefined
+          }
+        >
+          {canResume
+            ? t("home.resumeJob", { defaultValue: "Lanjutkan job" })
+            : t("home.waitingForAdmin", { defaultValue: "Menunggu admin" })}
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 function formatCountdown(ms: number): string {
@@ -185,26 +227,7 @@ export function CrewHomePage() {
     // hiding it. The auto-redirect above is suppressed by noResume, so without
     // this card the job would be unreachable from home.
     if (job) {
-      return (
-        <div className='w-full space-y-4'>
-          <div className='flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 p-5'>
-            <p className='text-xs font-semibold uppercase tracking-widest text-primary'>
-              {t("home.activeJobLabel", { defaultValue: "Job aktif kamu" })}
-            </p>
-            <p className='font-mono text-2xl font-bold tracking-widest text-foreground'>
-              {job.plateText}
-            </p>
-            <Button
-              size='lg'
-              className='h-14 w-full rounded-xl text-base font-bold'
-              suffix={<ArrowRight className='h-5 w-5' />}
-              onClick={() => router.replace(getResumeTarget(job))}
-            >
-              {t("home.resumeJob", { defaultValue: "Lanjutkan job" })}
-            </Button>
-          </div>
-        </div>
-      );
+      return <ActiveJobCard job={job} />;
     }
 
     if (hasNoJob && !hasJob && !isWaiting) {
@@ -309,7 +332,10 @@ export function CrewHomePage() {
   if (isJobLoading) {
     return (
       <main className='flex min-h-[calc(100dvh-44px)] items-center justify-center'>
-        <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' aria-label={t("job.loading")} />
+        <Loader2
+          className='h-8 w-8 animate-spin text-muted-foreground'
+          aria-label={t("job.loading")}
+        />
       </main>
     );
   }

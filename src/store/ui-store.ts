@@ -38,6 +38,7 @@ interface UIActions {
   setSites: (sites: AdminSite[]) => void;
   setLocale: (locale: "id" | "en") => void;
   addTimeExtNotification: (n: TimeExtNotification) => void;
+  setTimeExtNotifications: (notifications: TimeExtNotification[]) => void;
   removeTimeExtNotification: (bookingId: string) => void;
   setDrawerBookingId: (bookingId: string | null) => void;
   toggleSidebarCollapsed: () => void;
@@ -87,15 +88,22 @@ export const useUIStore = create<UIState & UIActions>()(
       addTimeExtNotification: (n) =>
         set((state) => {
           // deduplicate by bookingId — only one notification per booking at a time
-          if (!state.timeExtNotifications.some((x) => x.bookingId === n.bookingId)) {
+          if (
+            !state.timeExtNotifications.some((x) => x.bookingId === n.bookingId)
+          ) {
             state.timeExtNotifications.push(n);
           }
+        }),
+
+      setTimeExtNotifications: (notifications) =>
+        set((state) => {
+          state.timeExtNotifications = notifications;
         }),
 
       removeTimeExtNotification: (bookingId) =>
         set((state) => {
           state.timeExtNotifications = state.timeExtNotifications.filter(
-            (x) => x.bookingId !== bookingId
+            (x) => x.bookingId !== bookingId,
           );
         }),
 
@@ -117,6 +125,6 @@ export const useUIStore = create<UIState & UIActions>()(
         sidebarCollapsed: state.sidebarCollapsed,
       }),
       skipHydration: true,
-    }
-  )
+    },
+  ),
 );

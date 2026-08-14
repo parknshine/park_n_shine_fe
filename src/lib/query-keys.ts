@@ -3,25 +3,62 @@ export const queryKeys = {
     queue: (siteId: string) => ["admin", "queue", siteId] as const,
     allSitesQueue: () => ["admin", "queue", "all"] as const,
     escalations: () => ["admin", "escalations"] as const,
+    timeExtensionRequests: () => ["admin", "time-extension-requests"] as const,
     booking: (bookingId: string) => ["admin", "booking", bookingId] as const,
     report: (siteId: string, from: string, to: string) =>
       ["admin", "report", siteId, from, to] as const,
-    reportBookings: (siteId: string, from: string, to: string, filters?: object, page?: number, pageSize?: number, search?: string) =>
-      ["admin", "report-bookings", siteId, from, to, filters ?? {}, page ?? 1, pageSize ?? 25, search ?? ""] as const,
+    reportBookings: (
+      siteId: string,
+      from: string,
+      to: string,
+      filters?: object,
+      page?: number,
+      pageSize?: number,
+      search?: string,
+    ) =>
+      [
+        "admin",
+        "report-bookings",
+        siteId,
+        from,
+        to,
+        filters ?? {},
+        page ?? 1,
+        pageSize ?? 25,
+        search ?? "",
+      ] as const,
     auditLog: (siteId: string) => ["admin", "audit-log", siteId] as const,
     settings: () => ["admin", "settings"] as const,
     sites: () => ["admin", "sites"] as const,
     site: (siteId: string) => ["admin", "sites", siteId] as const,
-    qrCodes: (siteId: string) => ["admin", "sites", siteId, "qr-codes"] as const,
+    qrCodes: (siteId: string) =>
+      ["admin", "sites", siteId, "qr-codes"] as const,
     crew: () => ["admin", "crew"] as const,
     shifts: (siteId: string) => ["admin", "sites", siteId, "shifts"] as const,
     testimonials: () => ["admin", "testimonials"] as const,
-    tipCrewSummary: (period: string, siteId: string) => ["admin", "tips", "crew-summary", period, siteId] as const,
-    tipList: (period: string, page: number, pageSize: number, search: string, siteId: string) =>
-      ["admin", "tips", "list", period, page, pageSize, search, siteId] as const,
+    tipCrewSummary: (period: string, siteId: string) =>
+      ["admin", "tips", "crew-summary", period, siteId] as const,
+    tipList: (
+      period: string,
+      page: number,
+      pageSize: number,
+      search: string,
+      siteId: string,
+    ) =>
+      [
+        "admin",
+        "tips",
+        "list",
+        period,
+        page,
+        pageSize,
+        search,
+        siteId,
+      ] as const,
     disbursements: () => ["admin", "disbursements"] as const,
     tipPendingSummary: () => ["admin", "tips", "pending-summary"] as const,
-    loyaltyCustomers: (params?: object) => ["admin", "loyalty", "customers", params ?? {}] as const,
+    loyaltyCustomers: (params?: object) =>
+      ["admin", "loyalty", "customers", params ?? {}] as const,
     chatConversations: () => ["admin", "chat", "conversations"] as const,
     chatMessages: (conversationId: string) =>
       ["admin", "chat", "conversations", conversationId, "messages"] as const,
@@ -61,18 +98,26 @@ export const mutationKeys = {
       ["admin", "booking", bookingId, "notification-sent"] as const,
     saveSettings: () => ["admin", "settings", "save"] as const,
     createSite: () => ["admin", "sites", "create"] as const,
-    updateSite: (siteId: string) => ["admin", "sites", siteId, "update"] as const,
-    generateQr: (siteId: string) => ["admin", "sites", siteId, "qr", "generate"] as const,
+    updateSite: (siteId: string) =>
+      ["admin", "sites", siteId, "update"] as const,
+    generateQr: (siteId: string) =>
+      ["admin", "sites", siteId, "qr", "generate"] as const,
     rotateQr: (qrId: string) => ["admin", "qr", qrId, "rotate"] as const,
     createCrew: () => ["admin", "crew", "create"] as const,
-    updateCrew: (crewId: string) => ["admin", "crew", crewId, "update"] as const,
+    updateCrew: (crewId: string) =>
+      ["admin", "crew", crewId, "update"] as const,
     deleteCrew: () => ["admin", "crew", "delete"] as const,
-    createShift: (siteId: string) => ["admin", "sites", siteId, "shifts", "create"] as const,
-    updateShiftCrew: (shiftId: string) => ["admin", "shifts", shiftId, "crew"] as const,
-    closeShift: (shiftId: string) => ["admin", "shifts", shiftId, "close"] as const,
+    createShift: (siteId: string) =>
+      ["admin", "sites", siteId, "shifts", "create"] as const,
+    updateShiftCrew: (shiftId: string) =>
+      ["admin", "shifts", shiftId, "crew"] as const,
+    closeShift: (shiftId: string) =>
+      ["admin", "shifts", shiftId, "close"] as const,
     createTestimonial: () => ["admin", "testimonials", "create"] as const,
-    updateTestimonial: (id: string) => ["admin", "testimonials", id, "update"] as const,
-    deleteTestimonial: (id: string) => ["admin", "testimonials", id, "delete"] as const,
+    updateTestimonial: (id: string) =>
+      ["admin", "testimonials", id, "update"] as const,
+    deleteTestimonial: (id: string) =>
+      ["admin", "testimonials", id, "delete"] as const,
     createDisbursement: () => ["admin", "disbursements", "create"] as const,
   },
   crew: {

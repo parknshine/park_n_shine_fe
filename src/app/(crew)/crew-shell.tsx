@@ -36,15 +36,18 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
   const hasHydrated = useCrewAuthStore((s) => s._hasHydrated);
   const queryClient = useQueryClient();
   const { t } = useTranslation("crew");
-  const [staleJobId, setStaleJobId] = useState<string | null>(null);
+  const [expiredJobId, setExpiredJobId] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [activeEtaEndsAt, setActiveEtaEndsAt] = useState<string | null>(() => {
+  const [activeJob, setActiveJob] = useState<{
+    id: string;
+    etaEndsAt: string;
+  } | null>(() => {
     for (const query of queryClient
       .getQueryCache()
       .findAll({ queryKey: ["crew", "job"] })) {
       const data = query.state.data as CrewJob | null;
       if (data?.etaEndsAt && !TIMER_HIDDEN_STATUSES.has(data.status))
-        return data.etaEndsAt;
+        return { id: data.id, etaEndsAt: data.etaEndsAt };
     }
     return null;
   });
@@ -60,14 +63,19 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
       const key = event.query.queryKey;
       if (key[0] === "crew" && key[1] === "job" && key.length === 3) {
         if (event.type === "removed") {
-          setActiveEtaEndsAt(null);
+          setActiveJob(null);
+          setExpiredJobId(null);
           return;
         }
         const data = event.query.state.data as CrewJob | null;
         const isTerminal = data?.status
           ? TIMER_HIDDEN_STATUSES.has(data.status)
           : false;
-        setActiveEtaEndsAt(isTerminal ? null : (data?.etaEndsAt ?? null));
+        setActiveJob(
+          isTerminal || !data?.etaEndsAt
+            ? null
+            : { id: data.id, etaEndsAt: data.etaEndsAt },
+        );
       }
     });
   }, [queryClient]);
@@ -101,9 +109,6 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
         void queryClient.invalidateQueries({
           queryKey: queryKeys.crew.job(event.bookingId as string),
         });
-      }
-      if (event.type === "booking_status_changed" && event.status === "STALE") {
-        setStaleJobId(event.bookingId as string);
       }
       if (
         event.type === "booking_status_changed" &&
@@ -215,14 +220,11 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
 
   return (
     <>
-      {staleJobId && (
+      {expiredJobId && (
         <JobStaleModal
           open={true}
-          jobId={staleJobId}
-          onDone={() => {
-            setStaleJobId(null);
-            router.replace("/crew/home?noResume=true");
-          }}
+          jobId={expiredJobId}
+          onDone={() => setExpiredJobId(null)}
         />
       )}
       <header className='fixed inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm'>
@@ -239,11 +241,11 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
           </div>
 
           <div className='flex items-center gap-1'>
-            {activeEtaEndsAt && (
+            {activeJob && (
               <EtaCountdown
-                etaEndsAt={activeEtaEndsAt}
+                etaEndsAt={activeJob.etaEndsAt}
                 compact
-                onExpire={() => setActiveEtaEndsAt(null)}
+                onExpire={() => setExpiredJobId(activeJob.id)}
               />
             )}
             <LanguageSwitcher />

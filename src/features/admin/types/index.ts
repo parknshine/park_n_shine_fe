@@ -39,12 +39,19 @@ export interface AdminEscalationsResponse {
   escalations: AdminEscalationBooking[];
 }
 
+export interface AdminTimeExtensionRequestsResponse {
+  requests: TimeExtensionRequest[];
+}
+
 export interface RefundPayload {
   reasonCode: string;
 }
 
 export interface StatusOverridePayload {
-  nextStatus: Extract<BookingStatus, "PAID" | "CANCELLED" | "STALE" | "ASSIGNED" | "IN_PROGRESS" | "CLOSED">;
+  nextStatus: Extract<
+    BookingStatus,
+    "PAID" | "CANCELLED" | "STALE" | "ASSIGNED" | "IN_PROGRESS" | "CLOSED"
+  >;
   reasonCode: string;
 }
 
@@ -72,7 +79,18 @@ export interface AuditEntry {
   bookingId: string;
   reference: string | null;
   plateText: string | null;
-  action: "refund" | "status_override" | "reassign" | "extend_time" | "crew.job_rejected" | "crew.requested_help" | "crew.requested_wait" | "crew.request_time_extension" | "booking.status_changed" | "approve_time_extension" | "reject_time_extension";
+  action:
+    | "refund"
+    | "status_override"
+    | "reassign"
+    | "extend_time"
+    | "crew.job_rejected"
+    | "crew.requested_help"
+    | "crew.requested_wait"
+    | "crew.request_time_extension"
+    | "booking.status_changed"
+    | "approve_time_extension"
+    | "reject_time_extension";
   detail: string;
   adminEmail: string;
   createdAt: string;

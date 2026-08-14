@@ -86,9 +86,8 @@
       "description": "Waktu ETA untuk job ini telah habis. Silakan pilih tindakan berikut:",
       "requestHelp": "Minta Bantuan",
       "requestHelpDesc": "Tandai job sebagai butuh bantuan. Admin akan segera menghubungi kamu.",
-      "markStale": "Tandai Stale",
-      "markStaleDesc": "Tandai job sebagai stale. Job tetap tercatat dan admin dapat menugaskan ulang.",
-      "submitting": "Memproses..."
+      "requestTimeAdjustment": "Minta Tambah Waktu",
+      "requestTimeAdjustmentDesc": "Kirim permintaan tambahan waktu ke admin untuk menyelesaikan job ini."
     },
     "incomingModal": {
       "title": "Job Tersedia",
