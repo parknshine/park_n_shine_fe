@@ -49,6 +49,14 @@ export function AdminNavbar() {
   const { jobs: expiringJobs } = useAdminExpiringJobs();
   const expiringCount = expiringJobs.length;
 
+  // Ticks so the "minutes left" countdown in the expiring-soon dropdown stays
+  // fresh — Date.now() itself can't be called during render (impure).
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
   const { refunds, total: refundsCount } = useAdminRefundsNeeded();
 
   const { requests: notificationRequests, total: notificationRequestsCount } = useAdminNotificationRequests();
@@ -209,7 +217,7 @@ export function AdminNavbar() {
                       ? Math.max(
                           0,
                           Math.round(
-                            (new Date(job.estimatedReadyAt).getTime() - Date.now()) / 60_000
+                            (new Date(job.estimatedReadyAt).getTime() - now) / 60_000
                           )
                         )
                       : null;
