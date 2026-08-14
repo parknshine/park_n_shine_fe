@@ -26,14 +26,14 @@ interface BookingsPage {
   nextCursor: string | null;
 }
 
-export function useCustomerBookings(enabled = true) {
+export function useCustomerBookings(enabled = true, skipAuthRedirect = false) {
   return useInfiniteQuery({
     queryKey: queryKeys.customer.bookings(),
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       const url = pageParam
         ? `/v1/me/bookings?cursor=${pageParam}`
         : "/v1/me/bookings";
-      const { data } = await customerApi.get<BookingsPage>(url);
+      const { data } = await customerApi.get<BookingsPage>(url, { skipAuthRedirect });
       return data;
     },
     getNextPageParam: (lastPage: BookingsPage) => lastPage.nextCursor ?? undefined,

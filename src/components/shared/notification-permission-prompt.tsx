@@ -50,7 +50,10 @@ export function NotificationPermissionPrompt() {
   const customerHydrated = useCustomerAuthStore((s) => s._hasHydrated);
   const customerAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
 
-  const bookingsQuery = useCustomerBookings(customerHydrated && customerAuthenticated);
+  // skipAuthRedirect: this is a silent background check mounted app-wide (including
+  // public pages like the landing page) — a stale local "authenticated" flag whose
+  // session has actually expired must not force a hard redirect to /login here.
+  const bookingsQuery = useCustomerBookings(customerHydrated && customerAuthenticated, true);
 
   const activeBooking = useMemo(() => {
     // When the query is disabled (logged out), .data can still hold cache from
