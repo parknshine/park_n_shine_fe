@@ -10,6 +10,7 @@ interface PublicSettings {
   whatsappNumber: string;
   avgCleaningMinutes: number;
   loyaltyEnabled: boolean;
+  promoBannerUrls: string[];
 }
 
 async function fetchPublicSettings(): Promise<PublicSettings> {
@@ -30,6 +31,7 @@ export function usePublicSettings() {
     whatsappNumber: query.data?.whatsappNumber || ENV_FALLBACK,
     avgCleaningMinutes: query.data?.avgCleaningMinutes ?? 30,
     loyaltyEnabled: query.data?.loyaltyEnabled ?? false,
+    promoBannerUrls: query.data?.promoBannerUrls ?? [],
     isLoading: query.isLoading,
   };
 }

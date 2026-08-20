@@ -63,6 +63,13 @@
     "enable": "Enable",
     "later": "Not now"
   },
+  "promoBanner": {
+    "title": "Today's Promo",
+    "imageAlt": "Promo banner {{count}}",
+    "goToSlide": "Go to banner {{n}}",
+    "prevSlide": "Previous banner",
+    "nextSlide": "Next banner"
+  },
   "support": {
     "title": "How can we help?",
     "subtitle": "Find answers to common questions below, or reach out to our team directly.",

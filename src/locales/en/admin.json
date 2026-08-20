@@ -290,6 +290,20 @@
       "success": "Wash price saved successfully.",
       "error": "Failed to save wash price."
     },
+    "promoBanner": {
+      "title": "Promo Banner",
+      "description": "These images show as a once-per-session popup on the general landing page and the QR landing page. Upload up to 3 banners — customers can swipe between them. Leave all empty to disable the popup.",
+      "hint": "Max 3 banners, 1MB each, image format (JPG/PNG).",
+      "slotAlt": "Promo banner {{n}}",
+      "uploadLabel": "Upload Banner",
+      "uploading": "Uploading...",
+      "removeLabel": "Remove Banner",
+      "removing": "Removing...",
+      "uploadSuccess": "Promo banner uploaded successfully.",
+      "uploadError": "Failed to upload promo banner.",
+      "removeSuccess": "Promo banner removed successfully.",
+      "removeError": "Failed to remove promo banner."
+    },
     "jobEta": {
       "title": "Job Completion Time Limit",
       "description": "Time given to crew to complete a job after claiming it. Should be greater than the average cleaning duration.",
@@ -580,6 +594,9 @@
       "timezoneLabel": "Timezone",
       "codeLabel": "Mall Code (2 digits, optional)",
       "cutoffLabel": "Cutoff Time (HH:MM, optional)",
+      "pausedMessageLabel": "Message while inactive (optional)",
+      "pausedMessagePlaceholder": "e.g. We'll launch on August 22, 2026",
+      "pausedMessageHint": "Shown to customers who scan the QR while the site is paused. Leave empty for the default message.",
       "saving": "Saving...",
       "save": "Save Changes",
       "cancel": "Cancel"

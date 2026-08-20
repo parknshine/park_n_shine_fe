@@ -34,6 +34,42 @@ export function useAdminSettings() {
     },
   });
 
+  const uploadPromoBannerMutation = useMutation({
+    meta: { persist: false },
+    mutationKey: mutationKeys.admin.uploadPromoBanner(),
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await api.post<AdminSettings>(
+        "/v1/admin/settings/promo-banner",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.settings(),
+      });
+    },
+  });
+
+  const deletePromoBannerMutation = useMutation({
+    meta: { persist: false },
+    mutationKey: mutationKeys.admin.deletePromoBanner(),
+    mutationFn: async (key: string) => {
+      const response = await api.delete<AdminSettings>(
+        `/v1/admin/settings/promo-banner?key=${encodeURIComponent(key)}`,
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.settings(),
+      });
+    },
+  });
+
   let error: string | null = null;
   if (saveMutation.error instanceof Error) {
     error = saveMutation.error.message;
@@ -48,5 +84,9 @@ export function useAdminSettings() {
     isSaving: saveMutation.isPending,
     saveSuccess: saveMutation.isSuccess,
     error,
+    uploadPromoBanner: uploadPromoBannerMutation.mutateAsync,
+    isUploadingPromoBanner: uploadPromoBannerMutation.isPending,
+    deletePromoBanner: deletePromoBannerMutation.mutateAsync,
+    isDeletingPromoBanner: deletePromoBannerMutation.isPending,
   };
 }

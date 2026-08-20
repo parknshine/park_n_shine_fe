@@ -290,6 +290,20 @@
       "success": "Harga cuci berhasil disimpan.",
       "error": "Gagal menyimpan harga cuci."
     },
+    "promoBanner": {
+      "title": "Banner Promo",
+      "description": "Gambar promo ini akan muncul sebagai popup sekali per sesi di halaman landing umum dan halaman landing QR. Bisa upload hingga 3 banner, customer bisa geser antar banner. Kosongkan semua untuk menonaktifkan popup.",
+      "hint": "Maks. 3 banner, masing-masing maks. 1MB, format gambar (JPG/PNG).",
+      "slotAlt": "Banner promo {{n}}",
+      "uploadLabel": "Upload Banner",
+      "uploading": "Mengunggah...",
+      "removeLabel": "Hapus Banner",
+      "removing": "Menghapus...",
+      "uploadSuccess": "Banner promo berhasil diunggah.",
+      "uploadError": "Gagal mengunggah banner promo.",
+      "removeSuccess": "Banner promo berhasil dihapus.",
+      "removeError": "Gagal menghapus banner promo."
+    },
     "jobEta": {
       "title": "Batas Waktu Pengerjaan Job",
       "description": "Waktu yang diberikan ke crew untuk menyelesaikan satu job sejak diklaim. Sesuaikan dengan rata-rata durasi cuci.",
@@ -580,6 +594,9 @@
       "timezoneLabel": "Timezone",
       "codeLabel": "Mall Code (2 digits, optional)",
       "cutoffLabel": "Cutoff Time (HH:MM, optional)",
+      "pausedMessageLabel": "Pesan saat nonaktif (opsional)",
+      "pausedMessagePlaceholder": "Contoh: Kami akan mulai 22 Agustus 2026",
+      "pausedMessageHint": "Ditampilkan ke customer saat scan QR selama site nonaktif. Kosongkan untuk pesan default.",
       "saving": "Saving...",
       "save": "Save Changes",
       "cancel": "Cancel"

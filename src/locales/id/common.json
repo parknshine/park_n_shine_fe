@@ -63,6 +63,13 @@
     "enable": "Aktifkan",
     "later": "Nanti saja"
   },
+  "promoBanner": {
+    "title": "Promo Hari ini",
+    "imageAlt": "Banner promo {{count}}",
+    "goToSlide": "Ke banner {{n}}",
+    "prevSlide": "Banner sebelumnya",
+    "nextSlide": "Banner selanjutnya"
+  },
   "support": {
     "title": "Apa yang bisa kami bantu?",
     "subtitle": "Temukan jawaban atas pertanyaan umum di bawah, atau hubungi tim kami langsung.",

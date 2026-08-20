@@ -375,7 +375,8 @@
   "qr": {
     "cannotProceedTitle": "Tidak Dapat Melanjutkan",
     "invalidMessage": "QR Code tidak valid atau sudah kadaluarsa.",
-    "pausedMessage": "Booking sedang ditutup sementara. Silakan coba lagi nanti.",
+    "rotatedMessage": "QR Code ini sudah tidak berlaku. Silakan scan QR Code yang terbaru di lokasi.",
+    "pausedMessage": "Lokasi ini sedang nonaktif sementara. Silakan coba lagi nanti.",
     "pastCutoffMessage": "Booking hari ini sudah ditutup. Coba lagi besok!"
   },
   "howItWorks": {

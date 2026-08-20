@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { ImagePlus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -505,9 +506,176 @@ function SettingsTable({
   );
 }
 
+const MAX_PROMO_BANNERS = 3;
+
+function PromoBannerSlot({
+  slotNumber,
+  banner,
+  isUploadingPromoBanner,
+  isDeletingPromoBanner,
+  onUpload,
+  onRemove,
+}: Readonly<{
+  slotNumber: number;
+  banner: { key: string; url: string } | null;
+  isUploadingPromoBanner: boolean;
+  isDeletingPromoBanner: boolean;
+  onUpload: (file: File) => void;
+  onRemove: (key: string) => void;
+}>) {
+  const { t } = useTranslation("admin");
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (file) onUpload(file);
+  }
+
+  if (banner) {
+    return (
+      <div className='group relative aspect-4/3 w-full overflow-hidden rounded-xl border border-border bg-muted shadow-sm'>
+        {/* eslint-disable-next-line @next/next/no-img-element -- dynamic storage URL, not in next/image remotePatterns */}
+        <img
+          src={banner.url}
+          alt={t("settings.promoBanner.slotAlt", { n: slotNumber })}
+          className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
+        />
+        <div className='pointer-events-none absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
+        <span className='absolute left-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-white/90 text-[11px] font-bold text-primary shadow-sm'>
+          {slotNumber}
+        </span>
+        <button
+          type='button'
+          disabled={isDeletingPromoBanner}
+          onClick={() => onRemove(banner.key)}
+          className='absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-foreground opacity-0 shadow-sm transition-all hover:bg-destructive hover:text-white disabled:opacity-50 group-hover:opacity-100'
+          aria-label={t("settings.promoBanner.removeLabel")}
+        >
+          <X className='h-3.5 w-3.5' />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <Button
+      variant='ghost'
+      disabled={isUploadingPromoBanner}
+      asChild
+      className='aspect-4/3 h-auto w-full flex-col gap-1.5 rounded-xl border-2 border-dashed border-border bg-(--surface-low)/40 text-muted-foreground transition-colors hover:border-primary/40 hover:bg-(--surface-low) hover:text-primary'
+    >
+      <label className='cursor-pointer'>
+        <ImagePlus className='h-5 w-5' />
+        <span className='text-xs font-medium'>
+          {isUploadingPromoBanner
+            ? t("settings.promoBanner.uploading")
+            : t("settings.promoBanner.uploadLabel")}
+        </span>
+        <input
+          type='file'
+          accept='image/*'
+          className='hidden'
+          onChange={handleFileChange}
+        />
+      </label>
+    </Button>
+  );
+}
+
+function PromoBannerSection({
+  promoBannerKeys,
+  promoBannerUrls,
+  uploadPromoBanner,
+  isUploadingPromoBanner,
+  deletePromoBanner,
+  isDeletingPromoBanner,
+}: Readonly<{
+  promoBannerKeys: string[];
+  promoBannerUrls: string[];
+  uploadPromoBanner: (file: File) => Promise<unknown>;
+  isUploadingPromoBanner: boolean;
+  deletePromoBanner: (key: string) => Promise<unknown>;
+  isDeletingPromoBanner: boolean;
+}>) {
+  const { t } = useTranslation("admin");
+  const banners = promoBannerKeys.map((key, i) => ({ key, url: promoBannerUrls[i] ?? "" }));
+  const emptySlots = MAX_PROMO_BANNERS - banners.length;
+
+  async function handleUpload(file: File) {
+    try {
+      await uploadPromoBanner(file);
+      toast.success(t("settings.promoBanner.uploadSuccess"));
+    } catch {
+      toast.error(t("settings.promoBanner.uploadError"));
+    }
+  }
+
+  async function handleRemove(key: string) {
+    try {
+      await deletePromoBanner(key);
+      toast.success(t("settings.promoBanner.removeSuccess"));
+    } catch {
+      toast.error(t("settings.promoBanner.removeError"));
+    }
+  }
+
+  return (
+    <div className='rounded-lg border border-border p-4 space-y-4'>
+      <div className='flex items-start justify-between gap-3'>
+        <div>
+          <p className='font-medium text-foreground'>
+            {t("settings.promoBanner.title")}
+          </p>
+          <p className='text-xs text-muted-foreground mt-0.5 max-w-md'>
+            {t("settings.promoBanner.description")}
+          </p>
+        </div>
+        <span className='shrink-0 rounded-full bg-(--surface-low) px-2.5 py-1 text-xs font-semibold text-primary'>
+          {banners.length}/{MAX_PROMO_BANNERS}
+        </span>
+      </div>
+
+      <div className='grid grid-cols-3 gap-3'>
+        {banners.map((banner, i) => (
+          <PromoBannerSlot
+            key={banner.key}
+            slotNumber={i + 1}
+            banner={banner}
+            isUploadingPromoBanner={isUploadingPromoBanner}
+            isDeletingPromoBanner={isDeletingPromoBanner}
+            onUpload={handleUpload}
+            onRemove={handleRemove}
+          />
+        ))}
+        {Array.from({ length: emptySlots }).map((_, i) => (
+          <PromoBannerSlot
+            key={`empty-${i}`}
+            slotNumber={banners.length + i + 1}
+            banner={null}
+            isUploadingPromoBanner={isUploadingPromoBanner}
+            isDeletingPromoBanner={isDeletingPromoBanner}
+            onUpload={handleUpload}
+            onRemove={handleRemove}
+          />
+        ))}
+      </div>
+      <p className='text-xs text-muted-foreground'>{t("settings.promoBanner.hint")}</p>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const { t } = useTranslation("admin");
-  const { settings, isLoading, save, isSaving } = useAdminSettings();
+  const {
+    settings,
+    isLoading,
+    save,
+    isSaving,
+    uploadPromoBanner,
+    isUploadingPromoBanner,
+    deletePromoBanner,
+    isDeletingPromoBanner,
+  } = useAdminSettings();
 
   return (
     <div className='max-w-3xl space-y-6'>
@@ -523,12 +691,22 @@ export default function SettingsPage() {
       {isLoading || !settings ? (
         <p className='text-sm text-muted-foreground'>{t("settings.loading")}</p>
       ) : (
-        <SettingsTable
-          key={`${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}-${String(settings.loyaltyEnabled)}-${settings.signupDiscountPercent}-${settings.loyaltyWashThreshold}-${settings.loyaltyRewardDiscountPercent}-${settings.washPrice}`}
-          settings={settings}
-          save={save}
-          isSaving={isSaving}
-        />
+        <>
+          <SettingsTable
+            key={`${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}-${String(settings.loyaltyEnabled)}-${settings.signupDiscountPercent}-${settings.loyaltyWashThreshold}-${settings.loyaltyRewardDiscountPercent}-${settings.washPrice}`}
+            settings={settings}
+            save={save}
+            isSaving={isSaving}
+          />
+          <PromoBannerSection
+            promoBannerKeys={settings.promoBannerKeys}
+            promoBannerUrls={settings.promoBannerUrls}
+            uploadPromoBanner={uploadPromoBanner}
+            isUploadingPromoBanner={isUploadingPromoBanner}
+            deletePromoBanner={deletePromoBanner}
+            isDeletingPromoBanner={isDeletingPromoBanner}
+          />
+        </>
       )}
     </div>
   );

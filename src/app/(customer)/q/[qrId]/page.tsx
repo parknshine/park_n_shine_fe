@@ -1,58 +1,78 @@
 import type { Metadata } from "next";
-import { AppShell } from "@/components/shared";
+import { AppShell, PromoBannerPopup } from "@/components/shared";
 import { BookNowButtonV2 } from "@/features/customer/components/book-now-button-v2";
 import { HowItWorksPanel } from "@/features/customer/components/how-it-works-panel";
 import { LandingHero } from "@/features/customer/components/landing-hero";
 import { QrBlockingMessage } from "@/features/customer/components/qr-blocking-message";
-import { QrErrorState } from "@/features/customer/components/qr-error-state";
+import { QrErrorState, type QrReason } from "@/features/customer/components/qr-error-state";
 import type { SiteQrResolution } from "@/features/customer/types";
 
 interface Props {
   params: Promise<{ qrId: string }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { qrId } = await params;
-  const resolution = await getQrResolution(qrId);
-  return {
-    title: resolution ? `Book at ${resolution.siteName}` : "Book a Wash",
-  };
-}
+// Backend error codes from GET /v1/qr/:qrId (ErrorCodes in park-n-shine-api) mapped
+// to the specific message shown on this page — falls back to "invalid" for any
+// other/unrecognized code (bad format, network failure, unexpected server error).
+const QR_ERROR_REASON: Record<string, QrReason> = {
+  QR_NOT_FOUND: "invalid",
+  QR_ROTATED: "rotated",
+  SITE_INTAKE_PAUSED: "paused",
+  SITE_CUTOFF_REACHED: "past_cutoff",
+};
+
+type QrResolveResult =
+  | { ok: true; data: SiteQrResolution }
+  | { ok: false; reason: QrReason; message?: string | null };
 
 const SAFE_QR_ID_RE = /^[a-zA-Z0-9_-]{1,128}$/;
 
-async function getQrResolution(qrId: string): Promise<SiteQrResolution | null> {
-  if (!SAFE_QR_ID_RE.test(qrId)) return null;
+async function getQrResolution(qrId: string): Promise<QrResolveResult> {
+  if (!SAFE_QR_ID_RE.test(qrId)) return { ok: false, reason: "invalid" };
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "/api";
   try {
-    console.log("Fetching QR resolution for ID:", qrId);
     const res = await fetch(`${baseUrl}/v1/qr/${qrId}`, {
       cache: "no-store",
     });
+    const body = (await res.json()) as
+      | { data: SiteQrResolution }
+      | { error: { code: string; details?: { pausedMessage?: string | null } } };
     if (!res.ok) {
-      console.log("QR resolution fetch failed with status:", res.status);
-      return null;
+      const code = "error" in body ? body.error.code : undefined;
+      const message = "error" in body ? body.error.details?.pausedMessage : undefined;
+      return {
+        ok: false,
+        reason: (code && QR_ERROR_REASON[code]) || "invalid",
+        message,
+      };
     }
-    const body = (await res.json()) as { data: SiteQrResolution };
-    console.log("QR resolution fetched successfully:", body.data);
-    return body.data ?? null;
+    if (!("data" in body) || !body.data) return { ok: false, reason: "invalid" };
+    return { ok: true, data: body.data };
   } catch (error) {
     console.error("Error fetching QR resolution:", error);
-    return null;
+    return { ok: false, reason: "invalid" };
   }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { qrId } = await params;
+  const result = await getQrResolution(qrId);
+  return {
+    title: result.ok ? `Book at ${result.data.siteName}` : "Book a Wash",
+  };
 }
 
 export default async function LandingPage({ params }: Props) {
   const { qrId } = await params;
-  const resolution = await getQrResolution(qrId);
-  console.log("resolution", resolution);
-  if (!resolution) {
+  const result = await getQrResolution(qrId);
+  if (!result.ok) {
     return (
       <AppShell surface='customer'>
-        <QrErrorState reason='invalid' />
+        <QrErrorState reason={result.reason} message={result.message} />
       </AppShell>
     );
   }
+  const resolution = result.data;
 
   const now = new Date();
   const isPastCutoff = resolution.cutoffTime && resolution.timezone
@@ -88,6 +108,7 @@ export default async function LandingPage({ params }: Props) {
           <BookNowButtonV2 qrId={qrId} />
         )}
       </div>
+      <PromoBannerPopup />
     </AppShell>
   );
 }

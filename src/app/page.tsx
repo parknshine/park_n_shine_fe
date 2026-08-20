@@ -7,7 +7,7 @@ import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 import { usePublicTestimonials, usePublicSettings } from "@/features/customer/hooks";
 import { BookNowModal } from "@/features/customer/components/book-now-modal";
-import { MarketingFooter } from "@/components/shared";
+import { MarketingFooter, PromoBannerPopup } from "@/components/shared";
 
 const imgParkShineLogo = "/parknshinelogo.svg";
 const imgScanningQrCode = "/park-shine-panel-1.jpeg";
@@ -479,6 +479,7 @@ export default function Home() {
         open={bookNowOpen}
         onOpenChange={setBookNowOpen}
       />
+      <PromoBannerPopup />
     </div>
   );
 }

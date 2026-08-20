@@ -16,6 +16,7 @@ import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -297,6 +298,7 @@ interface EditFormState {
   timezone: string;
   code: string | null;
   cutoffTime: string | null;
+  pausedMessage: string | null;
   lat: number | null;
   lng: number | null;
 }
@@ -322,6 +324,7 @@ function EditSiteModal({
     timezone: site.timezone,
     code: site.code,
     cutoffTime: site.cutoffTime,
+    pausedMessage: site.pausedMessage,
     lat: site.lat ?? null,
     lng: site.lng ?? null,
   });
@@ -338,6 +341,7 @@ function EditSiteModal({
           timezone: form.timezone,
           code: form.code,
           cutoffTime: form.cutoffTime,
+          pausedMessage: form.pausedMessage,
           lat: form.lat,
           lng: form.lng,
         },
@@ -445,6 +449,27 @@ function EditSiteModal({
                   setForm((f) => ({ ...f, cutoffTime: e.target.value || null }))
                 }
               />
+            </div>
+            <div className='space-y-1'>
+              <Label htmlFor='edit-site-paused-message'>
+                {t("sitesPage.editModal.pausedMessageLabel")}
+              </Label>
+              <Textarea
+                id='edit-site-paused-message'
+                placeholder={t("sitesPage.editModal.pausedMessagePlaceholder")}
+                maxLength={500}
+                rows={3}
+                value={form.pausedMessage ?? ""}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    pausedMessage: e.target.value || null,
+                  }))
+                }
+              />
+              <p className='text-xs text-muted-foreground'>
+                {t("sitesPage.editModal.pausedMessageHint")}
+              </p>
             </div>
             <div className='flex gap-2 pt-2'>
               <Button type='submit' disabled={isUpdating}>

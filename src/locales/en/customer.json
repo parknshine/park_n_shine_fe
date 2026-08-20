@@ -375,7 +375,8 @@
   "qr": {
     "cannotProceedTitle": "Cannot Proceed",
     "invalidMessage": "This QR code is invalid or has expired.",
-    "pausedMessage": "Bookings are temporarily closed. Please try again later.",
+    "rotatedMessage": "This QR code is no longer active. Please scan the latest QR code at the location.",
+    "pausedMessage": "This location is temporarily inactive. Please try again later.",
     "pastCutoffMessage": "Bookings for today are closed. Try again tomorrow!"
   },
   "howItWorks": {

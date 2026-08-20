@@ -166,6 +166,8 @@ export interface AdminSettings {
   signupDiscountPercent: number;
   loyaltyWashThreshold: number;
   loyaltyRewardDiscountPercent: number;
+  promoBannerKeys: string[];
+  promoBannerUrls: string[];
 }
 
 export interface AdminSite {
@@ -196,6 +198,7 @@ export interface AdminSiteDetail {
   address: string;
   timezone: string;
   intakePaused: boolean;
+  pausedMessage: string | null;
   code: string | null;
   cutoffTime: string | null;
   lat?: number | null;
@@ -229,6 +232,7 @@ export interface UpdateSitePayload {
   code?: string | null;
   cutoffTime?: string | null;
   intakePaused?: boolean;
+  pausedMessage?: string | null;
   lat?: number | null;
   lng?: number | null;
 }
