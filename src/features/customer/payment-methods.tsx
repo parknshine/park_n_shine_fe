@@ -45,3 +45,19 @@ export const PAYMENT_CATEGORIES: { label: string; methods: PaymentMethodDef[] }[
     ],
   },
 ];
+
+// ─── Admin-controlled filtering ────────────────────────────────────────────────
+
+export function filterEnabledPaymentCategories(
+  categories: { label: string; methods: PaymentMethodDef[] }[],
+  enabledCodes: string[],
+): { label: string; methods: PaymentMethodDef[] }[] {
+  return categories
+    .map((category) => ({
+      ...category,
+      methods: category.methods.filter((method) =>
+        enabledCodes.includes(method.code),
+      ),
+    }))
+    .filter((category) => category.methods.length > 0);
+}

@@ -22,7 +22,8 @@ export function useAdminSettings() {
     mutationFn: async (payload: Partial<Pick<AdminSettings,
       "whatsappNumber" | "avgCleaningMinutes" | "paymentExpiryMinutes" |
       "crewTimeExtensionMinutes" | "washPrice" | "loyaltyEnabled" | "loyaltyOtpChannel" |
-      "signupDiscountPercent" | "loyaltyWashThreshold" | "loyaltyRewardDiscountPercent"
+      "signupDiscountPercent" | "loyaltyWashThreshold" | "loyaltyRewardDiscountPercent" |
+      "enabledPaymentMethods"
     >>) => {
       const response = await api.post<AdminSettings>("/v1/admin/settings", payload);
       return response.data;

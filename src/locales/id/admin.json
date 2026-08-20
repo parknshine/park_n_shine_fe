@@ -290,6 +290,12 @@
       "success": "Harga cuci berhasil disimpan.",
       "error": "Gagal menyimpan harga cuci."
     },
+    "paymentMethods": {
+      "title": "Metode Pembayaran",
+      "description": "Pilih metode pembayaran yang ditampilkan ke customer saat checkout. Minimal satu metode harus aktif.",
+      "success": "Metode pembayaran berhasil disimpan.",
+      "error": "Gagal menyimpan metode pembayaran."
+    },
     "promoBanner": {
       "title": "Banner Promo",
       "description": "Gambar promo ini akan muncul sebagai popup sekali per sesi di halaman landing umum dan halaman landing QR. Bisa upload hingga 3 banner, customer bisa geser antar banner. Kosongkan semua untuk menonaktifkan popup.",

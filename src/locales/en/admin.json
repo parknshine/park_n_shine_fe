@@ -290,6 +290,12 @@
       "success": "Wash price saved successfully.",
       "error": "Failed to save wash price."
     },
+    "paymentMethods": {
+      "title": "Payment Methods",
+      "description": "Choose which payment methods are shown to customers at checkout. At least one method must stay enabled.",
+      "success": "Payment methods saved successfully.",
+      "error": "Failed to save payment methods."
+    },
     "promoBanner": {
       "title": "Promo Banner",
       "description": "These images show as a once-per-session popup on the general landing page and the QR landing page. Upload up to 3 banners — customers can swipe between them. Leave all empty to disable the popup.",

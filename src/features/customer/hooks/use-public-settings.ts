@@ -11,7 +11,10 @@ interface PublicSettings {
   avgCleaningMinutes: number;
   loyaltyEnabled: boolean;
   promoBannerUrls: string[];
+  enabledPaymentMethods: string[];
 }
+
+const DEFAULT_PAYMENT_METHODS = ["QRIS", "SHOPEEPAY", "GOPAY"];
 
 async function fetchPublicSettings(): Promise<PublicSettings> {
   const res = await axios.get<{ data: PublicSettings }>("/v1/settings", {
@@ -32,6 +35,8 @@ export function usePublicSettings() {
     avgCleaningMinutes: query.data?.avgCleaningMinutes ?? 30,
     loyaltyEnabled: query.data?.loyaltyEnabled ?? false,
     promoBannerUrls: query.data?.promoBannerUrls ?? [],
+    enabledPaymentMethods:
+      query.data?.enabledPaymentMethods ?? DEFAULT_PAYMENT_METHODS,
     isLoading: query.isLoading,
   };
 }

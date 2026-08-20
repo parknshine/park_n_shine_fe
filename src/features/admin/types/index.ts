@@ -168,6 +168,7 @@ export interface AdminSettings {
   loyaltyRewardDiscountPercent: number;
   promoBannerKeys: string[];
   promoBannerUrls: string[];
+  enabledPaymentMethods: string[];
 }
 
 export interface AdminSite {

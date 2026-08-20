@@ -28,11 +28,18 @@ interface SettingsTableProps {
         | "loyaltyWashThreshold"
         | "loyaltyRewardDiscountPercent"
         | "washPrice"
+        | "enabledPaymentMethods"
       >
     >,
   ) => Promise<unknown>;
   isSaving: boolean;
 }
+
+const PAYMENT_METHOD_OPTIONS = [
+  { code: "QRIS", label: "QRIS" },
+  { code: "SHOPEEPAY", label: "ShopeePay" },
+  { code: "GOPAY", label: "GoPay" },
+] as const;
 
 function SettingsTable({
   settings,
@@ -59,6 +66,17 @@ function SettingsTable({
   );
   const [loyaltyRewardDiscountPercent, setLoyaltyRewardDiscountPercent] =
     useState(settings.loyaltyRewardDiscountPercent);
+  const [enabledPaymentMethods, setEnabledPaymentMethods] = useState(
+    settings.enabledPaymentMethods,
+  );
+
+  function togglePaymentMethod(code: string) {
+    setEnabledPaymentMethods((prev) =>
+      prev.includes(code)
+        ? prev.filter((c) => c !== code)
+        : [...prev, code],
+    );
+  }
 
   async function handleSave(
     payload: Parameters<typeof save>[0],
@@ -300,6 +318,53 @@ function SettingsTable({
               </td>
             </tr>
           )}
+
+          {/* Payment Methods */}
+          <tr className='align-top'>
+            <td className='px-4 py-3'>
+              <p className='font-medium text-foreground'>
+                {t("settings.paymentMethods.title")}
+              </p>
+              <p className='text-xs text-muted-foreground mt-0.5'>
+                {t("settings.paymentMethods.description")}
+              </p>
+            </td>
+            <td className='px-4 py-3'>
+              <div className='flex flex-col gap-2'>
+                {PAYMENT_METHOD_OPTIONS.map((option) => (
+                  <label
+                    key={option.code}
+                    htmlFor={`payment-method-${option.code}`}
+                    className='flex items-center gap-2 text-sm font-medium text-foreground cursor-pointer select-none'
+                  >
+                    <input
+                      id={`payment-method-${option.code}`}
+                      type='checkbox'
+                      checked={enabledPaymentMethods.includes(option.code)}
+                      onChange={() => togglePaymentMethod(option.code)}
+                      className='h-4 w-4 rounded border-border accent-primary'
+                    />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
+            </td>
+            <td className='px-4 py-3'>
+              <Button
+                size='sm'
+                disabled={isSaving || enabledPaymentMethods.length === 0}
+                onClick={() =>
+                  handleSave(
+                    { enabledPaymentMethods },
+                    "settings.paymentMethods.success",
+                    "settings.paymentMethods.error",
+                  )
+                }
+              >
+                {t("settings.table.save")}
+              </Button>
+            </td>
+          </tr>
 
           {/* Loyalty Program */}
           {/* <tr className='align-top'>
@@ -693,7 +758,7 @@ export default function SettingsPage() {
       ) : (
         <>
           <SettingsTable
-            key={`${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}-${String(settings.loyaltyEnabled)}-${settings.signupDiscountPercent}-${settings.loyaltyWashThreshold}-${settings.loyaltyRewardDiscountPercent}-${settings.washPrice}`}
+            key={`${settings.avgCleaningMinutes}-${settings.paymentExpiryMinutes}-${settings.whatsappNumber}-${String(settings.loyaltyEnabled)}-${settings.signupDiscountPercent}-${settings.loyaltyWashThreshold}-${settings.loyaltyRewardDiscountPercent}-${settings.washPrice}-${settings.enabledPaymentMethods.join(",")}`}
             settings={settings}
             save={save}
             isSaving={isSaving}

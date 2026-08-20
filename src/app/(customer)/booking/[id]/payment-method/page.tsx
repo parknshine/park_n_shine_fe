@@ -5,7 +5,11 @@ import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { ChevronRight, CreditCard } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
 import { useChargePayment } from "@/features/customer/hooks/use-charge-payment";
-import { PAYMENT_CATEGORIES } from "@/features/customer/payment-methods";
+import { usePublicSettings } from "@/features/customer/hooks/use-public-settings";
+import {
+  PAYMENT_CATEGORIES,
+  filterEnabledPaymentCategories,
+} from "@/features/customer/payment-methods";
 import { BookingExpiredModal } from "@/features/customer/components/booking-expired-modal";
 import { AppShell } from "@/components/shared";
 
@@ -38,7 +42,12 @@ function PaymentMethodContent() {
 
   const { booking } = useBookingStatus({ bookingId, signedToken: token });
   const { charge, isCharging, error } = useChargePayment(bookingId, token);
+  const { enabledPaymentMethods } = usePublicSettings();
   const [loadingMethod, setLoadingMethod] = useState<string | null>(null);
+  const paymentCategories = filterEnabledPaymentCategories(
+    PAYMENT_CATEGORIES,
+    enabledPaymentMethods,
+  );
 
   // If booking is already charged (user navigated back from pay page), go directly —
   // unless they explicitly chose to change method (change=1), which must keep them here.
@@ -100,7 +109,7 @@ function PaymentMethodContent() {
 
         {/* ── Categories ────────────────────────────────────────────── */}
         <div className="space-y-5">
-          {PAYMENT_CATEGORIES.map((category) => (
+          {paymentCategories.map((category) => (
             <div key={category.label}>
               <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {category.label}
