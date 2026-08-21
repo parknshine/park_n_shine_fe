@@ -137,7 +137,9 @@
       "filterRatingYes": "With rating",
       "filterRatingNo": "No rating",
       "backToSummary": "← Back to Summary",
-      "viewJobs": "View Job Details →"
+      "viewJobs": "View Job Details →",
+      "photosPurged": "Photos were automatically deleted per the 90-day retention policy.",
+      "noPhotosYet": "No photos for this booking yet."
     },
     "tabs": {
       "summary": "Summary",

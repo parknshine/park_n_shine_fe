@@ -17,6 +17,7 @@ import { BOOKING_STATUSES } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { usePublicSettings } from "@/features/customer/hooks/use-public-settings";
 import { CleaningProgressBar } from "@/features/customer/components/cleaning-progress-bar";
+import { isMediaLikelyPurged } from "@/lib/media-retention";
 
 export default function BookingStatusPage() {
   const { id: bookingId } = useParams<{ id: string }>();
@@ -424,7 +425,7 @@ export default function BookingStatusPage() {
                 </div>
               )}
             </div>
-            {plateMedia && (
+            {plateMedia ? (
               <>
                 <div className='w-px shrink-0 self-stretch bg-border' />
                 <div className='ml-4 w-32 shrink-0'>
@@ -436,6 +437,16 @@ export default function BookingStatusPage() {
                   />
                 </div>
               </>
+            ) : (
+              paidAt &&
+              isMediaLikelyPurged(paidAt) && (
+                <>
+                  <div className='w-px shrink-0 self-stretch bg-border' />
+                  <div className='ml-4 w-32 shrink-0 self-center text-xs text-muted-foreground'>
+                    {t("status.photoPurged")}
+                  </div>
+                </>
+              )
             )}
           </div>
 
@@ -457,7 +468,7 @@ export default function BookingStatusPage() {
                 </p>
               )}
             </div>
-            {slotMedia && (
+            {slotMedia ? (
               <>
                 <div className='w-px shrink-0 self-stretch bg-border' />
                 <div className='ml-4 w-32 shrink-0'>
@@ -469,6 +480,16 @@ export default function BookingStatusPage() {
                   />
                 </div>
               </>
+            ) : (
+              paidAt &&
+              isMediaLikelyPurged(paidAt) && (
+                <>
+                  <div className='w-px shrink-0 self-stretch bg-border' />
+                  <div className='ml-4 w-32 shrink-0 self-center text-xs text-muted-foreground'>
+                    {t("status.photoPurged")}
+                  </div>
+                </>
+              )
             )}
           </div>
         </div>

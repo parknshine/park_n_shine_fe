@@ -137,7 +137,9 @@
       "filterRatingYes": "Ada rating",
       "filterRatingNo": "Tanpa rating",
       "backToSummary": "← Kembali ke Ringkasan",
-      "viewJobs": "Lihat Detail Job →"
+      "viewJobs": "Lihat Detail Job →",
+      "photosPurged": "Foto sudah dihapus otomatis sesuai kebijakan retensi 90 hari.",
+      "noPhotosYet": "Belum ada foto untuk booking ini."
     },
     "tabs": {
       "summary": "Ringkasan",

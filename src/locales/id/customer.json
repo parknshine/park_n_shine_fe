@@ -332,7 +332,8 @@
     "paymentMethodLabel": "Metode Pembayaran",
     "amountLabel": "Jumlah",
     "enableNotifications": "Aktifkan notifikasi saat kendaraanmu siap",
-    "notifDenied": "Notifikasi diblokir. Buka pengaturan browser lalu izinkan notifikasi, kemudian muat ulang halaman."
+    "notifDenied": "Notifikasi diblokir. Buka pengaturan browser lalu izinkan notifikasi, kemudian muat ulang halaman.",
+    "photoPurged": "Foto sudah dihapus otomatis sesuai kebijakan retensi 90 hari."
   },
   "rate": {
     "title": "Bagaimana pengalamanmu?",

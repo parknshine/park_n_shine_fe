@@ -332,7 +332,8 @@
     "paymentMethodLabel": "Payment Method",
     "amountLabel": "Amount",
     "enableNotifications": "Enable notifications when your car is ready",
-    "notifDenied": "Notifications blocked. Open browser settings and enable notifications, then reload the page."
+    "notifDenied": "Notifications blocked. Open browser settings and enable notifications, then reload the page.",
+    "photoPurged": "The photo was automatically deleted per the 90-day retention policy."
   },
   "rate": {
     "title": "How was your experience?",

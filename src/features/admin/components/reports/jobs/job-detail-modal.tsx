@@ -21,6 +21,7 @@ import {
   formatRupiah,
   formatTurnaround,
 } from "@/features/admin/utils/reports/jobs-format";
+import { isMediaLikelyPurged } from "@/lib/media-retention";
 import { PhotoLightboxOverlay, PhotoSection } from "./job-photo-viewer";
 
 export function JobDetailModal({
@@ -286,12 +287,13 @@ export function JobDetailModal({
             </div>
 
             {/* Photos */}
-            {viewable.length > 0 && (
-              <div className='space-y-3'>
-                <p className='flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
-                  <Camera className='h-3 w-3' />
-                  {t("reports.jobDetail.photos")} ({viewable.length})
-                </p>
+            <div className='space-y-3'>
+              <p className='flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                <Camera className='h-3 w-3' />
+                {t("reports.jobDetail.photos")}
+                {viewable.length > 0 && ` (${viewable.length})`}
+              </p>
+              {viewable.length > 0 ? (
                 <div className='space-y-4'>
                   <PhotoSection
                     photos={before}
@@ -312,8 +314,14 @@ export function JobDetailModal({
                     onPhotoClick={setLightboxIndex}
                   />
                 </div>
-              </div>
-            )}
+              ) : (
+                <p className='text-sm text-muted-foreground'>
+                  {isMediaLikelyPurged(row.createdAt)
+                    ? t("reports.jobDetail.photosPurged")
+                    : t("reports.jobDetail.noPhotosYet")}
+                </p>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
