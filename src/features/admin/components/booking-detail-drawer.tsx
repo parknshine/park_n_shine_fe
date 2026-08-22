@@ -581,7 +581,7 @@ export function BookingDetailDrawer({
                         <p className='font-medium text-foreground capitalize'>
                           {formatAuditAction(entry.action)}
                         </p>
-                        <p className='text-muted-foreground'>
+                        <p className='text-muted-foreground wrap-break-word'>
                           {formatAuditDetail(entry.action, entry.detail)}
                         </p>
                         <p className='text-xs text-muted-foreground'>

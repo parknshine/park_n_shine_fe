@@ -72,6 +72,10 @@ function parseDetail(action: string, p: Record<string, unknown>, raw: string): s
     const to = (p.to as string) ?? "—";
     return `${from} → ${to}`;
   }
+  if (action === "booking.created") {
+    const qrCodeId = p.qrCodeId as string | undefined;
+    return qrCodeId ? `QR ${qrCodeId}` : "—";
+  }
   return raw;
 }
 
@@ -81,6 +85,7 @@ export function formatAuditAction(action: string): string {
   if (action === "crew.requested_wait") return "Crew Requested Wait";
   if (action === "crew.request_time_extension") return "Crew Requested Time Extension";
   if (action === "booking.status_changed") return "Status Changed";
+  if (action === "booking.created") return "Booking Created";
   if (action === "extend_time") return "Extend Time";
   if (action === "approve_time_extension") return "Approve Time Extension";
   if (action === "reject_time_extension") return "Reject Time Extension";
