@@ -2,7 +2,7 @@ import type { BookingStatus, CustomerBooking } from "@/features/customer/types";
 
 export interface AdminQueueBooking extends CustomerBooking {
   crewName?: string | null;
-  elapsedSeconds: number;
+  elapsedSeconds: number | null;
   rejectionCount?: number;
 }
 

@@ -247,7 +247,9 @@ export function BookingDetailDrawer({
                     {t("drawer.elapsed")}
                   </dt>
                   <dd className='font-medium text-foreground'>
-                    {formatElapsed(booking.elapsedSeconds, t)}
+                    {booking.elapsedSeconds != null
+                      ? formatElapsed(booking.elapsedSeconds, t)
+                      : "—"}
                   </dd>
 
                   <dt className='text-muted-foreground'>
