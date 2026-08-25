@@ -265,7 +265,12 @@
       "mandiriStep5": "Confirm the payment",
       "alreadyPaid": "Already made a payment?",
       "updateStatus": "Update Payment Status",
-      "checking": "Checking status..."
+      "checking": "Checking status...",
+      "appNotOpened": "App Didn't Open",
+      "appNotOpenedDesc": "The app didn't open automatically. Try opening it again or download the app.",
+      "retryOpenApp": "Try Opening Again",
+      "downloadApp": "Download App",
+      "openingApp": "Opening app..."
     },
     "card": {
       "title": "Card Details",

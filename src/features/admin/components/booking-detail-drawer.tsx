@@ -153,6 +153,7 @@ export function BookingDetailDrawer({
   const isPendingTooYoung =
     booking &&
     booking.status === "PENDING" &&
+    booking.elapsedSeconds != null &&
     booking.elapsedSeconds < PENDING_OVERRIDE_UNLOCK_SECONDS;
 
   return (

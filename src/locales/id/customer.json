@@ -265,7 +265,12 @@
       "mandiriStep5": "Konfirmasi pembayaran",
       "alreadyPaid": "Sudah melakukan pembayaran?",
       "updateStatus": "Update Status Pembayaran",
-      "checking": "Memeriksa status..."
+      "checking": "Memeriksa status...",
+      "appNotOpened": "Aplikasi Tidak Terbuka",
+      "appNotOpenedDesc": "Aplikasi tidak terbuka secara otomatis. Coba buka kembali atau unduh aplikasinya.",
+      "retryOpenApp": "Coba Buka Lagi",
+      "downloadApp": "Unduh Aplikasi",
+      "openingApp": "Membuka aplikasi..."
     },
     "card": {
       "title": "Detail Kartu",
