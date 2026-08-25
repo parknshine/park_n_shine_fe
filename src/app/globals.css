@@ -6,36 +6,36 @@
 
 /* ─── Design tokens ────────────────────────────────────────────────────────── */
 :root {
-  --background:              #eff8fe;
-  --surface-low:             #e8f2f9;
-  --surface:                 #dfeaf1;
-  --surface-high:            #d1dfe7;
-  --surface-card:            #ffffff;
-  --foreground:              #273034;
-  --text:                    #273034;
-  --text-soft:               #5a666d;
-  --primary:                 #006289;
-  --primary-bright:          #1db1f1;
-  --primary-foreground:      #ffffff;
-  --secondary:               #fdd34d;
-  --secondary-ink:           #5c4900;
-  --secondary-foreground:    #5c4900;
-  --tertiary:                #514eb6;
-  --outline:                 rgba(111, 120, 125, 0.16);
+  --background: #eff8fe;
+  --surface-low: #e8f2f9;
+  --surface: #dfeaf1;
+  --surface-high: #d1dfe7;
+  --surface-card: #ffffff;
+  --foreground: #273034;
+  --text: #273034;
+  --text-soft: #5a666d;
+  --primary: #006289;
+  --primary-bright: #1db1f1;
+  --primary-foreground: #ffffff;
+  --secondary: #fdd34d;
+  --secondary-ink: #5c4900;
+  --secondary-foreground: #5c4900;
+  --tertiary: #514eb6;
+  --outline: rgba(111, 120, 125, 0.16);
 
   /* Aliases for shadcn/ui compatibility */
-  --card:                    #ffffff;
-  --card-foreground:         #273034;
-  --muted:                   #d1dfe7;
-  --muted-foreground:        #5a666d;
-  --border:                  #d1dfe7;
-  --destructive:             #ef4444;
-  --destructive-foreground:  #ffffff;
-  --accent:                  #fdd34d;
-  --accent-foreground:       #5c4900;
-  --ring:                    #006289;
+  --card: #ffffff;
+  --card-foreground: #273034;
+  --muted: #d1dfe7;
+  --muted-foreground: #5a666d;
+  --border: #d1dfe7;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --accent: #fdd34d;
+  --accent-foreground: #5c4900;
+  --ring: #006289;
 
-  --shadow:      0 24px 40px rgba(0, 98, 137, 0.08);
+  --shadow: 0 24px 40px rgba(0, 98, 137, 0.08);
   --shadow-soft: 0 24px 60px rgba(29, 177, 241, 0.16);
 }
 
@@ -44,22 +44,22 @@
   --font-sans: var(--font-plus-jakarta-sans);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --color-background:              var(--background);
-  --color-foreground:              var(--foreground);
-  --color-card:                    var(--card);
-  --color-card-foreground:         var(--card-foreground);
-  --color-muted:                   var(--muted);
-  --color-muted-foreground:        var(--muted-foreground);
-  --color-border:                  var(--border);
-  --color-primary:                 var(--primary);
-  --color-primary-foreground:      var(--primary-foreground);
-  --color-secondary:               var(--secondary);
-  --color-secondary-foreground:    var(--secondary-foreground);
-  --color-destructive:             var(--destructive);
-  --color-destructive-foreground:  var(--destructive-foreground);
-  --color-accent:                  var(--accent);
-  --color-accent-foreground:       var(--accent-foreground);
-  --color-ring:                    var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
 }
 
 /* ─── Base ──────────────────────────────────────────────────────────────────── */
@@ -91,8 +91,16 @@ body {
 
 .landing-bg {
   background-image:
-    radial-gradient(circle at top left, rgba(255, 211, 77, 0.22), transparent 20rem),
-    radial-gradient(circle at 80% 10%, rgba(29, 177, 241, 0.14), transparent 18rem);
+    radial-gradient(
+      circle at top left,
+      rgba(255, 211, 77, 0.22),
+      transparent 20rem
+    ),
+    radial-gradient(
+      circle at 80% 10%,
+      rgba(29, 177, 241, 0.14),
+      transparent 18rem
+    );
 }
 
 @layer base {
@@ -210,7 +218,9 @@ img {
   font-weight: 800;
   box-shadow: var(--shadow-soft);
   cursor: pointer;
-  transition: transform 160ms ease, box-shadow 160ms ease;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .button:hover,
@@ -511,6 +521,17 @@ img {
   font-size: 2.2rem;
   font-weight: 800;
   color: var(--primary);
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.price-original {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
 }
 
 .plan-card ul {
@@ -613,7 +634,10 @@ img {
 
 .bubble-progress {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(
+      0,
+      1fr
+    ) auto minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: start;
   gap: 0.85rem;
   padding: 2rem 0.5rem;
@@ -718,9 +742,15 @@ img {
 
 /* ─── Photo scan animation ──────────────────────────────────────────────────── */
 @keyframes scan-line {
-  0%   { top: 0%; }
-  50%  { top: calc(100% - 2px); }
-  100% { top: 0%; }
+  0% {
+    top: 0%;
+  }
+  50% {
+    top: calc(100% - 2px);
+  }
+  100% {
+    top: 0%;
+  }
 }
 
 .scan-line {
@@ -729,28 +759,67 @@ img {
 
 /* ─── Confetti fall animation (booking CLOSED hero) ────────────────────────── */
 @keyframes confetti-fall {
-  0%   { translate: 0 -10px; opacity: 0; }
-  15%  { opacity: 1; }
-  85%  { opacity: 0.7; }
-  100% { translate: 0 55px; opacity: 0; }
+  0% {
+    translate: 0 -10px;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    translate: 0 55px;
+    opacity: 0;
+  }
 }
 
-.confetti-fall   { animation: confetti-fall ease-in forwards; }
-.confetti-fall-1 { animation-duration: 2.0s; animation-delay: 0.00s; }
-.confetti-fall-2 { animation-duration: 1.8s; animation-delay: 0.18s; }
-.confetti-fall-3 { animation-duration: 2.3s; animation-delay: 0.08s; }
-.confetti-fall-4 { animation-duration: 1.9s; animation-delay: 0.28s; }
-.confetti-fall-5 { animation-duration: 2.1s; animation-delay: 0.12s; }
-.confetti-fall-6 { animation-duration: 1.7s; animation-delay: 0.35s; }
-.confetti-fall-7 { animation-duration: 2.4s; animation-delay: 0.05s; }
+.confetti-fall {
+  animation: confetti-fall ease-in forwards;
+}
+.confetti-fall-1 {
+  animation-duration: 2s;
+  animation-delay: 0s;
+}
+.confetti-fall-2 {
+  animation-duration: 1.8s;
+  animation-delay: 0.18s;
+}
+.confetti-fall-3 {
+  animation-duration: 2.3s;
+  animation-delay: 0.08s;
+}
+.confetti-fall-4 {
+  animation-duration: 1.9s;
+  animation-delay: 0.28s;
+}
+.confetti-fall-5 {
+  animation-duration: 2.1s;
+  animation-delay: 0.12s;
+}
+.confetti-fall-6 {
+  animation-duration: 1.7s;
+  animation-delay: 0.35s;
+}
+.confetti-fall-7 {
+  animation-duration: 2.4s;
+  animation-delay: 0.05s;
+}
 
 /* ─── Testimonial slide-in animation ────────────────────────────────────────── */
 @keyframes testimonial-slide-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .testimonial-slide-in {
-  animation: testimonial-slide-in .34s cubic-bezier(.22,.61,.36,1) both;
+  animation: testimonial-slide-in 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
 /* ─── Responsive ────────────────────────────────────────────────────────────── */
@@ -849,7 +918,9 @@ img {
     color: rgba(0, 98, 137, 0.5);
     font-weight: 700;
     font-size: 0.85rem;
-    transition: color 160ms ease, background 160ms ease;
+    transition:
+      color 160ms ease,
+      background 160ms ease;
   }
 
   .dock-link.active {

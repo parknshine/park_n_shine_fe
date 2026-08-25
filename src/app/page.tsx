@@ -5,7 +5,10 @@ import { useState, useRef, useEffect } from "react";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
-import { usePublicTestimonials, usePublicSettings } from "@/features/customer/hooks";
+import {
+  usePublicTestimonials,
+  usePublicSettings,
+} from "@/features/customer/hooks";
 import { BookNowModal } from "@/features/customer/components/book-now-modal";
 import { MarketingFooter, PromoBannerPopup } from "@/components/shared";
 
@@ -69,7 +72,10 @@ export default function Home() {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     }
@@ -91,7 +97,7 @@ export default function Home() {
   }
 
   return (
-    <div className="landing-bg">
+    <div className='landing-bg'>
       {/* ── Topbar ─────────────────────────────────────────────── */}
       <header className='topbar'>
         <nav className='nav shell'>
@@ -139,7 +145,7 @@ export default function Home() {
 
             <div className='nav-actions'>
               <button
-                type="button"
+                type='button'
                 className='button button-small'
                 onClick={() => setBookNowOpen(true)}
               >
@@ -215,7 +221,7 @@ export default function Home() {
             <p>{t("landingPage.hero.description")}</p>
             <div className='hero-actions'>
               <button
-                type="button"
+                type='button'
                 className='button'
                 onClick={() => setBookNowOpen(true)}
               >
@@ -244,9 +250,23 @@ export default function Home() {
         <section className='process-wrap' id='process'>
           <div className='shell'>
             <div className='section-heading centered'>
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" className="mx-auto mb-3">
-                <path d="M24 6L26.8 20.2L41 24L26.8 27.8L24 42L21.2 27.8L7 24L21.2 20.2L24 6Z" fill="#006289" fillOpacity="0.15"/>
-                <path d="M24 10L26.2 21.2L37 24L26.2 26.8L24 38L21.8 26.8L11 24L21.8 21.2L24 10Z" fill="#006289"/>
+              <svg
+                width='48'
+                height='48'
+                viewBox='0 0 48 48'
+                fill='none'
+                aria-hidden='true'
+                className='mx-auto mb-3'
+              >
+                <path
+                  d='M24 6L26.8 20.2L41 24L26.8 27.8L24 42L21.2 27.8L7 24L21.2 20.2L24 6Z'
+                  fill='#006289'
+                  fillOpacity='0.15'
+                />
+                <path
+                  d='M24 10L26.2 21.2L37 24L26.2 26.8L24 38L21.8 26.8L11 24L21.8 21.2L24 10Z'
+                  fill='#006289'
+                />
               </svg>
               <h2>{t("landingPage.howItWorks.title")}</h2>
             </div>
@@ -277,12 +297,19 @@ export default function Home() {
         <section className='plans-section-promo' id='pricing'>
           <div className='shell plans-promo-inner'>
             <div>
-              <p className='plans-promo-subtitle'>{t("landingPage.pricing.subtitle")}</p>
-              <h2 className='plans-promo-title'>{t("landingPage.pricing.title")}</h2>
+              <p className='plans-promo-subtitle'>
+                {t("landingPage.pricing.subtitle")}
+              </p>
+              <h2 className='plans-promo-title'>
+                {t("landingPage.pricing.title")}
+              </h2>
             </div>
             <article className='plan-card plans-promo-card'>
               <h3>{t("landingPage.pricing.serviceLabel")}</h3>
-              <p className='price'>Rp50.000</p>
+              <p className='price'>
+                <span className='price-original'>Rp70.000</span>
+                Rp50.000
+              </p>
               <p>{t("landingPage.pricing.description")}</p>
               <ul>
                 {pricingFeatures.map((feature) => (
@@ -313,7 +340,13 @@ export default function Home() {
                   <div key={`step-${i}`} className={stepCls}>
                     <div className={bubbleCls}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`/icons/step${i + 1}.svg`} alt="" width={22} height={22} className="bubble-step-icon" />
+                      <img
+                        src={`/icons/step${i + 1}.svg`}
+                        alt=''
+                        width={22}
+                        height={22}
+                        className='bubble-step-icon'
+                      />
                     </div>
                     <span>{t(`landingPage.track.step${i + 1}`)}</span>
                   </div>,
@@ -333,7 +366,7 @@ export default function Home() {
 
             <div className='tracker-action'>
               <button
-                type="button"
+                type='button'
                 className='button'
                 onClick={() => setBookNowOpen(true)}
               >
@@ -345,107 +378,142 @@ export default function Home() {
 
         {/* ── Testimonials ──────────────────────────────────────── */}
         {testimonials.length > 0 && (
-  <section id="testimonials" className="shell pt-16 pb-16">
-    <div
-      className="relative rounded-3xl bg-[var(--surface-low)] px-8 py-10 md:px-14 md:py-16"
-      onMouseEnter={() => setIsCarouselPaused(true)}
-      onMouseLeave={() => setIsCarouselPaused(false)}
-    >
-      {/* Counter — top right */}
-      <div className="flex justify-end mb-6 text-sm font-medium text-[var(--text-soft)] select-none">
-        <span className="text-[var(--foreground)] text-lg font-bold">
-          {String(testimonialIndex + 1).padStart(2, "0")}
-        </span>
-        <span className="mx-1.5">／</span>
-        <span>{String(testimonials.length).padStart(2, "0")}</span>
-      </div>
-
-      {/* Slide content — fade+slide animation on index change */}
-      {(() => {
-        const item = testimonials[testimonialIndex];
-        return (
-          <div key={testimonialIndex} className="testimonial-slide-in" style={{ minHeight: 280 }}>
-            {/* Stars */}
-            <div className="flex gap-1 mb-5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={`star-${i + 1}`}
-                  className={`h-[22px] w-[22px] ${i < item.rating ? "fill-[var(--primary)] text-[var(--primary)]" : "text-[var(--surface-high)]"}`}
-                />
-              ))}
-            </div>
-
-            {/* Headline — large editorial quote */}
-            {item.title && (
-              <h3
-                className="font-semibold text-[var(--foreground)] leading-[1.12] tracking-[-0.025em] mb-5 max-w-[20ch]"
-                style={{ fontSize: "clamp(28px, 4.2vw, 50px)" }}
-              >
-                &ldquo;{item.title}&rdquo;
-              </h3>
-            )}
-
-            {/* Body */}
-            <p className="text-[var(--text-soft)] leading-relaxed max-w-[56ch]" style={{ fontSize: 17 }}>
-              {item.body}
-            </p>
-          </div>
-        );
-      })()}
-
-      {/* Footer: author + nav */}
-      <div className="flex items-center justify-between gap-4 mt-12 flex-wrap">
-        {/* Author chip */}
-        <div className="flex items-center gap-3.5">
-          <div className="w-11.5 h-11.5 rounded-full bg-white border border-border flex items-center justify-center flex-shrink-0 text-[var(--primary)]">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="12" cy="8.2" r="3.6" stroke="currentColor" strokeWidth="1.6" />
-              <path d="M4.8 19.4c0-3.6 3.2-5.6 7.2-5.6s7.2 2 7.2 5.6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="font-semibold text-[15.5px] text-foreground">
-              {testimonials[testimonialIndex].authorName}
-            </span>
-            {testimonials[testimonialIndex].location && (
-              <span className="text-[13.5px] text-(--text-soft)">
-                {testimonials[testimonialIndex].location}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Progress bar + nav arrows */}
-        {testimonials.length > 1 && (
-          <div className="flex items-center gap-3.5 flex-shrink-0">
-            <div className="hidden sm:block w-40 h-1 rounded-full bg-[var(--surface-high)] overflow-hidden">
-              <div
-                className="h-full rounded-full bg-[var(--primary)] transition-all duration-500"
-                style={{ width: `${((testimonialIndex + 1) / testimonials.length) * 100}%` }}
-              />
-            </div>
-            <button
-              type="button"
-              onClick={() => setTestimonialIndex((c) => (c - 1 + testimonials.length) % testimonials.length)}
-              aria-label="Previous testimonial"
-              className="w-[54px] h-[54px] rounded-full border border-[var(--border)] bg-white flex items-center justify-center text-[var(--foreground)] cursor-pointer hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] transition-colors"
+          <section id='testimonials' className='shell pt-16 pb-16'>
+            <div
+              className='relative rounded-3xl bg-[var(--surface-low)] px-8 py-10 md:px-14 md:py-16'
+              onMouseEnter={() => setIsCarouselPaused(true)}
+              onMouseLeave={() => setIsCarouselPaused(false)}
             >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setTestimonialIndex((c) => (c + 1) % testimonials.length)}
-              aria-label="Next testimonial"
-              className="w-[54px] h-[54px] rounded-full border border-[var(--border)] bg-white flex items-center justify-center text-[var(--foreground)] cursor-pointer hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] transition-colors"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
+              {/* Counter — top right */}
+              <div className='flex justify-end mb-6 text-sm font-medium text-[var(--text-soft)] select-none'>
+                <span className='text-[var(--foreground)] text-lg font-bold'>
+                  {String(testimonialIndex + 1).padStart(2, "0")}
+                </span>
+                <span className='mx-1.5'>／</span>
+                <span>{String(testimonials.length).padStart(2, "0")}</span>
+              </div>
+
+              {/* Slide content — fade+slide animation on index change */}
+              {(() => {
+                const item = testimonials[testimonialIndex];
+                return (
+                  <div
+                    key={testimonialIndex}
+                    className='testimonial-slide-in'
+                    style={{ minHeight: 280 }}
+                  >
+                    {/* Stars */}
+                    <div className='flex gap-1 mb-5'>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={`star-${i + 1}`}
+                          className={`h-[22px] w-[22px] ${i < item.rating ? "fill-[var(--primary)] text-[var(--primary)]" : "text-[var(--surface-high)]"}`}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Headline — large editorial quote */}
+                    {item.title && (
+                      <h3
+                        className='font-semibold text-[var(--foreground)] leading-[1.12] tracking-[-0.025em] mb-5 max-w-[20ch]'
+                        style={{ fontSize: "clamp(28px, 4.2vw, 50px)" }}
+                      >
+                        &ldquo;{item.title}&rdquo;
+                      </h3>
+                    )}
+
+                    {/* Body */}
+                    <p
+                      className='text-[var(--text-soft)] leading-relaxed max-w-[56ch]'
+                      style={{ fontSize: 17 }}
+                    >
+                      {item.body}
+                    </p>
+                  </div>
+                );
+              })()}
+
+              {/* Footer: author + nav */}
+              <div className='flex items-center justify-between gap-4 mt-12 flex-wrap'>
+                {/* Author chip */}
+                <div className='flex items-center gap-3.5'>
+                  <div className='w-11.5 h-11.5 rounded-full bg-white border border-border flex items-center justify-center flex-shrink-0 text-[var(--primary)]'>
+                    <svg
+                      width='24'
+                      height='24'
+                      viewBox='0 0 24 24'
+                      fill='none'
+                      aria-hidden='true'
+                    >
+                      <circle
+                        cx='12'
+                        cy='8.2'
+                        r='3.6'
+                        stroke='currentColor'
+                        strokeWidth='1.6'
+                      />
+                      <path
+                        d='M4.8 19.4c0-3.6 3.2-5.6 7.2-5.6s7.2 2 7.2 5.6'
+                        stroke='currentColor'
+                        strokeWidth='1.6'
+                        strokeLinecap='round'
+                      />
+                    </svg>
+                  </div>
+                  <div className='flex flex-col leading-tight'>
+                    <span className='font-semibold text-[15.5px] text-foreground'>
+                      {testimonials[testimonialIndex].authorName}
+                    </span>
+                    {testimonials[testimonialIndex].location && (
+                      <span className='text-[13.5px] text-(--text-soft)'>
+                        {testimonials[testimonialIndex].location}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Progress bar + nav arrows */}
+                {testimonials.length > 1 && (
+                  <div className='flex items-center gap-3.5 flex-shrink-0'>
+                    <div className='hidden sm:block w-40 h-1 rounded-full bg-[var(--surface-high)] overflow-hidden'>
+                      <div
+                        className='h-full rounded-full bg-[var(--primary)] transition-all duration-500'
+                        style={{
+                          width: `${((testimonialIndex + 1) / testimonials.length) * 100}%`,
+                        }}
+                      />
+                    </div>
+                    <button
+                      type='button'
+                      onClick={() =>
+                        setTestimonialIndex(
+                          (c) =>
+                            (c - 1 + testimonials.length) % testimonials.length,
+                        )
+                      }
+                      aria-label='Previous testimonial'
+                      className='w-[54px] h-[54px] rounded-full border border-[var(--border)] bg-white flex items-center justify-center text-[var(--foreground)] cursor-pointer hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] transition-colors'
+                    >
+                      <ChevronLeft className='h-5 w-5' />
+                    </button>
+                    <button
+                      type='button'
+                      onClick={() =>
+                        setTestimonialIndex(
+                          (c) => (c + 1) % testimonials.length,
+                        )
+                      }
+                      aria-label='Next testimonial'
+                      className='w-[54px] h-[54px] rounded-full border border-[var(--border)] bg-white flex items-center justify-center text-[var(--foreground)] cursor-pointer hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] transition-colors'
+                    >
+                      <ChevronRight className='h-5 w-5' />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
         )}
-      </div>
-    </div>
-  </section>
-)}
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────── */}
@@ -467,7 +535,7 @@ export default function Home() {
           {t("landingPage.nav.services")}
         </a>
         <button
-          type="button"
+          type='button'
           className='dock-link dock-link-cta'
           onClick={() => setBookNowOpen(true)}
         >

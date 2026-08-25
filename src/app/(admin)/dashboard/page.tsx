@@ -376,7 +376,7 @@ function DashboardContent() {
             onValueChange={(v) => setSortBy(v as "name" | "code")}
           >
             <SelectTrigger
-              className='h-9 w-[170px] text-xs'
+              className='h-9 w-42.5 text-xs'
               aria-label='Sort sites'
             >
               <SelectValue />
