@@ -17,7 +17,14 @@ interface StorageLike {
   removeItem(key: string): void;
 }
 
+const noopStorage: StorageLike = {
+  getItem: () => null,
+  setItem: () => {},
+  removeItem: () => {},
+};
+
 function defaultStorage(): StorageLike {
+  if (typeof window === "undefined") return noopStorage;
   return wrapStorageSafely(window.localStorage);
 }
 
