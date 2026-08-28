@@ -1,6 +1,7 @@
 "use client";
 
 import QRCode from "react-qr-code";
+import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Copy, CheckCircle, RefreshCw, AlertCircle, Wallet } from "lucide-react";
@@ -18,6 +19,28 @@ import type { PaymentInstructions } from "@/features/customer/types";
 type TFunction = (key: string) => string;
 
 const IS_SNAP_MODE = process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
+
+// SNAP mode currently restricts enabled_payments to QRIS only (server-side
+// default), so the embedded popup opens directly on the QRIS view — no
+// payment-method chooser inside the popup.
+const MIDTRANS_CLIENT_KEY = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "";
+const MIDTRANS_SNAP_JS_URL =
+  process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true"
+    ? "https://app.midtrans.com/snap/snap.js"
+    : "https://app.sandbox.midtrans.com/snap/snap.js";
+
+interface SnapPayOptions {
+  onSuccess?: () => void;
+  onPending?: () => void;
+  onError?: () => void;
+  onClose?: () => void;
+}
+
+declare global {
+  interface Window {
+    snap?: { pay: (token: string, options?: SnapPayOptions) => void };
+  }
+}
 
 // SNAP mode ignores the paymentMethod value server-side (Midtrans Snap
 // bundles all channels), but the /charge endpoint still requires a valid one.
@@ -128,11 +151,13 @@ function ExpiryBadge({ expiryTime, t }: { expiryTime: string; t: TFunction }) {
 function PaymentInstructionsUI({
   instructions,
   onChangeMethod,
+  onSnapPay,
   canChangeMethod,
   t,
 }: Readonly<{
   instructions: PaymentInstructions;
   onChangeMethod: () => void;
+  onSnapPay: (token: string | undefined, redirectUrl: string) => void;
   canChangeMethod: boolean;
   t: TFunction;
 }>) {
@@ -252,12 +277,13 @@ function PaymentInstructionsUI({
             {t("booking.payment.completePaymentDesc")}
           </p>
         </div>
-        <a
-          href={instructions.redirectUrl}
+        <button
+          type="button"
+          onClick={() => onSnapPay(instructions.token, instructions.redirectUrl)}
           className="w-full py-3 rounded-xl bg-primary-foreground text-primary text-sm font-semibold text-center hover:bg-primary-foreground/90 transition-colors"
         >
           {t("booking.payment.pay")}
-        </a>
+        </button>
       </div>
     );
   }
@@ -408,8 +434,23 @@ export default function PayPage() {
     router.push(`/booking/${bookingId}/payment-method?token=${token}&change=1`);
   }
 
+  // Prefer the embedded Snap popup (stays on this page, no method chooser
+  // since enabled_payments is QRIS-only) — fall back to full-page redirect
+  // if snap.js hasn't loaded yet or no token was returned.
+  function handleSnapPay(snapToken: string | undefined, redirectUrl: string) {
+    if (snapToken && window.snap?.pay) {
+      window.snap.pay(snapToken, {
+        onSuccess: () => void checkPayment(),
+        onPending: () => void checkPayment(),
+      });
+      return;
+    }
+    window.location.href = redirectUrl;
+  }
+
   return (
     <>
+    <Script src={MIDTRANS_SNAP_JS_URL} data-client-key={MIDTRANS_CLIENT_KEY} strategy="afterInteractive" />
     <BookingExpiredModal open={booking?.status === BOOKING_STATUSES.EXPIRED} />
     <AppShell surface="customer" className="pb-32">
       <div className="space-y-5">
@@ -431,6 +472,7 @@ export default function PayPage() {
           <PaymentInstructionsUI
             instructions={booking.paymentInstructions}
             onChangeMethod={handleChangeMethod}
+            onSnapPay={handleSnapPay}
             canChangeMethod={!IS_SNAP_MODE}
             t={t}
           />

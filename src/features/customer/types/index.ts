@@ -62,7 +62,7 @@ export type PaymentInstructions =
   | { type: "MANDIRI"; companyCode: string; billCode: string; expiryTime: string }
   | { type: "QRIS"; qrString: string; expiryTime: string }
   | { type: "EWALLET"; provider: string; deepLinkUrl: string; expiryTime: string }
-  | { type: "REDIRECT"; redirectUrl: string };
+  | { type: "REDIRECT"; redirectUrl: string; token?: string };
 
 export interface CustomerBooking {
   id: string;

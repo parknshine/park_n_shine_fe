@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://apis.google.com`,
+              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://apis.google.com https://app.midtrans.com https://app.sandbox.midtrans.com`,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https://res.cloudinary.com https://midtrans-website.al-mp-id-p.cdn.gtflabs.io https://storage.googleapis.com https://lh3.googleusercontent.com https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://api.sandbox.midtrans.com https://api.midtrans.com blob:",
               `connect-src 'self'${isDev ? " ws: http://localhost:* http://127.0.0.1:*" : ""} https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://api.sandbox.midtrans.com https://api.midtrans.com https://nominatim.openstreetmap.org ` + (process.env.NEXT_PUBLIC_API_URL ?? ""),
