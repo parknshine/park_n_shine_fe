@@ -396,8 +396,6 @@ export function BookingDetailDrawer({
                       "CLOSED",
                       "CANCELLED",
                       "EXPIRED",
-                      "ASSIGNED",
-                      "LOCATED",
                       "IN_PROGRESS",
                     ].includes(booking.status)}
                     onClick={() => setActiveModal("reassign")}
