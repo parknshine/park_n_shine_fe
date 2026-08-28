@@ -115,7 +115,8 @@ function DashboardSiteCard({
                     )}
                     <div className='min-w-0'>
                       <p className='font-semibold text-foreground truncate'>
-                        {booking.plateText ?? bookingRef(booking.reference, booking.id)}
+                        {booking.plateText ??
+                          bookingRef(booking.reference, booking.id)}
                       </p>
                       <p className='text-xs text-muted-foreground truncate'>
                         {booking.slotText}
@@ -132,7 +133,9 @@ function DashboardSiteCard({
                       : t("drawer.notifyNo")}
                   </p>
                   <p className='text-xs font-mono text-muted-foreground shrink-0'>
-                    {formatElapsedShort(booking.elapsedSeconds, t)}
+                    {booking.elapsedSeconds != null
+                      ? formatElapsedShort(booking.elapsedSeconds, t)
+                      : "-"}
                   </p>
                 </button>
               );
@@ -200,13 +203,21 @@ function DashboardSiteView({
             <ArrowLeft className='h-4 w-4' />
           </Button>
           <div>
-            <h1 className='text-xl font-bold text-foreground'>{site.siteName}</h1>
+            <h1 className='text-xl font-bold text-foreground'>
+              {site.siteName}
+            </h1>
             <p className='text-sm text-muted-foreground'>
               {t("dashboard.subtitle")}
             </p>
           </div>
         </div>
-        <Button variant='outline' size='sm' onClick={() => onRefresh()} title='Refresh' className='gap-1.5 shrink-0'>
+        <Button
+          variant='outline'
+          size='sm'
+          onClick={() => onRefresh()}
+          title='Refresh'
+          className='gap-1.5 shrink-0'
+        >
           <RefreshCw className='h-3.5 w-3.5' />
         </Button>
       </div>
@@ -364,7 +375,10 @@ function DashboardContent() {
             value={sortBy}
             onValueChange={(v) => setSortBy(v as "name" | "code")}
           >
-            <SelectTrigger className='h-9 w-[170px] text-xs' aria-label='Sort sites'>
+            <SelectTrigger
+              className='h-9 w-42.5 text-xs'
+              aria-label='Sort sites'
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -372,7 +386,13 @@ function DashboardContent() {
               <SelectItem value='code'>{t("dashboard.sortCode")}</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant='outline' size='sm' onClick={() => refresh()} title='Refresh' className='gap-1.5 shrink-0'>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => refresh()}
+            title='Refresh'
+            className='gap-1.5 shrink-0'
+          >
             <RefreshCw className='h-3.5 w-3.5' />
           </Button>
         </div>

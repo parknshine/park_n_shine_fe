@@ -153,6 +153,7 @@ export function BookingDetailDrawer({
   const isPendingTooYoung =
     booking &&
     booking.status === "PENDING" &&
+    booking.elapsedSeconds != null &&
     booking.elapsedSeconds < PENDING_OVERRIDE_UNLOCK_SECONDS;
 
   return (
@@ -247,7 +248,9 @@ export function BookingDetailDrawer({
                     {t("drawer.elapsed")}
                   </dt>
                   <dd className='font-medium text-foreground'>
-                    {formatElapsed(booking.elapsedSeconds, t)}
+                    {booking.elapsedSeconds != null
+                      ? formatElapsed(booking.elapsedSeconds, t)
+                      : "—"}
                   </dd>
 
                   <dt className='text-muted-foreground'>
