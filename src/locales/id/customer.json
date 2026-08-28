@@ -511,7 +511,9 @@
     "activeBookingStatusAssigned": "Crew menuju mobilmu",
     "activeBookingStatusLocated": "Crew menuju mobilmu",
     "activeBookingStatusInProgress": "Sedang dicuci",
-    "activeBookingStatusNeedsHelp": "Butuh bantuan"
+    "activeBookingStatusNeedsHelp": "Butuh bantuan",
+    "activeBookingStatusPending": "Menunggu pembayaran",
+    "resumePaymentCta": "Lanjutkan Pembayaran"
   },
   "history": {
     "title": "Riwayat Saya",

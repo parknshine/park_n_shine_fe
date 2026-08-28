@@ -9,6 +9,7 @@ interface ActiveBookingCardProps {
   statusLabel: string;
   ctaLabel: string;
   sectionTitle?: string;
+  href?: string;
 }
 
 export function ActiveBookingCard({
@@ -19,6 +20,7 @@ export function ActiveBookingCard({
   statusLabel,
   ctaLabel,
   sectionTitle,
+  href,
 }: Readonly<ActiveBookingCardProps>) {
   return (
     <div>
@@ -28,7 +30,7 @@ export function ActiveBookingCard({
         </div>
       )}
       <Link
-        href={`/booking/${bookingId}/status?token=${signedToken}`}
+        href={href ?? `/booking/${bookingId}/status?token=${signedToken}`}
         className="w-full text-left flex items-center gap-3 px-4 py-[14px] rounded-2xl bg-white border border-[#006289]/10"
         style={{ boxShadow: "0 10px 26px rgba(0,98,137,0.08)" }}
       >

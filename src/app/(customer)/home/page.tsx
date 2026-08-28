@@ -14,6 +14,7 @@ import { usePublicSites } from "@/features/customer/hooks/use-public-sites";
 import { useCustomerBookings } from "@/features/customer/hooks/use-customer-bookings";
 import { useCustomerHome } from "@/features/customer/hooks/use-customer-home";
 import { ActiveBookingCard } from "@/features/customer/components/active-booking-card";
+import { useGuestActiveBooking } from "@/features/customer/hooks/use-guest-active-booking";
 import type { BookingStatus } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ function isSitePastCutoff(cutoffTime: string | null): boolean {
 }
 
 const ACTIVE_STATUS_LABEL_KEYS: Record<string, string> = {
+  PENDING: "home.activeBookingStatusPending",
   PAID: "home.activeBookingStatusPaid",
   ASSIGNED: "home.activeBookingStatusAssigned",
   LOCATED: "home.activeBookingStatusLocated",
@@ -53,6 +55,7 @@ export default function HomePage() {
 
   const { data: bookingsData } = useCustomerBookings(isAuthenticated);
   const { data: homeData } = useCustomerHome(isAuthenticated);
+  const guestActiveBooking = useGuestActiveBooking(!isAuthenticated);
 
   const activeBookings = (bookingsData?.pages.flatMap((p) => p.items) ?? []).filter(
     (b) => ACTIVE_STATUSES.includes(b.status as BookingStatus),
@@ -99,6 +102,29 @@ export default function HomePage() {
               {t("home.guestHeading")}
             </h1>
           </div>
+
+          {guestActiveBooking && (
+            <ActiveBookingCard
+              bookingId={guestActiveBooking.bookingId}
+              signedToken={guestActiveBooking.token}
+              plate={guestActiveBooking.booking.plateText ?? "—"}
+              siteName={guestActiveBooking.booking.siteName ?? "—"}
+              statusLabel={t(
+                ACTIVE_STATUS_LABEL_KEYS[guestActiveBooking.booking.status] ?? "",
+              )}
+              ctaLabel={
+                guestActiveBooking.booking.status === "PENDING"
+                  ? t("home.resumePaymentCta")
+                  : t("home.activeBookingCta")
+              }
+              href={
+                guestActiveBooking.booking.status === "PENDING"
+                  ? `/booking/${guestActiveBooking.bookingId}/pay?token=${guestActiveBooking.token}`
+                  : `/booking/${guestActiveBooking.bookingId}/status?token=${guestActiveBooking.token}`
+              }
+              sectionTitle={t("home.activeBookingTitle")}
+            />
+          )}
 
           {/* Quick actions */}
           <div>

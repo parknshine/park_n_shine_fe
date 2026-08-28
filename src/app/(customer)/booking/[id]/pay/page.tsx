@@ -20,6 +20,7 @@ import { BOOKING_STATUSES } from "@/features/customer/types";
 import { resolvePayPageAction } from "@/features/customer/utils/pay-page-action";
 import { openDeeplink } from "@/features/customer/utils/open-deeplink";
 import { BookingExpiredModal } from "@/features/customer/components/booking-expired-modal";
+import { saveGuestBookingPointer } from "@/lib/guest-booking-pointer";
 import { AppShell } from "@/components/shared";
 import type { PaymentInstructions } from "@/features/customer/types";
 
@@ -496,6 +497,7 @@ export default function PayPage() {
   useEffect(() => {
     if (token) {
       sessionStorage.setItem(`booking_payment_token_${bookingId}`, token);
+      saveGuestBookingPointer({ bookingId, token });
     }
   }, [bookingId, token]);
 

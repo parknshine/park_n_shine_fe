@@ -511,7 +511,9 @@
     "activeBookingStatusAssigned": "Crew on the way",
     "activeBookingStatusLocated": "Crew on the way",
     "activeBookingStatusInProgress": "Being washed",
-    "activeBookingStatusNeedsHelp": "Needs attention"
+    "activeBookingStatusNeedsHelp": "Needs attention",
+    "activeBookingStatusPending": "Awaiting payment",
+    "resumePaymentCta": "Continue Payment"
   },
   "history": {
     "title": "My History",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Bell, Check, Car, Star, ChevronUp } from "lucide-react";
@@ -18,6 +18,7 @@ import { useTranslation } from "@/i18n";
 import { usePublicSettings } from "@/features/customer/hooks/use-public-settings";
 import { CleaningProgressBar } from "@/features/customer/components/cleaning-progress-bar";
 import { isMediaLikelyPurged } from "@/lib/media-retention";
+import { saveGuestBookingPointer } from "@/lib/guest-booking-pointer";
 
 export default function BookingStatusPage() {
   const { id: bookingId } = useParams<{ id: string }>();
@@ -31,6 +32,12 @@ export default function BookingStatusPage() {
     signedToken: token ?? "",
     enabled: !!bookingId && !!token,
   });
+
+  useEffect(() => {
+    if (bookingId && token) {
+      saveGuestBookingPointer({ bookingId, token });
+    }
+  }, [bookingId, token]);
 
   const { checkPayment, isChecking } = useCheckPayment({
     bookingId,
