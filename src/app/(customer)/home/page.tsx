@@ -15,12 +15,17 @@ import { useCustomerBookings } from "@/features/customer/hooks/use-customer-book
 import { useCustomerHome } from "@/features/customer/hooks/use-customer-home";
 import { ActiveBookingCard } from "@/features/customer/components/active-booking-card";
 import { useGuestActiveBooking } from "@/features/customer/hooks/use-guest-active-booking";
+import {
+  resolveBookingResumeHref,
+  resolveBookingResumeCtaLabelKey,
+} from "@/features/customer/utils/booking-resume-link";
 import type { BookingStatus } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { setMarketingBackOrigin } from "@/lib/marketing-back-origin";
 
 const ACTIVE_STATUSES: BookingStatus[] = [
+  "PENDING",
   "PAID",
   "ASSIGNED",
   "LOCATED",
@@ -112,16 +117,14 @@ export default function HomePage() {
               statusLabel={t(
                 ACTIVE_STATUS_LABEL_KEYS[guestActiveBooking.booking.status] ?? "",
               )}
-              ctaLabel={
-                guestActiveBooking.booking.status === "PENDING"
-                  ? t("home.resumePaymentCta")
-                  : t("home.activeBookingCta")
-              }
-              href={
-                guestActiveBooking.booking.status === "PENDING"
-                  ? `/booking/${guestActiveBooking.bookingId}/pay?token=${guestActiveBooking.token}`
-                  : `/booking/${guestActiveBooking.bookingId}/status?token=${guestActiveBooking.token}`
-              }
+              ctaLabel={t(
+                resolveBookingResumeCtaLabelKey(guestActiveBooking.booking.status),
+              )}
+              href={resolveBookingResumeHref(
+                guestActiveBooking.bookingId,
+                guestActiveBooking.token,
+                guestActiveBooking.booking.status,
+              )}
               sectionTitle={t("home.activeBookingTitle")}
             />
           )}
@@ -253,7 +256,8 @@ export default function HomePage() {
                   plate={b.plate ?? "—"}
                   siteName={b.site?.name ?? "—"}
                   statusLabel={t(ACTIVE_STATUS_LABEL_KEYS[b.status] ?? "")}
-                  ctaLabel={t("home.activeBookingCta")}
+                  ctaLabel={t(resolveBookingResumeCtaLabelKey(b.status))}
+                  href={resolveBookingResumeHref(b.id, b.bookingToken, b.status)}
                 />
               ))}
             </div>

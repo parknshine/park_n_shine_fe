@@ -17,6 +17,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import customerApi from "@/lib/axios-customer";
 import { mutationKeys } from "@/lib/query-keys";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
+import { clearGuestBookingPointer } from "@/lib/guest-booking-pointer";
 import type { Customer } from "@/types";
 
 interface SessionResponse {
@@ -205,6 +206,9 @@ export function useCustomerAuth() {
       // best-effort server-side revoke
     }
     clearCustomer();
+    // A shared device could otherwise resurface this account's booking to
+    // whoever uses the site as a guest next.
+    clearGuestBookingPointer();
     // Cache is not tied to auth state — without this, bookings from the old
     // session keep feeding components (e.g. NotificationPermissionPrompt).
     queryClient.removeQueries({ queryKey: ["customer"] });

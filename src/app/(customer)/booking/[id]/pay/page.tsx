@@ -21,6 +21,7 @@ import { resolvePayPageAction } from "@/features/customer/utils/pay-page-action"
 import { openDeeplink } from "@/features/customer/utils/open-deeplink";
 import { BookingExpiredModal } from "@/features/customer/components/booking-expired-modal";
 import { saveGuestBookingPointer } from "@/lib/guest-booking-pointer";
+import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import { AppShell } from "@/components/shared";
 import type { PaymentInstructions } from "@/features/customer/types";
 
@@ -493,13 +494,19 @@ export default function PayPage() {
   const router = useRouter();
   const signedToken = token ?? "";
   const { t } = useTranslation("customer");
+  const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
 
   useEffect(() => {
     if (token) {
       sessionStorage.setItem(`booking_payment_token_${bookingId}`, token);
-      saveGuestBookingPointer({ bookingId, token });
+      // Only guests need this — logged-in users already get their bookings
+      // from /v1/me/bookings, and leaving it here would leak this booking
+      // into a later guest session on a shared device after logout.
+      if (!isAuthenticated) {
+        saveGuestBookingPointer({ bookingId, token });
+      }
     }
-  }, [bookingId, token]);
+  }, [bookingId, token, isAuthenticated]);
 
   const { booking } = useBookingStatus({
     bookingId,

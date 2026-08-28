@@ -19,6 +19,7 @@ import { usePublicSettings } from "@/features/customer/hooks/use-public-settings
 import { CleaningProgressBar } from "@/features/customer/components/cleaning-progress-bar";
 import { isMediaLikelyPurged } from "@/lib/media-retention";
 import { saveGuestBookingPointer } from "@/lib/guest-booking-pointer";
+import { useCustomerAuthStore } from "@/store/customer-auth-store";
 
 export default function BookingStatusPage() {
   const { id: bookingId } = useParams<{ id: string }>();
@@ -26,6 +27,7 @@ export default function BookingStatusPage() {
   const token = searchParams.get("token");
   const { t } = useTranslation("customer");
   const { whatsappNumber, avgCleaningMinutes } = usePublicSettings();
+  const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
 
   const { booking, isLoading, error, refresh } = useBookingStatus({
     bookingId,
@@ -34,10 +36,13 @@ export default function BookingStatusPage() {
   });
 
   useEffect(() => {
-    if (bookingId && token) {
+    // Only guests need this — logged-in users already get their bookings
+    // from /v1/me/bookings, and leaving it here would leak this booking
+    // into a later guest session on a shared device after logout.
+    if (bookingId && token && !isAuthenticated) {
       saveGuestBookingPointer({ bookingId, token });
     }
-  }, [bookingId, token]);
+  }, [bookingId, token, isAuthenticated]);
 
   const { checkPayment, isChecking } = useCheckPayment({
     bookingId,

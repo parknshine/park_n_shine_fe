@@ -8,6 +8,7 @@ import { useCustomerBookings } from "@/features/customer/hooks/use-customer-book
 import { useTranslation } from "@/i18n";
 import { Button } from "@/components/ui/button";
 import { bookingRef } from "@/lib/utils";
+import { resolveBookingResumeHref } from "@/features/customer/utils/booking-resume-link";
 
 type StatusKind = "ok" | "fail" | "refunded" | "pending";
 
@@ -97,7 +98,7 @@ export default function HistoryPage() {
   const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
   const hasHydrated = useCustomerAuthStore((s) => s._hasHydrated);
   const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useCustomerBookings(isAuthenticated);
-  const HIDDEN_STATUSES = new Set(["PENDING", "DRAFT"]);
+  const HIDDEN_STATUSES = new Set(["DRAFT"]);
   const bookings = (data?.pages.flatMap((p) => p.items) ?? []).filter(
     (b) => !HIDDEN_STATUSES.has(b.status),
   );
@@ -269,7 +270,11 @@ export default function HistoryPage() {
                     type='button'
                     onClick={() =>
                       router.push(
-                        `/booking/${booking.id}/status?token=${booking.bookingToken}`,
+                        resolveBookingResumeHref(
+                          booking.id,
+                          booking.bookingToken,
+                          booking.status,
+                        ),
                       )
                     }
                     className='w-full text-left border-0 cursor-pointer bg-white rounded-[18px] p-4'
