@@ -324,11 +324,29 @@ export default function ReportsPage() {
           <div className='grid grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:divide-x sm:divide-y-0'>
             {/* Date range */}
             <div className='space-y-2 px-4 py-3'>
-              <div className='flex items-center gap-1.5'>
-                <Calendar className='h-3 w-3 text-muted-foreground' />
-                <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
-                  {t("reports.fromLabel")} — {t("reports.toLabel")}
-                </span>
+              <div className='flex items-center justify-between gap-1.5'>
+                <div className='flex items-center gap-1.5'>
+                  <Calendar className='h-3 w-3 text-muted-foreground' />
+                  <span className='text-[10px] font-semibold uppercase tracking-widest text-muted-foreground'>
+                    {t("reports.fromLabel")} — {t("reports.toLabel")}
+                  </span>
+                </div>
+                <button
+                  type='button'
+                  onClick={() => {
+                    setFrom("");
+                    setTo("");
+                  }}
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest transition-colors",
+                    !from && !to
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
+                  title='Semua data tanpa filter tanggal'
+                >
+                  All revenue
+                </button>
               </div>
               <div className='flex items-center gap-2'>
                 <input
