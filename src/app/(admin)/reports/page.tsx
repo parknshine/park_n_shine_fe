@@ -75,9 +75,9 @@ export default function ReportsPage() {
   const { crewSummary } = useAdminTipCrewSummary(tipPeriod, appliedSiteId);
 
   const activeFilterCount = [
-    appliedSiteId,
-    appliedFrom && appliedFrom !== today ? appliedFrom : "",
-    appliedTo && appliedTo !== today ? appliedTo : "",
+    !!appliedSiteId,
+    appliedFrom !== today,
+    appliedTo !== today,
   ].filter(Boolean).length;
   const hasFilter = activeFilterCount > 0;
 
