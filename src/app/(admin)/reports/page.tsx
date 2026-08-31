@@ -57,12 +57,13 @@ export default function ReportsPage() {
   const { sites } = useSiteSelection();
   const { t } = useTranslation("admin");
 
+  const today = toISODate(new Date());
   const [siteId, setSiteId] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const [from, setFrom] = useState(today);
+  const [to, setTo] = useState(today);
   const [appliedSiteId, setAppliedSiteId] = useState("");
-  const [appliedFrom, setAppliedFrom] = useState("");
-  const [appliedTo, setAppliedTo] = useState("");
+  const [appliedFrom, setAppliedFrom] = useState(today);
+  const [appliedTo, setAppliedTo] = useState(today);
 
   const tipPeriod = deriveTipPeriod(appliedFrom);
 
@@ -73,9 +74,11 @@ export default function ReportsPage() {
   );
   const { crewSummary } = useAdminTipCrewSummary(tipPeriod, appliedSiteId);
 
-  const activeFilterCount = [appliedSiteId, appliedFrom, appliedTo].filter(
-    Boolean,
-  ).length;
+  const activeFilterCount = [
+    appliedSiteId,
+    appliedFrom && appliedFrom !== today ? appliedFrom : "",
+    appliedTo && appliedTo !== today ? appliedTo : "",
+  ].filter(Boolean).length;
   const hasFilter = activeFilterCount > 0;
 
   const statusEntries = useMemo(
@@ -258,12 +261,13 @@ export default function ReportsPage() {
   }
 
   function handleClear() {
+    const todayDate = toISODate(new Date());
     setSiteId("");
-    setFrom("");
-    setTo("");
+    setFrom(todayDate);
+    setTo(todayDate);
     setAppliedSiteId("");
-    setAppliedFrom("");
-    setAppliedTo("");
+    setAppliedFrom(todayDate);
+    setAppliedTo(todayDate);
   }
 
   if (sites.length === 0) {
@@ -440,7 +444,7 @@ export default function ReportsPage() {
               {sites.find((s) => s.id === appliedSiteId)?.name ?? appliedSiteId}
             </span>
           )}
-          {(appliedFrom || appliedTo) && (
+          {(appliedFrom !== today || appliedTo !== today) && (
             <span className='inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'>
               <Calendar className='h-2.5 w-2.5' />
               {appliedFrom || "…"} → {appliedTo || "…"}
