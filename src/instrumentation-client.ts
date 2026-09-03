@@ -54,3 +54,7 @@ if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
     },
   });
 }
+
+// Next.js calls this on client-side navigations so Sentry can create
+// navigation spans (required by the instrumentation-client convention).
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
