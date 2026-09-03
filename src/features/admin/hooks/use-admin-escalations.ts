@@ -7,7 +7,6 @@ import type { AdminEscalationsResponse } from "@/features/admin/types";
 
 export function useAdminEscalations(pollIntervalMs = 3_000) {
   const query = useQuery({
-    meta: { persist: true },
     queryFn: async () => {
       const response = await api.get<AdminEscalationsResponse>(
         "/v1/admin/escalations"

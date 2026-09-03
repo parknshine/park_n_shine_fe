@@ -7,7 +7,6 @@ import type { AdminTimeExtensionRequestsResponse } from "@/features/admin/types"
 
 export function useAdminTimeExtensionRequests(pollIntervalMs = 3_000) {
   const query = useQuery({
-    meta: { persist: true },
     queryFn: async () => {
       const response = await api.get<AdminTimeExtensionRequestsResponse>(
         "/v1/admin/time-extension-requests",

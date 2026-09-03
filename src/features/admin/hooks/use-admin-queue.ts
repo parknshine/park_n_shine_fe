@@ -18,7 +18,6 @@ export function useAdminQueue({
 }: UseAdminQueueOptions) {
   const query = useQuery({
     enabled,
-    meta: { persist: true },
     queryFn: async () => {
       const response = await api.get<AdminQueueResponse>(
         `/v1/admin/sites/${siteId}/queue`

@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { wrapStorageSafely } from "@/lib/safe-storage";
 
 interface Toast {
   id: string;
@@ -119,6 +120,9 @@ export const useUIStore = create<UIState & UIActions>()(
     })),
     {
       name: "ui",
+      // Never let a full/unavailable localStorage throw out of a store action
+      // (a QuotaExceededError inside a layout effect crashes to global-error).
+      storage: createJSONStorage(() => wrapStorageSafely(window.localStorage)),
       partialize: (state) => ({
         sites: state.sites,
         locale: state.locale,

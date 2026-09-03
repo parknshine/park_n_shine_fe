@@ -13,7 +13,6 @@ export function useAdminAllSitesQueue({
   pollIntervalMs = 3_000,
 }: UseAdminAllSitesQueueOptions = {}) {
   const query = useQuery({
-    meta: { persist: true },
     queryFn: async () => {
       const response = await api.get<AdminAllSitesQueueResponse>("/v1/admin/queue");
       return response.data;

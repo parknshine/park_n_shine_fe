@@ -42,6 +42,8 @@ export function makeQueryPersister() {
 }
 
 export const queryPersistenceOptions = {
-  buster: "park-shine-query-v1",
+  // v2: admin polling queries are no longer persisted — bump discards the
+  // oversized v1 caches that were filling localStorage.
+  buster: "park-shine-query-v2",
   maxAge: 7 * ONE_DAY,
 };

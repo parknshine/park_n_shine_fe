@@ -7,7 +7,6 @@ import type { AdminExpiringJobsResponse } from "@/features/admin/types";
 
 export function useAdminExpiringJobs(pollIntervalMs = 3_000) {
   const query = useQuery({
-    meta: { persist: true },
     queryFn: async () => {
       const response = await api.get<AdminExpiringJobsResponse>(
         "/v1/admin/expiring-jobs"
