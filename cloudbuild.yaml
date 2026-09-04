@@ -33,6 +33,11 @@ substitutions:
   # crew-token cookies trapped crews in a login redirect loop (stuck spinner).
   # Client-side shells + API auth still protect everything.
   _NEXT_PUBLIC_COOKIE_AUTH: "false"
+  # Explicit here (Dockerfile also defaults both to "true") so the trigger's
+  # substitution list doesn't let these silently drift from what the backend
+  # assumes (ENABLE_REALTIME / ENABLE_PUSH_NOTIFICATIONS in park-n-shine-api).
+  _NEXT_PUBLIC_REALTIME_ENABLED: "true"
+  _NEXT_PUBLIC_PUSH_ENABLED: "true"
 
 options:
   logging: CLOUD_LOGGING_ONLY
@@ -80,6 +85,10 @@ steps:
       - NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION=${_NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION}
       - --build-arg
       - NEXT_PUBLIC_COOKIE_AUTH=${_NEXT_PUBLIC_COOKIE_AUTH}
+      - --build-arg
+      - NEXT_PUBLIC_REALTIME_ENABLED=${_NEXT_PUBLIC_REALTIME_ENABLED}
+      - --build-arg
+      - NEXT_PUBLIC_PUSH_ENABLED=${_NEXT_PUBLIC_PUSH_ENABLED}
       - .
 
   # 2. Push both tags to Artifact Registry.
