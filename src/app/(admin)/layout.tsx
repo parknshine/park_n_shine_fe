@@ -101,7 +101,7 @@ export default function AdminLayout({
   });
 
   return (
-    <div className='flex h-dvh overflow-hidden bg-background'>
+    <div translate='no' className='flex h-dvh overflow-hidden bg-background'>
       <AdminSidebar />
       <div className='flex flex-1 flex-col overflow-hidden'>
         <AdminNavbar />
