@@ -5,6 +5,12 @@ import api from "@/lib/axios-admin";
 import { queryKeys } from "@/lib/query-keys";
 import type { AdminTimeExtensionRequestsResponse } from "@/features/admin/types";
 
+// Stable empty array so `requests` keeps the same reference while the query is
+// loading/undefined. Returning a fresh `[]` on every render causes downstream
+// effects (e.g. the admin layout syncing notifications into the UI store) to
+// loop infinitely — "Maximum update depth exceeded".
+const EMPTY_REQUESTS: AdminTimeExtensionRequestsResponse["requests"] = [];
+
 export function useAdminTimeExtensionRequests(pollIntervalMs = 3_000) {
   const query = useQuery({
     queryFn: async () => {
@@ -27,7 +33,7 @@ export function useAdminTimeExtensionRequests(pollIntervalMs = 3_000) {
 
   return {
     error,
-    requests: query.data?.requests ?? [],
+    requests: query.data?.requests ?? EMPTY_REQUESTS,
     isFetching: query.isFetching,
     isLoading: query.isLoading,
     isOfflinePaused: query.fetchStatus === "paused",

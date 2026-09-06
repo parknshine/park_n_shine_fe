@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { BOOKING_STATUS_TONES } from "@/features/customer/types";
 import { bookingRef, shortId } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
+import { adminClock } from "@/features/admin/utils/admin-clock";
 
 const PAGE_TITLE_KEYS: Record<string, string> = {
   "/dashboard": "dashboard.title",
@@ -69,12 +70,9 @@ export function AdminNavbar() {
   // client returns Date.now()) and the lint error from calling setState
   // synchronously inside an effect body.
   const now = useSyncExternalStore(
-    (onChange) => {
-      const id = setInterval(onChange, 30_000);
-      return () => clearInterval(id);
-    },
-    () => Date.now(),
-    () => 0,
+    adminClock.subscribe,
+    adminClock.getSnapshot,
+    adminClock.getServerSnapshot,
   );
 
   const { refunds, total: refundsCount } = useAdminRefundsNeeded();
