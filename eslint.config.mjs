@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // nested backend clone, if present (separate repo)
+    "parknshine-backend/**",
   ]),
 ]);
 

@@ -1,0 +1,4 @@
+# Unit tests live under src/ as *.test.ts. Scoping the root keeps `bun test`
+# away from e2e/ (Playwright specs) and any nested backend checkout.
+[test]
+root = "src"
