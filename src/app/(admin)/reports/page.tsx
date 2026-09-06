@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   X,
@@ -53,11 +53,27 @@ function reliabilityTextColor(score: number): string {
   return "text-red-600 dark:text-red-400";
 }
 
+const subscribeToHydration = () => () => {};
+
 export default function ReportsPage() {
+  // Defer date initialization to after hydration to avoid SSR/client
+  // mismatch when server and client timezones differ (e.g. server in UTC,
+  // users in UTC+7). The server snapshot keeps initial markup consistent;
+  // report content mounts with the browser's local date after hydration.
+  const mounted = useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false,
+  );
+
+  return mounted ? <ReportsContent /> : null;
+}
+
+function ReportsContent() {
   const { sites } = useSiteSelection();
   const { t } = useTranslation("admin");
 
-  const today = toISODate(new Date());
+  const [today] = useState(() => toISODate(new Date()));
   const [siteId, setSiteId] = useState("");
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(today);
@@ -261,13 +277,12 @@ export default function ReportsPage() {
   }
 
   function handleClear() {
-    const todayDate = toISODate(new Date());
     setSiteId("");
-    setFrom(todayDate);
-    setTo(todayDate);
+    setFrom(today);
+    setTo(today);
     setAppliedSiteId("");
-    setAppliedFrom(todayDate);
-    setAppliedTo(todayDate);
+    setAppliedFrom(today);
+    setAppliedTo(today);
   }
 
   if (sites.length === 0) {
@@ -352,7 +367,7 @@ export default function ReportsPage() {
                 <input
                   type='date'
                   value={from}
-                  max={to || toISODate(new Date())}
+                  max={to || today}
                   onChange={(e) => setFrom(e.target.value)}
                   className={cn(
                     "h-8 min-w-0 flex-1 rounded-lg border px-2.5 text-xs bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring",
@@ -366,7 +381,7 @@ export default function ReportsPage() {
                   type='date'
                   value={to}
                   min={from}
-                  max={toISODate(new Date())}
+                  max={today}
                   onChange={(e) => setTo(e.target.value)}
                   className={cn(
                     "h-8 min-w-0 flex-1 rounded-lg border px-2.5 text-xs bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring",

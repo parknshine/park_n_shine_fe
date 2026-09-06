@@ -20,7 +20,10 @@ function scrubObject(obj: Record<string, unknown>): Record<string, unknown> {
 if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-    environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? process.env.NODE_ENV ?? "development",
+    environment:
+      process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ??
+      process.env.NODE_ENV ??
+      "development",
     sendDefaultPii: false,
     tracesSampleRate: 0.2,
     enableLogs: true,
@@ -30,6 +33,16 @@ if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
     ],
     replaysOnErrorSampleRate: 0,
     replaysSessionSampleRate: 0,
+    ignoreErrors: [
+      // Browser extensions (Grammarly, Google Translate, Dark Reader, etc.)
+      // inject <font> and other nodes into the DOM. When React tries to
+      // reconcile during navigation, removeChild fails because the DOM
+      // structure has been altered externally. This is not actionable.
+      "Failed to execute 'removeChild' on 'Node'",
+      // Related browser-extension noise: insertBefore fails for the same
+      // reason as removeChild above.
+      "Failed to execute 'insertBefore' on 'Node'",
+    ],
     beforeSend(event) {
       if (event.request) {
         // Strip cookies and query string entirely
@@ -37,17 +50,23 @@ if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
         event.request.query_string = undefined;
 
         // Scrub sensitive headers
-        if (event.request.headers && typeof event.request.headers === "object") {
+        if (
+          event.request.headers &&
+          typeof event.request.headers === "object"
+        ) {
           for (const h of Object.keys(event.request.headers)) {
             if (SENSITIVE_HEADERS.test(h)) {
-              (event.request.headers as Record<string, string>)[h] = "[Filtered]";
+              (event.request.headers as Record<string, string>)[h] =
+                "[Filtered]";
             }
           }
         }
 
         // Recursively scrub request body keys
         if (event.request.data && typeof event.request.data === "object") {
-          event.request.data = scrubObject(event.request.data as Record<string, unknown>);
+          event.request.data = scrubObject(
+            event.request.data as Record<string, unknown>,
+          );
         }
       }
       return event;

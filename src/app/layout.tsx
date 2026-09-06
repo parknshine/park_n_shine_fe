@@ -32,6 +32,14 @@ export const metadata: Metadata = {
     icon: "/parknshinelogo.svg",
     apple: "/parknshinelogo.svg",
   },
+  // Prevent Google Translate / browser extensions from injecting <font> tags
+  // into the DOM.  Those injected nodes break React reconciliation and cause
+  // "NotFoundError: Failed to execute 'removeChild'" on navigation.  The app
+  // already has its own i18n (react-i18next) so external translation is not
+  // needed.
+  other: {
+    google: "notranslate",
+  },
 };
 
 export const viewport: Viewport = {
@@ -48,9 +56,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang='id' translate='no' suppressHydrationWarning>
       <head />
-      <body className={`${plusJakartaSans.variable} antialiased`} suppressHydrationWarning>
+      <body
+        className={`${plusJakartaSans.variable} antialiased`}
+        suppressHydrationWarning
+      >
         {/* DARK MODE DISABLED — script below reads localStorage/system preference and applies dark class */}
         {/* <Script
           id="theme-init"

@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import {
   SlidersHorizontal,
   Calendar,
@@ -30,6 +31,9 @@ import { toISODate } from "@/features/admin/utils/reports/jobs-format";
 
 type Site = { id: string; name: string };
 type Crew = { id: string; name: string };
+
+const subscribeToDate = () => () => {};
+const getToday = () => toISODate(new Date());
 
 export function JobFiltersPanel({
   t,
@@ -83,7 +87,9 @@ export function JobFiltersPanel({
   statusFilter: string;
   onStatusFilterChange: (v: string) => void;
   paymentStatusFilter: "" | "true" | "false" | "needs_refund";
-  onPaymentStatusFilterChange: (v: "" | "true" | "false" | "needs_refund") => void;
+  onPaymentStatusFilterChange: (
+    v: "" | "true" | "false" | "needs_refund",
+  ) => void;
   searchInput: string;
   onSearchInputChange: (v: string) => void;
   appliedSearch: ReportBookingFilters["search"];
@@ -96,6 +102,10 @@ export function JobFiltersPanel({
   notificationSentFilter: "" | "true" | "false";
   onNotificationSentFilterChange: (v: "" | "true" | "false") => void;
 }) {
+  // Defer "today" to after hydration so server and client render the same
+  // max value (avoids hydration mismatch when timezones differ).
+  const today = useSyncExternalStore(subscribeToDate, getToday, () => "");
+
   return (
     <div className='overflow-hidden rounded-xl border border-border bg-card shadow-sm'>
       <div className='flex items-center justify-between border-b border-border bg-muted/40 px-4 py-3'>
@@ -133,7 +143,7 @@ export function JobFiltersPanel({
               <input
                 type='date'
                 value={from}
-                max={to || toISODate(new Date())}
+                max={to || today}
                 onChange={(e) => onFromChange(e.target.value)}
                 className={cn(
                   "h-8 min-w-0 flex-1 rounded-lg border px-2.5 text-xs bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring",
@@ -147,7 +157,7 @@ export function JobFiltersPanel({
                 type='date'
                 value={to}
                 min={from}
-                max={toISODate(new Date())}
+                max={today}
                 onChange={(e) => onToChange(e.target.value)}
                 className={cn(
                   "h-8 min-w-0 flex-1 rounded-lg border px-2.5 text-xs bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring",
@@ -236,7 +246,9 @@ export function JobFiltersPanel({
             </div>
             <Select
               value={statusFilter || "__all__"}
-              onValueChange={(v) => onStatusFilterChange(v === "__all__" ? "" : v)}
+              onValueChange={(v) =>
+                onStatusFilterChange(v === "__all__" ? "" : v)
+              }
             >
               <SelectTrigger
                 className={cn(
