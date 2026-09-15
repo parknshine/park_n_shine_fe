@@ -5,8 +5,8 @@ import customerApi from "@/lib/axios-customer";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
 
 // Guards booking creation for users who *appear* logged in (local store says
-// isAuthenticated) but whose session cookie may have actually expired. Guests
-// (isAuthenticated === false) are always allowed through unchanged.
+// isAuthenticated) but whose stored session token may have actually expired.
+// Guests (isAuthenticated === false) are always allowed through unchanged.
 export function useSessionGuard() {
   const isAuthenticated = useCustomerAuthStore((s) => s.isAuthenticated);
   const [sessionInvalid, setSessionInvalid] = useState(false);

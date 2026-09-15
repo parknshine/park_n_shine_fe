@@ -5,6 +5,7 @@ import { HowItWorksPanel } from "@/features/customer/components/how-it-works-pan
 import { LandingHero } from "@/features/customer/components/landing-hero";
 import { QrBlockingMessage } from "@/features/customer/components/qr-blocking-message";
 import { QrErrorState, type QrReason } from "@/features/customer/components/qr-error-state";
+import { serverApiBaseUrl } from "@/lib/server-api-base-url";
 import type { SiteQrResolution } from "@/features/customer/types";
 
 interface Props {
@@ -29,9 +30,8 @@ const SAFE_QR_ID_RE = /^[a-zA-Z0-9_-]{1,128}$/;
 
 async function getQrResolution(qrId: string): Promise<QrResolveResult> {
   if (!SAFE_QR_ID_RE.test(qrId)) return { ok: false, reason: "invalid" };
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "/api";
   try {
-    const res = await fetch(`${baseUrl}/v1/qr/${qrId}`, {
+    const res = await fetch(`${serverApiBaseUrl()}/v1/qr/${qrId}`, {
       cache: "no-store",
     });
     const body = (await res.json()) as

@@ -17,12 +17,47 @@ import { auth, googleProvider } from "@/lib/firebase";
 import customerApi from "@/lib/axios-customer";
 import { mutationKeys } from "@/lib/query-keys";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
+import { getCustomerRefreshToken } from "@/lib/customer-token-storage";
 import { clearGuestBookingPointer } from "@/lib/guest-booking-pointer";
 import type { Customer } from "@/types";
 
 interface SessionResponse {
   customer: Customer;
+  token?: string;
+  refreshToken?: string;
 }
+
+function normalizeSessionResponse(
+  data: SessionResponse | Customer | null | undefined,
+): SessionResponse {
+  if (!data || typeof data !== "object") {
+    throw new Error("auth.errors.generic");
+  }
+  if ("customer" in data && data.customer) {
+    return {
+      customer: data.customer,
+      token: data.token,
+      refreshToken: data.refreshToken,
+    };
+  }
+  if ("id" in data && "email" in data) {
+    return { customer: data };
+  }
+  throw new Error("auth.errors.generic");
+}
+
+function firebaseErrorCode(error: unknown): string {
+  return typeof error === "object" && error && "code" in error
+    ? String((error as { code: unknown }).code)
+    : "";
+}
+
+const GOOGLE_REDIRECT_FALLBACK_CODES = new Set([
+  "auth/popup-blocked",
+  "auth/operation-not-supported-in-this-environment",
+  "auth/internal-error",
+  "auth/web-storage-unsupported",
+]);
 
 interface EmailCredentials {
   email: string;
@@ -31,10 +66,7 @@ interface EmailCredentials {
 
 // Map raw Firebase auth error codes to i18n keys the UI can translate.
 function mapFirebaseError(error: unknown): string {
-  const code =
-    typeof error === "object" && error && "code" in error
-      ? String((error as { code: unknown }).code)
-      : "";
+  const code = firebaseErrorCode(error);
   switch (code) {
     case "auth/invalid-credential":
     case "auth/wrong-password":
@@ -54,6 +86,12 @@ function mapFirebaseError(error: unknown): string {
       return "auth.errors.accountExistsDifferentProvider";
     case "auth/network-request-failed":
       return "auth.errors.networkError";
+    case "auth/unauthorized-domain":
+      return "auth.errors.unauthorizedDomain";
+    case "auth/operation-not-allowed":
+      return "auth.errors.googleNotEnabled";
+    case "auth/internal-error":
+      return "auth.errors.popupBlocked";
     case "auth/invalid-action-code":
       return "auth.errors.invalidActionCode";
     case "auth/expired-action-code":
@@ -73,16 +111,14 @@ export function useCustomerAuth() {
   const startSession = useCallback(
     async (user: FirebaseUser): Promise<Customer> => {
       const idToken = await user.getIdToken();
-      const { data } = await customerApi.post<SessionResponse>(
+      const { data } = await customerApi.post<SessionResponse | Customer>(
         "/v1/auth/session",
         { idToken }
       );
-      // Drop customer-scoped cache from any previous session BEFORE auth flips,
-      // so stale snapshots (e.g. a since-closed "active" booking) never render
-      // during the login → home transition.
+      const session = normalizeSessionResponse(data);
       await queryClient.resetQueries({ queryKey: ["customer"] });
-      setCustomer(data.customer);
-      return data.customer;
+      setCustomer(session.customer, session.token, session.refreshToken);
+      return session.customer;
     },
     [queryClient, setCustomer]
   );
@@ -161,20 +197,14 @@ export function useCustomerAuth() {
       const { user } = await signInWithPopup(auth, googleProvider);
       return startSession(user);
     } catch (error) {
-      const code =
-        typeof error === "object" && error && "code" in error
-          ? String((error as { code: unknown }).code)
-          : "";
-      // Popup unavailable -> fall back to full-page redirect.
-      if (
-        code === "auth/popup-blocked" ||
-        code === "auth/operation-not-supported-in-this-environment"
-      ) {
+      const code = firebaseErrorCode(error);
+      // Popup unavailable, or Chrome blocking the firebaseapp.com iframe
+      // (third-party cookies) — finish via redirect instead.
+      if (GOOGLE_REDIRECT_FALLBACK_CODES.has(code)) {
         sessionStorage.setItem("google-redirect-pending", "1");
         await signInWithRedirect(auth, googleProvider);
         return null;
       }
-      // User closed the popup or a newer attempt superseded it -> silent cancel.
       if (
         code === "auth/popup-closed-by-user" ||
         code === "auth/cancelled-popup-request"
@@ -201,7 +231,13 @@ export function useCustomerAuth() {
 
   const logout = useCallback(async () => {
     try {
-      await customerApi.post("/v1/auth/logout");
+      // The refresh token goes in the body: it is what the server revokes, and
+      // the Authorization header carries the access token instead.
+      const refreshToken = getCustomerRefreshToken();
+      await customerApi.post(
+        "/v1/auth/logout",
+        refreshToken ? { refreshToken } : {}
+      );
     } catch {
       // best-effort server-side revoke
     }

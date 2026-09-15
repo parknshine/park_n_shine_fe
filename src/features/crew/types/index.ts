@@ -7,6 +7,7 @@ export interface CrewSession {
   siteId: string;
   expiresAt: string;
   token: string;
+  refreshToken?: string;
 }
 
 export interface CrewLoginPayload {

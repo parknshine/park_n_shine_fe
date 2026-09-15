@@ -454,6 +454,9 @@
       "userDisabled": "Akun kamu telah dinonaktifkan. Hubungi tim dukungan kami.",
       "accountExistsDifferentProvider": "Email ini sudah terdaftar dengan metode login lain. Coba masuk dengan email dan kata sandi.",
       "networkError": "Koneksi internet bermasalah. Periksa jaringan kamu lalu coba lagi.",
+      "unauthorizedDomain": "Situs ini belum diizinkan untuk masuk dengan Google. Tambahkan domain di Firebase console.",
+      "googleNotEnabled": "Login Google belum diaktifkan untuk proyek ini. Aktifkan di Firebase console.",
+      "popupBlocked": "Login Google diblokir browser. Izinkan popup lalu coba lagi.",
       "generic": "Terjadi kesalahan. Silakan coba lagi.",
       "invalidActionCode": "Link reset tidak valid.",
       "expiredActionCode": "Link reset sudah kadaluarsa. Minta link baru."

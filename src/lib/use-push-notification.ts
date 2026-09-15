@@ -6,7 +6,7 @@ interface SubscribeOptions {
   /** "booking" channel: pass bookingId + signedToken */
   bookingId?: string;
   bookingToken?: string;
-  /** "crew" channel: no extra params needed, uses the crew-token cookie */
+  /** "crew" channel: no extra params needed, uses the stored crew Bearer token */
   type: "booking" | "crew";
 }
 
@@ -78,10 +78,14 @@ export function usePushNotification({ type, bookingId, bookingToken }: Subscribe
           body: JSON.stringify({ endpoint, keys, bookingId, token: bookingToken }),
         });
       } else {
+        const { getCrewAccessToken } = await import("@/lib/crew-token-storage");
+        const crewToken = getCrewAccessToken();
         await fetch(`${API_URL}/v1/crew/push/subscribe`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            ...(crewToken ? { Authorization: `Bearer ${crewToken}` } : {}),
+          },
           body: JSON.stringify({ endpoint, keys }),
         });
       }
