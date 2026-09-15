@@ -212,3 +212,5 @@ Subdomain routing (`app.`, `crew.`, `admin.`) is done by `src/middleware.ts` rea
 - [`docs/DEPLOY.md`](docs/DEPLOY.md): deployment options (Indonesian)
 - [`docs/user-manual/`](docs/user-manual/): end-user PDF manuals for the customer app, crew app, and admin console
 - [`e2e/README.md`](e2e/README.md): Playwright guide
+
+# make a change, e.g. edit README.md
