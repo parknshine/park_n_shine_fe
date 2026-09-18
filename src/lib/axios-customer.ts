@@ -1,5 +1,10 @@
 import axios from "axios";
 import { ApiContractError, normalizeApiError } from "@/lib/api-error";
+import { unwrapEnvelopeData } from "@/lib/token-storage";
+import {
+  getCustomerAccessToken,
+  getCustomerRefreshToken,
+} from "@/lib/customer-token-storage";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
 
 declare module "axios" {
@@ -12,13 +17,10 @@ declare module "axios" {
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
-// Authenticated customer-account endpoints (/v1/me, /v1/me/bookings, …).
-// pns_token httpOnly cookie is sent automatically via withCredentials.
 const customerApi = axios.create({
   baseURL,
   headers: { "Content-Type": "application/json" },
   timeout: 10_000,
-  withCredentials: true,
 });
 
 // Single-flight queue for concurrent 401s.
@@ -34,35 +36,74 @@ function processQueue(error: unknown) {
   failedQueue = [];
 }
 
-// Refresh the session. pns_refresh cookie is sent automatically (withCredentials).
-// If the refresh cookie is expired, fall back to Firebase ID token re-exchange.
-async function refreshCustomerToken(): Promise<void> {
-  // Try 1: refresh endpoint — pns_refresh cookie sent automatically.
-  try {
-    await axios.post(
-      `${baseURL}/v1/auth/session/refresh`,
-      {},
-      { headers: { "Content-Type": "application/json" }, withCredentials: true }
-    );
-    return;
-  } catch {
-    // fall through to Firebase re-exchange
-  }
-
-  // Try 2: re-exchange still-valid Firebase session for new cookies.
-  const { auth } = await import("@/lib/firebase");
-  const fbUser = auth.currentUser;
-  if (!fbUser) throw new Error("No refresh cookie and no Firebase session");
-
-  const idToken = await fbUser.getIdToken(true);
-  await axios.post(
-    `${baseURL}/v1/auth/session`,
-    { idToken },
-    { headers: { "Content-Type": "application/json" }, withCredentials: true }
+function isCustomerSessionCreate(
+  url: string | undefined,
+  method: string | undefined,
+) {
+  const path = url ?? "";
+  return (
+    (method ?? "get").toLowerCase() === "post" &&
+    path.includes("/v1/auth/session") &&
+    !path.includes("/refresh")
   );
 }
 
-// Unwrap { success, data } envelope + handle 401 with cookie refresh.
+function persistSessionTokens(payload: unknown) {
+  const data = payload as { token?: string; refreshToken?: string } | null;
+  if (!data?.token) return;
+  useCustomerAuthStore.getState().setTokens(data.token, data.refreshToken);
+}
+
+async function refreshCustomerToken(): Promise<void> {
+  const refreshToken =
+    getCustomerRefreshToken() ?? useCustomerAuthStore.getState().refreshToken;
+
+  if (refreshToken) {
+    try {
+      const response = await axios.post(
+        `${baseURL}/v1/auth/session/refresh`,
+        { refreshToken },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${refreshToken}`,
+          },
+        }
+      );
+      persistSessionTokens(unwrapEnvelopeData(response.data));
+      return;
+    } catch {
+      // fall through to Firebase re-exchange
+    }
+  }
+
+  const { auth } = await import("@/lib/firebase");
+  const fbUser = auth.currentUser;
+  if (!fbUser) throw new Error("No refresh token and no Firebase session");
+
+  const idToken = await fbUser.getIdToken(true);
+  const response = await axios.post(
+    `${baseURL}/v1/auth/session`,
+    { idToken },
+    { headers: { "Content-Type": "application/json" } }
+  );
+  persistSessionTokens(unwrapEnvelopeData(response.data));
+}
+
+customerApi.interceptors.request.use(
+  (config) => {
+    if (!isCustomerSessionCreate(config.url, config.method)) {
+      const token =
+        getCustomerAccessToken() ?? useCustomerAuthStore.getState().token;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 customerApi.interceptors.response.use(
   (response) => {
     if (
@@ -84,7 +125,12 @@ customerApi.interceptors.response.use(
       return Promise.reject(normalizedError);
     }
 
-    if (!originalRequest._retry) {
+    const isSessionCreate = isCustomerSessionCreate(
+      originalRequest.url,
+      originalRequest.method,
+    );
+
+    if (!originalRequest._retry && !isSessionCreate) {
       if (isRefreshing) {
         return new Promise<void>((resolve, reject) => {
           failedQueue.push({ resolve, reject });

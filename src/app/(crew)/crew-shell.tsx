@@ -200,9 +200,9 @@ export function CrewShell({ children }: Readonly<CrewShellProps>) {
 
   useEffect(() => {
     if (!hasHydrated || session) return;
-    // Local store looks logged-out (e.g. localStorage was evicted by the OS
-    // under low device storage) — confirm with the server before bouncing to
-    // login, since the httpOnly session cookie may still be valid.
+    // Local store looks logged-out (e.g. the persist blob was evicted) —
+    // confirm with the server before bouncing to login, since dedicated
+    // token keys may still be valid.
     let cancelled = false;
     recoverSession().then((recovered) => {
       if (!cancelled && !recovered) router.replace("/crew/login");

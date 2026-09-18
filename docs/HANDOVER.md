@@ -103,9 +103,11 @@ There are **four axios instances** in `src/lib/`:
 | File | Used by | Auth |
 |---|---|---|
 | `axios.ts` | guest booking flow, public endpoints | `X-Booking-Token` header set per request |
-| `axios-customer.ts` | logged-in customer (`/v1/me/*`) | httpOnly cookies `pns_token` / `pns_refresh`, `withCredentials`. On 401 it refreshes, and if the refresh cookie is dead it re-exchanges the Firebase ID token. Concurrent 401s are queued single-flight. |
-| `axios-crew.ts` | crew app | httpOnly `crew-token` cookie, auto-refresh on 401 or `CREW_SESSION_EXPIRED` |
-| `axios-admin.ts` | admin console | httpOnly `admin-token` + `admin-refresh-token` cookies, auto-refresh on 401 |
+| `axios-customer.ts` | logged-in customer (`/v1/me/*`) | `Authorization: Bearer` from localStorage `pns_token`. On 401 it refreshes with `pns_refresh`, and if that is dead it re-exchanges the Firebase ID token. Concurrent 401s are queued single-flight. |
+| `axios-crew.ts` | crew app | `Authorization: Bearer` from localStorage `crew-token`, auto-refresh on 401 or `CREW_SESSION_EXPIRED` |
+| `axios-admin.ts` | admin console | `Authorization: Bearer` from localStorage `admin-token` + `admin-refresh-token`, auto-refresh on 401 |
+
+Tokens live in localStorage under dedicated keys (`src/lib/token-storage.ts` and the per-surface wrappers) as well as in the Zustand auth stores. The dedicated keys are what the axios request interceptors read, so a request sent before the store rehydrates is still authenticated. No client sends `withCredentials` any more, which is what lets the FE and API sit on unrelated domains. The customer endpoints no longer set cookies at all; the crew and admin endpoints still set theirs, but nothing reads them.
 
 All of them unwrap the backend's `{ success, data }` envelope in a response interceptor, so hooks receive `data` directly. Errors are normalised by `src/lib/api-error.ts` into a typed `code` from the `API_ERROR_CODES` catalogue. User-facing messages for those codes are in `src/lib/api-messages.ts`. When the backend adds an error code, add it to both.
 
@@ -148,11 +150,11 @@ The root layout sets `translate="no"` and `google: notranslate`. Google Translat
 Two modes coexist:
 
 1. **Guest**: scanning a QR creates a booking and the backend returns a signed **booking token**. It is kept in localStorage under `png_guest_active_booking` (`src/lib/guest-booking-pointer.ts`) and sent as `X-Booking-Token`. The pointer is cleared when the booking reaches `CLOSED`, `CANCELLED`, or `EXPIRED`. Guests can resume their active booking from the home page.
-2. **Account**: Firebase Auth on the client (email/password or Google popup, `src/lib/firebase.ts`). The Firebase ID token is posted to `POST /v1/auth/session`, which sets the `pns_token` / `pns_refresh` httpOnly cookies. The Firebase config has hardcoded fallbacks for the production project, so login works even with an empty `.env.local`. Password reset and email verification land on `/auth/action`.
+2. **Account**: Firebase Auth on the client (email/password or Google popup, `src/lib/firebase.ts`). The Firebase ID token is posted to `POST /v1/auth/session`, which returns `token` + `refreshToken` in the body. The FE stores the pair in localStorage under `pns_token` / `pns_refresh` and sends it as a Bearer header; the endpoint no longer sets cookies. The Firebase config has hardcoded fallbacks for the production project, so login works even with an empty `.env.local`. Password reset and email verification land on `/auth/action`.
 
 ### Crew
 
-Login is **shift code + PIN** at `/crew/login` (`POST /v1/crew/sessions`). The backend sets an httpOnly `crew-token` cookie tied to the shift. Sessions expire with the shift. `use-crew-session.ts` can recover a session from the cookie if local state is lost, and on logout it invalidates the server cookie *before* clearing local state to avoid a race with the recovery effect. Crew home claims jobs with `POST /v1/crew/jobs/next`; there is a single active job at a time.
+Login is **shift code + PIN** at `/crew/login` (`POST /v1/crew/sessions`), which returns a JWT tied to the shift. Sessions expire with the shift. `use-crew-session.ts` can recover a session from the stored token if the Zustand store is lost, and on logout it revokes server-side *before* clearing local state to avoid a race with the recovery effect. Crew home claims jobs with `POST /v1/crew/jobs/next`; there is a single active job at a time.
 
 ### Admin
 

@@ -33,10 +33,9 @@ export function CrewLoginPage() {
   useEffect(() => {
     if (!hasHydrated || !session || isRedirecting) return;
     let cancelled = false;
-    // The persisted store can outlive the httpOnly crew-token cookie (e.g.
-    // overnight). Confirm the server session is alive before auto-redirecting;
-    // redirecting on a dead cookie used to bounce off the middleware and trap
-    // this page in a 307 loop. Dead session → drop the stale store instead.
+    // The persisted store can outlive the stored crew token (e.g. overnight).
+    // Confirm the server session is alive before auto-redirecting. Dead
+    // session → drop the stale store instead.
     fetchCrewSession(api).then((live) => {
       if (cancelled) return;
       if (live) {
@@ -64,10 +63,6 @@ export function CrewLoginPage() {
     try {
       await login({ shiftCode, pin });
       setIsRedirecting(true);
-      // Full-page navigation, not router.replace: it forces the middleware to
-      // re-evaluate the fresh crew-token cookie. A client-side replace can
-      // replay the pre-login 307 bounce (expired cookie) and strand the
-      // spinner on this page until the user hard-refreshes.
       window.location.replace("/crew/home");
     } catch (err) {
       const code = (err as { code?: string }).code;

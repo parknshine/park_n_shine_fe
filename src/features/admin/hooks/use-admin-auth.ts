@@ -44,6 +44,7 @@ export function useAdminAuth() {
         data.token,
         data.role,
         data.menuAccess,
+        data.refreshToken,
       );
       setSites(data.sites);
       router.replace("/dashboard");
@@ -52,9 +53,9 @@ export function useAdminAuth() {
 
   function logout() {
     localStorage.removeItem("admin-sites");
+    const logoutRequest = api.delete("/v1/admin/sessions/current");
     clearAuth();
-    // Clear httpOnly cookies server-side then redirect
-    api.delete("/v1/admin/sessions/current").catch(() => {}).finally(() => {
+    logoutRequest.catch(() => {}).finally(() => {
       router.replace("/admin/login");
     });
   }

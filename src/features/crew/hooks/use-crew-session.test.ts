@@ -3,7 +3,7 @@ import { fetchCrewSession } from "./use-crew-session";
 import type { CrewSession } from "@/features/crew/types";
 
 describe("fetchCrewSession", () => {
-  it("returns the session when the server confirms an active crew-token cookie", async () => {
+  it("returns the session when the server confirms an active crew token", async () => {
     const session: CrewSession = {
       id: "crew-1",
       crewId: "crew-1",

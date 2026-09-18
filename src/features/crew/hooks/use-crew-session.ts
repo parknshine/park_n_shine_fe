@@ -8,8 +8,8 @@ import { useCrewAuthStore } from "@/store/crew-auth-store";
 import type { CrewLoginPayload, CrewSession } from "@/features/crew/types";
 
 /**
- * Confirms whether the httpOnly crew-token cookie still has a live server
- * session, without relying on the (possibly evicted) local auth store.
+ * Confirms whether the stored crew Bearer token still has a live server
+ * session, without relying on the (possibly evicted) Zustand auth store.
  * Never throws — a missing/expired session resolves to null.
  */
 export async function fetchCrewSession(
@@ -49,7 +49,13 @@ export function useCrewSession() {
       // Wipe crew-scoped cache from any previous shift BEFORE auth flips, so
       // stale job/queue snapshots never flash during the login → home transition.
       queryClient.removeQueries({ queryKey: ["crew"] });
-      store.setCrewSession(data.crewId, data.crewName, data.siteId);
+      store.setCrewSession(
+        data.crewId,
+        data.crewName,
+        data.siteId,
+        data.token,
+        data.refreshToken,
+      );
       queryClient.setQueryData(queryKeys.crew.session(), data);
     },
   });
@@ -59,27 +65,30 @@ export function useCrewSession() {
   }
 
   async function clearSession() {
-    // Invalidate the server-side cookie BEFORE clearing local state. Otherwise
-    // CrewShell's recoverSession effect (which fires the moment the local
-    // session goes null) can race this call, find the cookie still valid, and
-    // silently re-authenticate the crew right after they logged out.
+    // Send the revoke while the Bearer token is still in storage, then drop
+    // local state. Clearing first would make this request unauthenticated.
     await api.delete("/v1/crew/sessions/current").catch(() => {});
     store.clearCrewSession();
     queryClient.removeQueries({ queryKey: ["crew"] });
   }
 
   /**
-   * Called when the local auth store looks logged-out (e.g. localStorage was
-   * evicted by the OS under low device storage) but the httpOnly crew-token
-   * cookie may still be valid server-side. Restores the store from the server
-   * instead of forcing a redirect to login. Returns whether a session was
+   * Called when the Zustand auth store looks logged-out (e.g. the persist blob
+   * was evicted) but dedicated token keys may still be valid. Restores the
+   * store from GET /v1/crew/sessions/current. Returns whether a session was
    * recovered.
    */
   async function recoverSession(): Promise<boolean> {
     const data = await fetchCrewSession(api);
     if (!data) return false;
     queryClient.removeQueries({ queryKey: ["crew"] });
-    store.setCrewSession(data.crewId, data.crewName, data.siteId);
+    store.setCrewSession(
+      data.crewId,
+      data.crewName,
+      data.siteId,
+      data.token,
+      data.refreshToken,
+    );
     queryClient.setQueryData(queryKeys.crew.session(), data);
     return true;
   }

@@ -1,9 +1,10 @@
+import { serverApiBaseUrl } from "@/lib/server-api-base-url";
+
 const ENV_FALLBACK = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
 
 export async function getWhatsAppNumber(): Promise<string> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-    const res = await fetch(`${apiUrl}/v1/settings`, {
+    const res = await fetch(`${serverApiBaseUrl()}/v1/settings`, {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return ENV_FALLBACK;

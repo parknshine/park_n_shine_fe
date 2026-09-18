@@ -454,6 +454,9 @@
       "userDisabled": "Your account has been disabled. Please contact our support team.",
       "accountExistsDifferentProvider": "This email is already registered with a different sign-in method. Try signing in with email and password.",
       "networkError": "Network connection issue. Check your internet and try again.",
+      "unauthorizedDomain": "This site is not allowed to sign in with Google. Add the domain in the Firebase console.",
+      "googleNotEnabled": "Google sign-in is not enabled for this project. Enable it in the Firebase console.",
+      "popupBlocked": "Google sign-in was blocked by the browser. Allow popups and try again.",
       "generic": "Something went wrong. Please try again.",
       "invalidActionCode": "This reset link is invalid.",
       "expiredActionCode": "This reset link has expired. Request a new one."
