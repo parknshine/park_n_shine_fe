@@ -4,6 +4,7 @@ import {
   SUBDOMAIN_CONFIG,
   detectSubdomain,
   isPathAllowed,
+  isStaticAsset,
   middleware,
 } from "./middleware";
 
@@ -38,6 +39,25 @@ describe("detectSubdomain", () => {
 
   test("returns null for apex domain without subdomain", () => {
     expect(detectSubdomain("park-shine.sg")).toBeNull();
+  });
+
+  test("returns null for www (canonical public host)", () => {
+    expect(detectSubdomain("www.parknshine.net")).toBeNull();
+    expect(detectSubdomain("www.park-shine.sg")).toBeNull();
+  });
+});
+
+describe("isStaticAsset", () => {
+  test("treats public files as static", () => {
+    expect(isStaticAsset("/parknshinelogo.svg")).toBe(true);
+    expect(isStaticAsset("/park-shine-hero.jpeg")).toBe(true);
+    expect(isStaticAsset("/icons/icon.svg")).toBe(true);
+  });
+
+  test("does not treat app routes as static", () => {
+    expect(isStaticAsset("/")).toBe(false);
+    expect(isStaticAsset("/login")).toBe(false);
+    expect(isStaticAsset("/crew/home")).toBe(false);
   });
 });
 
@@ -220,6 +240,43 @@ describe("middleware cookie auth gating (NEXT_PUBLIC_COOKIE_AUTH)", () => {
     const res = await middleware(req);
     expect(res.headers.get("location")).toBe(
       "http://localhost:3000/crew/login",
+    );
+  });
+});
+
+describe("middleware host routing", () => {
+  function hostRequest(url: string) {
+    const parsed = new URL(url);
+    return new NextRequest(url, { headers: { host: parsed.host } });
+  }
+
+  test("does not redirect the logo on www.parknshine.net", async () => {
+    const res = await middleware(
+      hostRequest("https://www.parknshine.net/parknshinelogo.svg"),
+    );
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  test("does not redirect landing routes on www.parknshine.net", async () => {
+    const res = await middleware(
+      hostRequest("https://www.parknshine.net/login"),
+    );
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  test("does not redirect static assets on the crew host", async () => {
+    const res = await middleware(
+      hostRequest("https://crew.parknshine.net/parknshinelogo.svg"),
+    );
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  test("still redirects unknown crew paths to /crew/home", async () => {
+    const res = await middleware(
+      hostRequest("https://crew.parknshine.net/login"),
+    );
+    expect(res.headers.get("location")).toBe(
+      "https://crew.parknshine.net/crew/home",
     );
   });
 });

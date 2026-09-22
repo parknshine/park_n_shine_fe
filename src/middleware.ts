@@ -26,17 +26,17 @@ export const SUBDOMAIN_CONFIG = {
     ] as const,
     defaultPath: "/admin/login",
   },
-  www: {
-    allowedPrefixes: ["/"] as const,
-    defaultPath: "/",
-  },
 } as const;
 
 type Subdomain = keyof typeof SUBDOMAIN_CONFIG;
 
 /**
  * Extract the subdomain from a host header value.
- * Returns null for localhost, bare domains, or unrecognised subdomains.
+ * Returns null for localhost, bare domains, www, or unrecognised subdomains.
+ *
+ * `www` is treated as the apex on purpose: Vercel 307s parknshine.net →
+ * www.parknshine.net, so the public site (and its /public assets) actually
+ * run on the www host.
  */
 export function detectSubdomain(host: string): Subdomain | null {
   // Strip port if present (e.g. "app.park-shine.sg:443" -> "app.park-shine.sg")
@@ -47,9 +47,15 @@ export function detectSubdomain(host: string): Subdomain | null {
   if (parts.length < 3) return null;
 
   const sub = parts[0];
+  if (sub === "www") return null;
   if (sub in SUBDOMAIN_CONFIG) return sub as Subdomain;
 
   return null;
+}
+
+/** Public files (logo, photos, icons) must never be rewritten to a page. */
+export function isStaticAsset(pathname: string): boolean {
+  return /\.[a-zA-Z0-9]+$/.test(pathname);
 }
 
 /**
@@ -152,12 +158,14 @@ async function verifyCookieAuth(
 }
 
 export async function middleware(req: NextRequest): Promise<NextResponse> {
+  const { pathname } = req.nextUrl;
+  if (isStaticAsset(pathname)) return NextResponse.next();
+
   // Check cookie-based JWT auth first (Phase 6 feature flag)
   const cookieAuthResponse = await verifyCookieAuth(req);
   if (cookieAuthResponse) return cookieAuthResponse;
 
   const host = req.headers.get("host") ?? "";
-  const { pathname } = req.nextUrl;
 
   const subdomain = detectSubdomain(host);
 
@@ -178,6 +186,6 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|icons|manifest.webmanifest|sw.js|favicon.ico|api/|v1/).*)",
+    "/((?!_next/static|_next/image|icons|manifest.webmanifest|sw.js|favicon.ico|api/|v1/|.*\\.[\\w]+$).*)",
   ],
 };
