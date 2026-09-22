@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var mode = params.get("mode");
+        var oobCode = params.get("oobCode");
+        var apiKey = params.get("apiKey");
+        var lang = params.get("lang") || "en";
+
+        var appBase = "https://parknshine.net";
+
+        if (oobCode && (mode === "resetPassword" || mode === "verifyEmail" || mode === "recoverEmail")) {
+          var target =
+            appBase +
+            "/auth/action?mode=" +
+            encodeURIComponent(mode) +
+            "&oobCode=" +
+            encodeURIComponent(oobCode) +
+            "&apiKey=" +
+            encodeURIComponent(apiKey) +
+            "&lang=" +
+            encodeURIComponent(lang);
+          window.location.replace(target);
+        } else {
+          window.location.replace(appBase + "/login");
+        }
+      })();
+    </script>
+  </body>
+</html>
