@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { usePublicSettings } from "@/features/customer/hooks/use-public-settings";
 
 const DISMISS_PREFIX = "promo-banner-dismissed:";
-const BANNER_HEIGHT = "h-72";
 
 function isDismissed(dismissKey: string) {
   if (typeof window === "undefined") return true;
@@ -56,8 +55,8 @@ export function PromoBannerPopup() {
 
   return (
     <Dialog open onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="h-auto w-fit max-h-[90dvh] max-w-[92vw] overflow-hidden p-3 sm:max-w-[70vw] sm:p-4">
+        <DialogHeader className="pr-8">
           <DialogTitle>{t("promoBanner.title")}</DialogTitle>
         </DialogHeader>
         <div className="mt-2 space-y-2">
@@ -65,18 +64,18 @@ export function PromoBannerPopup() {
             <div
               ref={scrollerRef}
               onScroll={handleScroll}
-              className={cn(
-                "flex w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden rounded-xl scroll-smooth scrollbar-none",
-                BANNER_HEIGHT,
-              )}
+              className="flex w-max max-w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden rounded-xl scroll-smooth scrollbar-none"
             >
               {promoBannerUrls.map((url, i) => (
-                <div key={url} className="w-full shrink-0 snap-center">
+                <div
+                  key={url}
+                  className="flex shrink-0 snap-center items-center justify-center"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element -- promoBannerUrl is a dynamic storage URL not in next/image's remotePatterns allowlist */}
                   <img
                     src={url}
                     alt={t("promoBanner.imageAlt", { count: i + 1 })}
-                    className={cn("h-full w-full object-cover", BANNER_HEIGHT)}
+                    className="h-auto w-auto max-h-[calc(90dvh-6rem)] max-w-[calc(92vw-1.5rem)] object-contain sm:max-w-[calc(70vw-2rem)]"
                   />
                 </div>
               ))}
