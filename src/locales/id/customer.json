@@ -464,12 +464,12 @@
   },
   "bookNowModal": {
     "title": "Cuci Mobil Sekarang",
-    "promoText": "Login dan dapatkan promo gratis cucinya",
-    "eyebrow": "PROMO MEMBER BARU",
+    "promoText": "Login dan dapatkan promo cucinya",
+    "eyebrow": "",
     "loginBtn": "Lanjut dengan Login",
     "continueBtn": "Lanjutkan",
     "guestBtn": "Langsung Cuci tanpa Login",
-    "terms": "Promo gratis cuci hanya berlaku untuk member terdaftar."
+    "terms": "Promo cuci hanya berlaku untuk member terdaftar."
   },
   "bottomNav": {
     "home": "Home",
