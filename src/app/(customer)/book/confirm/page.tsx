@@ -12,6 +12,7 @@ import { PayButton } from "@/features/customer/components/pay-button";
 import { useBookingStatus } from "@/features/customer/hooks";
 import { useTranslation } from "@/i18n";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
+import { clearBookingIdempotencyKey } from "@/lib/booking-idempotency";
 
 const SKIP_PAYMENT_METHOD_SELECTION =
   process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
@@ -110,7 +111,10 @@ function WalkInConfirmContent() {
           locationLng={lng ? Number.parseFloat(lng) : undefined}
           locationName={loc ?? undefined}
           siteId={siteId ?? undefined}
-          onBeforePay={clearCapture}
+          onBeforePay={() => {
+            clearCapture();
+            clearBookingIdempotencyKey("walkin");
+          }}
         />
       </div>
     </AppShell>

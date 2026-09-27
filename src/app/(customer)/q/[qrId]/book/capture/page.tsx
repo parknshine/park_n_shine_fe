@@ -27,6 +27,7 @@ import {
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
+import { getBookingIdempotencyKey } from "@/lib/booking-idempotency";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import type {
   CreateBookingPayload,
@@ -69,7 +70,7 @@ export default function BookCapturePage() {
     const bUnavailable = b.intakePaused || isSitePastCutoff(b.cutoffTime);
     return aUnavailable === bUnavailable ? 0 : aUnavailable ? 1 : -1;
   });
-  const { save: saveCapture, clear: clearCapture } = useBookingCaptureStore();
+  const { save: saveCapture } = useBookingCaptureStore();
   const setCaptureHasProgress = useBookingCaptureStore(
     (s) => s.setCaptureHasProgress,
   );
@@ -112,6 +113,7 @@ export default function BookCapturePage() {
       const payload: CreateBookingPayload = {
         qrId,
         locale: locale === "en" ? "en-US" : "id-ID",
+        idempotencyKey: getBookingIdempotencyKey(QR_BOOK_FLOW),
       };
       const response = await api.post<CustomerBooking>("/v1/bookings", payload);
       return response.data;
@@ -131,21 +133,25 @@ export default function BookCapturePage() {
 
   useEffect(() => {
     if (hasSession) return;
-    if (!hasCreatedRef.current) {
-      hasCreatedRef.current = true;
-      ensureValidSession().then((valid) => {
-        if (valid) createMutation.mutate();
-      });
-    }
-    return () => {
-      hasCreatedRef.current = false;
-    };
+    if (hasCreatedRef.current) return;
+    hasCreatedRef.current = true;
+    ensureValidSession().then((valid) => {
+      if (valid) createMutation.mutate();
+    });
+    // Do not reset the ref on unmount — React Strict Mode remounts this
+    // page in dev and would otherwise POST a second DRAFT booking.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (createMutation.data?.id) clearCapture();
-  }, [createMutation.data?.id, clearCapture]);
+    const created = createMutation.data;
+    if (!created?.id || !created.signedToken) return;
+    saveCapture({
+      flowKey: QR_BOOK_FLOW,
+      bookingId: created.id,
+      signedToken: created.signedToken,
+    });
+  }, [createMutation.data, saveCapture]);
 
   const plateUpload = usePhotoUpload({
     bookingId: bookingId ?? "",

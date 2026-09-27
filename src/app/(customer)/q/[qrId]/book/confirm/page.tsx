@@ -9,6 +9,7 @@ import { BookingLocationCard } from "@/features/customer/components/booking-loca
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { PayButton } from "@/features/customer/components/pay-button";
 import { useBookingStatus } from "@/features/customer/hooks";
+import { clearBookingIdempotencyKey } from "@/lib/booking-idempotency";
 
 const SKIP_PAYMENT_METHOD_SELECTION =
   process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
@@ -112,6 +113,7 @@ function BookConfirmContent() {
           slotText={slot}
           phone={phone ?? undefined}
           siteId={siteId ?? undefined}
+          onBeforePay={() => clearBookingIdempotencyKey("qr-book-capture")}
         />
       </div>
     </AppShell>

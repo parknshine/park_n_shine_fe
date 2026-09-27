@@ -30,6 +30,7 @@ import type { CustomerBooking } from "@/features/customer/types";
 import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
+import { getBookingIdempotencyKey } from "@/lib/booking-idempotency";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import {
   Select,
@@ -82,7 +83,7 @@ function WalkInCaptureContent() {
   });
   const { loyaltyEnabled } = usePublicSettings();
 
-  const { clear: clearCapture, save: saveCapture } = useBookingCaptureStore();
+  const { save: saveCapture } = useBookingCaptureStore();
   const setCaptureHasProgress = useBookingCaptureStore(
     (s) => s.setCaptureHasProgress,
   );
@@ -126,6 +127,7 @@ function WalkInCaptureContent() {
     mutationFn: async () => {
       const response = await api.post<CustomerBooking>("/v1/bookings", {
         locale: locale === "en" ? "en-US" : "id-ID",
+        idempotencyKey: getBookingIdempotencyKey(WALKIN_FLOW_KEY),
       });
       return response.data;
     },
@@ -137,23 +139,26 @@ function WalkInCaptureContent() {
     savedSession?.signedToken ?? createMutation.data?.signedToken ?? null;
 
   useEffect(() => {
-    if (hasSession) return; // Restored session — skip creating new booking
-    if (!hasCreatedRef.current) {
-      hasCreatedRef.current = true;
-      ensureValidSession().then((valid) => {
-        if (valid) createMutation.mutate();
-      });
-    }
-    return () => {
-      hasCreatedRef.current = false;
-    };
+    if (hasSession) return;
+    if (hasCreatedRef.current) return;
+    hasCreatedRef.current = true;
+    ensureValidSession().then((valid) => {
+      if (valid) createMutation.mutate();
+    });
+    // Do not reset the ref on unmount — React Strict Mode remounts this
+    // page in dev and would otherwise POST a second DRAFT booking.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Clear old session when a fresh booking is created
   useEffect(() => {
-    if (createMutation.data?.id) clearCapture();
-  }, [createMutation.data?.id, clearCapture]);
+    const created = createMutation.data;
+    if (!created?.id || !created.signedToken) return;
+    saveCapture({
+      flowKey: WALKIN_FLOW_KEY,
+      bookingId: created.id,
+      signedToken: created.signedToken,
+    });
+  }, [createMutation.data, saveCapture]);
 
   const plateUpload = usePhotoUpload({
     bookingId: bookingId ?? "",

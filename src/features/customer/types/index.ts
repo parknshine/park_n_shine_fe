@@ -90,6 +90,7 @@ export interface CustomerBooking {
 export interface CreateBookingPayload {
   qrId: string;
   locale: "id-ID" | "en-US";
+  idempotencyKey?: string;
 }
 
 export interface ConfirmBookingPayload {
