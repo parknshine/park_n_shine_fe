@@ -497,7 +497,7 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, X-Booking-Token, Idempotency-Key",
+    "Content-Type, Authorization, X-Booking-Token, X-Customer-Token, Idempotency-Key",
 };
 
 function json(data: unknown, status = 200): Response {

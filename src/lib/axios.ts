@@ -9,14 +9,14 @@ const api = axios.create({
   timeout: 10_000,
 });
 
-// Booking routes put the booking JWT in X-Booking-Token (and sometimes
-// Authorization). The logged-in session must ride along as X-Customer-Token
-// so create / photo / pay can attach the booking to that account.
+// Booking routes send the booking JWT in X-Booking-Token. Authorization is
+// already CORS-allowed in production, so the logged-in session rides there.
+// Do not use X-Customer-Token: api-1.parknshine.net rejects it on preflight.
 api.interceptors.request.use((config) => {
   const token =
     getCustomerAccessToken() ?? useCustomerAuthStore.getState().token;
-  if (token) {
-    config.headers["X-Customer-Token"] = token;
+  if (token && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
