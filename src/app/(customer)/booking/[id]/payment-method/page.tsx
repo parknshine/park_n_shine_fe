@@ -6,6 +6,7 @@ import { ChevronRight, CreditCard } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
 import { useChargePayment } from "@/features/customer/hooks/use-charge-payment";
 import { usePublicSettings } from "@/features/customer/hooks/use-public-settings";
+import { useResolvedWashPrice } from "@/features/customer/hooks/use-public-sites";
 import {
   PAYMENT_CATEGORIES,
   filterEnabledPaymentCategories,
@@ -41,6 +42,7 @@ function PaymentMethodContent() {
   const token = searchParams.get("token") ?? "";
 
   const { booking } = useBookingStatus({ bookingId, signedToken: token });
+  const priceAmount = useResolvedWashPrice(booking?.siteId, booking?.priceAmount);
   const { charge, isCharging, error } = useChargePayment(bookingId, token);
   const { enabledPaymentMethods } = usePublicSettings();
   const [loadingMethod, setLoadingMethod] = useState<string | null>(null);
@@ -170,8 +172,8 @@ function PaymentMethodContent() {
               Total Harga
             </p>
             <p className="text-lg font-bold leading-tight text-foreground">
-              {booking?.priceAmount !== undefined ? (
-                formatIDR(booking.priceAmount)
+              {priceAmount !== undefined ? (
+                formatIDR(priceAmount)
               ) : (
                 <span className="text-muted-foreground">Memuat...</span>
               )}

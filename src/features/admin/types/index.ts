@@ -204,6 +204,8 @@ export interface AdminSiteDetail {
   cutoffTime: string | null;
   lat?: number | null;
   lng?: number | null;
+  /** Null = use global wash price from app settings. */
+  price: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -224,6 +226,7 @@ export interface CreateSitePayload {
   cutoffTime?: string | null;
   lat?: number | null;
   lng?: number | null;
+  price?: number | null;
 }
 
 export interface UpdateSitePayload {
@@ -236,6 +239,7 @@ export interface UpdateSitePayload {
   pausedMessage?: string | null;
   lat?: number | null;
   lng?: number | null;
+  price?: number | null;
 }
 
 export interface GenerateQrPayload {

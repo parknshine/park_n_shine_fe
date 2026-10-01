@@ -15,6 +15,7 @@ import {
   usePhotoUpload,
   usePublicSettings,
   usePublicSites,
+  publicSiteOptionLabel,
 } from "@/features/customer/hooks";
 import { useSessionGuard } from "@/features/customer/hooks/use-session-guard";
 import { SessionInvalidModal } from "@/features/customer/components/session-invalid-modal";
@@ -407,7 +408,7 @@ export default function BookCapturePage() {
                   : "";
               return {
                 value: site.id,
-                label: `${site.name}${statusSuffix}`,
+                label: publicSiteOptionLabel(site, statusSuffix),
                 disabled: unavailable,
               };
             })}

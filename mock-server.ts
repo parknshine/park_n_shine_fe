@@ -531,10 +531,14 @@ async function handleRequest(req: Request): Promise<Response> {
     cutoff.setHours(22, 0, 0, 0);
     return json({
       qrId,
+      siteId: "site-1",
       siteName: "Senayan City — P2",
       intakePaused: false,
       cutoffTime: "22:00",
+      timezone: "Asia/Jakarta",
+      price: 75_000,
       rotatedAt: now(),
+      isOpen: true,
     });
   }
 

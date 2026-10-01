@@ -578,6 +578,8 @@
       "edit": "Edit",
       "manageQr": "Manage QR"
     },
+    "priceGlobalDefault": "Harga default",
+    "priceSiteOverride": "{{amount}}",
     "genericQrModal": {
       "title": "Generic Site QR",
       "description": "Scan to open the Park & Shine booking page.",
@@ -591,6 +593,8 @@
       "timezoneLabel": "Timezone",
       "codeLabel": "Mall Code (2 digits, optional)",
       "cutoffLabel": "Cutoff Time (HH:MM, optional)",
+      "priceLabel": "Harga cuci (opsional)",
+      "priceHint": "Kosongkan untuk memakai harga global di Settings.",
       "creating": "Creating...",
       "create": "Create Site",
       "cancel": "Cancel"
@@ -605,6 +609,9 @@
       "pausedMessageLabel": "Pesan saat nonaktif (opsional)",
       "pausedMessagePlaceholder": "Contoh: Kami akan mulai 22 Agustus 2026",
       "pausedMessageHint": "Ditampilkan ke customer saat scan QR selama site nonaktif. Kosongkan untuk pesan default.",
+      "priceLabel": "Harga cuci (opsional)",
+      "priceHint": "Kosongkan untuk memakai harga global di Settings. Isi angka untuk override khusus site ini.",
+      "priceClear": "Pakai harga global",
       "saving": "Saving...",
       "save": "Save Changes",
       "cancel": "Cancel"

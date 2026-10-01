@@ -61,6 +61,7 @@ export function useBookingStatus({
         slot?: string | null;
         phone?: string | null;
         price?: number;
+        siteId?: string | null;
         siteName: string;
         siteAddress?: string | null;
         paymentMethod?: string | null;
@@ -80,6 +81,7 @@ export function useBookingStatus({
         signedToken,
         status: d.status,
         siteName: d.siteName,
+        siteId: d.siteId ?? null,
         siteAddress: d.siteAddress ?? null,
         plateText: d.plate ?? null,
         slotText: d.slot ?? null,

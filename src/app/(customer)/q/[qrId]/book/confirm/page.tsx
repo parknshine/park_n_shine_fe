@@ -8,7 +8,7 @@ import { BookingSummaryCard } from "@/features/customer/components/booking-summa
 import { BookingLocationCard } from "@/features/customer/components/booking-location-card";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { PayButton } from "@/features/customer/components/pay-button";
-import { useBookingStatus } from "@/features/customer/hooks";
+import { useBookingStatus, useResolvedWashPrice } from "@/features/customer/hooks";
 import { clearBookingIdempotencyKey } from "@/lib/booking-idempotency";
 
 const SKIP_PAYMENT_METHOD_SELECTION =
@@ -49,6 +49,10 @@ function BookConfirmContent() {
     pollIntervalMs: Infinity,
     enabled: !!bookingId && !!token,
   });
+  const priceAmount = useResolvedWashPrice(
+    siteId ?? booking?.siteId,
+    booking?.priceAmount,
+  );
 
   const locationName = loc ?? booking?.siteName ?? "";
   const locationAddress = addr ?? booking?.siteAddress ?? undefined;
@@ -92,7 +96,7 @@ function BookConfirmContent() {
             plate={plate}
             slot={slot}
             siteName={locationName}
-            priceAmount={booking?.priceAmount}
+            priceAmount={priceAmount}
             currency={booking?.currency}
             estimatedReadyAt={booking?.estimatedReadyAt}
           />
