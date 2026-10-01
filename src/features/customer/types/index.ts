@@ -41,6 +41,8 @@ export interface SiteQrResolution {
   cutoffTime: string | null;
   timezone: string;
   rotatedAt?: string | null;
+  /** Resolved wash price for this site. */
+  price?: number;
 }
 
 export interface BookingMedia {
@@ -70,6 +72,7 @@ export interface CustomerBooking {
   signedToken: string;
   status: BookingStatus;
   siteName: string;
+  siteId?: string | null;
   siteAddress?: string | null;
   plateText?: string | null;
   slotText?: string | null;

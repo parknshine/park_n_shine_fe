@@ -9,6 +9,7 @@ const ENV_FALLBACK = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
 interface PublicSettings {
   whatsappNumber: string;
   avgCleaningMinutes: number;
+  washPrice?: number;
   loyaltyEnabled: boolean;
   promoBannerUrls: string[];
   enabledPaymentMethods: string[];
@@ -33,6 +34,7 @@ export function usePublicSettings() {
   return {
     whatsappNumber: query.data?.whatsappNumber || ENV_FALLBACK,
     avgCleaningMinutes: query.data?.avgCleaningMinutes ?? 30,
+    washPrice: query.data?.washPrice ?? 50_000,
     loyaltyEnabled: query.data?.loyaltyEnabled ?? false,
     promoBannerUrls: query.data?.promoBannerUrls ?? [],
     enabledPaymentMethods:

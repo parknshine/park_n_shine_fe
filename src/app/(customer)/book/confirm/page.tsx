@@ -9,7 +9,7 @@ import { BookingSummaryCard } from "@/features/customer/components/booking-summa
 import { BookingLocationCard } from "@/features/customer/components/booking-location-card";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { PayButton } from "@/features/customer/components/pay-button";
-import { useBookingStatus } from "@/features/customer/hooks";
+import { useBookingStatus, useResolvedWashPrice } from "@/features/customer/hooks";
 import { useTranslation } from "@/i18n";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
 import { clearBookingIdempotencyKey } from "@/lib/booking-idempotency";
@@ -54,6 +54,10 @@ function WalkInConfirmContent() {
     pollIntervalMs: Infinity,
     enabled: !!bookingId && !!token,
   });
+  const priceAmount = useResolvedWashPrice(
+    siteId ?? booking?.siteId,
+    booking?.priceAmount,
+  );
 
   useEffect(() => {
     if (!booking || !bookingId || !token) return;
@@ -89,7 +93,7 @@ function WalkInConfirmContent() {
           <BookingSummaryCard
             plate={plate}
             slot={slot}
-            priceAmount={booking?.priceAmount}
+            priceAmount={priceAmount}
             currency={booking?.currency}
             estimatedReadyAt={booking?.estimatedReadyAt}
           />

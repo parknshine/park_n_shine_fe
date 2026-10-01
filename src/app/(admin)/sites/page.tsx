@@ -32,8 +32,18 @@ import type {
   UpdateSitePayload,
 } from "@/features/admin/types";
 import { LocationPickerModal } from "@/features/admin/components/location-picker-modal";
+import { formatRupiah } from "@/features/admin/utils/reports/format";
 
 const CUSTOMER_APP_URL = "https://parknshine.net";
+
+function parseOptionalSitePrice(raw: string): number | null | "invalid" {
+  const trimmed = raw.trim();
+  if (trimmed === "") return null;
+  const digits = trimmed.replace(/\D/g, "");
+  const n = Number(digits);
+  if (!Number.isFinite(n) || n <= 0) return "invalid";
+  return n;
+}
 
 function GenericSiteQrModal({ onClose }: Readonly<{ onClose: () => void }>) {
   const { t } = useTranslation("admin");
@@ -117,6 +127,7 @@ interface CreateFormState {
   cutoffTime: string | null;
   lat: number | null;
   lng: number | null;
+  priceInput: string;
 }
 
 function CreateSiteModal({
@@ -137,11 +148,19 @@ function CreateSiteModal({
     cutoffTime: null,
     lat: null,
     lng: null,
+    priceInput: "",
   });
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [priceError, setPriceError] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const parsedPrice = parseOptionalSitePrice(form.priceInput);
+    if (parsedPrice === "invalid") {
+      setPriceError(true);
+      return;
+    }
+    setPriceError(false);
     try {
       await onCreate({
         name: form.name,
@@ -151,6 +170,7 @@ function CreateSiteModal({
         cutoffTime: form.cutoffTime,
         lat: form.lat,
         lng: form.lng,
+        ...(parsedPrice !== null ? { price: parsedPrice } : {}),
       });
       onClose();
     } catch {
@@ -256,6 +276,32 @@ function CreateSiteModal({
                 }
               />
             </div>
+            <div className='space-y-1'>
+              <Label htmlFor='site-price'>
+                {t("sitesPage.create.priceLabel")}
+              </Label>
+              <div className='flex items-center gap-2'>
+                <span className='text-xs text-muted-foreground'>Rp</span>
+                <Input
+                  id='site-price'
+                  inputMode='numeric'
+                  placeholder='50000'
+                  value={form.priceInput}
+                  onChange={(e) => {
+                    setPriceError(false);
+                    setForm((f) => ({ ...f, priceInput: e.target.value }));
+                  }}
+                />
+              </div>
+              <p className='text-xs text-muted-foreground'>
+                {t("sitesPage.create.priceHint")}
+              </p>
+              {priceError && (
+                <p className='text-xs text-destructive'>
+                  Enter a positive amount or leave empty.
+                </p>
+              )}
+            </div>
             <div className='flex gap-2 pt-2'>
               <Button type='submit' disabled={isCreating}>
                 {isCreating
@@ -301,6 +347,7 @@ interface EditFormState {
   pausedMessage: string | null;
   lat: number | null;
   lng: number | null;
+  priceInput: string;
 }
 
 function EditSiteModal({
@@ -327,11 +374,20 @@ function EditSiteModal({
     pausedMessage: site.pausedMessage,
     lat: site.lat ?? null,
     lng: site.lng ?? null,
+    priceInput:
+      site.price != null ? String(site.price) : "",
   });
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [priceError, setPriceError] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const parsedPrice = parseOptionalSitePrice(form.priceInput);
+    if (parsedPrice === "invalid") {
+      setPriceError(true);
+      return;
+    }
+    setPriceError(false);
     try {
       await onUpdate({
         siteId: site.id,
@@ -344,6 +400,7 @@ function EditSiteModal({
           pausedMessage: form.pausedMessage,
           lat: form.lat,
           lng: form.lng,
+          price: parsedPrice,
         },
       });
       onClose();
@@ -470,6 +527,42 @@ function EditSiteModal({
               <p className='text-xs text-muted-foreground'>
                 {t("sitesPage.editModal.pausedMessageHint")}
               </p>
+            </div>
+            <div className='space-y-1'>
+              <Label htmlFor='edit-site-price'>
+                {t("sitesPage.editModal.priceLabel")}
+              </Label>
+              <div className='flex items-center gap-2'>
+                <span className='text-xs text-muted-foreground'>Rp</span>
+                <Input
+                  id='edit-site-price'
+                  inputMode='numeric'
+                  placeholder='50000'
+                  value={form.priceInput}
+                  onChange={(e) => {
+                    setPriceError(false);
+                    setForm((f) => ({ ...f, priceInput: e.target.value }));
+                  }}
+                />
+              </div>
+              <p className='text-xs text-muted-foreground'>
+                {t("sitesPage.editModal.priceHint")}
+              </p>
+              <button
+                type='button'
+                className='text-xs text-muted-foreground underline hover:text-foreground'
+                onClick={() => {
+                  setPriceError(false);
+                  setForm((f) => ({ ...f, priceInput: "" }));
+                }}
+              >
+                {t("sitesPage.editModal.priceClear")}
+              </button>
+              {priceError && (
+                <p className='text-xs text-destructive'>
+                  Enter a positive amount or clear to use the global default.
+                </p>
+              )}
             </div>
             <div className='flex gap-2 pt-2'>
               <Button type='submit' disabled={isUpdating}>
@@ -608,6 +701,13 @@ export default function SitesPage() {
                 </div>
                 <p className='text-xs text-muted-foreground leading-snug mt-0.5'>
                   {site.address}
+                </p>
+                <p className='text-xs text-muted-foreground mt-1'>
+                  {site.price != null
+                    ? t("sitesPage.priceSiteOverride", {
+                        amount: formatRupiah(site.price),
+                      })
+                    : t("sitesPage.priceGlobalDefault")}
                 </p>
               </div>
               <div className='flex items-center gap-3 shrink-0'>

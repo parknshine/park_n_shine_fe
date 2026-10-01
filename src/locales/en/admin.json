@@ -578,6 +578,8 @@
       "edit": "Edit",
       "manageQr": "Manage QR"
     },
+    "priceGlobalDefault": "Default wash price",
+    "priceSiteOverride": "{{amount}}",
     "genericQrModal": {
       "title": "Generic Site QR",
       "description": "Scan to open the Park & Shine booking page.",
@@ -591,6 +593,8 @@
       "timezoneLabel": "Timezone",
       "codeLabel": "Mall Code (2 digits, optional)",
       "cutoffLabel": "Cutoff Time (HH:MM, optional)",
+      "priceLabel": "Wash price (optional)",
+      "priceHint": "Leave empty to use the global wash price from Settings.",
       "creating": "Creating...",
       "create": "Create Site",
       "cancel": "Cancel"
@@ -605,6 +609,9 @@
       "pausedMessageLabel": "Message while inactive (optional)",
       "pausedMessagePlaceholder": "e.g. We'll launch on August 22, 2026",
       "pausedMessageHint": "Shown to customers who scan the QR while the site is paused. Leave empty for the default message.",
+      "priceLabel": "Wash price (optional)",
+      "priceHint": "Leave empty to use the global wash price from Settings. Set a value to override for this site only.",
+      "priceClear": "Use global default",
       "saving": "Saving...",
       "save": "Save Changes",
       "cancel": "Cancel"

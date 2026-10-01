@@ -24,6 +24,7 @@ import {
   usePhotoUpload,
   usePublicSettings,
   usePublicSites,
+  publicSiteOptionLabel,
 } from "@/features/customer/hooks";
 import {
   getDialCodeOptions,
@@ -352,7 +353,7 @@ function CaptureContent() {
                   : "";
               return {
                 value: site.id,
-                label: `${site.name}${statusSuffix}`,
+                label: publicSiteOptionLabel(site, statusSuffix),
                 disabled: unavailable,
               };
             })}

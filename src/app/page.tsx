@@ -53,7 +53,7 @@ export default function Home() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: testimonials = [] } = usePublicTestimonials();
-  const { whatsappNumber } = usePublicSettings();
+  const { whatsappNumber, washPrice } = usePublicSettings();
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
   const [bookNowOpen, setBookNowOpen] = useState(false);
@@ -306,9 +306,12 @@ export default function Home() {
             </div>
             <article className='plan-card plans-promo-card'>
               <h3>{t("landingPage.pricing.serviceLabel")}</h3>
+              <div className='tracker-copy'>
+                <h2>{t("landingPage.pricing.serviceLabel2")}</h2>
+              </div>
               <p className='price'>
                 <span className='price-original'>Rp70.000</span>
-                Rp50.000
+                {`Rp${washPrice.toLocaleString("id-ID")}`}
               </p>
               <p>{t("landingPage.pricing.description")}</p>
               <ul>

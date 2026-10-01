@@ -2,7 +2,8 @@
   "landing": {
     "badge": "Go Waterless, Go Green",
     "heading": "Mobil Bersih,\nKetika Anda\nBerbelanja.",
-    "heroAlt": "Keluarga bahagia di parkiran dengan mobil bersih"
+    "heroAlt": "Keluarga bahagia di parkiran dengan mobil bersih",
+    "fromPrice": "Mulai {{amount}}"
   },
   "landingPage": {
     "nav": {
@@ -44,6 +45,7 @@
       "title": "PROMO WAKTU TERBATAS!",
       "subtitle": "Harga terjangkau, ramah lingkungan, mudah digunakan",
       "serviceLabel": "Cuci Tanpa Air",
+      "serviceLabel2": "Mulai Dari",
       "description": "Pembersihan eksterior kendaraan menggunakan teknologi waterless yang aman untuk cat. Kendaraan bersih dan mengilap saat Anda sedang berbelanja.",
       "feature1": "Pembersihan body eksterior kendaraan",
       "feature2": "Aman untuk seluruh permukaan cat kendaraan",

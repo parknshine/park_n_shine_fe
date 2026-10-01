@@ -100,7 +100,10 @@ export default async function LandingPage({ params }: Props) {
   return (
     <AppShell surface='customer'>
       <div className='space-y-8 pb-10'>
-        <LandingHero siteName={resolution.siteName} />
+        <LandingHero
+          siteName={resolution.siteName}
+          washPrice={resolution.price}
+        />
         <HowItWorksPanel />
         {blockingReason ? (
           <QrBlockingMessage reason={blockingReason} />

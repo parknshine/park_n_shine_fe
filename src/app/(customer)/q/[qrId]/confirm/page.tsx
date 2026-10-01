@@ -7,7 +7,7 @@ import { BookingSummaryCard } from "@/features/customer/components/booking-summa
 import { BookingLocationCard } from "@/features/customer/components/booking-location-card";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import { PayButton } from "@/features/customer/components/pay-button";
-import { useBookingStatus } from "@/features/customer/hooks";
+import { useBookingStatus, useResolvedWashPrice } from "@/features/customer/hooks";
 import { useTranslation } from "@/i18n";
 
 export default function ConfirmPage() {
@@ -45,6 +45,10 @@ function ConfirmContent() {
     pollIntervalMs: Infinity,
     enabled: !!bookingId && !!token,
   });
+  const priceAmount = useResolvedWashPrice(
+    siteId ?? booking?.siteId,
+    booking?.priceAmount,
+  );
 
   const locationName = loc ?? booking?.siteName ?? "";
   const locationAddress = addr ?? booking?.siteAddress ?? undefined;
@@ -76,7 +80,7 @@ function ConfirmContent() {
             plate={plate}
             slot={slot}
             siteName={locationName}
-            priceAmount={booking?.priceAmount}
+            priceAmount={priceAmount}
             currency={booking?.currency}
             estimatedReadyAt={booking?.estimatedReadyAt}
           />

@@ -5,9 +5,14 @@ import { useTranslation } from "@/i18n";
 
 interface LandingHeroProps {
   siteName: string;
+  washPrice?: number;
 }
 
-export function LandingHero({ siteName }: LandingHeroProps) {
+function formatIDR(amount: number): string {
+  return `Rp ${amount.toLocaleString("id-ID")}`;
+}
+
+export function LandingHero({ siteName, washPrice }: LandingHeroProps) {
   const { t } = useTranslation("customer");
 
   return (
@@ -22,9 +27,16 @@ export function LandingHero({ siteName }: LandingHeroProps) {
         ))}
       </h1>
 
-      <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-foreground">
-        <span className="h-2 w-2 rounded-full bg-primary" />
-        {siteName}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-foreground">
+          <span className="h-2 w-2 rounded-full bg-primary" />
+          {siteName}
+        </div>
+        {washPrice != null && (
+          <div className="inline-flex items-center rounded-full bg-primary/10 px-3.5 py-1.5 text-sm font-semibold text-primary">
+            {t("landing.fromPrice", { amount: formatIDR(washPrice) })}
+          </div>
+        )}
       </div>
 
       <div className="overflow-hidden rounded-2xl">

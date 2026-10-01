@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Lock, CreditCard, AlertCircle } from "lucide-react";
 import { useBookingStatus } from "@/features/customer/hooks/use-booking-status";
+import { useResolvedWashPrice } from "@/features/customer/hooks/use-public-sites";
 import { useChargeCard } from "@/features/customer/hooks/use-charge-card";
 import { BookingExpiredModal } from "@/features/customer/components/booking-expired-modal";
 import { AppShell } from "@/components/shared";
@@ -108,6 +109,7 @@ function CardPayContent() {
     signedToken,
     enabled: !!bookingId && !!token,
   });
+  const priceAmount = useResolvedWashPrice(booking?.siteId, booking?.priceAmount);
   const { chargeCard, isCharging, error: chargeError } = useChargeCard(bookingId, signedToken);
 
   const [cardNumber, setCardNumber] = useState("");
@@ -144,7 +146,7 @@ function CardPayContent() {
         expMonth: mm,
         expYear: `20${yy}`,
         cvn: cvv,
-        amount: booking?.priceAmount ?? 0,
+        amount: priceAmount ?? 0,
       });
 
       setTokenizing(false);
@@ -291,7 +293,7 @@ function CardPayContent() {
             <div className='flex items-center justify-between text-sm'>
               <span className='text-muted-foreground'>Total Pembayaran</span>
               <span className='font-bold text-foreground'>
-                {booking?.priceAmount !== undefined ? formatIDR(booking.priceAmount) : "—"}
+                {priceAmount !== undefined ? formatIDR(priceAmount) : "—"}
               </span>
             </div>
             <button

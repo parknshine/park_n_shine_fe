@@ -2,7 +2,8 @@
   "landing": {
     "badge": "Go Waterless, Go Green",
     "heading": "Clean Car,\nWhile You\nShop.",
-    "heroAlt": "Happy family in parking lot with clean car"
+    "heroAlt": "Happy family in parking lot with clean car",
+    "fromPrice": "From {{amount}}"
   },
   "landingPage": {
     "nav": {
@@ -44,6 +45,7 @@
       "title": "LIMITED TIME PROMOTION!",
       "subtitle": "Affordable, eco-friendly cleaning made simple",
       "serviceLabel": "Waterless Cleaning",
+      "serviceLabel2": "Start From",
       "description": "Exterior vehicle cleaning using advanced waterless technology that is safe for your vehicle's paint. Your car will be clean and glossy while you enjoy your shopping.",
       "feature1": "Exterior body cleaning",
       "feature2": "Safe for all painted surfaces",
