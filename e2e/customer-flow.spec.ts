@@ -29,7 +29,7 @@ const LOCATION_SUBTITLE =
 const USE_CURRENT_LOCATION = /Gunakan Lokasi Saat Ini|Use Current Location/i;
 const USE_THIS_LOCATION = /Gunakan Lokasi Ini|Use This Location/i;
 
-const CAPTURE_TITLE = /Foto Kendaraan|Vehicle Photos/i;
+const CAPTURE_TITLE = /Booking cuci mobil|Book a car wash/i;
 
 const STEP_LABEL = /Langkah \d+ dari \d+|Step \d+ of \d+/i;
 

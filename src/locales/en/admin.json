@@ -139,7 +139,14 @@
       "backToSummary": "← Back to Summary",
       "viewJobs": "View Job Details →",
       "photosPurged": "Photos were automatically deleted per the 90-day retention policy.",
-      "noPhotosYet": "No photos for this booking yet."
+      "noPhotosYet": "No photos for this booking yet.",
+      "closeBooking": "Close booking",
+      "closeHint": "This booking is IN_PROGRESS. Closing it sets the status to CLOSED.",
+      "closeReasonPlaceholder": "Reason for closing",
+      "closeConfirm": "Yes, set to CLOSED",
+      "closeCancel": "Cancel",
+      "closeSaving": "Saving...",
+      "closeError": "Could not change the status. Try again."
     },
     "tabs": {
       "summary": "Summary",

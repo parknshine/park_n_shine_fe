@@ -9,6 +9,7 @@ import { StepProgressBar } from "@/features/customer/components/step-progress-ba
 import { PayButton } from "@/features/customer/components/pay-button";
 import { useBookingStatus, useResolvedWashPrice } from "@/features/customer/hooks";
 import { useTranslation } from "@/i18n";
+import { sanitizePlateOrSlot } from "@/features/customer/utils/plate";
 
 export default function ConfirmPage() {
   return (
@@ -25,8 +26,10 @@ function ConfirmContent() {
   const searchParams = useSearchParams();
   const bookingId = searchParams.get("bookingId");
   const token = searchParams.get("token");
-  const plate = searchParams.get("plate");
-  const slot = searchParams.get("slot");
+  const plateParam = searchParams.get("plate");
+  const slotParam = searchParams.get("slot");
+  const plate = plateParam ? sanitizePlateOrSlot(plateParam) : null;
+  const slot = slotParam ? sanitizePlateOrSlot(slotParam) : null;
   const phone = searchParams.get("phone");
   const loc = searchParams.get("loc");
   const addr = searchParams.get("addr");

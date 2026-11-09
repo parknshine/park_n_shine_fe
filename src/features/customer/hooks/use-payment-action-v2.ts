@@ -7,6 +7,7 @@ import api from "@/lib/axios";
 import { API_ERROR_CODES } from "@/lib/api-error";
 import { mutationKeys, queryKeys } from "@/lib/query-keys";
 import type { PaymentIntentResponse } from "@/features/customer/types";
+import { sanitizePlateOrSlot } from "@/features/customer/utils/plate";
 
 // TEMPORARY: mirrors backend MIDTRANS_CHARGE_MODE=snap workaround. When set,
 // every method on this list routes to the same Snap redirect anyway, so skip
@@ -38,7 +39,11 @@ export function usePaymentActionV2(bookingId: string, signedToken: string) {
       const { plateText, slotText, ...rest } = payload;
       const response = await api.post<PaymentIntentResponse>(
         `/v1/bookings/${bookingId}/confirm`,
-        { ...rest, plate: plateText, slot: slotText },
+        {
+          ...rest,
+          plate: sanitizePlateOrSlot(plateText),
+          slot: sanitizePlateOrSlot(slotText),
+        },
         {
           headers: {
             "Idempotency-Key": bookingId,

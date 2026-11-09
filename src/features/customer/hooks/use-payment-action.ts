@@ -9,6 +9,7 @@ import type {
   ConfirmBookingPayload,
   PaymentIntentResponse,
 } from "@/features/customer/types";
+import { sanitizePlateOrSlot } from "@/features/customer/utils/plate";
 
 export function usePaymentAction(bookingId: string, signedToken: string) {
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -20,7 +21,11 @@ export function usePaymentAction(bookingId: string, signedToken: string) {
       const { plateText, slotText, ...rest } = payload;
       const response = await api.post<PaymentIntentResponse>(
         `/v1/bookings/${bookingId}/confirm`,
-        { ...rest, plate: plateText, slot: slotText },
+        {
+          ...rest,
+          plate: sanitizePlateOrSlot(plateText),
+          slot: sanitizePlateOrSlot(slotText),
+        },
         {
           headers: {
             "Idempotency-Key": bookingId,

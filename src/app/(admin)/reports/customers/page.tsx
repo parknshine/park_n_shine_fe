@@ -41,6 +41,7 @@ import { useTranslation } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { ReportTabs } from "@/features/admin/components";
 import { formatDate } from "@/features/admin/utils/reports/format";
+import { useAuthStore } from "@/store/auth-store";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50];
 
@@ -48,6 +49,14 @@ function maskPhone(phone: string | null | undefined): string {
   if (!phone) return "—";
   if (phone.length <= 6) return phone;
   return phone.slice(0, 4) + "****" + phone.slice(-3);
+}
+
+function formatCustomerPhone(
+  phone: string | null | undefined,
+  showFull: boolean,
+): string {
+  if (!phone) return "—";
+  return showFull ? phone : maskPhone(phone);
 }
 
 function CustomerTypeBadge({ type }: { type: "registered" | "guest" }) {
@@ -67,6 +76,7 @@ function CustomerTypeBadge({ type }: { type: "registered" | "guest" }) {
 
 export default function CustomersReportPage() {
   const { t } = useTranslation("admin");
+  const isSuperAdmin = useAuthStore((s) => s.role === "super_admin");
   const { deleteCustomer, isDeleting } = useDeleteCustomer();
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
@@ -166,7 +176,9 @@ export default function CustomersReportPage() {
       id: "phone",
       header: "No HP",
       cell: ({ row }) => (
-        <span className="font-mono text-xs">{maskPhone(row.original.phone)}</span>
+        <span className="font-mono text-xs">
+          {formatCustomerPhone(row.original.phone, isSuperAdmin)}
+        </span>
       ),
     },
     {

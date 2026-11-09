@@ -10,6 +10,7 @@ import { StepProgressBar } from "@/features/customer/components/step-progress-ba
 import { PayButton } from "@/features/customer/components/pay-button";
 import { useBookingStatus, useResolvedWashPrice } from "@/features/customer/hooks";
 import { clearBookingIdempotencyKey } from "@/lib/booking-idempotency";
+import { sanitizePlateOrSlot } from "@/features/customer/utils/plate";
 
 const SKIP_PAYMENT_METHOD_SELECTION =
   process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
@@ -31,8 +32,10 @@ function BookConfirmContent() {
   const bookingId = searchParams.get("bookingId");
   const token = searchParams.get("token");
   const phone = searchParams.get("phone");
-  const plate = searchParams.get("plate");
-  const slot = searchParams.get("slot");
+  const plateParam = searchParams.get("plate");
+  const slotParam = searchParams.get("slot");
+  const plate = plateParam ? sanitizePlateOrSlot(plateParam) : null;
+  const slot = slotParam ? sanitizePlateOrSlot(slotParam) : null;
   const loc = searchParams.get("loc");
   const addr = searchParams.get("addr");
   const siteId = searchParams.get("siteId");
