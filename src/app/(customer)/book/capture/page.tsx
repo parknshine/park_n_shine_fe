@@ -14,6 +14,11 @@ import { PhotoUploadField } from "@/features/customer/components/photo-upload-fi
 import { PhotoGuidelinesPanel } from "@/features/customer/components/photo-guidelines-panel";
 import { StepProgressBar } from "@/features/customer/components/step-progress-bar";
 import {
+  CaptureHowTo,
+  CaptureSection,
+  CaptureStillNeeded,
+} from "@/features/customer/components/capture-guidance";
+import {
   usePhotoUpload,
   usePublicSettings,
   usePublicSites,
@@ -32,6 +37,7 @@ import { useTranslation } from "@/i18n";
 import { useUIStore } from "@/store/ui-store";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
 import { getBookingIdempotencyKey } from "@/lib/booking-idempotency";
+import { sanitizePlateOrSlot } from "@/features/customer/utils/plate";
 import { useCustomerAuthStore } from "@/store/customer-auth-store";
 import {
   Select,
@@ -180,12 +186,12 @@ function WalkInCaptureContent() {
 
   useEffect(() => {
     const text = plateUpload.media?.ocrText;
-    if (text) startTransition(() => setPlateText(text));
+    if (text) startTransition(() => setPlateText(sanitizePlateOrSlot(text)));
   }, [plateUpload.media?.ocrText]);
 
   useEffect(() => {
     const text = slotUpload.media?.ocrText;
-    if (text) startTransition(() => setSlotText(text));
+    if (text) startTransition(() => setSlotText(sanitizePlateOrSlot(text)));
   }, [slotUpload.media?.ocrText]);
 
   let effectivePhone = "";
@@ -207,8 +213,8 @@ function WalkInCaptureContent() {
 
   function handleContinue() {
     if (!bookingId || !signedToken) return;
-    const plate = plateText.trim().toUpperCase();
-    const slot = slotText.trim().toUpperCase();
+    const plate = sanitizePlateOrSlot(plateText);
+    const slot = sanitizePlateOrSlot(slotText);
     const phoneForSave = useProfilePhone
       ? normalizePhone(profilePhone ?? "")
       : normalizePhone(`${dialCode}${phone}`);
@@ -307,111 +313,13 @@ function WalkInCaptureContent() {
           <h1 className='text-2xl font-bold leading-tight text-foreground'>
             {t("booking.capture.title")}
           </h1>
-          <p className='mt-1 text-sm text-muted-foreground'>
+          <p className='mt-1 text-sm leading-relaxed text-muted-foreground'>
             {t("booking.capture.subtitle")}
           </p>
+          <CaptureHowTo variant='walkin' />
         </div>
 
-        {/* Plate photo + OCR */}
-        <PhotoUploadField
-          id='plate-photo'
-          kind='plate'
-          label={t("booking.capture.platePhotoLabel")}
-          hint={t("booking.capture.platePhotoGuideline")}
-          state={plateUpload}
-          onSelect={(file, kind) => plateUpload.uploadPhoto({ file, kind })}
-          onRetry={plateUpload.reset}
-          ocrValue={plateText}
-          onOcrChange={setPlateText}
-          ocrLabel={t("booking.capture.plateOcrLabel")}
-          ocrHint={t("booking.capture.plateOcrHint")}
-          ocrPlaceholder={t("booking.capture.platePlaceholder")}
-          guidelines={
-            <PhotoGuidelinesPanel
-              goodSrc='/images/guidelines/plate-good.jpeg'
-              avoidExamples={[
-                {
-                  src: "/images/guidelines/plate-good.jpeg",
-                  label: t("booking.capture.guidelines.avoidBlurry"),
-                  blur: true,
-                },
-                {
-                  src: "/images/guidelines/plate-angled.webp",
-                  label: t("booking.capture.guidelines.avoidAngled"),
-                },
-                {
-                  src: "/images/guidelines/plate-dark.jpeg",
-                  label: t("booking.capture.guidelines.avoidDark"),
-                },
-                {
-                  src: "/images/guidelines/plate-good.jpeg",
-                  label: t("booking.capture.guidelines.avoidObstructed"),
-                  obstructed: true,
-                },
-              ]}
-              checklistItems={[
-                t("booking.capture.guidelines.plateChecklist_0"),
-                t("booking.capture.guidelines.plateChecklist_1"),
-                t("booking.capture.guidelines.plateChecklist_2"),
-                t("booking.capture.guidelines.plateChecklist_3"),
-              ]}
-            />
-          }
-        />
-
-        {/* Slot photo + OCR */}
-        <PhotoUploadField
-          id='slot-photo'
-          kind='slot'
-          label={t("booking.capture.slotPhotoLabel")}
-          hint={t("booking.capture.slotPhotoGuideline")}
-          state={slotUpload}
-          onSelect={(file, kind) => slotUpload.uploadPhoto({ file, kind })}
-          onRetry={slotUpload.reset}
-          ocrValue={slotText}
-          onOcrChange={setSlotText}
-          ocrLabel={t("booking.capture.slotOcrLabel")}
-          ocrHint={t("booking.capture.slotOcrHint")}
-          ocrPlaceholder={t("booking.capture.slotPlaceholder")}
-          guidelines={
-            <PhotoGuidelinesPanel
-              goodSrc='/images/guidelines/slot-good.webp'
-              avoidExamples={[
-                {
-                  src: "/images/guidelines/slot-good.webp",
-                  label: t("booking.capture.guidelines.avoidBlurry"),
-                  blur: true,
-                },
-                {
-                  src: "/images/guidelines/slot-angled.webp",
-                  label: t("booking.capture.guidelines.avoidAngled"),
-                },
-                {
-                  src: "/images/guidelines/slot-good.webp",
-                  label: t("booking.capture.guidelines.avoidDark"),
-                  dark: true,
-                },
-                {
-                  src: "/images/guidelines/slot-good.webp",
-                  label: t("booking.capture.guidelines.avoidObstructed"),
-                  obstructed: true,
-                },
-              ]}
-              checklistItems={[
-                t("booking.capture.guidelines.slotChecklist_0"),
-                t("booking.capture.guidelines.slotChecklist_1"),
-                t("booking.capture.guidelines.slotChecklist_2"),
-                t("booking.capture.guidelines.slotChecklist_3"),
-              ]}
-            />
-          }
-        />
-
-        {/* Location — selectable (no QR) */}
-        <div className='rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2'>
-          <label className='text-sm font-bold text-foreground'>
-            {t("booking.capture.locationLabel")}
-          </label>
+        <CaptureSection step={1} title={t("booking.capture.locationLabel")}>
           <Combobox
             options={sites.map((site) => {
               const unavailable =
@@ -446,7 +354,106 @@ function WalkInCaptureContent() {
           <p className='text-xs text-muted-foreground'>
             {t("booking.capture.locationHelper")}
           </p>
-        </div>
+        </CaptureSection>
+
+        {/* Plate photo + OCR */}
+        <PhotoUploadField
+          id='plate-photo'
+          step={2}
+          kind='plate'
+          label={t("booking.capture.platePhotoLabel")}
+          hint={t("booking.capture.platePhotoGuideline")}
+          state={plateUpload}
+          onSelect={(file, kind) => plateUpload.uploadPhoto({ file, kind })}
+          onRetry={plateUpload.reset}
+          ocrValue={plateText}
+          onOcrChange={setPlateText}
+          ocrLabel={t("booking.capture.plateOcrLabel")}
+          ocrHint={t("booking.capture.plateOcrHint")}
+          ocrPlaceholder={t("booking.capture.platePlaceholder")}
+          guidelines={
+            <PhotoGuidelinesPanel
+              embedded
+              goodSrc='/images/guidelines/plate-good.jpeg'
+              avoidExamples={[
+                {
+                  src: "/images/guidelines/plate-good.jpeg",
+                  label: t("booking.capture.guidelines.avoidBlurry"),
+                  blur: true,
+                },
+                {
+                  src: "/images/guidelines/plate-angled.webp",
+                  label: t("booking.capture.guidelines.avoidAngled"),
+                },
+                {
+                  src: "/images/guidelines/plate-dark.jpeg",
+                  label: t("booking.capture.guidelines.avoidDark"),
+                },
+                {
+                  src: "/images/guidelines/plate-good.jpeg",
+                  label: t("booking.capture.guidelines.avoidObstructed"),
+                  obstructed: true,
+                },
+              ]}
+              checklistItems={[
+                t("booking.capture.guidelines.plateChecklist_0"),
+                t("booking.capture.guidelines.plateChecklist_1"),
+                t("booking.capture.guidelines.plateChecklist_2"),
+                t("booking.capture.guidelines.plateChecklist_3"),
+              ]}
+            />
+          }
+        />
+
+        {/* Slot photo + OCR */}
+        <PhotoUploadField
+          id='slot-photo'
+          step={3}
+          kind='slot'
+          label={t("booking.capture.slotPhotoLabel")}
+          hint={t("booking.capture.slotPhotoGuideline")}
+          state={slotUpload}
+          onSelect={(file, kind) => slotUpload.uploadPhoto({ file, kind })}
+          onRetry={slotUpload.reset}
+          ocrValue={slotText}
+          onOcrChange={setSlotText}
+          ocrLabel={t("booking.capture.slotOcrLabel")}
+          ocrHint={t("booking.capture.slotOcrHint")}
+          ocrPlaceholder={t("booking.capture.slotPlaceholder")}
+          guidelines={
+            <PhotoGuidelinesPanel
+              embedded
+              goodSrc='/images/guidelines/slot-good.webp'
+              avoidExamples={[
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidBlurry"),
+                  blur: true,
+                },
+                {
+                  src: "/images/guidelines/slot-angled.webp",
+                  label: t("booking.capture.guidelines.avoidAngled"),
+                },
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidDark"),
+                  dark: true,
+                },
+                {
+                  src: "/images/guidelines/slot-good.webp",
+                  label: t("booking.capture.guidelines.avoidObstructed"),
+                  obstructed: true,
+                },
+              ]}
+              checklistItems={[
+                t("booking.capture.guidelines.slotChecklist_0"),
+                t("booking.capture.guidelines.slotChecklist_1"),
+                t("booking.capture.guidelines.slotChecklist_2"),
+                t("booking.capture.guidelines.slotChecklist_3"),
+              ]}
+            />
+          }
+        />
 
         {/* Phone */}
         <div className='rounded-2xl border border-border bg-white p-4 shadow-sm space-y-2'>
@@ -518,7 +525,7 @@ function WalkInCaptureContent() {
           </div>
           {loyaltyEnabled && (
             <p className='text-xs text-muted-foreground'>
-              Nomor HP akan digunakan untuk program loyalti Park N Shine
+              {t("booking.capture.phoneLoyalty")}
             </p>
           )}
           <p className='text-xs text-muted-foreground'>
@@ -531,15 +538,23 @@ function WalkInCaptureContent() {
           )}
         </div>
 
-        {/* Continue */}
+        <CaptureStillNeeded
+          plateReady={plateUpload.status === "success"}
+          plateText={plateText}
+          slotReady={slotUpload.status === "success"}
+          slotText={slotText}
+          locationReady={
+            location.length > 0 && sites.some((s) => s.id === location)
+          }
+        />
         <Button
           size='lg'
-          className='w-full rounded-full border-0 bg-linear-to-b from-[#1db1f1] to-[#006289] font-extrabold text-[#eff8fe] shadow-[0_24px_30px_rgba(29,177,241,0.16)] hover:opacity-90'
+          className='w-full'
           disabled={!canContinue}
           suffix={<ArrowRight className='h-4 w-4' />}
           onClick={handleContinue}
         >
-          {t("action.next", { ns: "common" })}
+          {t("booking.capture.continue")}
         </Button>
       </div>
     </AppShell>

@@ -139,7 +139,14 @@
       "backToSummary": "← Kembali ke Ringkasan",
       "viewJobs": "Lihat Detail Job →",
       "photosPurged": "Foto sudah dihapus otomatis sesuai kebijakan retensi 90 hari.",
-      "noPhotosYet": "Belum ada foto untuk booking ini."
+      "noPhotosYet": "Belum ada foto untuk booking ini.",
+      "closeBooking": "Tutup booking",
+      "closeHint": "Status sekarang IN_PROGRESS. Menutup booking mengubahnya menjadi CLOSED.",
+      "closeReasonPlaceholder": "Alasan penutupan",
+      "closeConfirm": "Ya, ubah ke CLOSED",
+      "closeCancel": "Batal",
+      "closeSaving": "Menyimpan...",
+      "closeError": "Gagal mengubah status. Coba lagi."
     },
     "tabs": {
       "summary": "Ringkasan",

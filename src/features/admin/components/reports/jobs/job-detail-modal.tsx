@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Hash, Users, Building2, Clock, Star, Camera, Undo2 } from "lucide-react";
 import api from "@/lib/axios-admin";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import type { ReportBookingRow } from "@/features/admin/types";
 import { bookingRef, cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth-store";
 import {
   BEFORE_TYPES,
   AFTER_TYPES,
@@ -37,13 +38,23 @@ export function JobDetailModal({
 }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [confirmRefund, setConfirmRefund] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
+  const [closeReason, setCloseReason] = useState("");
+  const [closedLocally, setClosedLocally] = useState(false);
   const queryClient = useQueryClient();
+  const role = useAuthStore((state) => state.role);
+  const isSuperAdmin = role === "super_admin";
 
   const refundMutation = useMutation({
-    mutationFn: (bookingId: string) =>
-      api.post(`/v1/admin/bookings/${bookingId}/refund`, {
+    mutationFn: (bookingId: string) => {
+      if (!isSuperAdmin) {
+        throw new Error("Only super admins can issue refunds");
+      }
+
+      return api.post(`/v1/admin/bookings/${bookingId}/refund`, {
         reasonCode: "admin_manual",
-      }),
+      });
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: ["admin", "report-bookings"],
@@ -53,10 +64,50 @@ export function JobDetailModal({
     },
   });
 
+  const closeMutation = useMutation({
+    mutationFn: ({
+      bookingId,
+      reasonCode,
+    }: {
+      bookingId: string;
+      reasonCode: string;
+    }) => {
+      if (!isSuperAdmin) {
+        throw new Error("Only super admins can close a booking");
+      }
+
+      return api.post(`/v1/admin/bookings/${bookingId}/status-override`, {
+        nextStatus: "CLOSED",
+        reasonCode,
+      });
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["admin", "report-bookings"],
+      });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "report"] });
+      setClosedLocally(true);
+      setConfirmClose(false);
+      setCloseReason("");
+    },
+  });
+
+  const resetClose = closeMutation.reset;
+  useEffect(() => {
+    setConfirmClose(false);
+    setCloseReason("");
+    setClosedLocally(false);
+    resetClose();
+  }, [row?.id, resetClose]);
+
   if (!row) return null;
 
-  const canRefund = !!row.paidAt && row.refundedAmount === 0;
+  const canRefund =
+    isSuperAdmin && !!row.paidAt && row.refundedAmount === 0;
   const isRefunded = row.refundedAmount > 0;
+  const displayStatus = closedLocally ? "CLOSED" : row.status;
+  const canClose =
+    isSuperAdmin && displayStatus === "IN_PROGRESS";
 
   const before = row.photos.filter((p) => BEFORE_TYPES.has(p.type));
   const after = row.photos.filter((p) => AFTER_TYPES.has(p.type));
@@ -65,7 +116,7 @@ export function JobDetailModal({
   );
   const viewable = [...before, ...after, ...other];
 
-  const effStatus = row.refundedAmount > 0 ? "REFUNDED" : row.status;
+  const effStatus = row.refundedAmount > 0 ? "REFUNDED" : displayStatus;
   const statusStyle =
     STATUS_STYLES[effStatus] ?? "bg-muted text-muted-foreground";
 
@@ -80,6 +131,8 @@ export function JobDetailModal({
               return;
             }
             setConfirmRefund(false);
+            setConfirmClose(false);
+            setCloseReason("");
             onClose();
           }
         }}
@@ -210,6 +263,67 @@ export function JobDetailModal({
                   >
                     <Undo2 className='h-3.5 w-3.5' />
                     Proses Refund
+                  </button>
+                )}
+              </div>
+            )}
+
+            {canClose && (
+              <div className='rounded-lg border border-border bg-muted/30 px-4 py-3'>
+                {confirmClose ? (
+                  <div className='space-y-2'>
+                    <p className='text-xs text-muted-foreground'>
+                      {t("reports.jobDetail.closeHint")}
+                    </p>
+                    <input
+                      value={closeReason}
+                      onChange={(e) => setCloseReason(e.target.value)}
+                      placeholder={t("reports.jobDetail.closeReasonPlaceholder")}
+                      className='h-8 w-full rounded-md border border-border bg-background px-2 text-xs'
+                    />
+                    <div className='flex gap-2'>
+                      <Button
+                        size='sm'
+                        disabled={
+                          closeMutation.isPending || !closeReason.trim()
+                        }
+                        onClick={() =>
+                          closeMutation.mutate({
+                            bookingId: row.id,
+                            reasonCode: closeReason.trim(),
+                          })
+                        }
+                        className='h-7 text-xs'
+                      >
+                        {closeMutation.isPending
+                          ? t("reports.jobDetail.closeSaving")
+                          : t("reports.jobDetail.closeConfirm")}
+                      </Button>
+                      <Button
+                        size='sm'
+                        variant='ghost'
+                        onClick={() => {
+                          setConfirmClose(false);
+                          setCloseReason("");
+                        }}
+                        className='h-7 text-xs'
+                      >
+                        {t("reports.jobDetail.closeCancel")}
+                      </Button>
+                    </div>
+                    {closeMutation.isError && (
+                      <p className='text-xs text-destructive'>
+                        {t("reports.jobDetail.closeError")}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    type='button'
+                    onClick={() => setConfirmClose(true)}
+                    className='text-xs font-medium text-foreground hover:text-primary transition-colors'
+                  >
+                    {t("reports.jobDetail.closeBooking")}
                   </button>
                 )}
               </div>

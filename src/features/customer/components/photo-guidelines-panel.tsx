@@ -15,23 +15,33 @@ interface PhotoGuidelinesPanelProps {
   goodSrc: string;
   avoidExamples: [AvoidExample, AvoidExample, AvoidExample, AvoidExample];
   checklistItems?: string[];
+  /** Drop the outer card and title when the panel sits inside another disclosure. */
+  embedded?: boolean;
 }
 
 export function PhotoGuidelinesPanel({
   goodSrc,
   avoidExamples,
   checklistItems,
+  embedded = false,
 }: Readonly<PhotoGuidelinesPanelProps>) {
   const { t } = useTranslation("customer");
   return (
-    <div className='rounded-xl border border-border bg-[#f8f9f9] px-4 pt-3 pb-5 shadow-sm space-y-4'>
-      {/* Header */}
-      <div className='flex items-center gap-1.5'>
-        <span className='text-sm font-semibold text-foreground'>
-          {t("booking.capture.guidelines.title")}
-        </span>
-        <Info className='h-3.5 w-3.5 shrink-0 text-muted-foreground' />
-      </div>
+    <div
+      className={
+        embedded
+          ? "space-y-4"
+          : "space-y-4 rounded-xl border border-border bg-[#f8f9f9] px-4 pt-3 pb-5 shadow-sm"
+      }
+    >
+      {!embedded && (
+        <div className='flex items-center gap-1.5'>
+          <span className='text-sm font-semibold text-foreground'>
+            {t("booking.capture.guidelines.title")}
+          </span>
+          <Info className='h-3.5 w-3.5 shrink-0 text-muted-foreground' />
+        </div>
+      )}
 
       {/* Photo examples */}
       <div className='space-y-2.5'>

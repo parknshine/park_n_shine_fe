@@ -10,6 +10,7 @@ import {
   type ConfirmBookingPayloadV2,
 } from "@/features/customer/hooks/use-payment-action-v2";
 import { useTranslation } from "@/i18n";
+import { sanitizePlateOrSlot } from "@/features/customer/utils/plate";
 
 interface PayButtonProps {
   bookingId: string;
@@ -77,7 +78,11 @@ export function PayButton({
     try {
       await api.post(
         `/v1/dev/bookings/${bookingId}/simulate-payment`,
-        { plate: plateText, slot: slotText, ...(phone ? { phone } : {}) },
+        {
+          plate: sanitizePlateOrSlot(plateText),
+          slot: sanitizePlateOrSlot(slotText),
+          ...(phone ? { phone } : {}),
+        },
         { headers: { "X-Booking-Token": signedToken } },
       );
       globalThis.location.assign(

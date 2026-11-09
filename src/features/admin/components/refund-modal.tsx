@@ -21,6 +21,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useBookingActions } from "@/features/admin/hooks";
 import { useTranslation } from "@/i18n";
+import { useAuthStore } from "@/store/auth-store";
 
 const REFUND_REASONS: Array<{ value: string; labelKey: string }> = [
   { value: "Kendaraan tidak ditemukan", labelKey: "vehicleNotFound" },
@@ -51,9 +52,16 @@ export function RefundModal({
   const [reasonCode, setReasonCode] = useState("");
   const { refund, isSubmitting } = useBookingActions(bookingId);
   const { t } = useTranslation("admin");
+  const isSuperAdmin = useAuthStore((state) => state.role === "super_admin");
 
   async function handleConfirm() {
     if (!reasonCode) return;
+    if (!isSuperAdmin) {
+      toast.error(t("refundModal.error"));
+      onClose();
+      return;
+    }
+
     try {
       await refund({ reasonCode });
       setReasonCode("");
@@ -64,7 +72,10 @@ export function RefundModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog
+      open={open && isSuperAdmin}
+      onOpenChange={(o) => !o && onClose()}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("refundModal.title")}</DialogTitle>

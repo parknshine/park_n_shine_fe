@@ -46,6 +46,8 @@ interface PhotoUploadFieldProps {
   showDownload?: boolean;
   /** Content shown as photo-taking guidelines in the idle state */
   guidelines?: ReactNode;
+  /** Step number shown in place of the kind icon, matching the how-to list. */
+  step?: number;
 }
 
 export function PhotoUploadField({
@@ -64,6 +66,7 @@ export function PhotoUploadField({
   ocrPlaceholder,
   showDownload,
   guidelines,
+  step,
 }: Readonly<PhotoUploadFieldProps>) {
   const { t } = useTranslation("customer");
   const defaults = {
@@ -146,19 +149,21 @@ export function PhotoUploadField({
     <div className='rounded-2xl border border-border bg-white p-4 shadow-sm space-y-3'>
       {/* ── Card header ────────────────────────────── */}
       <div className='flex items-center gap-2.5'>
-        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary'>
-          {kind === "plate" ? (
-            <Camera className='h-4 w-4 text-white' />
-          ) : (
-            <Grid3X3 className='h-4 w-4 text-white' />
-          )}
-        </div>
+        {step != null ? (
+          <span className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground'>
+            {step}
+          </span>
+        ) : (
+          <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary'>
+            {kind === "plate" ? (
+              <Camera className='h-4 w-4 text-white' />
+            ) : (
+              <Grid3X3 className='h-4 w-4 text-white' />
+            )}
+          </div>
+        )}
         <span className='text-sm font-bold text-foreground'>{label}</span>
       </div>
-
-      {hint && (
-        <p className='text-xs leading-relaxed text-muted-foreground'>{hint}</p>
-      )}
 
       {/* ── Hidden file inputs ──────────────────── */}
       <input
@@ -182,31 +187,29 @@ export function PhotoUploadField({
       {/* ── Empty state ─────────────────────────── */}
       {!hasPhoto && (
         <div className='space-y-3'>
-          {guidelines}
-          <div className='flex gap-2'>
-            <Button
-              asChild
-              size='sm'
-              variant='outline'
-              className='flex-1 rounded-full'
-            >
-              <label htmlFor={`${id}-camera`} className='cursor-pointer gap-1.5'>
-                <Camera className='h-4 w-4 shrink-0' />
-                {L.upload}
-              </label>
-            </Button>
-            <Button
-              asChild
-              size='sm'
-              variant='outline'
-              className='flex-1 rounded-full'
-            >
-              <label htmlFor={`${id}-gallery`} className='cursor-pointer gap-1.5'>
-                <ImageIcon className='h-4 w-4 shrink-0' />
-                {L.gallery}
-              </label>
-            </Button>
-          </div>
+          {hint && (
+            <p className='text-sm leading-relaxed text-muted-foreground'>{hint}</p>
+          )}
+          <Button asChild size='lg' className='w-full'>
+            <label htmlFor={`${id}-camera`} className='cursor-pointer'>
+              <Camera className='h-4 w-4 shrink-0' />
+              {L.upload}
+            </label>
+          </Button>
+          <Button asChild size='sm' variant='ghost' className='w-full'>
+            <label htmlFor={`${id}-gallery`} className='cursor-pointer'>
+              <ImageIcon className='h-4 w-4 shrink-0' />
+              {L.gallery}
+            </label>
+          </Button>
+          {guidelines && (
+            <details className='rounded-xl border border-border bg-[#f8f9f9] px-3 py-2'>
+              <summary className='cursor-pointer list-none text-xs font-semibold text-primary [&::-webkit-details-marker]:hidden'>
+                {t("booking.capture.seeExample")}
+              </summary>
+              <div className='pt-3'>{guidelines}</div>
+            </details>
+          )}
         </div>
       )}
 

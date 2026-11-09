@@ -13,6 +13,7 @@ import { useBookingStatus, useResolvedWashPrice } from "@/features/customer/hook
 import { useTranslation } from "@/i18n";
 import { useBookingCaptureStore } from "@/store/booking-capture-store";
 import { clearBookingIdempotencyKey } from "@/lib/booking-idempotency";
+import { sanitizePlateOrSlot } from "@/features/customer/utils/plate";
 
 const SKIP_PAYMENT_METHOD_SELECTION =
   process.env.NEXT_PUBLIC_SKIP_PAYMENT_METHOD_SELECTION === "true";
@@ -39,8 +40,10 @@ function WalkInConfirmContent() {
   const addr = searchParams.get("addr");
   const siteId = searchParams.get("siteId");
   const phone = searchParams.get("phone");
-  const plate = searchParams.get("plate");
-  const slot = searchParams.get("slot");
+  const plateParam = searchParams.get("plate");
+  const slotParam = searchParams.get("slot");
+  const plate = plateParam ? sanitizePlateOrSlot(plateParam) : null;
+  const slot = slotParam ? sanitizePlateOrSlot(slotParam) : null;
 
   useEffect(() => {
     if (!bookingId || !token || !plate || !slot) {
