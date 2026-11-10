@@ -60,6 +60,8 @@ export const queryKeys = {
     tipPendingSummary: () => ["admin", "tips", "pending-summary"] as const,
     loyaltyCustomers: (params?: object) =>
       ["admin", "loyalty", "customers", params ?? {}] as const,
+    customerWashes: (customerId: string) =>
+      ["admin", "loyalty", "customers", customerId, "washes"] as const,
     chatConversations: () => ["admin", "chat", "conversations"] as const,
     chatMessages: (conversationId: string) =>
       ["admin", "chat", "conversations", conversationId, "messages"] as const,

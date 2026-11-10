@@ -68,6 +68,30 @@ export function useAdminLoyaltyCustomers(params?: CustomerFilterParams) {
   };
 }
 
+export interface WashedSite {
+  siteName: string | null;
+  closedAt: string | null;
+}
+
+export function useCustomerWashedSites(customerId: string | null) {
+  const query = useQuery({
+    queryKey: queryKeys.admin.customerWashes(customerId ?? ""),
+    enabled: Boolean(customerId),
+    queryFn: async () => {
+      const res = await api.get<{ washes: WashedSite[] }>(
+        `/v1/admin/loyalty/customers/${customerId}/washes`,
+      );
+      return res.data.washes;
+    },
+  });
+
+  return {
+    washes: query.data ?? [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
+}
+
 export function useDeleteCustomer() {
   const queryClient = useQueryClient();
 
