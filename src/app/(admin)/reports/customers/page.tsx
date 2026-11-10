@@ -12,6 +12,7 @@ import {
   Check,
   Hash,
   RefreshCw,
+  MapPin,
 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   useAdminLoyaltyCustomers,
+  useCustomerWashedSites,
   useDeleteCustomer,
   type LoyaltyCustomer,
 } from "@/features/admin/hooks/use-admin-loyalty";
@@ -79,6 +81,12 @@ export default function CustomersReportPage() {
   const isSuperAdmin = useAuthStore((s) => s.role === "super_admin");
   const { deleteCustomer, isDeleting } = useDeleteCustomer();
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [washCustomer, setWashCustomer] = useState<LoyaltyCustomer | null>(null);
+  const {
+    washes,
+    isLoading: washesLoading,
+    isError: washesError,
+  } = useCustomerWashedSites(washCustomer?.id ?? null);
 
   // Staged filter state (pending Apply)
   const [searchInput, setSearchInput] = useState("");
@@ -185,9 +193,22 @@ export default function CustomersReportPage() {
       id: "washCount",
       header: "Cuci",
       meta: { align: "right" },
-      cell: ({ row }) => (
-        <span className="font-mono text-xs">{row.original.washCount}</span>
-      ),
+      cell: ({ row }) => {
+        const count = row.original.washCount;
+        if (count <= 0) {
+          return <span className="font-mono text-xs text-muted-foreground">0</span>;
+        }
+        return (
+          <button
+            type="button"
+            onClick={() => setWashCustomer(row.original)}
+            className="font-mono text-xs font-semibold text-primary underline decoration-primary/40 underline-offset-2 hover:decoration-primary"
+            title="Lihat lokasi yang sudah dicuci"
+          >
+            {count}
+          </button>
+        );
+      },
     },
     {
       id: "bookingCount",
@@ -467,6 +488,56 @@ export default function CustomersReportPage() {
           </>
         )}
       />
+
+      <Dialog
+        open={washCustomer !== null}
+        onOpenChange={(open) => {
+          if (!open) setWashCustomer(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Lokasi yang sudah dicuci</DialogTitle>
+            <DialogDescription>
+              {washCustomer?.name || washCustomer?.phone || washCustomer?.email || "Pelanggan"}
+              {" · "}
+              {washCustomer?.washCount ?? 0}× cuci
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-72 overflow-y-auto">
+            {washesLoading ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">Memuat lokasi...</p>
+            ) : washesError ? (
+              <p className="py-6 text-center text-sm text-destructive">Gagal memuat lokasi cuci.</p>
+            ) : washes.length === 0 ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                Belum ada lokasi cuci yang tercatat.
+              </p>
+            ) : (
+              <ul className="divide-y divide-border">
+                {washes.map((wash, index) => (
+                  <li key={`${wash.siteName ?? "unknown"}-${wash.closedAt ?? index}`} className="flex items-start gap-2 py-2.5">
+                    <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground">
+                        {wash.siteName ?? "Lokasi tidak diketahui"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDate(wash.closedAt, { withTime: true })}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setWashCustomer(null)}>
+              Tutup
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete confirm dialog */}
       <Dialog
